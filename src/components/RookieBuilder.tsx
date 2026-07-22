@@ -8,7 +8,6 @@ import {
   Pencil,
   RefreshCw,
   Shuffle,
-  Sparkles,
   Unlock,
   UserRound,
   UsersRound,
@@ -901,7 +900,6 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   const [body, setBody] = useState<BodySettings>(() => createBodySettings("PG", Date.now()));
   const [settingsLocked, setSettingsLocked] = useState(false);
   const [locks, setLocks] = useState<LockState>({});
-  const [drawSeed, setDrawSeed] = useState(() => Date.now());
   const [round, setRound] = useState<TeamRound>(() => createRound(teams, Date.now()));
   const [isTeamDrawing, setIsTeamDrawing] = useState(false);
   const [drawingTeamName, setDrawingTeamName] = useState<string | null>(null);
@@ -1103,7 +1101,6 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     drawIntervalRef.current = window.setInterval(() => setDrawingTeamName(nextPreviewName()), 190);
     drawTimeoutRef.current = window.setTimeout(() => {
       clearTeamDrawTimers();
-      setDrawSeed(seed);
       setRound(nextRound);
       setDrawingTeamName(null);
       setIsTeamDrawing(false);
@@ -1172,53 +1169,10 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     finishLock({ ...locks, [customizingBundle.id]: { kind: "custom", values } });
   };
 
-  const autoComplete = () => {
-    if (!settingsLocked || isTeamDrawing || isComplete) return;
-    const nextLocks = { ...locks };
-    const used = new Set(Object.values(nextLocks).flatMap((lock) => {
-      if (lock.kind !== "player") return [];
-      const player = playersById.get(lock.playerId);
-      return player ? [playerIdentity(player)] : [];
-    }));
-    let seed = drawSeed;
-    let previousTeam = round.teamId;
-    let nextRound = round;
-    let useCurrentTeam = true;
-    for (const bundle of bundles) {
-      if (nextLocks[bundle.id]) continue;
-      if (!useCurrentTeam) {
-        seed += 1;
-        nextRound = createRound(teams, seed, previousTeam);
-      }
-      useCurrentTeam = false;
-      previousTeam = nextRound.teamId;
-      const nextTeam = teamsById.get(nextRound.teamId);
-      if (!nextTeam) continue;
-      const candidates = nextRound.playerOrder
-        .map((id) => playersById.get(id))
-        .filter((player): player is PlayerSource => Boolean(player))
-        .filter((player) => !used.has(playerIdentity(player)))
-        .sort((left, right) => evaluate(right, bundle, position, secondaryPosition, body).adjusted - evaluate(left, bundle, position, secondaryPosition, body).adjusted);
-      const winner = candidates[0];
-      if (!winner) continue;
-      const id = playerId(winner);
-      used.add(playerIdentity(winner));
-      nextLocks[bundle.id] = { kind: "player", playerId: id };
-    }
-    const nextIsComplete = Object.keys(nextLocks).length === bundles.length;
-    setDrawSeed(seed);
-    setRound(nextRound);
-    setLocks(nextLocks);
-    setSelectedPlayerId(null);
-    setStatus(nextIsComplete ? `${isPrime ? "巅峰球员" : "新秀"}已揭晓` : `可用球员不足，已补齐 ${Object.keys(nextLocks).length}/${bundles.length} 项属性`);
-    setMobilePane(nextIsComplete ? "result" : "players");
-  };
-
   const reset = () => {
     const seed = Date.now();
     clearTeamDrawTimers();
     setRookieName(generateRookieName());
-    setDrawSeed(seed);
     setRound(createRound(teams, seed));
     setSettingsLocked(false);
     setIsTeamDrawing(false);
@@ -1444,13 +1398,10 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
               </div>
             </div>
             <div className="flex w-full items-stretch gap-2" aria-label="设定操作">
-              <div className="flex min-w-0 flex-[2] gap-2" aria-label="生成流程操作" role="group">
-                {!settingsLocked && <button className="action-button primary-action flex-1 justify-center px-2.5 py-2 text-[11px] font-semibold" onClick={confirmSettings} type="button"><Check className="h-3.5 w-3.5" />确认设定</button>}
-                <button className="action-button flex-1 justify-center px-2.5 py-2 text-[11px]" disabled={!settingsLocked || isTeamDrawing || isComplete} onClick={autoComplete} type="button"><Sparkles className="h-3.5 w-3.5" />自动补齐</button>
-              </div>
-              <div className="flex min-w-0 flex-1 border-l border-ink-200 pl-2" aria-label="重置操作" role="group">
-                <button className="action-button flex-1 justify-center px-2.5 py-2 text-[11px]" onClick={reset} type="button"><RefreshCw className="h-3.5 w-3.5" />重新开始</button>
-              </div>
+              {!settingsLocked && (
+                <button className="action-button primary-action flex-[3] justify-center px-2.5 py-2 text-[11px] font-semibold" onClick={confirmSettings} type="button"><Check className="h-3.5 w-3.5" />确认设定并抽取球队</button>
+              )}
+              <button className={`action-button justify-center px-2.5 py-2 text-[11px] ${settingsLocked ? "flex-1" : "flex-[1]"}`} onClick={reset} type="button"><RefreshCw className="h-3.5 w-3.5" />重新开始</button>
             </div>
           </div>
         </div>
@@ -1561,7 +1512,6 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             </div>
             {settingsLocked && !isComplete && (
               <div className="flex items-center gap-1.5">
-                <button className="action-button px-2 py-1.5 text-[10px] lg:hidden" disabled={isTeamDrawing} onClick={autoComplete} type="button"><Sparkles className="h-3 w-3" />自动补齐</button>
                 <button className="action-button px-2 py-1.5 text-[10px]" disabled={isTeamDrawing || switchesLeft <= 0 || !hasNextBatch} onClick={switchPlayers} title="仅在当前球队内换下一批球员，不会重新抽取球队" type="button"><UsersRound className="h-3 w-3" />换球员 {switchesLeft}</button>
               </div>
             )}
