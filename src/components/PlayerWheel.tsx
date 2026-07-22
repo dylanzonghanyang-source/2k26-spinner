@@ -16,19 +16,19 @@ type PlayerWheelProps = {
 };
 
 const SEGMENT_COLORS_ABILITY = [
-  "rgba(92,169,156,0.9)",
-  "rgba(96,146,193,0.9)",
-  "rgba(194,128,98,0.88)",
-  "rgba(88,177,128,0.88)",
-  "rgba(148,125,190,0.86)",
-  "rgba(209,171,89,0.84)",
+  "#4f8f78",
+  "#557da4",
+  "#bf755b",
+  "#6c8d55",
+  "#8a6c9f",
+  "#b39143",
 ];
 
 const SEGMENT_COLORS_PHYSICAL = [
-  "rgba(83,159,149,0.9)",
-  "rgba(91,139,184,0.9)",
-  "rgba(190,127,92,0.88)",
-  "rgba(72,157,132,0.88)",
+  "#3e7f72",
+  "#607ea0",
+  "#b46850",
+  "#6a8f62",
 ];
 
 const MAX_LABELS = 28;
@@ -96,13 +96,13 @@ function PlayerWheel({
   }, [count, isPhysical, items]);
 
   return (
-    <div className="flex flex-1 flex-col justify-center gap-3">
-      <div className="relative mx-auto aspect-square w-full max-w-[440px]" aria-live="polite">
+    <div className="flex flex-1 flex-col justify-start gap-3 pt-4 sm:pt-6">
+      <div className="relative mx-auto aspect-square w-full max-w-[430px]" aria-live="polite">
         <div className="absolute left-1/2 top-0 z-30 -translate-x-1/2 -translate-y-1">
-          <ChevronDown className="h-8 w-8 text-court-700 drop-shadow-[0_3px_8px_rgba(31,73,86,0.28)]" />
+          <ChevronDown className="h-8 w-8 fill-white text-ink-900 drop-shadow-[0_2px_2px_rgba(32,32,29,0.18)]" />
         </div>
 
-        <div className="absolute inset-0 rounded-full border border-ink-700/10 bg-white/80 p-[3%] shadow-glow">
+        <div className="absolute inset-0 rounded-full border border-ink-300 bg-ink-50 p-[3%] shadow-glow">
           <div
             className="relative h-full w-full overflow-hidden rounded-full transition-transform duration-[4200ms]"
             style={{
@@ -113,8 +113,7 @@ function PlayerWheel({
                 : "ease-out",
             }}
           >
-            <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.18),transparent_28%,rgba(255,255,255,0.08)_62%,rgba(23,43,48,0.13)_100%)]" />
-            <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/60" />
+            <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-black/10" />
 
             {visibleLabels.map(({ item, index }) => {
               const angle = index * segmentDeg + segmentDeg / 2;
@@ -134,7 +133,7 @@ function PlayerWheel({
                     transform: `translate(-50%, -50%) rotate(${labelRotation}deg)`,
                   }}
                 >
-                  <span className="block max-w-[120px] truncate rounded border border-ink-700/10 bg-white/88 px-3 py-1 text-center text-[12px] font-semibold leading-none text-ink-900 shadow-sm backdrop-blur">
+                  <span className="block max-w-[120px] truncate rounded-[4px] border border-ink-300 bg-white px-2.5 py-1 text-center text-[11px] font-semibold leading-none text-ink-900 shadow-[0_1px_2px_rgba(32,32,29,0.1)]">
                     {item.label}
                   </span>
                 </div>
@@ -142,12 +141,12 @@ function PlayerWheel({
             })}
           </div>
 
-          <div className="absolute inset-[36%] flex items-center justify-center rounded-full border border-ink-700/10 bg-[radial-gradient(circle,rgba(255,255,255,0.98),rgba(226,246,240,0.96))] shadow-[0_10px_24px_rgba(31,73,86,0.18)]">
+          <div className="absolute inset-[36%] flex items-center justify-center rounded-full border border-ink-300 bg-white shadow-[0_4px_12px_rgba(32,32,29,0.14)]">
             {isPhysical ? (
               <div className="flex w-[88%] flex-col items-center text-center">
                 <div className="max-w-full truncate text-[20px] font-semibold text-ink-900 tabular-nums">{currentLabel ?? "--"}</div>
                 <button
-                  className="mt-1 inline-flex min-h-6 items-center justify-center rounded-full border border-court-600/20 bg-court-50 px-2.5 text-[10px] font-semibold text-court-900 shadow-sm transition hover:bg-court-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="mt-1 inline-flex min-h-6 items-center justify-center rounded-full border border-ink-900 bg-ink-900 px-2.5 text-[10px] font-semibold text-white shadow-sm transition hover:bg-ink-700 disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={!canSpin}
                   onClick={onSpin}
                   type="button"
@@ -158,7 +157,7 @@ function PlayerWheel({
             ) : (
               <div className="flex flex-col items-center gap-1">
                 <button
-                  className="inline-flex min-h-14 min-w-14 items-center justify-center rounded-full border border-court-600/20 bg-court-50 px-2 text-[12px] font-semibold text-court-900 shadow-[0_10px_24px_rgba(31,73,86,0.16)] transition hover:scale-[1.03] hover:bg-court-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex min-h-14 min-w-14 items-center justify-center rounded-full border border-ink-900 bg-ink-900 px-2 text-[12px] font-semibold text-white shadow-[0_3px_8px_rgba(32,32,29,0.2)] transition hover:scale-[1.02] hover:bg-ink-700 disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={!canSpin}
                   onClick={onSpin}
                   type="button"
@@ -171,7 +170,7 @@ function PlayerWheel({
         </div>
       </div>
 
-      <div className="mx-auto min-h-5 max-w-[420px] truncate text-center text-[11px] font-medium text-ink-500">
+      <div className="mx-auto min-h-5 max-w-[420px] truncate text-center font-mono text-[9px] font-medium text-ink-500">
         {count > 0 ? `${activeGroupName} · ${statusLabel} · ${count} 个选项` : emptyText}
       </div>
     </div>

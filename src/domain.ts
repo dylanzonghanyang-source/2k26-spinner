@@ -1,6 +1,11 @@
 export type PlayerSource = {
+  id?: string;
   name: string;
   slug?: string;
+  rosterCategory?: "current" | "classic" | "allTime";
+  rosterTeam?: string;
+  isEstimated?: boolean;
+  badges?: PlayerBadge[];
   overall?: number | null;
   team?: string | null;
   position?: string | null;
@@ -24,6 +29,26 @@ export type WheelItem = {
 
 export type AttributeGroupKey = "shooting" | "athleticism" | "playmaking" | "defense" | "inside";
 
+export type BadgeTier = "Bronze" | "Silver" | "Gold" | "HOF";
+export type BadgeCategory = AttributeGroupKey | "general" | "rebounding";
+export type PlayerBadge = {
+  name: string;
+  category: BadgeCategory;
+  tier: BadgeTier;
+};
+
+export type CareerStage = "rookie" | "prime";
+export type RookieTier = "rotation" | "lottery" | "generational";
+export type CareerProfile = {
+  stage: CareerStage;
+  rookieTier: RookieTier;
+};
+
+export const defaultCareerProfile: CareerProfile = {
+  stage: "rookie",
+  rookieTier: "lottery",
+};
+
 export type SourceMap = Record<AttributeGroupKey, PlayerSource>;
 
 export type BodyTemplate = {
@@ -40,6 +65,12 @@ export type PlayerDraft = {
   weight: number | null;
   wingspan: string;
   shoulderWidth: string;
+  careerStage: CareerStage;
+  rookieTier: RookieTier;
+  potential: number;
+  badges: PlayerBadge[];
+  peakBadges: PlayerBadge[];
+  badgesEstimated: boolean;
   sourceNames: string[];
   // Category totals
   shooting: number;
@@ -154,7 +185,23 @@ export const attrNameCN: Record<string, string> = {
   "Hands": "\u63a5\u7403",
   "Offensive Rebound": "\u8fdb\u653b\u7bee\u677f",
   "Defensive Rebound": "\u9632\u5b88\u7bee\u677f",
-  "Intangibles": "\u9690\u85cf\u5c5e\u6027"
+  "Intangibles": "\u7efc\u8bc4\u8865\u507f",
+  "Potential": "\u6f5c\u529b",
+  "Head Durability": "\u5934\u90e8\u8010\u4e45",
+  "Neck Durability": "\u9888\u90e8\u8010\u4e45",
+  "Back Durability": "\u80cc\u90e8\u8010\u4e45",
+  "Left Shoulder Durability": "\u5de6\u80a9\u8010\u4e45",
+  "Right Shoulder Durability": "\u53f3\u80a9\u8010\u4e45",
+  "Left Elbow Durability": "\u5de6\u8098\u8010\u4e45",
+  "Right Elbow Durability": "\u53f3\u8098\u8010\u4e45",
+  "Left Hip Durability": "\u5de6\u9acb\u5173\u8282\u8010\u4e45",
+  "Right Hip Durability": "\u53f3\u9acb\u5173\u8282\u8010\u4e45",
+  "Left Knee Durability": "\u5de6\u819d\u8010\u4e45",
+  "Right Knee Durability": "\u53f3\u819d\u8010\u4e45",
+  "Left Ankle Durability": "\u5de6\u8e1d\u5173\u8282\u8010\u4e45",
+  "Right Ankle Durability": "\u53f3\u8e1d\u5173\u8282\u8010\u4e45",
+  "Left Foot Durability": "\u5de6\u811a\u8010\u4e45",
+  "Right Foot Durability": "\u53f3\u811a\u8010\u4e45"
 };
 
 
@@ -240,9 +287,11 @@ export function getWheelPointerIndex(rotation: number, itemCount: number): numbe
 }
 
 export function availablePlayers(selectedNames: string[], pool: PlayerSource[]) {
-  const picks = pool.filter((player) => selectedNames.includes(player.name));
-  if (picks.length > 0) return picks;
-  return pool.filter((p) => p.detailed && Object.keys(p.detailed).length > 0);
+  return pool.filter((player) => selectedNames.includes(playerSourceKey(player)));
+}
+
+export function playerSourceKey(player: PlayerSource): string {
+  return player.id ?? player.slug ?? player.name;
 }
 
 
@@ -280,7 +329,11 @@ export function normalizeSourceMap(
   };
 }
 
-export function createDraftFromSources(sources: SourceMap, body: BodyTemplate): PlayerDraft {
+export function createDraftFromSources(
+  sources: SourceMap,
+  body: BodyTemplate,
+  profile: CareerProfile = defaultCareerProfile,
+): PlayerDraft {
   const sourceNames = attributeGroups.map(({ key }) => sources[key].name);
   const bias = bodyBiasByPosition[body.position] ?? { speed: 0, vertical: 0, strength: 0, handle: 0, shooting: 0, athleticism: 0, playmaking: 0, defense: 0, inside: 0 };
 
@@ -294,8 +347,14 @@ export function createDraftFromSources(sources: SourceMap, body: BodyTemplate): 
     return typeof val === "number" ? val : null;
   };
 
-  return {
+  const peakDraft: PlayerDraft = {
     ...body,
+    careerStage: profile.stage,
+    rookieTier: profile.rookieTier,
+    potential: 0,
+    badges: [],
+    peakBadges: [],
+    badgesEstimated: false,
     shooting: clamp(blended("shooting", ["shooting", "playmaking", "athleticism"]) + bias.shooting + randomOffset(4), 55, 99),
     athleticism: clamp(blended("athleticism", ["athleticism", "defense"]) + bias.athleticism + randomOffset(4), 55, 99),
     playmaking: clamp(blended("playmaking", ["playmaking", "shooting"]) + bias.playmaking + randomOffset(4), 55, 99),
@@ -339,6 +398,192 @@ export function createDraftFromSources(sources: SourceMap, body: BodyTemplate): 
     intangibles: inheritDetail("Intangibles", "shooting"),
     sourceNames
   };
+
+  return applyCareerProfile(peakDraft, sources, profile);
+}
+
+const badgeTierRank: Record<BadgeTier, number> = {
+  Bronze: 1,
+  Silver: 2,
+  Gold: 3,
+  HOF: 4,
+};
+
+const badgeTierByRank: Record<number, BadgeTier> = {
+  1: "Bronze",
+  2: "Silver",
+  3: "Gold",
+  4: "HOF",
+};
+
+function applyCareerProfile(draft: PlayerDraft, sources: SourceMap, profile: CareerProfile): PlayerDraft {
+  const peakBadges = buildPeakBadges(sources);
+  const peakScore = Math.round((draft.shooting + draft.athleticism + draft.playmaking + draft.defense + draft.inside) / 5);
+  const potential = calculatePotential(peakScore, profile.rookieTier);
+
+  if (profile.stage === "prime") {
+    return {
+      ...draft,
+      careerStage: "prime",
+      potential,
+      badges: peakBadges.badges,
+      peakBadges: peakBadges.badges,
+      badgesEstimated: peakBadges.estimated,
+    };
+  }
+
+  const next = { ...draft } as Record<string, unknown>;
+  for (const key of rookieRatingKeys) {
+    const rating = next[key];
+    if (typeof rating !== "number") continue;
+    next[key] = rookieRating(rating, key, profile.rookieTier);
+  }
+
+  return {
+    ...(next as PlayerDraft),
+    careerStage: "rookie",
+    potential,
+    badges: downgradeBadges(peakBadges.badges, profile.rookieTier),
+    peakBadges: peakBadges.badges,
+    badgesEstimated: peakBadges.estimated,
+  };
+}
+
+function calculatePotential(peakScore: number, tier: RookieTier): number {
+  const config = {
+    rotation: { floor: 74, scale: 0.48, cap: 86 },
+    lottery: { floor: 82, scale: 0.62, cap: 93 },
+    generational: { floor: 88, scale: 0.72, cap: 98 },
+  }[tier];
+  return clamp(Math.round(config.floor + Math.max(0, peakScore - 68) * config.scale), config.floor, config.cap);
+}
+
+const physicalRatingKeys = new Set([
+  "athleticism", "speed", "agility", "vertical", "strength", "hustle", "stamina", "overallDurability",
+  "drivingDunk", "standingDunk", "block", "offensiveRebound", "defensiveRebound",
+]);
+
+const mentalRatingKeys = new Set([
+  "offensiveConsistency", "shotIQ", "passVision", "passIQ", "passPerception", "defensiveConsistency", "helpDefenseIQ", "intangibles",
+]);
+
+const rookieRatingKeys = [
+  "shooting", "athleticism", "playmaking", "defense", "inside",
+  "closeShot", "midRangeShot", "threePointShot", "freeThrow", "offensiveConsistency", "shotIQ",
+  "speed", "agility", "vertical", "strength", "hustle", "stamina", "overallDurability",
+  "ballHandle", "speedWithBall", "passAccuracy", "passVision", "passIQ",
+  "block", "steal", "passPerception", "interiorDefense", "perimeterDefense", "defensiveConsistency", "helpDefenseIQ",
+  "layup", "drivingDunk", "standingDunk", "postHook", "postFade", "postControl", "drawFoul", "hands", "offensiveRebound", "defensiveRebound", "intangibles",
+];
+
+function rookieRating(value: number, key: string, tier: RookieTier): number {
+  const config = {
+    rotation: { technical: 0.48, physical: 0.61, mental: 0.39, cap: 78 },
+    lottery: { technical: 0.59, physical: 0.71, mental: 0.5, cap: 85 },
+    generational: { technical: 0.69, physical: 0.8, mental: 0.61, cap: 90 },
+  }[tier];
+  const multiplier = physicalRatingKeys.has(key)
+    ? config.physical
+    : mentalRatingKeys.has(key)
+      ? config.mental
+      : config.technical;
+  const baseline = physicalRatingKeys.has(key) ? 54 : mentalRatingKeys.has(key) ? 50 : 52;
+  return clamp(Math.round(baseline + (value - baseline) * multiplier), 25, config.cap);
+}
+
+function buildPeakBadges(sources: SourceMap): { badges: PlayerBadge[]; estimated: boolean } {
+  const result: PlayerBadge[] = [];
+  let estimated = false;
+
+  for (const group of attributeGroups) {
+    const source = sources[group.key];
+    const exact = source.badges?.filter((badge) => badgeMatchesGroup(badge, group.key)) ?? [];
+    if (exact.length > 0) {
+      result.push(...exact);
+    } else {
+      estimated = true;
+      result.push(...inferBadges(source, group.key));
+    }
+  }
+
+  const unique = new Map<string, PlayerBadge>();
+  for (const badge of result) {
+    const existing = unique.get(badge.name);
+    if (!existing || badgeTierRank[badge.tier] > badgeTierRank[existing.tier]) {
+      unique.set(badge.name, badge);
+    }
+  }
+
+  return {
+    badges: [...unique.values()].sort((left, right) => badgeTierRank[right.tier] - badgeTierRank[left.tier] || left.name.localeCompare(right.name)),
+    estimated,
+  };
+}
+
+function badgeMatchesGroup(badge: PlayerBadge, group: AttributeGroupKey): boolean {
+  if (badge.category === group) return true;
+  if (badge.category === "general") return group === "shooting" || group === "athleticism";
+  if (badge.category === "rebounding") return group === "defense" || group === "inside";
+  return false;
+}
+
+function inferBadges(source: PlayerSource, group: AttributeGroupKey): PlayerBadge[] {
+  const detail = source.detailed;
+  const rating = (key: string, fallback = source[group] ?? 60) => detail[key] ?? fallback;
+  const makeBadge = (name: string, category: BadgeCategory, score: number): PlayerBadge => ({
+    name,
+    category,
+    tier: score >= 96 ? "HOF" : score >= 89 ? "Gold" : score >= 80 ? "Silver" : "Bronze",
+  });
+
+  if (group === "shooting") {
+    return [
+      makeBadge("Set Shot Specialist", "shooting", rating("Three-Point Shot")),
+      makeBadge("Deadeye", "shooting", rating("Mid-Range Shot")),
+      ...(rating("Three-Point Shot") >= 82 ? [makeBadge("Limitless Range", "shooting", rating("Three-Point Shot") - 3)] : []),
+      ...(rating("Ball Handle") >= 78 ? [makeBadge("Shifty Shooter", "shooting", rating("Ball Handle"))] : []),
+    ];
+  }
+  if (group === "inside") {
+    return [
+      makeBadge("Physical Finisher", "inside", rating("Layup")),
+      makeBadge("Posterizer", "inside", rating("Driving Dunk")),
+      ...(rating("Standing Dunk") >= 70 ? [makeBadge("Rise Up", "inside", rating("Standing Dunk"))] : []),
+    ];
+  }
+  if (group === "playmaking") {
+    return [
+      makeBadge("Handles For Days", "playmaking", rating("Ball Handle")),
+      makeBadge("Dimer", "playmaking", rating("Pass Accuracy")),
+      makeBadge("Unpluckable", "playmaking", rating("Ball Handle") - 3),
+    ];
+  }
+  if (group === "defense") {
+    return [
+      makeBadge("Challenger", "defense", rating("Perimeter Defense")),
+      makeBadge("Interceptor", "defense", rating("Pass Perception")),
+      makeBadge("Paint Patroller", "defense", rating("Block")),
+    ];
+  }
+  return [
+    makeBadge("Lightning Launch", "athleticism", rating("Speed with Ball", source.athleticism ?? 60)),
+    makeBadge("Aerial Wizard", "athleticism", rating("Vertical", source.athleticism ?? 60)),
+  ];
+}
+
+function downgradeBadges(badges: PlayerBadge[], tier: RookieTier): PlayerBadge[] {
+  const config = {
+    rotation: { drop: 2, limit: 3 },
+    lottery: { drop: 1, limit: 5 },
+    generational: { drop: 1, limit: 7 },
+  }[tier];
+
+  return badges
+    .slice(0, config.limit)
+    .map((badge) => ({
+      ...badge,
+      tier: badgeTierByRank[Math.max(1, badgeTierRank[badge.tier] - config.drop)],
+    }));
 }
 
 function randomOffset(range: number) {
@@ -346,7 +591,7 @@ function randomOffset(range: number) {
 }
 
 function ensurePoolMember(candidate: PlayerSource | undefined, pool: PlayerSource[]) {
-  if (candidate && pool.some((player) => player.name === candidate.name)) {
+  if (candidate && pool.some((player) => playerSourceKey(player) === playerSourceKey(candidate))) {
     return candidate;
   }
 

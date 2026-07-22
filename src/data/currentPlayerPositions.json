@@ -1,0 +1,3697 @@
+{
+  "version": "NBA 2K26 Play Now positions",
+  "generatedAt": "2026-07-22T05:55:37.435Z",
+  "sources": {
+    "nba2klab": "https://www.nba2klab.com/.netlify/functions/player-roster",
+    "nbaOfficial": "https://www.nba.com/players",
+    "fallback": "https://www.2kratings.com/current-teams"
+  },
+  "summary": {
+    "currentTeams": 30,
+    "currentPlayers": 522,
+    "nba2klabMatches": 458,
+    "manualOverrides": 6,
+    "fallbackRecords": 58
+  },
+  "players": [
+    {
+      "id": "jalen-johnson",
+      "name": "Jalen Johnson",
+      "team": "Atlanta Hawks",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "nickeil-alexander-walker",
+      "name": "Nickeil Alexander-Walker",
+      "team": "Atlanta Hawks",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cj-mccollum",
+      "name": "CJ McCollum",
+      "team": "Atlanta Hawks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dyson-daniels",
+      "name": "Dyson Daniels",
+      "team": "Atlanta Hawks",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "onyeka-okongwu",
+      "name": "Onyeka Okongwu",
+      "team": "Atlanta Hawks",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "luguentz-dort",
+      "name": "Luguentz Dort",
+      "team": "Atlanta Hawks",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jock-landale",
+      "name": "Jock Landale",
+      "team": "Atlanta Hawks",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "aaron-wiggins",
+      "name": "Aaron Wiggins",
+      "team": "Atlanta Hawks",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "devin-carter",
+      "name": "Devin Carter",
+      "team": "Atlanta Hawks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "corey-kispert",
+      "name": "Corey Kispert",
+      "team": "Atlanta Hawks",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "buddy-hield",
+      "name": "Buddy Hield",
+      "team": "Atlanta Hawks",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "asa-newell",
+      "name": "Asa Newell",
+      "team": "Atlanta Hawks",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ryan-nembhard",
+      "name": "Ryan Nembhard",
+      "team": "Atlanta Hawks",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "mouhamed-gueye",
+      "name": "Mouhamed Gueye",
+      "team": "Atlanta Hawks",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tony-bradley-jr",
+      "name": "Tony Bradley",
+      "team": "Atlanta Hawks",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "gabe-vincent",
+      "name": "Gabe Vincent",
+      "team": "Atlanta Hawks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "christian-koloko",
+      "name": "Christian Koloko",
+      "team": "Atlanta Hawks",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "keaton-wallace",
+      "name": "Keaton Wallace",
+      "team": "Atlanta Hawks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "rayj-dennis",
+      "name": "RayJ Dennis",
+      "team": "Atlanta Hawks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "keshon-gilbert",
+      "name": "Keshon Gilbert",
+      "team": "Atlanta Hawks",
+      "position": "SG/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "jayson-tatum",
+      "name": "Jayson Tatum",
+      "team": "Boston Celtics",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "derrick-white",
+      "name": "Derrick White",
+      "team": "Boston Celtics",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "paul-george",
+      "name": "Paul George",
+      "team": "Boston Celtics",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "payton-pritchard",
+      "name": "Payton Pritchard",
+      "team": "Boston Celtics",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "neemias-queta",
+      "name": "Neemias Queta",
+      "team": "Boston Celtics",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "mitchell-robinson",
+      "name": "Mitchell Robinson",
+      "team": "Boston Celtics",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "luka-garza",
+      "name": "Luka Garza",
+      "team": "Boston Celtics",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "sam-hauser",
+      "name": "Sam Hauser",
+      "team": "Boston Celtics",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "mike-conley",
+      "name": "Mike Conley",
+      "team": "Boston Celtics",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jordan-walsh",
+      "name": "Jordan Walsh",
+      "team": "Boston Celtics",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "baylor-scheierman",
+      "name": "Baylor Scheierman",
+      "team": "Boston Celtics",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "hugo-gonzalez",
+      "name": "Hugo Gonzalez",
+      "team": "Boston Celtics",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ron-harper-jr",
+      "name": "Ron Harper Jr.",
+      "team": "Boston Celtics",
+      "position": "SF/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "amari-williams",
+      "name": "Amari Williams",
+      "team": "Boston Celtics",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "john-tonje",
+      "name": "John Tonje",
+      "team": "Boston Celtics",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "max-shulga",
+      "name": "Max Shulga",
+      "team": "Boston Celtics",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "michael-porter-jr",
+      "name": "Michael Porter Jr.",
+      "team": "Brooklyn Nets",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "julius-randle",
+      "name": "Julius Randle",
+      "team": "Brooklyn Nets",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dayron-sharpe",
+      "name": "Day’Ron Sharpe",
+      "team": "Brooklyn Nets",
+      "position": "C",
+      "source": "2kratings"
+    },
+    {
+      "id": "egor-demin",
+      "name": "Egor Demin",
+      "team": "Brooklyn Nets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "josh-minott",
+      "name": "Josh Minott",
+      "team": "Brooklyn Nets",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "moritz-wagner",
+      "name": "Moritz Wagner",
+      "team": "Brooklyn Nets",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "danny-wolf",
+      "name": "Danny Wolf",
+      "team": "Brooklyn Nets",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "keon-ellis",
+      "name": "Keon Ellis",
+      "team": "Brooklyn Nets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "nolan-traore",
+      "name": "Nolan Traore",
+      "team": "Brooklyn Nets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "noah-clowney",
+      "name": "Noah Clowney",
+      "team": "Brooklyn Nets",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "terance-mann",
+      "name": "Terance Mann",
+      "team": "Brooklyn Nets",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ochai-agbaji",
+      "name": "Ochai Agbaji",
+      "team": "Brooklyn Nets",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ben-saraf",
+      "name": "Ben Saraf",
+      "team": "Brooklyn Nets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jalen-wilson",
+      "name": "Jalen Wilson",
+      "team": "Brooklyn Nets",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "drake-powell",
+      "name": "Drake Powell",
+      "team": "Brooklyn Nets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "chaney-johnson",
+      "name": "Chaney Johnson",
+      "team": "Brooklyn Nets",
+      "position": "SG/SF",
+      "source": "nba-official",
+      "reason": "NBA official roster lists Johnson as guard-forward.",
+      "evidence": [
+        "https://www.nba.com/player/1643052/chaney-johnson"
+      ]
+    },
+    {
+      "id": "tyson-etienne",
+      "name": "Tyson Etienne",
+      "team": "Brooklyn Nets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "malachi-smith",
+      "name": "Malachi Smith",
+      "team": "Brooklyn Nets",
+      "position": "PG/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "ej-liddell",
+      "name": "E.J. Liddell",
+      "team": "Brooklyn Nets",
+      "position": "PF/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "trevon-scott",
+      "name": "Trevon Scott",
+      "team": "Brooklyn Nets",
+      "position": "PF/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "brandon-miller",
+      "name": "Brandon Miller",
+      "team": "Charlotte Hornets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kon-knueppel",
+      "name": "Kon Knueppel",
+      "team": "Charlotte Hornets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "naz-reid",
+      "name": "Naz Reid",
+      "team": "Charlotte Hornets",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "coby-white",
+      "name": "Coby White",
+      "team": "Charlotte Hornets",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "grayson-allen",
+      "name": "Grayson Allen",
+      "team": "Charlotte Hornets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "moussa-diabate",
+      "name": "Moussa Diabate",
+      "team": "Charlotte Hornets",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ryan-kalkbrenner",
+      "name": "Ryan Kalkbrenner",
+      "team": "Charlotte Hornets",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "royce-oneale",
+      "name": "Royce O’Neale",
+      "team": "Charlotte Hornets",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "grant-williams",
+      "name": "Grant Williams",
+      "team": "Charlotte Hornets",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tidjane-salaun",
+      "name": "Tidjane Salaun",
+      "team": "Charlotte Hornets",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dorian-finney-smith",
+      "name": "Dorian Finney-Smith",
+      "team": "Charlotte Hornets",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "sion-james",
+      "name": "Sion James",
+      "team": "Charlotte Hornets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tre-mann",
+      "name": "Tre Mann",
+      "team": "Charlotte Hornets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "pat-connaughton",
+      "name": "Pat Connaughton",
+      "team": "Charlotte Hornets",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "xavier-tillman",
+      "name": "Xavier Tillman",
+      "team": "Charlotte Hornets",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "pj-hall",
+      "name": "PJ Hall",
+      "team": "Charlotte Hornets",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "liam-mcneeley",
+      "name": "Liam McNeeley",
+      "team": "Charlotte Hornets",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "antonio-reeves",
+      "name": "Antonio Reeves",
+      "team": "Charlotte Hornets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "norman-powell",
+      "name": "Norman Powell",
+      "team": "Chicago Bulls",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "josh-giddey",
+      "name": "Josh Giddey",
+      "team": "Chicago Bulls",
+      "position": "PG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "matas-buzelis",
+      "name": "Matas Buzelis",
+      "team": "Chicago Bulls",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "nicolas-claxton",
+      "name": "Nic Claxton",
+      "team": "Chicago Bulls",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tre-jones",
+      "name": "Tre Jones",
+      "team": "Chicago Bulls",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jalen-smith",
+      "name": "Jalen Smith",
+      "team": "Chicago Bulls",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "zach-collins",
+      "name": "Zach Collins",
+      "team": "Chicago Bulls",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "isaac-okoro",
+      "name": "Isaac Okoro",
+      "team": "Chicago Bulls",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "leonard-miller",
+      "name": "Leonard Miller",
+      "team": "Chicago Bulls",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "patrick-williams",
+      "name": "Patrick Williams",
+      "team": "Chicago Bulls",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "nick-richards",
+      "name": "Nick Richards",
+      "team": "Chicago Bulls",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "rob-dillingham",
+      "name": "Rob Dillingham",
+      "team": "Chicago Bulls",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "yuki-kawamura",
+      "name": "Yuki Kawamura",
+      "team": "Chicago Bulls",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "noa-essengue",
+      "name": "Noa Essengue",
+      "team": "Chicago Bulls",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "mac-mcclung",
+      "name": "Mac McClung",
+      "team": "Chicago Bulls",
+      "position": "SG/PG",
+      "source": "2kratings"
+    },
+    {
+      "id": "lachlan-olbrich",
+      "name": "Lachlan Olbrich",
+      "team": "Chicago Bulls",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "donovan-mitchell",
+      "name": "Donovan Mitchell",
+      "team": "Cleveland Cavaliers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "evan-mobley",
+      "name": "Evan Mobley",
+      "team": "Cleveland Cavaliers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jarrett-allen",
+      "name": "Jarrett Allen",
+      "team": "Cleveland Cavaliers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "max-strus",
+      "name": "Max Strus",
+      "team": "Cleveland Cavaliers",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "sam-merrill",
+      "name": "Sam Merrill",
+      "team": "Cleveland Cavaliers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dennis-schroder",
+      "name": "Dennis Schroder",
+      "team": "Cleveland Cavaliers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jaylon-tyson",
+      "name": "Jaylon Tyson",
+      "team": "Cleveland Cavaliers",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "thomas-bryant",
+      "name": "Thomas Bryant",
+      "team": "Cleveland Cavaliers",
+      "position": "C/PF",
+      "source": "nba-official",
+      "reason": "NBA official roster lists Bryant as center-forward.",
+      "evidence": [
+        "https://www.nba.com/player/1628418/thomas-bryant"
+      ]
+    },
+    {
+      "id": "craig-porter",
+      "name": "Craig Porter Jr.",
+      "team": "Cleveland Cavaliers",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "naeqwan-tomlin",
+      "name": "Nae’Qwan Tomlin",
+      "team": "Cleveland Cavaliers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tyrese-proctor",
+      "name": "Tyrese Proctor",
+      "team": "Cleveland Cavaliers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "olivier-sarr",
+      "name": "Olivier Sarr",
+      "team": "Cleveland Cavaliers",
+      "position": "C",
+      "source": "2kratings"
+    },
+    {
+      "id": "tristan-enaruna",
+      "name": "Tristan Enaruna",
+      "team": "Cleveland Cavaliers",
+      "position": "SF/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "riley-minix",
+      "name": "Riley Minix",
+      "team": "Cleveland Cavaliers",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kyrie-irving",
+      "name": "Kyrie Irving",
+      "team": "Dallas Mavericks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cooper-flagg",
+      "name": "Cooper Flagg",
+      "team": "Dallas Mavericks",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "naji-marshall",
+      "name": "Naji Marshall",
+      "team": "Dallas Mavericks",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "santi-aldama",
+      "name": "Santi Aldama",
+      "team": "Dallas Mavericks",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "pj-washington",
+      "name": "P.J. Washington",
+      "team": "Dallas Mavericks",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "daniel-gafford",
+      "name": "Daniel Gafford",
+      "team": "Dallas Mavericks",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dereck-lively-ii",
+      "name": "Dereck Lively II",
+      "team": "Dallas Mavericks",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "klay-thompson",
+      "name": "Klay Thompson",
+      "team": "Dallas Mavericks",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "max-christie",
+      "name": "Max Christie",
+      "team": "Dallas Mavericks",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "zaccharie-risacher",
+      "name": "Zaccharie Risacher",
+      "team": "Dallas Mavericks",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "caleb-martin",
+      "name": "Caleb Martin",
+      "team": "Dallas Mavericks",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dwight-powell",
+      "name": "Dwight Powell",
+      "team": "Dallas Mavericks",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jett-howard",
+      "name": "Jett Howard",
+      "team": "Dallas Mavericks",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "moussa-cisse",
+      "name": "Moussa Cisse",
+      "team": "Dallas Mavericks",
+      "position": "C",
+      "source": "2kratings"
+    },
+    {
+      "id": "john-poulakidas",
+      "name": "John Poulakidas",
+      "team": "Dallas Mavericks",
+      "position": "SG/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "nikola-jokic",
+      "name": "Nikola Jokic",
+      "team": "Denver Nuggets",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jamal-murray",
+      "name": "Jamal Murray",
+      "team": "Denver Nuggets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "aaron-gordon",
+      "name": "Aaron Gordon",
+      "team": "Denver Nuggets",
+      "position": "PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "peyton-watson",
+      "name": "Peyton Watson",
+      "team": "Denver Nuggets",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "christian-braun",
+      "name": "Christian Braun",
+      "team": "Denver Nuggets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cameron-johnson",
+      "name": "Cameron Johnson",
+      "team": "Denver Nuggets",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tim-hardaway-jr",
+      "name": "Tim Hardaway Jr.",
+      "team": "Denver Nuggets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "marvin-bagley-iii",
+      "name": "Marvin Bagley III",
+      "team": "Denver Nuggets",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "julian-strawther",
+      "name": "Julian Strawther",
+      "team": "Denver Nuggets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bruce-brown-jr",
+      "name": "Bruce Brown",
+      "team": "Denver Nuggets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "zeke-nnaji",
+      "name": "Zeke Nnaji",
+      "team": "Denver Nuggets",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tyus-jones",
+      "name": "Tyus Jones",
+      "team": "Denver Nuggets",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jalen-pickett",
+      "name": "Jalen Pickett",
+      "team": "Denver Nuggets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "daron-holmes",
+      "name": "DaRon Holmes II",
+      "team": "Denver Nuggets",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kj-simpson",
+      "name": "KJ Simpson",
+      "team": "Denver Nuggets",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "spencer-jones",
+      "name": "Spencer Jones",
+      "team": "Denver Nuggets",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "david-roddy",
+      "name": "David Roddy",
+      "team": "Denver Nuggets",
+      "position": "PF/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "curtis-jones",
+      "name": "Curtis Jones",
+      "team": "Denver Nuggets",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cade-cunningham",
+      "name": "Cade Cunningham",
+      "team": "Detroit Pistons",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ausar-thompson",
+      "name": "Ausar Thompson",
+      "team": "Detroit Pistons",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jalen-duren",
+      "name": "Jalen Duren",
+      "team": "Detroit Pistons",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "john-collins",
+      "name": "John Collins",
+      "team": "Detroit Pistons",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "daniss-jenkins",
+      "name": "Daniss Jenkins",
+      "team": "Detroit Pistons",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "duncan-robinson",
+      "name": "Duncan Robinson",
+      "team": "Detroit Pistons",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "paul-reed",
+      "name": "Paul Reed",
+      "team": "Detroit Pistons",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "isaiah-joe",
+      "name": "Isaiah Joe",
+      "team": "Detroit Pistons",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "javonte-green",
+      "name": "Javonte Green",
+      "team": "Detroit Pistons",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ronald-holland",
+      "name": "Ronald Holland II",
+      "team": "Detroit Pistons",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kevin-huerter",
+      "name": "Kevin Huerter",
+      "team": "Detroit Pistons",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "marcus-sasser",
+      "name": "Marcus Sasser",
+      "team": "Detroit Pistons",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "taurean-prince",
+      "name": "Taurean Prince",
+      "team": "Detroit Pistons",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "gary-harris",
+      "name": "Gary Harris",
+      "team": "Detroit Pistons",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "elijah-harkless",
+      "name": "Elijah Harkless",
+      "team": "Detroit Pistons",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "isaac-jones",
+      "name": "Isaac Jones",
+      "team": "Detroit Pistons",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "wendell-moore",
+      "name": "Wendell Moore Jr.",
+      "team": "Detroit Pistons",
+      "position": "SF/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "chaz-lanier",
+      "name": "Chaz Lanier",
+      "team": "Detroit Pistons",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tolu-smith",
+      "name": "Tolu Smith",
+      "team": "Detroit Pistons",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "stephen-curry",
+      "name": "Stephen Curry",
+      "team": "Golden State Warriors",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jimmy-butler",
+      "name": "Jimmy Butler",
+      "team": "Golden State Warriors",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kristaps-porzingis",
+      "name": "Kristaps Porzingis",
+      "team": "Golden State Warriors",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "brandin-podziemski",
+      "name": "Brandin Podziemski",
+      "team": "Golden State Warriors",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "gui-santos",
+      "name": "Gui Santos",
+      "team": "Golden State Warriors",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "draymond-green",
+      "name": "Draymond Green",
+      "team": "Golden State Warriors",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "deanthony-melton",
+      "name": "De’Anthony Melton",
+      "team": "Golden State Warriors",
+      "position": "SG/PG",
+      "source": "2kratings"
+    },
+    {
+      "id": "al-horford",
+      "name": "Al Horford",
+      "team": "Golden State Warriors",
+      "position": "C/PF",
+      "source": "2kratings"
+    },
+    {
+      "id": "gary-payton-ii",
+      "name": "Gary Payton II",
+      "team": "Golden State Warriors",
+      "position": "SG/SF",
+      "source": "nba-official",
+      "reason": "NBA official roster lists Payton as a guard; the 2KRatings SF/PF fallback conflicts with that role.",
+      "evidence": [
+        "https://www.nba.com/player/1627780/gary-payton-ii"
+      ]
+    },
+    {
+      "id": "moses-moody",
+      "name": "Moses Moody",
+      "team": "Golden State Warriors",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "will-richard",
+      "name": "Will Richard",
+      "team": "Golden State Warriors",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "seth-curry",
+      "name": "Seth Curry",
+      "team": "Golden State Warriors",
+      "position": "SG/PG",
+      "source": "2kratings"
+    },
+    {
+      "id": "jeenathan-williams",
+      "name": "Nate Williams",
+      "team": "Golden State Warriors",
+      "position": "SF/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "lj-cryer",
+      "name": "LJ Cryer",
+      "team": "Golden State Warriors",
+      "position": "PG",
+      "source": "2kratings"
+    },
+    {
+      "id": "charles-bassey",
+      "name": "Charles Bassey",
+      "team": "Golden State Warriors",
+      "position": "C/PF",
+      "source": "nba-official",
+      "reason": "NBA official roster lists Bassey as center-forward.",
+      "evidence": [
+        "https://www.nba.com/player/1629646/charles-bassey"
+      ]
+    },
+    {
+      "id": "malevy-leons",
+      "name": "Malevy Leons",
+      "team": "Golden State Warriors",
+      "position": "PF/C",
+      "source": "2kratings"
+    },
+    {
+      "id": "kevin-durant",
+      "name": "Kevin Durant",
+      "team": "Houston Rockets",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "alperen-sengun",
+      "name": "Alperen Sengun",
+      "team": "Houston Rockets",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "amen-thompson",
+      "name": "Amen Thompson",
+      "team": "Houston Rockets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jabari-smith",
+      "name": "Jabari Smith Jr.",
+      "team": "Houston Rockets",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "reed-sheppard",
+      "name": "Reed Sheppard",
+      "team": "Houston Rockets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "fred-vanvleet",
+      "name": "Fred VanVleet",
+      "team": "Houston Rockets",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "marcus-smart",
+      "name": "Marcus Smart",
+      "team": "Houston Rockets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tari-eason",
+      "name": "Tari Eason",
+      "team": "Houston Rockets",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "clint-capela",
+      "name": "Clint Capela",
+      "team": "Houston Rockets",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "steven-adams",
+      "name": "Steven Adams",
+      "team": "Houston Rockets",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "aaron-holiday",
+      "name": "Aaron Holiday",
+      "team": "Houston Rockets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bogdan-bogdanovic",
+      "name": "Bogdan Bogdanovic",
+      "team": "Houston Rockets",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jaesean-tate",
+      "name": "Jae’Sean Tate",
+      "team": "Houston Rockets",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jeff-green",
+      "name": "Jeff Green",
+      "team": "Houston Rockets",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jd-davison",
+      "name": "JD Davison",
+      "team": "Houston Rockets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tristen-newton",
+      "name": "Tristen Newton",
+      "team": "Houston Rockets",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "isaiah-crawford",
+      "name": "Isaiah Crawford",
+      "team": "Houston Rockets",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tyrese-haliburton",
+      "name": "Tyrese Haliburton",
+      "team": "Indiana Pacers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "pascal-siakam",
+      "name": "Pascal Siakam",
+      "team": "Indiana Pacers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ivica-zubac",
+      "name": "Ivica Zubac",
+      "team": "Indiana Pacers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "andrew-nembhard",
+      "name": "Andrew Nembhard",
+      "team": "Indiana Pacers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tj-mcconnell",
+      "name": "T.J. McConnell",
+      "team": "Indiana Pacers",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jarace-walker",
+      "name": "Jarace Walker",
+      "team": "Indiana Pacers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kelly-oubre-jr",
+      "name": "Kelly Oubre Jr.",
+      "team": "Indiana Pacers",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "obi-toppin",
+      "name": "Obi Toppin",
+      "team": "Indiana Pacers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "aaron-nesmith",
+      "name": "Aaron Nesmith",
+      "team": "Indiana Pacers",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jay-huff",
+      "name": "Jay Huff",
+      "team": "Indiana Pacers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "quenton-jackson",
+      "name": "Quenton Jackson",
+      "team": "Indiana Pacers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kobe-brown",
+      "name": "Kobe Brown",
+      "team": "Indiana Pacers",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ben-sheppard",
+      "name": "Ben Sheppard",
+      "team": "Indiana Pacers",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "johnny-furphy",
+      "name": "Johnny Furphy",
+      "team": "Indiana Pacers",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "larry-nance-jr",
+      "name": "Larry Nance Jr.",
+      "team": "Indiana Pacers",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jalen-slawson",
+      "name": "Jalen Slawson",
+      "team": "Indiana Pacers",
+      "position": "SF/PF",
+      "source": "2kratings"
+    },
+    {
+      "id": "ethan-thompson",
+      "name": "Ethan Thompson",
+      "team": "Indiana Pacers",
+      "position": "SG/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "brandon-ingram",
+      "name": "Brandon Ingram",
+      "team": "Los Angeles Clippers",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "darius-garland",
+      "name": "Darius Garland",
+      "team": "Los Angeles Clippers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bennedict-mathurin",
+      "name": "Bennedict Mathurin",
+      "team": "Los Angeles Clippers",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "rui-hachimura",
+      "name": "Rui Hachimura",
+      "team": "Los Angeles Clippers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "derrick-jones-jr",
+      "name": "Derrick Jones Jr.",
+      "team": "Los Angeles Clippers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "brook-lopez",
+      "name": "Brook Lopez",
+      "team": "Los Angeles Clippers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kris-dunn",
+      "name": "Kris Dunn",
+      "team": "Los Angeles Clippers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jordan-miller",
+      "name": "Jordan Miller",
+      "team": "Los Angeles Clippers",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "isaiah-jackson",
+      "name": "Isaiah Jackson",
+      "team": "Los Angeles Clippers",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bradley-beal",
+      "name": "Bradley Beal",
+      "team": "Los Angeles Clippers",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "gradey-dick",
+      "name": "Gradey Dick",
+      "team": "Los Angeles Clippers",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kobe-sanders",
+      "name": "Kobe Sanders",
+      "team": "Los Angeles Clippers",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "yanic-konan-niederhauser",
+      "name": "Yanic Konan Niederhauser",
+      "team": "Los Angeles Clippers",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "nicolas-batum",
+      "name": "Nicolas Batum",
+      "team": "Los Angeles Clippers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tyty-washington",
+      "name": "TyTy Washington Jr.",
+      "team": "Los Angeles Clippers",
+      "position": "PG/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "cam-christie",
+      "name": "Cam Christie",
+      "team": "Los Angeles Clippers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "norchad-omier",
+      "name": "Norchad Omier",
+      "team": "Los Angeles Clippers",
+      "position": "PF/C",
+      "source": "2kratings"
+    },
+    {
+      "id": "sean-pedulla",
+      "name": "Sean Pedulla",
+      "team": "Los Angeles Clippers",
+      "position": "PG",
+      "source": "2kratings"
+    },
+    {
+      "id": "luka-doncic",
+      "name": "Luka Doncic",
+      "team": "Los Angeles Lakers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "austin-reaves",
+      "name": "Austin Reaves",
+      "team": "Los Angeles Lakers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "walker-kessler",
+      "name": "Walker Kessler",
+      "team": "Los Angeles Lakers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "collin-sexton",
+      "name": "Collin Sexton",
+      "team": "Los Angeles Lakers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "quentin-grimes",
+      "name": "Quentin Grimes",
+      "team": "Los Angeles Lakers",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "sandro-mamukelashvili",
+      "name": "Sandro Mamukelashvili",
+      "team": "Los Angeles Lakers",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ziaire-williams",
+      "name": "Ziaire Williams",
+      "team": "Los Angeles Lakers",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jarred-vanderbilt",
+      "name": "Jarred Vanderbilt",
+      "team": "Los Angeles Lakers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "matisse-thybulle",
+      "name": "Matisse Thybulle",
+      "team": "Los Angeles Lakers",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jaden-hardy",
+      "name": "Jaden Hardy",
+      "team": "Los Angeles Lakers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jake-laravia",
+      "name": "Jake LaRavia",
+      "team": "Los Angeles Lakers",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "maxi-kleber",
+      "name": "Maxi Kleber",
+      "team": "Los Angeles Lakers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dalton-knecht",
+      "name": "Dalton Knecht",
+      "team": "Los Angeles Lakers",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kevon-looney",
+      "name": "Kevon Looney",
+      "team": "Los Angeles Lakers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "nick-smith-jr",
+      "name": "Nick Smith Jr.",
+      "team": "Los Angeles Lakers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "drew-timme",
+      "name": "Drew Timme",
+      "team": "Los Angeles Lakers",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bronny-james",
+      "name": "Bronny James",
+      "team": "Los Angeles Lakers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "adou-thiero",
+      "name": "Adou Thiero",
+      "team": "Los Angeles Lakers",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "chris-manon",
+      "name": "Chris Manon",
+      "team": "Los Angeles Lakers",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ty-jerome",
+      "name": "Ty Jerome",
+      "team": "Memphis Grizzlies",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "zach-edey",
+      "name": "Zach Edey",
+      "team": "Memphis Grizzlies",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jerami-grant",
+      "name": "Jerami Grant",
+      "team": "Memphis Grizzlies",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cedric-coward",
+      "name": "Cedric Coward",
+      "team": "Memphis Grizzlies",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "gregory-jackson-ii",
+      "name": "GG Jackson",
+      "team": "Memphis Grizzlies",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jaylen-wells",
+      "name": "Jaylen Wells",
+      "team": "Memphis Grizzlies",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cam-spencer",
+      "name": "Cam Spencer",
+      "team": "Memphis Grizzlies",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "isaiah-stewart",
+      "name": "Isaiah Stewart",
+      "team": "Memphis Grizzlies",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "olivier-maxence-prosper",
+      "name": "Olivier-Maxence Prosper",
+      "team": "Memphis Grizzlies",
+      "position": "C/PF",
+      "source": "2kratings"
+    },
+    {
+      "id": "javon-small",
+      "name": "Javon Small",
+      "team": "Memphis Grizzlies",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "scotty-pippen-jr",
+      "name": "Scotty Pippen Jr.",
+      "team": "Memphis Grizzlies",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dangelo-russell",
+      "name": "D’Angelo Russell",
+      "team": "Memphis Grizzlies",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "quinten-post",
+      "name": "Quinten Post",
+      "team": "Memphis Grizzlies",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "taylor-hendricks",
+      "name": "Taylor Hendricks",
+      "team": "Memphis Grizzlies",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "walter-clayton-jr",
+      "name": "Walter Clayton Jr.",
+      "team": "Memphis Grizzlies",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kentavious-caldwell-pope",
+      "name": "Kentavious Caldwell-Pope",
+      "team": "Memphis Grizzlies",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kris-murray",
+      "name": "Kris Murray",
+      "team": "Memphis Grizzlies",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jahmai-mashack",
+      "name": "Jahmai Mashack",
+      "team": "Memphis Grizzlies",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "aj-johnson",
+      "name": "AJ Johnson",
+      "team": "Memphis Grizzlies",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dariq-whitehead",
+      "name": "Dariq Whitehead",
+      "team": "Memphis Grizzlies",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "taj-gibson",
+      "name": "Taj Gibson",
+      "team": "Memphis Grizzlies",
+      "position": "PF/C",
+      "source": "nba-official",
+      "reason": "NBA official roster lists Gibson as a forward; center remains his secondary 2K role.",
+      "evidence": [
+        "https://www.nba.com/player/201959/taj-gibson"
+      ]
+    },
+    {
+      "id": "adama-bal",
+      "name": "Adama Bal",
+      "team": "Memphis Grizzlies",
+      "position": "SG/PG",
+      "source": "2kratings"
+    },
+    {
+      "id": "giannis-antetokounmpo",
+      "name": "Giannis Antetokounmpo",
+      "team": "Miami Heat",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bam-adebayo",
+      "name": "Bam Adebayo",
+      "team": "Miami Heat",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "andrew-wiggins",
+      "name": "Andrew Wiggins",
+      "team": "Miami Heat",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bobby-portis",
+      "name": "Bobby Portis",
+      "team": "Miami Heat",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "pelle-larsson",
+      "name": "Pelle Larsson",
+      "team": "Miami Heat",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "davion-mitchell",
+      "name": "Davion Mitchell",
+      "team": "Miami Heat",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "simone-fontecchio",
+      "name": "Simone Fontecchio",
+      "team": "Miami Heat",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dru-smith",
+      "name": "Dru Smith",
+      "team": "Miami Heat",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "myron-gardner",
+      "name": "Myron Gardner",
+      "team": "Miami Heat",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "nikola-jovic",
+      "name": "Nikola Jovic",
+      "team": "Miami Heat",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "keshad-johnson",
+      "name": "Keshad Johnson",
+      "team": "Miami Heat",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "trevor-keels",
+      "name": "Trevor Keels",
+      "team": "Miami Heat",
+      "position": "SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "vladislav-goldin",
+      "name": "Vladislav Goldin",
+      "team": "Miami Heat",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jahmir-young",
+      "name": "Jahmir Young",
+      "team": "Miami Heat",
+      "position": "PG",
+      "source": "2kratings"
+    },
+    {
+      "id": "tyler-herro",
+      "name": "Tyler Herro",
+      "team": "Milwaukee Bucks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kevin-porter-jr",
+      "name": "Kevin Porter Jr.",
+      "team": "Milwaukee Bucks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ryan-rollins",
+      "name": "Ryan Rollins",
+      "team": "Milwaukee Bucks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kyle-kuzma",
+      "name": "Kyle Kuzma",
+      "team": "Milwaukee Bucks",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jaime-jaquez-jr",
+      "name": "Jaime Jaquez Jr.",
+      "team": "Milwaukee Bucks",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kelel-ware",
+      "name": "Kel’el Ware",
+      "team": "Milwaukee Bucks",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "caris-levert",
+      "name": "Caris LeVert",
+      "team": "Milwaukee Bucks",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "myles-turner",
+      "name": "Myles Turner",
+      "team": "Milwaukee Bucks",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ousmane-dieng",
+      "name": "Ousmane Dieng",
+      "team": "Milwaukee Bucks",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "aj-green",
+      "name": "AJ Green",
+      "team": "Milwaukee Bucks",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kasparas-jakucionis",
+      "name": "Kasparas Jakucionis",
+      "team": "Milwaukee Bucks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "gary-trent-jr",
+      "name": "Gary Trent Jr.",
+      "team": "Milwaukee Bucks",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jericho-sims",
+      "name": "Jericho Sims",
+      "team": "Milwaukee Bucks",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "pete-nance",
+      "name": "Pete Nance",
+      "team": "Milwaukee Bucks",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kam-jones",
+      "name": "Kam Jones",
+      "team": "Milwaukee Bucks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "andre-jackson-jr",
+      "name": "Andre Jackson Jr.",
+      "team": "Milwaukee Bucks",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cormac-ryan",
+      "name": "Cormac Ryan",
+      "team": "Milwaukee Bucks",
+      "position": "SG/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "thanasis-antetokounmpo",
+      "name": "Thanasis Antetokounmpo",
+      "team": "Milwaukee Bucks",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "alex-antetokounmpo",
+      "name": "Alex Antetokounmpo",
+      "team": "Milwaukee Bucks",
+      "position": "SF/PF",
+      "source": "2kratings"
+    },
+    {
+      "id": "anthony-edwards",
+      "name": "Anthony Edwards",
+      "team": "Minnesota Timberwolves",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "lamelo-ball",
+      "name": "LaMelo Ball",
+      "team": "Minnesota Timberwolves",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "rudy-gobert",
+      "name": "Rudy Gobert",
+      "team": "Minnesota Timberwolves",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jaden-mcdaniels",
+      "name": "Jaden McDaniels",
+      "team": "Minnesota Timberwolves",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ayo-dosunmu",
+      "name": "Ayo Dosunmu",
+      "team": "Minnesota Timberwolves",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "donte-divincenzo",
+      "name": "Donte DiVincenzo",
+      "team": "Minnesota Timberwolves",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "terrence-shannon",
+      "name": "Terrence Shannon Jr.",
+      "team": "Minnesota Timberwolves",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bones-hyland",
+      "name": "Bones Hyland",
+      "team": "Minnesota Timberwolves",
+      "position": "PG/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "josh-green",
+      "name": "Josh Green",
+      "team": "Minnesota Timberwolves",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "trey-lyles",
+      "name": "Trey Lyles",
+      "team": "Minnesota Timberwolves",
+      "position": "PF/C",
+      "source": "2kratings"
+    },
+    {
+      "id": "jaylen-clark",
+      "name": "Jaylen Clark",
+      "team": "Minnesota Timberwolves",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "joe-ingles",
+      "name": "Joe Ingles",
+      "team": "Minnesota Timberwolves",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "julian-phillips",
+      "name": "Julian Phillips",
+      "team": "Minnesota Timberwolves",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "joan-beringer",
+      "name": "Joan Beringer",
+      "team": "Minnesota Timberwolves",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "enrique-freeman",
+      "name": "Enrique Freeman",
+      "team": "Minnesota Timberwolves",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "rocco-zikarsky",
+      "name": "Rocco Zikarsky",
+      "team": "Minnesota Timberwolves",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "mouhamadou-gueye",
+      "name": "Mouhamadou Gueye",
+      "team": "Minnesota Timberwolves",
+      "position": "PF/C",
+      "source": "2kratings"
+    },
+    {
+      "id": "zyon-pullin",
+      "name": "Zyon Pullin",
+      "team": "Minnesota Timberwolves",
+      "position": "PG/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "zion-williamson",
+      "name": "Zion Williamson",
+      "team": "New Orleans Pelicans",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "trey-murphy",
+      "name": "Trey Murphy III",
+      "team": "New Orleans Pelicans",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dejounte-murray",
+      "name": "Dejounte Murray",
+      "team": "New Orleans Pelicans",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "saddiq-bey",
+      "name": "Saddiq Bey",
+      "team": "New Orleans Pelicans",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jeremiah-fears",
+      "name": "Jeremiah Fears",
+      "team": "New Orleans Pelicans",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "derik-queen",
+      "name": "Derik Queen",
+      "team": "New Orleans Pelicans",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "herbert-jones",
+      "name": "Herbert Jones",
+      "team": "New Orleans Pelicans",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "yves-missi",
+      "name": "Yves Missi",
+      "team": "New Orleans Pelicans",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "deandre-jordan",
+      "name": "DeAndre Jordan",
+      "team": "New Orleans Pelicans",
+      "position": "C",
+      "source": "2kratings"
+    },
+    {
+      "id": "jordan-poole",
+      "name": "Jordan Poole",
+      "team": "New Orleans Pelicans",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "karlo-matkovic",
+      "name": "Karlo Matkovic",
+      "team": "New Orleans Pelicans",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bryce-mcgowens",
+      "name": "Bryce McGowens",
+      "team": "New Orleans Pelicans",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jordan-hawkins",
+      "name": "Jordan Hawkins",
+      "team": "New Orleans Pelicans",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "micah-peavy",
+      "name": "Micah Peavy",
+      "team": "New Orleans Pelicans",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "hunter-dickinson",
+      "name": "Hunter Dickinson",
+      "team": "New Orleans Pelicans",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "josh-oduro",
+      "name": "Josh Oduro",
+      "team": "New Orleans Pelicans",
+      "position": "PF/C",
+      "source": "2kratings"
+    },
+    {
+      "id": "jalen-brunson",
+      "name": "Jalen Brunson",
+      "team": "New York Knicks",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "karl-anthony-towns",
+      "name": "Karl-Anthony Towns",
+      "team": "New York Knicks",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "og-anunoby",
+      "name": "OG Anunoby",
+      "team": "New York Knicks",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "mikal-bridges",
+      "name": "Mikal Bridges",
+      "team": "New York Knicks",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "josh-hart",
+      "name": "Josh Hart",
+      "team": "New York Knicks",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "miles-mcbride",
+      "name": "Miles McBride",
+      "team": "New York Knicks",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jose-alvarado",
+      "name": "Jose Alvarado",
+      "team": "New York Knicks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "landry-shamet",
+      "name": "Landry Shamet",
+      "team": "New York Knicks",
+      "position": "SG/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "jordan-clarkson",
+      "name": "Jordan Clarkson",
+      "team": "New York Knicks",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "andre-drummond",
+      "name": "Andre Drummond",
+      "team": "New York Knicks",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jeremy-sochan",
+      "name": "Jeremy Sochan",
+      "team": "New York Knicks",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tyler-kolek",
+      "name": "Tyler Kolek",
+      "team": "New York Knicks",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "mohamed-diawara",
+      "name": "Mohamed Diawara",
+      "team": "New York Knicks",
+      "position": "PF/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "trey-jemison",
+      "name": "Trey Jemison III",
+      "team": "New York Knicks",
+      "position": "C",
+      "source": "2kratings"
+    },
+    {
+      "id": "kevin-mccullar",
+      "name": "Kevin McCullar Jr.",
+      "team": "New York Knicks",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "pacome-dadiet",
+      "name": "Pacome Dadiet",
+      "team": "New York Knicks",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dillon-jones",
+      "name": "Dillon Jones",
+      "team": "New York Knicks",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "shai-gilgeous-alexander",
+      "name": "Shai Gilgeous-Alexander",
+      "team": "Oklahoma City Thunder",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "chet-holmgren",
+      "name": "Chet Holmgren",
+      "team": "Oklahoma City Thunder",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jalen-williams",
+      "name": "Jalen Williams",
+      "team": "Oklahoma City Thunder",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "isaiah-hartenstein",
+      "name": "Isaiah Hartenstein",
+      "team": "Oklahoma City Thunder",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ajay-mitchell",
+      "name": "Ajay Mitchell",
+      "team": "Oklahoma City Thunder",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cason-wallace",
+      "name": "Cason Wallace",
+      "team": "Oklahoma City Thunder",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "alex-caruso",
+      "name": "Alex Caruso",
+      "team": "Oklahoma City Thunder",
+      "position": "SF/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jared-mccain",
+      "name": "Jared McCain",
+      "team": "Oklahoma City Thunder",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jaylin-williams",
+      "name": "Jaylin Williams",
+      "team": "Oklahoma City Thunder",
+      "position": "PF/C",
+      "source": "nba-official",
+      "reason": "NBA official roster lists F and the Thunder describes Williams as a forward/center.",
+      "evidence": [
+        "https://www.nba.com/players",
+        "https://www.nba.com/thunder/news/release-williams-250629"
+      ]
+    },
+    {
+      "id": "kenrich-williams",
+      "name": "Kenrich Williams",
+      "team": "Oklahoma City Thunder",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "nikola-topic",
+      "name": "Nikola Topic",
+      "team": "Oklahoma City Thunder",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "thomas-sorber",
+      "name": "Thomas Sorber",
+      "team": "Oklahoma City Thunder",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "brooks-barnhizer",
+      "name": "Brooks Barnhizer",
+      "team": "Oklahoma City Thunder",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "paolo-banchero",
+      "name": "Paolo Banchero",
+      "team": "Orlando Magic",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "franz-wagner",
+      "name": "Franz Wagner",
+      "team": "Orlando Magic",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "desmond-bane",
+      "name": "Desmond Bane",
+      "team": "Orlando Magic",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "anthony-black",
+      "name": "Anthony Black",
+      "team": "Orlando Magic",
+      "position": "PG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jalen-suggs",
+      "name": "Jalen Suggs",
+      "team": "Orlando Magic",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "wendell-carter-jr",
+      "name": "Wendell Carter Jr.",
+      "team": "Orlando Magic",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "nikola-vucevic",
+      "name": "Nikola Vucevic",
+      "team": "Orlando Magic",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tristan-da-silva",
+      "name": "Tristan da Silva",
+      "team": "Orlando Magic",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "goga-bitadze",
+      "name": "Goga Bitadze",
+      "team": "Orlando Magic",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jevon-carter",
+      "name": "Jevon Carter",
+      "team": "Orlando Magic",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "noah-penda",
+      "name": "Noah Penda",
+      "team": "Orlando Magic",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jamal-cain",
+      "name": "Jamal Cain",
+      "team": "Orlando Magic",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jonathan-isaac",
+      "name": "Jonathan Isaac",
+      "team": "Orlando Magic",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jase-richardson",
+      "name": "Jase Richardson",
+      "team": "Orlando Magic",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "colin-castleton",
+      "name": "Colin Castleton",
+      "team": "Orlando Magic",
+      "position": "PF/C",
+      "source": "2kratings"
+    },
+    {
+      "id": "alex-morales",
+      "name": "Alex Morales",
+      "team": "Orlando Magic",
+      "position": "SG/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "jaylen-brown",
+      "name": "Jaylen Brown",
+      "team": "Philadelphia 76ers",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tyrese-maxey",
+      "name": "Tyrese Maxey",
+      "team": "Philadelphia 76ers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "joel-embiid",
+      "name": "Joel Embiid",
+      "team": "Philadelphia 76ers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "vj-edgecombe",
+      "name": "VJ Edgecombe",
+      "team": "Philadelphia 76ers",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "anfernee-simons",
+      "name": "Anfernee Simons",
+      "team": "Philadelphia 76ers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dean-wade",
+      "name": "Dean Wade",
+      "team": "Philadelphia 76ers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "trendon-watford",
+      "name": "Trendon Watford",
+      "team": "Philadelphia 76ers",
+      "position": "PF/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "justin-edwards",
+      "name": "Justin Edwards",
+      "team": "Philadelphia 76ers",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dominick-barlow",
+      "name": "Dominick Barlow",
+      "team": "Philadelphia 76ers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "caleb-love",
+      "name": "Caleb Love",
+      "team": "Philadelphia 76ers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "adem-bona",
+      "name": "Adem Bona",
+      "team": "Philadelphia 76ers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "rayan-rupert",
+      "name": "Rayan Rupert",
+      "team": "Philadelphia 76ers",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ariel-hukporti",
+      "name": "Ariel Hukporti",
+      "team": "Philadelphia 76ers",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tyrese-martin",
+      "name": "Tyrese Martin",
+      "team": "Philadelphia 76ers",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dalen-terry",
+      "name": "Dalen Terry",
+      "team": "Philadelphia 76ers",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jabari-walker",
+      "name": "Jabari Walker",
+      "team": "Philadelphia 76ers",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "johni-broome",
+      "name": "Johni Broome",
+      "team": "Philadelphia 76ers",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "marjon-beauchamp",
+      "name": "MarJon Beauchamp",
+      "team": "Philadelphia 76ers",
+      "position": "SF/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "devin-booker",
+      "name": "Devin Booker",
+      "team": "Phoenix Suns",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dillon-brooks",
+      "name": "Dillon Brooks",
+      "team": "Phoenix Suns",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jalen-green",
+      "name": "Jalen Green",
+      "team": "Phoenix Suns",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "mark-williams",
+      "name": "Mark Williams",
+      "team": "Phoenix Suns",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "miles-bridges",
+      "name": "Miles Bridges",
+      "team": "Phoenix Suns",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "collin-gillespie",
+      "name": "Collin Gillespie",
+      "team": "Phoenix Suns",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "luke-kennard",
+      "name": "Luke Kennard",
+      "team": "Phoenix Suns",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jordan-goodwin",
+      "name": "Jordan Goodwin",
+      "team": "Phoenix Suns",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "oso-ighodaro",
+      "name": "Oso Ighodaro",
+      "team": "Phoenix Suns",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "rasheer-fleming",
+      "name": "Rasheer Fleming",
+      "team": "Phoenix Suns",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "pat-spencer",
+      "name": "Pat Spencer",
+      "team": "Phoenix Suns",
+      "position": "PG/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "khaman-maluach",
+      "name": "Khaman Maluach",
+      "team": "Phoenix Suns",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ryan-dunn",
+      "name": "Ryan Dunn",
+      "team": "Phoenix Suns",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jamaree-bouyea",
+      "name": "Jamaree Bouyea",
+      "team": "Phoenix Suns",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "haywood-highsmith",
+      "name": "Haywood Highsmith",
+      "team": "Phoenix Suns",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "isaiah-livers",
+      "name": "Isaiah Livers",
+      "team": "Phoenix Suns",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "koby-brea",
+      "name": "Koby Brea",
+      "team": "Phoenix Suns",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cj-huntley",
+      "name": "CJ Huntley",
+      "team": "Phoenix Suns",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "damian-lillard",
+      "name": "Damian Lillard",
+      "team": "Portland Trail Blazers",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "deni-avdija",
+      "name": "Deni Avdija",
+      "team": "Portland Trail Blazers",
+      "position": "PF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ja-morant",
+      "name": "Ja Morant",
+      "team": "Portland Trail Blazers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "shaedon-sharpe",
+      "name": "Shaedon Sharpe",
+      "team": "Portland Trail Blazers",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "donovan-clingan",
+      "name": "Donovan Clingan",
+      "team": "Portland Trail Blazers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jrue-holiday",
+      "name": "Jrue Holiday",
+      "team": "Portland Trail Blazers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "scoot-henderson",
+      "name": "Scoot Henderson",
+      "team": "Portland Trail Blazers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "toumani-camara",
+      "name": "Toumani Camara",
+      "team": "Portland Trail Blazers",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "robert-williams-iii",
+      "name": "Robert Williams III",
+      "team": "Portland Trail Blazers",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "micah-potter",
+      "name": "Micah Potter",
+      "team": "Portland Trail Blazers",
+      "position": "C/PF",
+      "source": "2kratings"
+    },
+    {
+      "id": "vit-krejci",
+      "name": "Vit Krejci",
+      "team": "Portland Trail Blazers",
+      "position": "SF/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "sidy-cissoko",
+      "name": "Sidy Cissoko",
+      "team": "Portland Trail Blazers",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "blake-wesley",
+      "name": "Blake Wesley",
+      "team": "Portland Trail Blazers",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "branden-carlson",
+      "name": "Branden Carlson",
+      "team": "Portland Trail Blazers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "yang-hansen",
+      "name": "Yang Hansen",
+      "team": "Portland Trail Blazers",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "chris-youngblood",
+      "name": "Chris Youngblood",
+      "team": "Portland Trail Blazers",
+      "position": "SG/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "jayson-kent",
+      "name": "Jayson Kent",
+      "team": "Portland Trail Blazers",
+      "position": "SF/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "domantas-sabonis",
+      "name": "Domantas Sabonis",
+      "team": "Sacramento Kings",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "zach-lavine",
+      "name": "Zach LaVine",
+      "team": "Sacramento Kings",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "russell-westbrook",
+      "name": "Russell Westbrook",
+      "team": "Sacramento Kings",
+      "position": "PG/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "maxime-raynaud",
+      "name": "Maxime Raynaud",
+      "team": "Sacramento Kings",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "malik-monk",
+      "name": "Malik Monk",
+      "team": "Sacramento Kings",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "keegan-murray",
+      "name": "Keegan Murray",
+      "team": "Sacramento Kings",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "deandre-hunter",
+      "name": "De’Andre Hunter",
+      "team": "Sacramento Kings",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "precious-achiuwa",
+      "name": "Precious Achiuwa",
+      "team": "Sacramento Kings",
+      "position": "PF/C",
+      "source": "2kratings"
+    },
+    {
+      "id": "nique-clifford",
+      "name": "Nique Clifford",
+      "team": "Sacramento Kings",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dylan-cardwell",
+      "name": "Dylan Cardwell",
+      "team": "Sacramento Kings",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "drew-eubanks",
+      "name": "Drew Eubanks",
+      "team": "Sacramento Kings",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jonathan-mogbo",
+      "name": "Jonathan Mogbo",
+      "team": "Sacramento Kings",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "daeqwon-plowden",
+      "name": "Daeqwon Plowden",
+      "team": "Sacramento Kings",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "killian-hayes",
+      "name": "Killian Hayes",
+      "team": "Sacramento Kings",
+      "position": "PG/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "patrick-baldwin-jr",
+      "name": "Patrick Baldwin Jr.",
+      "team": "Sacramento Kings",
+      "position": "PF/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "doug-mcdermott",
+      "name": "Doug McDermott",
+      "team": "Sacramento Kings",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "isaiah-stevens",
+      "name": "Isaiah Stevens",
+      "team": "Sacramento Kings",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "adam-flagler",
+      "name": "Adam Flagler",
+      "team": "Sacramento Kings",
+      "position": "PG/SG",
+      "source": "2kratings"
+    },
+    {
+      "id": "victor-wembanyama",
+      "name": "Victor Wembanyama",
+      "team": "San Antonio Spurs",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "stephon-castle",
+      "name": "Stephon Castle",
+      "team": "San Antonio Spurs",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "deaaron-fox",
+      "name": "De’Aaron Fox",
+      "team": "San Antonio Spurs",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "dylan-harper",
+      "name": "Dylan Harper",
+      "team": "San Antonio Spurs",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tobias-harris",
+      "name": "Tobias Harris",
+      "team": "San Antonio Spurs",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "julian-champagnie",
+      "name": "Julian Champagnie",
+      "team": "San Antonio Spurs",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "devin-vassell",
+      "name": "Devin Vassell",
+      "team": "San Antonio Spurs",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "keldon-johnson",
+      "name": "Keldon Johnson",
+      "team": "San Antonio Spurs",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "luke-kornet",
+      "name": "Luke Kornet",
+      "team": "San Antonio Spurs",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "harrison-barnes",
+      "name": "Harrison Barnes",
+      "team": "San Antonio Spurs",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "carter-bryant",
+      "name": "Carter Bryant",
+      "team": "San Antonio Spurs",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "mason-plumlee",
+      "name": "Mason Plumlee",
+      "team": "San Antonio Spurs",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kelly-olynyk",
+      "name": "Kelly Olynyk",
+      "team": "San Antonio Spurs",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "lindy-waters-iii",
+      "name": "Lindy Waters III",
+      "team": "San Antonio Spurs",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jordan-mclaughlin",
+      "name": "Jordan McLaughlin",
+      "team": "San Antonio Spurs",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "david-jones-garcia",
+      "name": "David Jones Garcia",
+      "team": "San Antonio Spurs",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bismack-biyombo",
+      "name": "Bismack Biyombo",
+      "team": "San Antonio Spurs",
+      "position": "C",
+      "source": "2kratings"
+    },
+    {
+      "id": "harrison-ingram",
+      "name": "Harrison Ingram",
+      "team": "San Antonio Spurs",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "emanuel-miller",
+      "name": "Emanuel Miller",
+      "team": "San Antonio Spurs",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kawhi-leonard",
+      "name": "Kawhi Leonard",
+      "team": "Toronto Raptors",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "scottie-barnes",
+      "name": "Scottie Barnes",
+      "team": "Toronto Raptors",
+      "position": "PF/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "immanuel-quickley",
+      "name": "Immanuel Quickley",
+      "team": "Toronto Raptors",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "rj-barrett",
+      "name": "RJ Barrett",
+      "team": "Toronto Raptors",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "collin-murray-boyles",
+      "name": "Collin Murray-Boyles",
+      "team": "Toronto Raptors",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jakob-poeltl",
+      "name": "Jakob Poeltl",
+      "team": "Toronto Raptors",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jakobe-walter",
+      "name": "Ja’Kobe Walter",
+      "team": "Toronto Raptors",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jamal-shead",
+      "name": "Jamal Shead",
+      "team": "Toronto Raptors",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jamison-battle",
+      "name": "Jamison Battle",
+      "team": "Toronto Raptors",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kyle-anderson",
+      "name": "Kyle Anderson",
+      "team": "Toronto Raptors",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "aj-lawson",
+      "name": "A.J. Lawson",
+      "team": "Toronto Raptors",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kyle-lowry",
+      "name": "Kyle Lowry",
+      "team": "Toronto Raptors",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "trayce-jackson-davis",
+      "name": "Trayce Jackson-Davis",
+      "team": "Toronto Raptors",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "alijah-martin",
+      "name": "Alijah Martin",
+      "team": "Toronto Raptors",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "garrett-temple",
+      "name": "Garrett Temple",
+      "team": "Toronto Raptors",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "chucky-hepburn",
+      "name": "Chucky Hepburn",
+      "team": "Toronto Raptors",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "lauri-markkanen",
+      "name": "Lauri Markkanen",
+      "team": "Utah Jazz",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "keyonte-george",
+      "name": "Keyonte George",
+      "team": "Utah Jazz",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jaren-jackson-jr",
+      "name": "Jaren Jackson Jr.",
+      "team": "Utah Jazz",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "isaiah-collier",
+      "name": "Isaiah Collier",
+      "team": "Utah Jazz",
+      "position": "PG/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jusuf-nurkic",
+      "name": "Jusuf Nurkic",
+      "team": "Utah Jazz",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "ace-bailey",
+      "name": "Ace Bailey",
+      "team": "Utah Jazz",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "brice-sensabaugh",
+      "name": "Brice Sensabaugh",
+      "team": "Utah Jazz",
+      "position": "SF/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kyle-filipowski",
+      "name": "Kyle Filipowski",
+      "team": "Utah Jazz",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "jaxson-hayes",
+      "name": "Jaxson Hayes",
+      "team": "Utah Jazz",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kevin-love",
+      "name": "Kevin Love",
+      "team": "Utah Jazz",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cody-williams",
+      "name": "Cody Williams",
+      "team": "Utah Jazz",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "john-konchar",
+      "name": "John Konchar",
+      "team": "Utah Jazz",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "sviatoslav-mykhailiuk",
+      "name": "Svi Mykhailiuk",
+      "team": "Utah Jazz",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "josh-okogie",
+      "name": "Josh Okogie",
+      "team": "Utah Jazz",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "oscar-tshiebwe",
+      "name": "Oscar Tshiebwe",
+      "team": "Utah Jazz",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "blake-hinson",
+      "name": "Blake Hinson",
+      "team": "Utah Jazz",
+      "position": "PF/SF",
+      "source": "2kratings"
+    },
+    {
+      "id": "mohamed-bamba",
+      "name": "Mo Bamba",
+      "team": "Utah Jazz",
+      "position": "C",
+      "source": "2kratings"
+    },
+    {
+      "id": "bez-mbeng",
+      "name": "Bez Mbeng",
+      "team": "Utah Jazz",
+      "position": "SG/PG",
+      "source": "2kratings"
+    },
+    {
+      "id": "trey-alexander",
+      "name": "Trey Alexander",
+      "team": "Utah Jazz",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tamar-bates",
+      "name": "Tamar Bates",
+      "team": "Utah Jazz",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "hayden-gray",
+      "name": "Hayden Gray",
+      "team": "Utah Jazz",
+      "position": "SG/PG",
+      "source": "2kratings"
+    },
+    {
+      "id": "anthony-davis",
+      "name": "Anthony Davis",
+      "team": "Washington Wizards",
+      "position": "PF/C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "trae-young",
+      "name": "Trae Young",
+      "team": "Washington Wizards",
+      "position": "PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "alexandre-sarr",
+      "name": "Alex Sarr",
+      "team": "Washington Wizards",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "kyshawn-george",
+      "name": "KyShawn George",
+      "team": "Washington Wizards",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "will-riley",
+      "name": "Will Riley",
+      "team": "Washington Wizards",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "deandre-ayton",
+      "name": "Deandre Ayton",
+      "team": "Washington Wizards",
+      "position": "C",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bilal-coulibaly",
+      "name": "Bilal Coulibaly",
+      "team": "Washington Wizards",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "justin-champagnie",
+      "name": "Justin Champagnie",
+      "team": "Washington Wizards",
+      "position": "PF/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tre-johnson",
+      "name": "Tre Johnson",
+      "team": "Washington Wizards",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "bub-carrington",
+      "name": "Bub Carrington",
+      "team": "Washington Wizards",
+      "position": "SG/PG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "tristan-vukcevic",
+      "name": "Tristan Vukcevic",
+      "team": "Washington Wizards",
+      "position": "C/PF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "julian-reese",
+      "name": "Julian Reese",
+      "team": "Washington Wizards",
+      "position": "C/PF",
+      "source": "2kratings"
+    },
+    {
+      "id": "jamir-watkins",
+      "name": "Jamir Watkins",
+      "team": "Washington Wizards",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "khris-middleton",
+      "name": "Khris Middleton",
+      "team": "Washington Wizards",
+      "position": "SF/SG",
+      "source": "nba2klab"
+    },
+    {
+      "id": "cameron-whitmore",
+      "name": "Cam Whitmore",
+      "team": "Washington Wizards",
+      "position": "SG/SF",
+      "source": "nba2klab"
+    },
+    {
+      "id": "sharife-cooper",
+      "name": "Sharife Cooper",
+      "team": "Washington Wizards",
+      "position": "PG",
+      "source": "2kratings"
+    },
+    {
+      "id": "anthony-gill",
+      "name": "Anthony Gill",
+      "team": "Washington Wizards",
+      "position": "PF/C",
+      "source": "nba2klab"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "klay-thompson": [
+    { "name": "Deadeye", "category": "shooting", "tier": "Gold" },
+    { "name": "Set Shot Specialist", "category": "shooting", "tier": "Gold" },
+    { "name": "Shifty Shooter", "category": "shooting", "tier": "Gold" },
+    { "name": "Limitless Range", "category": "shooting", "tier": "Silver" },
+    { "name": "Slippery Off-Ball", "category": "general", "tier": "Gold" },
+    { "name": "Off-Ball Pest", "category": "defense", "tier": "Gold" },
+    { "name": "Challenger", "category": "defense", "tier": "Bronze" },
+    { "name": "Immovable Enforcer", "category": "defense", "tier": "Bronze" },
+    { "name": "On-Ball Menace", "category": "defense", "tier": "Bronze" },
+    { "name": "Pick Dodger", "category": "defense", "tier": "Bronze" }
+  ]
+}

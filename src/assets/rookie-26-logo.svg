@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" role="img" aria-labelledby="title">
+  <title id="title">2K26 Rookie Builder</title>
+  <rect x="0.75" y="0.75" width="38.5" height="38.5" rx="7.25" fill="#20201d" stroke="#11110f" stroke-width="1.5"/>
+  <path d="M1.5 30.5 1.5 38.5 9.5 38.5Z" fill="#2b8969"/>
+  <path d="M7.5 31.5H32.5" fill="none" stroke="#68c4a9" stroke-linecap="round" stroke-width="1.5"/>
+  <path d="M12.25 31.5c0-5 3.45-8.5 7.75-8.5s7.75 3.5 7.75 8.5" fill="none" stroke="#68c4a9" stroke-linecap="round" stroke-width="1.5"/>
+  <path d="M20 23v8.5" fill="none" stroke="#68c4a9" stroke-linecap="round" stroke-width="1.5"/>
+  <text x="19.5" y="19.75" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="800" letter-spacing="0" text-anchor="middle">26</text>
+  <circle cx="31.25" cy="8.75" r="3" fill="#c66b46"/>
+  <path d="M28.85 8.75h4.8M31.25 6.35v4.8" fill="none" stroke="#20201d" stroke-linecap="round" stroke-width="0.8"/>
+</svg>

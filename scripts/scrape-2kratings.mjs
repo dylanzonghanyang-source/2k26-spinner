@@ -12,27 +12,112 @@ const ATTRIBUTE_LABELS = {
     "Shot IQ",
     "Offensive Consistency"
   ],
-  athleticism: ["Speed", "Acceleration", "Vertical", "Stamina", "Hustle", "Durability"],
-  playmaking: ["Pass Accuracy", "Ball Handle", "Speed With Ball", "Pass IQ", "Offensive Consistency"],
+  athleticism: ["Speed", "Strength", "Agility", "Vertical", "Hustle", "Stamina", "Overall Durability"],
+  playmaking: ["Ball Handle", "Speed with Ball", "Pass Accuracy", "Pass Vision", "Pass IQ"],
   defense: [
     "Interior Defense",
     "Perimeter Defense",
     "Steal",
     "Block",
+    "Pass Perception",
+    "Defensive Consistency",
     "Defensive Rebound",
-    "Help Defense IQ",
-    "Lateral Quickness"
+    "Help Defense IQ"
   ],
   inside: [
-    "Driving Layup",
+    "Layup",
     "Driving Dunk",
     "Standing Dunk",
     "Post Control",
     "Post Hook",
     "Post Fade",
     "Close Shot",
-    "Draw Foul"
+    "Draw Foul",
+    "Hands",
+    "Offensive Rebound"
   ]
+};
+
+const ATTRIBUTE_ALIASES = {
+  "Close Shot": ["Close Shot"],
+  "Mid-Range Shot": ["Mid-Range Shot"],
+  "Three-Point Shot": ["Three-Point Shot"],
+  "Free Throw": ["Free Throw"],
+  "Offensive Consistency": ["Offensive Consistency"],
+  "Shot IQ": ["Shot IQ"],
+  "Speed": ["Speed"],
+  "Strength": ["Strength"],
+  "Agility": ["Agility", "Lateral Quickness", "Acceleration"],
+  "Vertical": ["Vertical"],
+  "Hustle": ["Hustle"],
+  "Stamina": ["Stamina"],
+  "Overall Durability": ["Overall Durability", "Durability"],
+  "Ball Handle": ["Ball Handle", "Ball Control"],
+  "Speed with Ball": ["Speed with Ball", "Speed With Ball"],
+  "Pass Accuracy": ["Pass Accuracy"],
+  "Pass Vision": ["Pass Vision"],
+  "Pass IQ": ["Pass IQ"],
+  "Block": ["Block"],
+  "Steal": ["Steal"],
+  "Pass Perception": ["Pass Perception"],
+  "Interior Defense": ["Interior Defense"],
+  "Perimeter Defense": ["Perimeter Defense"],
+  "Defensive Consistency": ["Defensive Consistency"],
+  "Help Defense IQ": ["Help Defense IQ"],
+  "Layup": ["Layup", "Driving Layup"],
+  "Driving Dunk": ["Driving Dunk"],
+  "Standing Dunk": ["Standing Dunk"],
+  "Post Hook": ["Post Hook"],
+  "Post Fade": ["Post Fade"],
+  "Post Control": ["Post Control"],
+  "Draw Foul": ["Draw Foul"],
+  "Hands": ["Hands"],
+  "Offensive Rebound": ["Offensive Rebound"],
+  "Defensive Rebound": ["Defensive Rebound"],
+  "Intangibles": ["Intangibles"]
+};
+
+const BADGE_CATEGORY_BY_NAME = {
+  "Set Shot Specialist": "shooting",
+  "Deadeye": "shooting",
+  "Limitless Range": "shooting",
+  "Mini Marksman": "shooting",
+  "Shifty Shooter": "shooting",
+  "Ankle Assassin": "playmaking",
+  "Bail Out": "playmaking",
+  "Break Starter": "playmaking",
+  "Dimer": "playmaking",
+  "Handles For Days": "playmaking",
+  "Lightning Launch": "athleticism",
+  "Strong Handle": "playmaking",
+  "Unpluckable": "playmaking",
+  "Versatile Visionary": "playmaking",
+  "Aerial Wizard": "athleticism",
+  "Float Game": "inside",
+  "Hook Specialist": "inside",
+  "Layup Mixmaster": "inside",
+  "Paint Prodigy": "inside",
+  "Physical Finisher": "inside",
+  "Post Fade Phenom": "inside",
+  "Post Powerhouse": "inside",
+  "Post-Up Poet": "inside",
+  "Posterizer": "inside",
+  "Rise Up": "inside",
+  "Challenger": "defense",
+  "Glove": "defense",
+  "High-Flying Denier": "defense",
+  "Immovable Enforcer": "defense",
+  "Interceptor": "defense",
+  "Off-Ball Pest": "defense",
+  "On-Ball Menace": "defense",
+  "Paint Patroller": "defense",
+  "Pick Dodger": "defense",
+  "Post Lockdown": "defense",
+  "Boxout Beast": "rebounding",
+  "Rebound Chaser": "rebounding",
+  "Brick Wall": "inside",
+  "Pogo Stick": "defense",
+  "Slippery Off-Ball": "shooting"
 };
 
 const inputArgs = process.argv.slice(2);
@@ -74,6 +159,7 @@ function parsePlayerPage(html, sourceUrl) {
   const overall = guessNumber(text, ["Overall", "OVR"]);
   const archetype = guessValue(text, ["Archetype", "Player Type"]);
   const detailedAttributes = extractKnownAttributes(text);
+  const badges = extractBadges(html);
 
   return {
     sourceUrl,
@@ -87,18 +173,45 @@ function parsePlayerPage(html, sourceUrl) {
     weight,
     wingspan,
     attributes: {
-      shooting: aggregateCategory(text, ATTRIBUTE_LABELS.shooting),
-      athleticism: aggregateCategory(text, ATTRIBUTE_LABELS.athleticism),
-      playmaking: aggregateCategory(text, ATTRIBUTE_LABELS.playmaking),
-      defense: aggregateCategory(text, ATTRIBUTE_LABELS.defense),
-      inside: aggregateCategory(text, ATTRIBUTE_LABELS.inside)
+      shooting: aggregateCategory(detailedAttributes, ATTRIBUTE_LABELS.shooting),
+      athleticism: aggregateCategory(detailedAttributes, ATTRIBUTE_LABELS.athleticism),
+      playmaking: aggregateCategory(detailedAttributes, ATTRIBUTE_LABELS.playmaking),
+      defense: aggregateCategory(detailedAttributes, ATTRIBUTE_LABELS.defense),
+      inside: aggregateCategory(detailedAttributes, ATTRIBUTE_LABELS.inside)
     },
-    detailedAttributes
+    detailedAttributes,
+    badges
   };
 }
 
-function aggregateCategory(text, labels) {
-  const values = labels.map((label) => guessNumber(text, [label])).filter((value) => Number.isFinite(value));
+function extractBadges(html) {
+  const badges = [];
+  const imageTags = html.match(/<img\b[^>]*>/gi) ?? [];
+
+  for (const tag of imageTags) {
+    const alt = matchAttribute(tag, "alt");
+    const src = matchAttribute(tag, "data-src") ?? matchAttribute(tag, "src");
+    const tierMatch = src?.match(/\/([a-z0-9-]+)-(bronze|silver|gold|hall-of-fame)-badge\.png/i);
+    if (!alt || !tierMatch) continue;
+
+    const name = clean(alt);
+    badges.push({
+      name,
+      category: BADGE_CATEGORY_BY_NAME[name] ?? "general",
+      tier: tierMatch[2].toLowerCase() === "hall-of-fame" ? "HOF" : `${tierMatch[2][0].toUpperCase()}${tierMatch[2].slice(1).toLowerCase()}`
+    });
+  }
+
+  return [...new Map(badges.map((badge) => [`${badge.name}:${badge.tier}`, badge])).values()];
+}
+
+function matchAttribute(tag, name) {
+  const match = tag.match(new RegExp(`\\b${escapeRegExp(name)}=["']([^"']+)["']`, "i"));
+  return match?.[1] ?? null;
+}
+
+function aggregateCategory(attributes, labels) {
+  const values = labels.map((label) => attributes[label]).filter((value) => Number.isFinite(value));
   if (values.length === 0) {
     return null;
   }
@@ -108,8 +221,8 @@ function aggregateCategory(text, labels) {
 
 function extractKnownAttributes(text) {
   const known = new Map();
-  for (const label of Object.values(ATTRIBUTE_LABELS).flat()) {
-    const value = guessNumber(text, [label]);
+  for (const [label, aliases] of Object.entries(ATTRIBUTE_ALIASES)) {
+    const value = guessNumber(text, aliases);
     if (Number.isFinite(value)) {
       known.set(label, value);
     }
@@ -277,13 +390,11 @@ async function expandInputs(items) {
       continue;
     }
 
-    if (looksLikePath(item)) {
-      const file = await readFile(path.resolve(item), "utf8");
-      const parsed = item.endsWith(".json") ? JSON.parse(file) : file.split(/\r?\n/);
-      for (const entry of parsed.flat?.() ?? parsed) {
-        if (typeof entry === "string" && looksLikeUrl(entry)) {
-          urls.push(entry);
-        }
+    const file = await readFile(path.resolve(item), "utf8");
+    const parsed = item.endsWith(".json") ? JSON.parse(file) : file.split(/\r?\n/);
+    for (const entry of parsed.flat?.() ?? parsed) {
+      if (typeof entry === "string" && looksLikeUrl(entry)) {
+        urls.push(entry);
       }
     }
   }
@@ -293,8 +404,4 @@ async function expandInputs(items) {
 
 function looksLikeUrl(value) {
   return /^https?:\/\//i.test(value);
-}
-
-function looksLikePath(value) {
-  return !looksLikeUrl(value);
 }

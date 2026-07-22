@@ -1,6 +1,10 @@
-import { Download, Sparkles, Upload } from "lucide-react";
+import { Award, BookOpen, Dice5, Disc3, Download, Sparkles, Upload, UserRoundPlus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PlayerWheel from "./components/PlayerWheel";
+import RookieBuilder, { type RookieBuilderTeam } from "./components/RookieBuilder";
+import { badgeTierCN, getBadgeNameCN } from "./badges";
+import { getPlayerNameCN } from "./playerNames";
+import rookieLogo from "./assets/rookie-26-logo.svg";
 import {
   attributeGroups,
   attrGroupMap,
@@ -17,16 +21,45 @@ import {
   randomShoulderWidth,
   randomWingspan,
   randomWeight,
+  playerSourceKey,
+  defaultCareerProfile,
   type PlayerSource,
   type AttributeGroupKey,
   type BodyTemplate,
+  type CareerProfile,
   type PlayerDraft,
+  type PlayerBadge,
+  type RookieTier,
   type SourceMap
 } from "./domain";
-import playerDatabase from "./data/players.json";
+import rosterCatalog from "./data/rosterCatalog.json";
+import badgeProfiles from "./data/badgeProfiles.json";
+import detailedPlayers from "./data/players.json";
 
-const appVersion = "v0.1";
-const lastUpdated = "2026-06-30";
+const appVersion = "v0.3";
+const lastUpdated = "2026-07-22";
+const usageGuides = {
+  rookie: [
+    { title: "设定新秀", detail: "选择主次位置、年龄、潜力和身体" },
+    { title: "抽取球队", detail: "每轮展示 7 人，可切换 3 次球员" },
+    { title: "锁定属性", detail: "球员锁定或自定义；↓ 表示位置衰减" },
+    { title: "生成清单", detail: "完成 13 项后查看、复制或导出" },
+  ],
+  prime: [
+    { title: "设定球员", detail: "选择主次位置和身体，年龄固定 28 岁" },
+    { title: "抽取球队", detail: "每轮展示 7 人，可切换 3 次球员" },
+    { title: "锁定属性", detail: "球员锁定或自定义；↓ 表示位置衰减" },
+    { title: "生成清单", detail: "完成 13 项后直接生成巅峰属性" },
+  ],
+  wheel: [
+    { title: "设定范围", detail: "调整身体范围和生涯阶段" },
+    { title: "选择球员池", detail: "按阵容类型筛选可抽球员" },
+    { title: "转动轮盘", detail: "依次抽取身体与能力来源" },
+    { title: "保存结果", detail: "复制清单、导出文件或全部重抽" },
+  ],
+} as const;
+
+type AppMode = keyof typeof usageGuides;
 
 function formatPlayerName(name: string): string {
   const suffixMap: Record<string, string> = {
@@ -142,14 +175,193 @@ function matchesPlayerSearch(playerName: string, query: string): boolean {
   if (!normalizedQuery) return true;
   const normalizedName = normalizeSearchText(playerName);
   if (normalizedName.includes(normalizedQuery)) return true;
+  if (normalizeSearchText(getPlayerNameCN(playerName)).includes(normalizedQuery)) return true;
   const aliases = chineseAliases[playerName] ?? [];
   return aliases.some((alias) => normalizeSearchText(alias).includes(normalizedQuery));
 }
 
-const playerPool = (playerDatabase as PlayerSource[]).map((player) => ({
-  ...player,
-  name: formatPlayerName(player.name),
-}));
+type RosterCategory = "current" | "classic" | "allTime";
+type RosterScope = "current" | "currentClassic" | "currentAllTime" | "all";
+type RosterCatalogPlayer = {
+  id: string;
+  name: string;
+  position: string | null;
+  height: string | null;
+  overall: number | null;
+  threePoint: number | null;
+  drivingDunk: number | null;
+};
+type RosterCatalogTeam = {
+  id: string;
+  name: string;
+  category: RosterCategory;
+  players: RosterCatalogPlayer[];
+};
+type BadgeProfileMap = Record<string, PlayerBadge[]>;
+type DetailedPlayerRecord = {
+  slug: string;
+  shooting: number | null;
+  athleticism: number | null;
+  playmaking: number | null;
+  defense: number | null;
+  inside: number | null;
+  detailed: Record<string, number | null>;
+};
+
+const sourceBadgeProfiles = badgeProfiles as BadgeProfileMap;
+const detailedPlayerBySlug = new Map(
+  (detailedPlayers as DetailedPlayerRecord[]).map((player) => [player.slug, player]),
+);
+
+const scopeOptions: Array<{ key: RosterScope; label: string }> = [
+  { key: "current", label: "现役" },
+  { key: "currentClassic", label: "现役 + 经典" },
+  { key: "currentAllTime", label: "现役 + All-Time" },
+  { key: "all", label: "所有球员" },
+];
+
+const rookieTierOptions: Array<{ key: RookieTier; label: string }> = [
+  { key: "rotation", label: "轮换新秀" },
+  { key: "lottery", label: "乐透新秀" },
+  { key: "generational", label: "天赋怪" },
+];
+
+const badgeTierStyles: Record<PlayerBadge["tier"], string> = {
+  HOF: "border-fuchsia-500/25 bg-fuchsia-50 text-fuchsia-800",
+  Gold: "border-amber-500/25 bg-amber-50 text-amber-800",
+  Silver: "border-slate-400/25 bg-slate-100 text-slate-700",
+  Bronze: "border-orange-700/20 bg-orange-50 text-orange-800",
+};
+
+function BadgeTokens({ badges, emptyText }: { badges: PlayerBadge[]; emptyText: string }) {
+  if (badges.length === 0) {
+    return <span className="text-[11px] text-ink-400">{emptyText}</span>;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {badges.map((badge) => (
+        <span
+          key={`${badge.name}:${badge.tier}`}
+          className={`border px-1.5 py-0.5 text-[10px] font-medium leading-4 ${badgeTierStyles[badge.tier]}`}
+          title={badgeTierCN[badge.tier]}
+        >
+          {getBadgeNameCN(badge.name)}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function clampRating(value: number) {
+  return Math.max(25, Math.min(99, Math.round(value)));
+}
+
+function rosterPlayerSource(team: RosterCatalogTeam, player: RosterCatalogPlayer): PlayerSource {
+  const detailedPlayer = detailedPlayerBySlug.get(player.id);
+  const overall = player.overall ?? 72;
+  const threePoint = player.threePoint ?? Math.max(45, overall - 14);
+  const drivingDunk = player.drivingDunk ?? Math.max(35, overall - 20);
+  const primaryPosition = player.position?.split("/")[0] ?? "SF";
+  const guardBonus = primaryPosition === "PG" ? 12 : primaryPosition === "SG" ? 7 : primaryPosition === "SF" ? 2 : -4;
+  const bigBonus = primaryPosition === "C" ? 11 : primaryPosition === "PF" ? 6 : 0;
+  const shooting = clampRating(threePoint * 0.62 + overall * 0.38);
+  const inside = clampRating(drivingDunk * 0.54 + overall * 0.46 + bigBonus);
+  const athleticism = clampRating(overall * 0.72 + drivingDunk * 0.24 + 4);
+  const playmaking = clampRating(overall * 0.68 + guardBonus);
+  const defense = clampRating(overall * 0.76 + bigBonus * 0.7);
+
+  return {
+    id: `${team.category}:${team.id}:${player.id}`,
+    name: formatPlayerName(player.name),
+    slug: player.id,
+    rosterCategory: team.category,
+    rosterTeam: team.name,
+    isEstimated: !detailedPlayer,
+    badges: sourceBadgeProfiles[player.id] ?? [],
+    overall,
+    team: team.name,
+    position: player.position,
+    archetype: null,
+    height: player.height,
+    weight: null,
+    wingspan: null,
+    shooting: detailedPlayer?.shooting ?? shooting,
+    athleticism: detailedPlayer?.athleticism ?? athleticism,
+    playmaking: detailedPlayer?.playmaking ?? playmaking,
+    defense: detailedPlayer?.defense ?? defense,
+    inside: detailedPlayer?.inside ?? inside,
+    detailed: detailedPlayer?.detailed ?? {
+      "Close Shot": clampRating(inside - 3),
+      "Mid-Range Shot": clampRating((shooting + overall) / 2),
+      "Three-Point Shot": threePoint,
+      "Free Throw": clampRating(shooting - 4),
+      "Offensive Consistency": clampRating(overall - 3),
+      "Shot IQ": clampRating(overall),
+      "Speed": clampRating(athleticism - bigBonus),
+      "Strength": clampRating(overall * 0.72 + bigBonus * 1.4),
+      "Agility": clampRating(athleticism + guardBonus * 0.35),
+      "Vertical": clampRating(athleticism + drivingDunk * 0.16),
+      "Hustle": clampRating(overall - 2),
+      "Stamina": clampRating(overall + 2),
+      "Overall Durability": clampRating(overall - 5),
+      "Ball Handle": clampRating(playmaking + guardBonus * 0.65),
+      "Speed with Ball": clampRating(playmaking + guardBonus * 0.45),
+      "Pass Accuracy": clampRating(playmaking),
+      "Pass Vision": clampRating(playmaking - 4),
+      "Pass IQ": clampRating(playmaking - 2),
+      "Block": clampRating(defense + bigBonus * 1.2 - 16),
+      "Steal": clampRating(defense + guardBonus * 0.45 - 5),
+      "Pass Perception": clampRating(defense - 2),
+      "Interior Defense": clampRating(defense + bigBonus),
+      "Perimeter Defense": clampRating(defense + guardBonus * 0.3 - bigBonus * 0.35),
+      "Defensive Consistency": clampRating(defense - 1),
+      "Help Defense IQ": clampRating(defense),
+      "Layup": clampRating(inside - 2),
+      "Driving Dunk": drivingDunk,
+      "Standing Dunk": clampRating(drivingDunk - 18 + bigBonus),
+      "Post Hook": clampRating(inside - 16 + bigBonus),
+      "Post Fade": clampRating((inside + shooting) / 2 - 8),
+      "Post Control": clampRating(inside - 5 + bigBonus),
+      "Draw Foul": clampRating(inside - 3),
+      "Hands": clampRating(overall + 2),
+      "Offensive Rebound": clampRating(defense - 12 + bigBonus),
+      "Defensive Rebound": clampRating(defense - 7 + bigBonus),
+      "Intangibles": clampRating(overall),
+    },
+  };
+}
+
+const catalogTeams = (rosterCatalog.teams as RosterCatalogTeam[]) ?? [];
+const rookieBuilderTeams: RookieBuilderTeam[] = catalogTeams
+  .filter((team) => team.category === "current" && team.players.length > 0)
+  .map((team) => ({
+    id: team.id,
+    name: team.name,
+    players: team.players.map((player) => rosterPlayerSource(team, player)),
+  }));
+const currentPlayerPool = catalogTeams
+  .filter((team) => team.category === "current")
+  .flatMap((team) => team.players.map((player) => rosterPlayerSource(team, player)));
+const historicalPlayerPool = catalogTeams
+  .filter((team) => team.category === "classic" || team.category === "allTime")
+  .flatMap((team) => team.players.map((player) => rosterPlayerSource(team, player)));
+
+const allPlayerPool = [...currentPlayerPool, ...historicalPlayerPool];
+
+function playersForScope(scope: RosterScope): PlayerSource[] {
+  if (scope === "current") return currentPlayerPool;
+  if (scope === "currentClassic") return allPlayerPool.filter((player) => player.rosterCategory !== "allTime");
+  if (scope === "currentAllTime") return allPlayerPool.filter((player) => player.rosterCategory !== "classic");
+  return allPlayerPool;
+}
+
+function playerPoolLabel(player: PlayerSource): string {
+  const name = getPlayerNameCN(player.name);
+  if (player.rosterCategory === "current") return name;
+  return player.rosterTeam ? `${name} · ${player.rosterTeam}` : name;
+}
+
 const spinDurationMs = 4200;
 
 type PhysicalWheelKey = "position" | "height" | "shoulder" | "wingspan" | "weight";
@@ -207,7 +419,10 @@ function createDraftText(draft: PlayerDraft): string {
   return [
     `球员模板: ${draft.position} / ${draft.height}`,
     `体型: ${draft.weight ?? "--"} kg | ${draft.wingspan} 臂展 | ${draft.shoulderWidth} 肩宽`,
-    `来源: ${draft.sourceNames.join(" / ")}`,
+    `创建阶段: ${draft.careerStage === "rookie" ? "生涯起点" : "巅峰模板"}${draft.careerStage === "rookie" ? ` | 潜力 ${draft.potential}` : ""}`,
+    `来源: ${draft.sourceNames.map(getPlayerNameCN).join(" / ")}`,
+    `当前徽章: ${draft.badges.map((badge) => `${getBadgeNameCN(badge.name)} (${badgeTierCN[badge.tier]})`).join(" / ") || "--"}`,
+    `巅峰徽章: ${draft.peakBadges.map((badge) => `${getBadgeNameCN(badge.name)} (${badgeTierCN[badge.tier]})`).join(" / ") || "--"}`,
     "",
     `投篮: ${draft.shooting}`,
     `运动: ${draft.athleticism}`,
@@ -262,9 +477,18 @@ const initialBodyTemplate: BodyTemplate = {
   shoulderWidth: "1",
 };
 
-function createEmptyDraft(body: BodyTemplate = initialBodyTemplate): PlayerDraft {
+function createEmptyDraft(
+  body: BodyTemplate = initialBodyTemplate,
+  profile: CareerProfile = defaultCareerProfile,
+): PlayerDraft {
   return {
     ...body,
+    careerStage: profile.stage,
+    rookieTier: profile.rookieTier,
+    potential: 0,
+    badges: [],
+    peakBadges: [],
+    badgesEstimated: false,
     sourceNames: [],
     shooting: 0, athleticism: 0, playmaking: 0, defense: 0, inside: 0,
     closeShot: null, midRangeShot: null, threePointShot: null, freeThrow: null,
@@ -298,6 +522,7 @@ function RangeSlider({
   absoluteMax,
   color,
   disabled = false,
+  onRandomize,
 }: {
   label: string;
   min: number;
@@ -308,7 +533,19 @@ function RangeSlider({
   absoluteMax: number;
   color: string;
   disabled?: boolean;
+  onRandomize?: () => void;
 }) {
+  const [minInput, setMinInput] = useState(String(min));
+  const [maxInput, setMaxInput] = useState(String(max));
+
+  useEffect(() => {
+    setMinInput(String(min));
+  }, [min]);
+
+  useEffect(() => {
+    setMaxInput(String(max));
+  }, [max]);
+
   const handleMinInput = (value: string) => {
     const next = clampNumber(parseRangeInput(value, min), absoluteMin, max);
     onMinChange(next);
@@ -319,35 +556,75 @@ function RangeSlider({
     onMaxChange(next);
   };
 
+  const syncMinWhileTyping = (value: string) => {
+    const parsed = Number(value);
+    if (value.trim() !== "" && Number.isFinite(parsed) && parsed >= absoluteMin && parsed <= max) {
+      onMinChange(Math.round(parsed));
+    }
+  };
+
+  const syncMaxWhileTyping = (value: string) => {
+    const parsed = Number(value);
+    if (value.trim() !== "" && Number.isFinite(parsed) && parsed >= min && parsed <= absoluteMax) {
+      onMaxChange(Math.round(parsed));
+    }
+  };
+
   return (
-    <div className={`flex flex-col gap-2 rounded-md border border-ink-700/10 bg-white/60 px-3 py-2 select-none ${disabled ? "opacity-50" : ""}`}>
+    <div className={`flex select-none flex-col gap-2 rounded-[6px] border border-ink-200 bg-ink-50 px-3 py-2 ${disabled ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between gap-2 text-[11px] leading-none">
         <span className="shrink-0 font-medium text-ink-700">{label}</span>
         <div className="flex items-center gap-1.5">
+          {onRandomize && (
+            <button
+              aria-label={`${label}全范围随机`}
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[5px] border border-ink-200 bg-white text-court-700 transition hover:border-ink-400 hover:bg-ink-50 disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={disabled}
+              onClick={onRandomize}
+              title={`在完整可选范围内随机${label}`}
+              type="button"
+            >
+              <Dice5 className="h-3.5 w-3.5" />
+            </button>
+          )}
           <input
             aria-label={`${label}下限`}
-            className="h-6 w-14 rounded border border-ink-700/10 bg-white px-1 text-center text-[11px] font-semibold tabular-nums text-ink-900 outline-none transition focus:border-court-500/50 focus:ring-2 focus:ring-court-300/30 disabled:cursor-not-allowed"
+            className="h-6 w-14 rounded-[5px] border border-ink-200 bg-white px-1 text-center text-[11px] font-semibold tabular-nums text-ink-900 outline-none transition focus:border-court-500 disabled:cursor-not-allowed"
             disabled={disabled}
             inputMode="numeric"
             max={max}
             min={absoluteMin}
-            onChange={(e) => handleMinInput(e.target.value)}
+            onBlur={(e) => handleMinInput(e.currentTarget.value)}
+            onChange={(e) => {
+              setMinInput(e.target.value);
+              syncMinWhileTyping(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.currentTarget.blur();
+            }}
             style={{ color }}
             type="number"
-            value={min}
+            value={minInput}
           />
           <span className="text-ink-400">–</span>
           <input
             aria-label={`${label}上限`}
-            className="h-6 w-14 rounded border border-ink-700/10 bg-white px-1 text-center text-[11px] font-semibold tabular-nums text-ink-900 outline-none transition focus:border-court-500/50 focus:ring-2 focus:ring-court-300/30 disabled:cursor-not-allowed"
+            className="h-6 w-14 rounded-[5px] border border-ink-200 bg-white px-1 text-center text-[11px] font-semibold tabular-nums text-ink-900 outline-none transition focus:border-court-500 disabled:cursor-not-allowed"
             disabled={disabled}
             inputMode="numeric"
             max={absoluteMax}
             min={min}
-            onChange={(e) => handleMaxInput(e.target.value)}
+            onBlur={(e) => handleMaxInput(e.currentTarget.value)}
+            onChange={(e) => {
+              setMaxInput(e.target.value);
+              syncMaxWhileTyping(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.currentTarget.blur();
+            }}
             style={{ color }}
             type="number"
-            value={max}
+            value={maxInput}
           />
         </div>
       </div>
@@ -368,10 +645,10 @@ function RangeSlider({
         {/* 最小值滑块 */}
         <input
           type="range"
-          className="absolute top-0 left-0 z-10 h-full w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-[var(--slider-thumb)] [&::-webkit-slider-thumb]:shadow-[0_2px_10px_rgba(31,73,86,0.28)] [&::-webkit-slider-track]:appearance-none [&::-webkit-slider-track]:bg-transparent"
+          className="range-control absolute top-0 left-0 z-10 h-full w-full [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-[var(--slider-thumb)] [&::-webkit-slider-thumb]:shadow-[0_2px_10px_rgba(31,73,86,0.28)]"
           style={{ "--slider-thumb": color, background: "transparent" } as React.CSSProperties}
           min={absoluteMin}
-          max={max}
+          max={absoluteMax}
           value={min}
           disabled={disabled}
           onChange={(e) => onMinChange(Number(e.target.value))}
@@ -379,9 +656,9 @@ function RangeSlider({
         {/* 最大值滑块 */}
         <input
           type="range"
-          className="absolute top-0 left-0 z-20 h-full w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-[var(--slider-thumb)] [&::-webkit-slider-thumb]:shadow-[0_2px_10px_rgba(31,73,86,0.28)] [&::-webkit-slider-track]:appearance-none [&::-webkit-slider-track]:bg-transparent"
+          className="range-control absolute top-0 left-0 z-20 h-full w-full [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-[var(--slider-thumb)] [&::-webkit-slider-thumb]:shadow-[0_2px_10px_rgba(31,73,86,0.28)]"
           style={{ "--slider-thumb": color, background: "transparent" } as React.CSSProperties}
-          min={min}
+          min={absoluteMin}
           max={absoluteMax}
           value={max}
           disabled={disabled}
@@ -393,15 +670,18 @@ function RangeSlider({
 }
 
 const App = () => {
+  const [appMode, setAppMode] = useState<AppMode>("rookie");
   const [draft, setDraft] = useState<PlayerDraft>(() => createEmptyDraft());
-  const [selectedPool, setSelectedPool] = useState<string[]>([]);
+  const [careerProfile, setCareerProfile] = useState<CareerProfile>(defaultCareerProfile);
+  const [rosterScope, setRosterScope] = useState<RosterScope>("current");
+  const [selectedPool, setSelectedPool] = useState<string[]>(() => currentPlayerPool.map(playerSourceKey));
   const [activeGroupKey, setActiveGroupKey] = useState<WheelKey>("shooting");
   const [sourceMap, setSourceMap] = useState<SourceMap | null>(null);
   const [bodyTemplate, setBodyTemplate] = useState<BodyTemplate>(initialBodyTemplate);
   const [poolSearch, setPoolSearch] = useState("");
   const [wheelRotations, setWheelRotations] = useState<Record<WheelKey, number>>(initialWheelRotations);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [statusText, setStatusText] = useState("先选球员，再转轮盘");
+  const [statusText, setStatusText] = useState("已载入 2KRatings 最新现役 roster");
   const spinTimerRef = useRef<number | null>(null);
 
   const [positionVal, setPositionVal] = useState(initialBodyTemplate.position);
@@ -422,9 +702,11 @@ const App = () => {
   const [wingspanMax, setWingspanMax] = useState(100);
   const [posFilter, setPosFilter] = useState<string[]>(["PG", "SG", "SF", "PF", "C"]);
 
+  const scopedPlayers = useMemo(() => playersForScope(rosterScope), [rosterScope]);
+
   const availablePlayers = useMemo(
     () => selectedPool.length > 0
-      ? playerPool.filter((player) => selectedPool.includes(player.name))
+      ? allPlayerPool.filter((player) => selectedPool.includes(playerSourceKey(player)))
       : [],
     [selectedPool]
   );
@@ -530,7 +812,7 @@ const App = () => {
       return buildWheelItems(physicalOptionsByKey[activeTab.key]);
     }
 
-    return buildWheelItems(availablePlayers.map((player) => player.name));
+    return buildWheelItems(availablePlayers.map(playerPoolLabel));
   }, [activeTab.key, availablePlayers, physicalOptionsByKey]);
 
   const activeCurrentLabel = isPhysicalWheelKey(activeTab.key)
@@ -543,7 +825,7 @@ const App = () => {
           : activeTab.key === "wingspan"
             ? wingspanVal
             : weightVal
-    : activeSource?.name;
+    : activeSource ? playerPoolLabel(activeSource) : undefined;
   const hasDraftBody = bodyTemplate.position !== initialBodyTemplate.position
     || bodyTemplate.height !== initialBodyTemplate.height
     || bodyTemplate.weight !== initialBodyTemplate.weight
@@ -561,8 +843,33 @@ const App = () => {
       shoulderWidth: sw
     };
     setBodyTemplate(template);
-    setDraft((current) => sourceMap ? createDraftFromSources(sourceMap, template) : { ...current, ...template });
-  }, [bodyTemplate.weight, sourceMap]);
+    setDraft((current) => sourceMap ? createDraftFromSources(sourceMap, template, careerProfile) : { ...current, ...template });
+  }, [bodyTemplate.weight, careerProfile, sourceMap]);
+
+  const randomizeFullBodyValue = useCallback((key: "height" | "shoulder" | "wingspan") => {
+    if (isSpinning) return;
+
+    if (key === "height") {
+      const value = randomHeight();
+      setHeightVal(value);
+      applyBody(positionVal, value, shoulderVal, wingspanVal, weightVal);
+      setStatusText(`身高 → ${value} cm（全范围随机）`);
+      return;
+    }
+
+    if (key === "shoulder") {
+      const value = randomShoulderWidth();
+      setShoulderVal(value);
+      applyBody(positionVal, heightVal, value, wingspanVal, weightVal);
+      setStatusText(`肩宽 → ${value}（全范围随机）`);
+      return;
+    }
+
+    const value = randomWingspan();
+    setWingspanVal(value);
+    applyBody(positionVal, heightVal, shoulderVal, value, weightVal);
+    setStatusText(`臂展 → ${value}（全范围随机）`);
+  }, [applyBody, heightVal, isSpinning, positionVal, shoulderVal, weightVal, wingspanVal]);
 
   const chooseRandom = useCallback(<T,>(options: readonly T[], fallback: T): T => {
     return options.length > 0 ? options[Math.floor(Math.random() * options.length)] : fallback;
@@ -579,39 +886,62 @@ const App = () => {
     return () => clearSpinTimer();
   }, [clearSpinTimer]);
 
-  const togglePool = (name: string) => {
+  const togglePool = (playerId: string) => {
     if (isSpinning) return;
-    const nextPool = selectedPool.includes(name)
-      ? selectedPool.filter((e) => e !== name)
-      : [...selectedPool, name];
+    const nextPool = selectedPool.includes(playerId)
+      ? selectedPool.filter((id) => id !== playerId)
+      : [...selectedPool, playerId];
     setSelectedPool(nextPool);
     if (nextPool.length === 0) {
       setSourceMap(null);
-      setDraft(createEmptyDraft(bodyTemplate));
+      setDraft(createEmptyDraft(bodyTemplate, careerProfile));
       setStatusText("球员池已清空");
       return;
     }
-    const normalized = sourceMap ? normalizeSourceMap(nextPool, sourceMap, playerPool) : createRandomSourceMap(nextPool, playerPool);
+    const normalized = sourceMap ? normalizeSourceMap(nextPool, sourceMap, allPlayerPool) : createRandomSourceMap(nextPool, allPlayerPool);
     setSourceMap(normalized);
-    setDraft(createDraftFromSources(normalized, bodyTemplate));
+    setDraft(createDraftFromSources(normalized, bodyTemplate, careerProfile));
     setStatusText("球员池已更新");
   };
 
   const selectAllPlayers = () => {
     if (isSpinning) return;
-    const nextPool = playerPool.map((p) => p.name);
-    const normalized = sourceMap ? normalizeSourceMap(nextPool, sourceMap, playerPool) : createRandomSourceMap(nextPool, playerPool);
+    const nextPool = scopedPlayers.map(playerSourceKey);
+    const normalized = sourceMap ? normalizeSourceMap(nextPool, sourceMap, allPlayerPool) : createRandomSourceMap(nextPool, allPlayerPool);
     setSelectedPool(nextPool);
     setSourceMap(normalized);
-    setDraft(createDraftFromSources(normalized, bodyTemplate));
+    setDraft(createDraftFromSources(normalized, bodyTemplate, careerProfile));
     setStatusText("已全选");
+  };
+
+  const changeRosterScope = (scope: RosterScope) => {
+    if (isSpinning) return;
+    const nextPlayers = playersForScope(scope);
+    const nextPool = nextPlayers.map(playerSourceKey);
+    const normalized = sourceMap ? normalizeSourceMap(nextPool, sourceMap, allPlayerPool) : createRandomSourceMap(nextPool, allPlayerPool);
+    setRosterScope(scope);
+    setSelectedPool(nextPool);
+    setSourceMap(normalized);
+    setDraft(createDraftFromSources(normalized, bodyTemplate, careerProfile));
+    setStatusText(`${scopeOptions.find((option) => option.key === scope)?.label ?? "球员池"}已载入`);
+  };
+
+  const updateCareerProfile = (nextProfile: CareerProfile) => {
+    if (isSpinning) return;
+    setCareerProfile(nextProfile);
+    if (sourceMap) {
+      setDraft(createDraftFromSources(sourceMap, bodyTemplate, nextProfile));
+    } else {
+      setDraft(createEmptyDraft(bodyTemplate, nextProfile));
+    }
+    setStatusText(nextProfile.stage === "rookie" ? "生涯起点已更新" : "巅峰模板已更新");
   };
 
   const clearPool = () => {
     if (isSpinning) return;
     setSelectedPool([]);
     setSourceMap(null);
-    setDraft(createEmptyDraft(bodyTemplate));
+    setDraft(createEmptyDraft(bodyTemplate, careerProfile));
     setStatusText("球员池已清空");
   };
 
@@ -702,15 +1032,15 @@ const App = () => {
       spins: 5 + Math.floor(Math.random() * 2),
       onFinish: () => {
         const nextSources = {
-          ...(sourceMap ?? createRandomSourceMap(selectedPool, playerPool)),
+          ...(sourceMap ?? createRandomSourceMap(selectedPool, allPlayerPool)),
           [activeGroupKey]: target,
         } as SourceMap;
         setSourceMap(nextSources);
-        setDraft(createDraftFromSources(nextSources, bodyTemplate));
-        setStatusText(`${activeGroup.name} → ${target.name}`);
+        setDraft(createDraftFromSources(nextSources, bodyTemplate, careerProfile));
+        setStatusText(`${activeGroup.name} → ${getPlayerNameCN(target.name)}`);
       },
     });
-  }, [activeGroup.name, activeGroupKey, availablePlayers, bodyTemplate, selectedPool, sourceMap, startWheelSpin]);
+  }, [activeGroup.name, activeGroupKey, availablePlayers, bodyTemplate, careerProfile, selectedPool, sourceMap, startWheelSpin]);
 
   const handleActiveWheelSpin = useCallback(() => {
     if (isPhysicalWheelKey(activeGroupKey)) {
@@ -722,8 +1052,12 @@ const App = () => {
   }, [activeGroupKey, spinCurrentGroup, spinPhysicalWheel]);
 
   const randomizeAll = () => {
-    if (isSpinning || playerPool.length === 0) return;
-    const nextSources = createRandomSourceMap(selectedPool, playerPool);
+    if (isSpinning) return;
+    if (selectedPool.length === 0) {
+      setStatusText("请先选择至少一名球员");
+      return;
+    }
+    const nextSources = createRandomSourceMap(selectedPool, allPlayerPool);
     const pos = chooseRandom(posOpts, randomPosition());
     const ht = chooseRandom(filteredHeights, randomHeight());
     const sw = chooseRandom(filteredShoulders, randomShoulderWidth());
@@ -739,11 +1073,11 @@ const App = () => {
 
     setSourceMap(nextSources);
     setBodyTemplate(template);
-    setDraft(createDraftFromSources(nextSources, template));
+    setDraft(createDraftFromSources(nextSources, template, careerProfile));
 
     const activeTargetIndex = isPhysicalWheelKey(activeTab.key)
       ? activeWheelItems.findIndex((item) => item.label === (activeTab.key === "position" ? pos : activeTab.key === "height" ? ht : activeTab.key === "shoulder" ? sw : activeTab.key === "wingspan" ? ws : wt))
-      : activeWheelItems.findIndex((item) => item.label === nextSources[activeGroupKey as AttributeGroupKey]?.name);
+      : activeWheelItems.findIndex((item) => item.label === playerPoolLabel(nextSources[activeGroupKey as AttributeGroupKey]));
 
     if (activeTargetIndex >= 0 && activeWheelItems.length > 0) {
       setWheelRotations((current) => ({
@@ -809,33 +1143,80 @@ const App = () => {
 
   return (
     <main className="min-h-screen text-ink-900">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1440px] flex-col gap-3 px-3 py-3 sm:px-4">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1520px] flex-col gap-2.5 px-2.5 py-2.5 sm:px-4 sm:py-3">
 
         {/* Header */}
-        <header className="flex flex-wrap items-center justify-between gap-2 border-b border-ink-700/10 pb-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full border border-court-500/20 bg-court-100 text-[10px] font-bold text-court-800">
-              2K
+        <header className="app-header">
+          <div className="flex min-w-0 shrink-0 items-center gap-2.5">
+            <div className="brand-mark" aria-hidden="true">
+              <img alt="" src={rookieLogo} />
             </div>
-            <h1 className="text-[15px] font-semibold tracking-[-0.01em]">球员轮盘生成器</h1>
+            <div className="min-w-0">
+              <h1 className="truncate text-[14px] font-semibold text-ink-900">2K26 球员生成器</h1>
+              <div className="mt-0.5 truncate text-[9px] text-ink-500">
+                {appMode === "rookie" ? "球队抽选 / 新秀构建" : appMode === "prime" ? "球队抽选 / 巅峰构建" : "能力混合 / 球员转盘"}
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px]">
-            <span className="text-ink-700/60">混合能力 · 快速出卡</span>
-            <span className="rounded bg-white/70 px-1.5 py-0.5 font-medium text-ink-600">{appVersion} · {lastUpdated}</span>
-            <span className="font-medium text-court-700">{statusText}</span>
+          <nav className="mode-nav" aria-label="生成模式">
+            <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} onClick={() => setAppMode("rookie")} type="button">
+              <UserRoundPlus className="h-3.5 w-3.5" />
+              <span className="lg:hidden">新秀</span>
+              <span className="hidden lg:inline">生成我的新秀</span>
+            </button>
+            <button aria-pressed={appMode === "prime"} className="mode-nav-button" data-active={appMode === "prime"} onClick={() => setAppMode("prime")} type="button">
+              <Award className="h-3.5 w-3.5" />
+              <span className="lg:hidden">巅峰</span>
+              <span className="hidden lg:inline">生成巅峰球员</span>
+            </button>
+            <button aria-pressed={appMode === "wheel"} className="mode-nav-button" data-active={appMode === "wheel"} onClick={() => setAppMode("wheel")} type="button">
+              <Disc3 className="h-3.5 w-3.5" />
+              <span className="lg:hidden">转盘</span>
+              <span className="hidden lg:inline">球员转盘</span>
+            </button>
+          </nav>
+
+          <div className="flex shrink-0 items-center justify-end gap-2">
+            <span className="meta-chip">{appVersion} / {lastUpdated}</span>
+            <span className="hidden items-center gap-1.5 text-[10px] font-medium text-ink-600 xl:flex">
+              <span className="h-1.5 w-1.5 rounded-full bg-court-500" />
+              {appMode === "rookie" ? "新秀构建" : appMode === "prime" ? "巅峰构建" : statusText}
+            </span>
           </div>
         </header>
 
-        {/* TOP HALF — two columns: left=ranges, right=wheel */}
-        <div className="grid gap-x-4 gap-y-3 md:grid-cols-[288px_1fr] md:grid-rows-[1fr_auto]">
+        {appMode === "wheel" && <section className="panel-surface overflow-hidden" aria-label="使用指南">
+          <div className="workspace-toolbar flex items-center justify-between px-3 py-2">
+            <div className="section-label flex items-center gap-1.5">
+              <BookOpen className="h-3.5 w-3.5 text-court-700" />
+              使用指南
+            </div>
+            <span className="text-[9px] text-ink-400">球员转盘</span>
+          </div>
+          <ol className="grid grid-cols-2 gap-px bg-ink-200 md:grid-cols-4">
+            {usageGuides.wheel.map((step, index) => (
+              <li key={step.title} className="flex min-w-0 items-start gap-2 bg-white px-3 py-2.5">
+                <span className="shrink-0 font-mono text-[10px] font-semibold text-court-700">0{index + 1}</span>
+                <span className="min-w-0">
+                  <strong className="block text-[11px] font-semibold text-ink-800">{step.title}</strong>
+                  <span className="mt-0.5 block text-[9px] leading-4 text-ink-500">{step.detail}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>}
+
+        {appMode === "wheel" ? (
+        /* TOP HALF — two columns: left=ranges, right=wheel */
+        <div className="grid gap-2.5 md:grid-cols-[300px_minmax(0,1fr)] md:grid-rows-[1fr_auto]">
 
           {/* Left column — range sliders + player pool */}
-          <aside className="flex flex-col gap-3 h-full">
+          <aside className="contents md:flex md:h-full md:flex-col md:gap-2.5">
             {/* Range sliders */}
-            <div className="panel-surface px-4 py-3.5">
-              <div className="section-label mb-3.5">身材抽奖范围</div>
-              <div className="grid gap-3">
+            <div className="panel-surface order-1 overflow-hidden md:order-none">
+              <div className="workspace-toolbar px-3 py-2.5"><div className="section-label">身材抽奖范围</div></div>
+              <div className="grid gap-2.5 p-3">
                 <RangeSlider
                   label="身高 (cm)"
                   min={heightMin}
@@ -846,6 +1227,7 @@ const App = () => {
                   absoluteMax={300}
                   color="#4b83b8"
                   disabled={isSpinning}
+                  onRandomize={() => randomizeFullBodyValue("height")}
                 />
                 <RangeSlider
                   label="肩宽"
@@ -857,6 +1239,7 @@ const App = () => {
                   absoluteMax={100}
                   color="#b86f5a"
                   disabled={isSpinning}
+                  onRandomize={() => randomizeFullBodyValue("shoulder")}
                 />
                 <RangeSlider
                   label="臂展"
@@ -868,6 +1251,7 @@ const App = () => {
                   absoluteMax={100}
                   color="#2f9d83"
                   disabled={isSpinning}
+                  onRandomize={() => randomizeFullBodyValue("wingspan")}
                 />
                 <RangeSlider
                   label="体重 (kg)"
@@ -884,18 +1268,18 @@ const App = () => {
             </div>
 
             {/* Position filter */}
-            <div className="panel-surface px-4 py-3.5">
-              <div className="section-label mb-3">位置抽奖池</div>
-              <div className="grid grid-cols-5 gap-1.5">
+            <div className="panel-surface order-2 overflow-hidden md:order-none">
+              <div className="workspace-toolbar px-3 py-2.5"><div className="section-label">位置抽奖池</div></div>
+              <div className="grid grid-cols-5 gap-1.5 p-3">
                 {["PG", "SG", "SF", "PF", "C"].map((pos) => {
                   const active = posFilter.includes(pos);
                   return (
                     <button
                       key={pos}
-                      className={`flex h-7 min-w-0 items-center justify-center rounded text-[11px] font-medium transition ${
+                      className={`flex h-7 min-w-0 items-center justify-center rounded-[5px] text-[11px] font-medium transition ${
                         active
-                          ? "border border-court-500/25 bg-court-100 text-court-800"
-                          : "border border-ink-700/10 bg-white text-ink-600 hover:border-court-500/22 hover:bg-court-50 hover:text-ink-900"
+                          ? "border border-ink-900 bg-ink-900 text-white"
+                          : "border border-ink-200 bg-white text-ink-600 hover:border-ink-400 hover:bg-ink-50 hover:text-ink-900"
                       }`}
                       onClick={() => {
                         setPosFilter((prev) => {
@@ -915,7 +1299,73 @@ const App = () => {
             </div>
 
             {/* Player pool */}
-            <div className="panel-surface flex flex-col">
+            <div className="panel-surface order-4 flex flex-col overflow-hidden md:order-none">
+              <div className="workspace-toolbar px-3 py-2.5">
+                <div className="section-label mb-2">生涯设定</div>
+                <div className="grid grid-cols-2 gap-px overflow-hidden rounded border border-ink-700/10 bg-ink-700/10">
+                  {([
+                    { key: "rookie", label: "生涯起点" },
+                    { key: "prime", label: "巅峰模板" },
+                  ] as const).map((option) => {
+                    const active = careerProfile.stage === option.key;
+                    return (
+                      <button
+                        key={option.key}
+                        className={`min-h-8 px-2 py-1.5 text-[11px] font-medium transition ${
+                          active ? "bg-court-100 text-court-900" : "bg-white text-ink-600 hover:bg-ink-50 hover:text-ink-900"
+                        }`}
+                        disabled={isSpinning}
+                        onClick={() => updateCareerProfile({ ...careerProfile, stage: option.key })}
+                        type="button"
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {careerProfile.stage === "rookie" && (
+                  <div className="mt-2 grid grid-cols-3 gap-1">
+                    {rookieTierOptions.map((option) => {
+                      const active = careerProfile.rookieTier === option.key;
+                      return (
+                        <button
+                          key={option.key}
+                          className={`min-h-7 border px-1 text-[10px] font-medium transition ${
+                            active
+                              ? "border-court-500/25 bg-court-50 text-court-800"
+                              : "border-ink-700/10 bg-white text-ink-600 hover:border-court-500/22 hover:text-ink-900"
+                          }`}
+                          disabled={isSpinning}
+                          onClick={() => updateCareerProfile({ ...careerProfile, rookieTier: option.key })}
+                          type="button"
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-px border-b border-ink-700/10 bg-ink-700/10">
+                {scopeOptions.map((option) => {
+                  const active = rosterScope === option.key;
+                  return (
+                    <button
+                      key={option.key}
+                      className={`min-h-8 px-2 py-1.5 text-[10px] font-medium transition ${
+                        active
+                          ? "bg-court-100 text-court-900"
+                          : "bg-white text-ink-600 hover:bg-ink-50 hover:text-ink-900"
+                      }`}
+                      disabled={isSpinning}
+                      onClick={() => changeRosterScope(option.key)}
+                      type="button"
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
               <div className="flex items-center gap-2 border-b border-ink-700/10 px-3 py-2">
                 <input
                   className="flex-1 bg-transparent text-[13px] text-ink-900 placeholder:text-ink-500/60 outline-none"
@@ -925,7 +1375,7 @@ const App = () => {
                 />
               </div>
               <div className="flex items-center gap-3 border-b border-ink-700/10 px-3 py-1.5">
-                <span className="text-[11px] text-ink-600">{selectedPool.length}/{playerPool.length}</span>
+                <span className="text-[11px] text-ink-600">{selectedPool.length}/{scopedPlayers.length}</span>
                 <span className="text-[10px] text-ink-300">|</span>
                 <button
                   className="text-[11px] text-ink-600 transition hover:text-ink-900 disabled:opacity-40"
@@ -945,26 +1395,27 @@ const App = () => {
                 </button>
               </div>
               <div className="overflow-y-auto max-h-[320px]">
-                {playerPool
+                {scopedPlayers
                   .filter((p) => matchesPlayerSearch(p.name, poolSearch))
 
                   .map((player) => {
-                    const active = selectedPool.includes(player.name);
+                    const playerId = playerSourceKey(player);
+                    const active = selectedPool.includes(playerId);
                     return (
                       <button
-                        key={player.name}
+                        key={playerId}
                         className={`flex w-full items-center justify-between border-b border-ink-700/5 px-3 py-1 text-left text-sm transition ${
                           active ? "bg-court-50 text-court-900" : "text-ink-700 hover:bg-ink-100/60"
                         }`}
                         disabled={isSpinning}
-                        onClick={() => togglePool(player.name)}
+                        onClick={() => togglePool(playerId)}
                         type="button"
                       >
-                        <span className="flex items-center gap-2 truncate">
+                        <span className="flex min-w-0 items-center gap-2 truncate">
                           <span className={"flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border transition " + (active ? "border-court-600 bg-court-600" : "border-ink-400/40 bg-white")}>
                 {active && <svg className="h-2.5 w-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}
               </span>
-                          {player.name}
+                          <span className="truncate">{playerPoolLabel(player)}</span>
                         </span>
                         {active && <span className="shrink-0 text-[10px] text-court-700">已选</span>}
                       </button>
@@ -975,19 +1426,19 @@ const App = () => {
           </aside>
 
           {/* Right — wheel + physical wheels + draft card */}
-          <section className="flex flex-col gap-3 h-full">
+          <section className="order-3 flex h-full flex-col gap-2.5 md:order-none">
             {/* All tabs — ability + physical */}
-            <div className="panel-surface">
-              <div className="flex flex-wrap">
+            <div className="panel-surface overflow-hidden p-1">
+              <div className="flex flex-wrap gap-1">
                 {allTabs.map((tab) => {
                   const active = tab.key === activeGroupKey;
                   return (
                     <button
                       key={tab.key}
-                      className={`flex-1 py-2 text-center text-[11px] transition ${
+                      className={`flex-1 rounded-[5px] py-2 text-center text-[11px] transition ${
                         active
-                          ? (tab.isPhysical ? "bg-ink-100 text-ink-900 font-medium" : "bg-court-100 text-court-900 font-medium")
-                          : "bg-white/50 text-ink-600 hover:bg-ink-50 hover:text-ink-900"
+                          ? "bg-ink-900 font-semibold text-white"
+                          : "bg-white text-ink-600 hover:bg-ink-50 hover:text-ink-900"
                       }`}
                       disabled={isSpinning}
                       onClick={() => { setActiveGroupKey(tab.key); setStatusText(tab.name); }}
@@ -1001,7 +1452,7 @@ const App = () => {
             </div>
 
             {/* Wheel — full width, adapts to active tab */}
-            <div className="panel-surface flex flex-1 flex-col p-4">
+            <div className="panel-surface flex flex-1 flex-col overflow-hidden p-3 sm:p-4">
               <PlayerWheel
                 activeGroupName={activeTab.name}
                 currentLabel={activeCurrentLabel}
@@ -1016,24 +1467,29 @@ const App = () => {
               />
             </div>
             {/* Player card + actions — horizontal bar */}
-            <div className="panel-surface md:col-span-2">
+            <div className="panel-surface overflow-hidden md:col-span-2">
               <div className="flex flex-col sm:flex-row sm:items-stretch">
                 {/* Draft card */}
-                <div className="flex-[2] border-b border-ink-700/10 bg-gradient-to-r from-court-50 to-transparent px-4 py-3 sm:border-b-0 sm:border-r">
+                <div className="flex-[2] border-b border-ink-200 bg-ink-50 px-4 py-3 sm:border-b-0 sm:border-r">
                   <div className="section-label">球员卡片</div>
                   {hasGeneratedDraft ? (
                     <>
-                      <div className="mt-1 text-[17px] font-semibold tracking-[-0.01em]">{draft.position} / {draft.height}</div>
+                      <div className="mt-1 text-[17px] font-semibold">{draft.position} / {draft.height}</div>
                       <div className="text-[12px] text-ink-600">
                         {draft.wingspan} 臂展 · {draft.weight ?? "--"} kg · {draft.shoulderWidth} 肩宽
                       </div>
+                      <div className="text-[11px] font-medium text-court-700">
+                        {draft.careerStage === "rookie"
+                          ? `${rookieTierOptions.find((option) => option.key === draft.rookieTier)?.label ?? "新秀"} · 潜力 ${draft.potential}`
+                          : "巅峰模板"}
+                      </div>
                       <div className="text-[11px] text-ink-500">
-                        {draft.sourceNames.length > 0 ? draft.sourceNames.join(" · ") : "来源待抽取"}
+                        {draft.sourceNames.length > 0 ? draft.sourceNames.map(getPlayerNameCN).join(" · ") : "来源待抽取"}
                       </div>
                     </>
                   ) : (
                     <>
-                      <div className="mt-1 text-[17px] font-semibold tracking-[-0.01em] text-ink-500">待抽取</div>
+                      <div className="mt-1 text-[17px] font-semibold text-ink-500">待抽取</div>
                       <div className="text-[12px] text-ink-500">身高、臂展、体重与来源待抽取</div>
                       <div className="text-[11px] text-ink-400">点击转盘开始生成球员卡片</div>
                     </>
@@ -1070,28 +1526,49 @@ const App = () => {
           </section>
 
           {/* BOTTOM — full width */}
-          <div className="flex flex-col gap-3 md:col-span-2 pt-3">
-            <div className="panel-surface">
-              <div className="section-label border-b border-ink-700/10 px-3 py-2">
+          <div className="order-5 flex flex-col gap-2.5 pt-1 md:order-none md:col-span-2">
+            <div className="panel-surface overflow-hidden">
+              <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">
+                <div className="section-label flex items-center gap-1.5">
+                  <Award className="h-3.5 w-3.5 text-court-700" />
+                  徽章
+                </div>
+                {draft.sourceNames.length > 0 && (
+                  <span className="text-[10px] text-ink-500">{draft.badgesEstimated ? "属性推导含部分来源" : "2KRatings 原始来源"}</span>
+                )}
+              </div>
+              <div className="grid gap-px bg-ink-200 md:grid-cols-2">
+                <div className="bg-white px-3 py-2.5">
+                  <div className="mb-2 text-[10px] font-semibold text-ink-500">当前徽章</div>
+                  <BadgeTokens badges={draft.badges} emptyText="待抽取" />
+                </div>
+                <div className="bg-white px-3 py-2.5">
+                  <div className="mb-2 text-[10px] font-semibold text-ink-500">巅峰徽章</div>
+                  <BadgeTokens badges={draft.peakBadges} emptyText="待抽取" />
+                </div>
+              </div>
+            </div>
+            <div className="panel-surface overflow-hidden">
+              <div className="workspace-toolbar section-label px-3 py-2.5">
                 来源分配
               </div>
-              <div className="grid grid-cols-2 gap-px bg-ink-200/70 sm:grid-cols-3 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-px bg-ink-200 sm:grid-cols-3 lg:grid-cols-5">
                 {sourceEntries.map(({ group, player }) => (
                   <div key={group.key} className="bg-white px-3 py-2 text-center">
-                    <div className="text-[10px] uppercase tracking-[0.1em] text-ink-500">{group.name}</div>
+                    <div className="text-[10px] font-semibold text-ink-500">{group.name}</div>
                     <div className={`mt-0.5 truncate text-[12px] font-medium ${player ? "text-ink-900" : "text-ink-400"}`}>
-                      {player?.name ?? "待抽取"}
+                      {player ? getPlayerNameCN(player.name) : "待抽取"}
                     </div>
                   </div>
 
                 ))}
               </div>
             </div>
-            <div className="panel-surface">
-              <div className="section-label border-b border-ink-700/10 px-3 py-2">
+            <div className="panel-surface overflow-hidden">
+              <div className="workspace-toolbar section-label px-3 py-2.5">
                 详细属性 · {detailedAttrs.length} 项
               </div>
-              <div className="grid gap-px bg-ink-200/70 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+              <div className="grid gap-px bg-ink-200 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                 {(["shooting","athleticism","playmaking","defense","inside"] as const).map((groupKey: "shooting" | "athleticism" | "playmaking" | "defense" | "inside") => {
                   const group = attrGroupMap[groupKey];
                   const groupAttrs: typeof detailedAttrs = detailedAttrs.filter((a: {label: string}) => (group.attrs as string[]).includes(a.label));
@@ -1099,7 +1576,7 @@ const App = () => {
                   return (
                     <div key={groupKey} className="bg-white">
                       <div
-                        className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                        className="px-3 py-1.5 text-[10px] font-semibold"
                         style={{ color: group.color, backgroundColor: group.color + "10" }}
                       >
                         {group.name}
@@ -1118,10 +1595,10 @@ const App = () => {
               </div>
             </div>
 
-            <footer className="panel-surface px-3 py-2.5 text-[11px] leading-5 text-ink-600">
+            <footer className="border-t border-ink-200 px-1 py-2.5 text-[10px] leading-5 text-ink-500">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <p>
-                  非 NBA、2K 或 2K Sports 官方项目，仅供娱乐和自用测试；球员数据与属性翻译可能存在误差。
+                  现役球队名单基于 {lastUpdated} 的 NBA 2K27 Play Now roster；经典与历史最佳球队保留原存档。部分属性和徽章由公开的 OVR、三分、扣篮等字段推导，不是完整官方属性表。
                 </p>
                 <p className="shrink-0 text-ink-500">
                   反馈入口：中文名、属性翻译或球员缺失可以直接把截图和建议发给作者。
@@ -1131,6 +1608,9 @@ const App = () => {
 
         </div>
         </div>
+        ) : (
+          <RookieBuilder key={appMode} mode={appMode} teams={rookieBuilderTeams} />
+        )}
 
       </div>
 
