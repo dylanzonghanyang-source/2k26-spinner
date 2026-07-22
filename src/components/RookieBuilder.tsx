@@ -1313,7 +1313,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
         id="builder-pane-settings"
         role="tabpanel"
       >
-        <div className="flex flex-col gap-3 px-3 py-3 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-3 px-3 py-3">
           <div className="flex flex-wrap items-end gap-3 sm:gap-4">
           <div className="min-w-[190px]">
             <div className="section-label mb-1">{isPrime ? "球员姓名" : "新秀姓名"}</div>
@@ -1427,11 +1427,19 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             <div className="mt-1.5 h-1 overflow-hidden rounded-sm bg-ink-200"><div className="h-full bg-court-600" style={{ width: `${(completed / bundles.length) * 100}%` }} /></div>
           </div>
           </div>
-          <div className="flex flex-wrap items-center justify-end gap-2">
-          <span className="mr-1 hidden items-center gap-1.5 text-[9px] font-medium text-ink-500 xl:flex"><span className="h-1.5 w-1.5 rounded-full bg-court-500" />{status}</span>
-          {!settingsLocked && <button className="action-button primary-action px-2.5 py-1.5 text-[11px] font-semibold" onClick={confirmSettings} type="button"><Check className="h-3.5 w-3.5" />确认设定</button>}
-          <button className="action-button px-2.5 py-1.5 text-[11px]" disabled={!settingsLocked || isTeamDrawing || isComplete} onClick={autoComplete} type="button"><Sparkles className="h-3.5 w-3.5" />自动补齐</button>
-          <button className="action-button px-2.5 py-1.5 text-[11px]" onClick={reset} type="button"><RefreshCw className="h-3.5 w-3.5" />重新开始</button>
+          <div className="border-t border-ink-100 pt-2.5">
+            <div className="mb-2 flex items-center gap-1.5 text-[9px] font-medium text-ink-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-court-500" />{status}
+            </div>
+            <div className="flex w-full items-stretch gap-2" aria-label="设定操作">
+              <div className="flex min-w-0 flex-[2] gap-2" aria-label="生成流程操作" role="group">
+                {!settingsLocked && <button className="action-button primary-action flex-1 justify-center px-2.5 py-2 text-[11px] font-semibold" onClick={confirmSettings} type="button"><Check className="h-3.5 w-3.5" />确认设定</button>}
+                <button className="action-button flex-1 justify-center px-2.5 py-2 text-[11px]" disabled={!settingsLocked || isTeamDrawing || isComplete} onClick={autoComplete} type="button"><Sparkles className="h-3.5 w-3.5" />自动补齐</button>
+              </div>
+              <div className="flex min-w-0 flex-1 border-l border-ink-200 pl-2" aria-label="重置操作" role="group">
+                <button className="action-button flex-1 justify-center px-2.5 py-2 text-[11px]" onClick={reset} type="button"><RefreshCw className="h-3.5 w-3.5" />重新开始</button>
+              </div>
+            </div>
           </div>
         </div>
         <div className="workspace-toolbar px-3 py-3">
