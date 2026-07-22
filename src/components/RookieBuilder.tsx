@@ -1351,7 +1351,8 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             </section>
             <section aria-labelledby="ability-estimate-label" className="border-t border-ink-100 pt-3 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
               <div className="section-label mb-2" id="ability-estimate-label">成长设定</div>
-              <div className={`grid items-end gap-3 ${isPrime ? "grid-cols-1" : "grid-cols-2"}`}>
+              <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_156px]">
+                <div className={`grid items-end gap-3 ${isPrime ? "grid-cols-1" : "grid-cols-2"}`}>
           {isPrime ? (
           <div className="min-w-0">
             <div className="section-label mb-1">属性阶段</div>
@@ -1390,22 +1391,23 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             </div>
           </>
           )}
+                </div>
+                <div className="flex w-full items-stretch gap-2 xl:flex-col" aria-label="设定操作">
+                  {!settingsLocked && (
+                    <button className="action-button primary-action flex-1 justify-center px-4 py-2 text-[11px] font-semibold xl:flex-none" onClick={confirmSettings} type="button"><Check className="h-3.5 w-3.5" />确认并抽取</button>
+                  )}
+                  <button className="action-button flex-1 justify-center px-4 py-2 text-[11px] xl:flex-none" onClick={reset} type="button"><RefreshCw className="h-3.5 w-3.5" />{settingsLocked ? "重新开始" : "重置设定"}</button>
+                </div>
               </div>
             </section>
           </div>
-          <div className="grid gap-3 border-t border-ink-100 pt-3 lg:grid-cols-[minmax(0,1fr)_220px_auto] lg:items-center">
+          <div className="grid gap-3 border-t border-ink-100 pt-3 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center">
             <div className="flex items-center gap-1.5 text-[9px] font-medium text-ink-500">
               <span className="h-1.5 w-1.5 rounded-full bg-court-500" />{status}
             </div>
             <div className="min-w-0">
               <div className="flex justify-between text-[9px] font-semibold text-ink-500"><span>完成进度</span><span className="tabular-nums">{completed}/{bundles.length}</span></div>
               <div className="mt-1.5 h-1 overflow-hidden rounded-sm bg-ink-200"><div className="h-full bg-court-600" style={{ width: `${(completed / bundles.length) * 100}%` }} /></div>
-            </div>
-            <div className="flex w-full items-stretch gap-2 lg:w-auto lg:justify-end" aria-label="设定操作">
-              {!settingsLocked && (
-                <button className="action-button primary-action flex-1 justify-center px-5 py-2 text-[11px] font-semibold lg:min-w-[156px] lg:flex-none" onClick={confirmSettings} type="button"><Check className="h-3.5 w-3.5" />确认并抽取</button>
-              )}
-              <button className="action-button flex-1 justify-center px-4 py-2 text-[11px] lg:flex-none" onClick={reset} type="button"><RefreshCw className="h-3.5 w-3.5" />{settingsLocked ? "重新开始" : "重置设定"}</button>
             </div>
           </div>
         </div>
