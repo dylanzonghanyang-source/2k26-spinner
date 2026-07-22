@@ -526,7 +526,6 @@ function downgradeTier(tier: BadgeTier, age: number, readiness: number): BadgeTi
 
 function createHotZones(
   attrs: Record<string, number>,
-  overall: number,
   position: Position,
   secondary: Position,
   hand: "左手" | "右手",
@@ -553,32 +552,16 @@ function createHotZones(
       ? 3
       : selectedPositions.some((candidate) => candidate === "PF" || candidate === "C") && (band === "rim" || band === "close") ? 4 : 0;
     const score = base + handBias + roleBias + (random() - 0.5) * 24;
-    const state: HotZoneState = score >= 84 ? "热区" : score < 70 ? "冷区" : "中性";
-    return { name, base, score, state };
+    return { name, base, score, state: "中性" as HotZoneState };
   });
 
-  if (overall < 95 && !scoredZones.some((zone) => zone.state === "冷区")) {
-    const weakest = scoredZones.reduce((current, zone) => zone.score < current.score ? zone : current, scoredZones[0]);
-    weakest.state = "冷区";
-  }
-
-  // Most players should have a few genuine strengths surrounded by neutral
-  // areas. Only a small share of 95+ players may keep a hot-heavy chart.
-  const shouldLimitHotZones = overall < 95 || random() < 0.82;
-  if (shouldLimitHotZones) {
-    let hotCount = scoredZones.filter((zone) => zone.state === "热区").length;
-    let neutralCount = scoredZones.filter((zone) => zone.state === "中性").length;
-    const weakestHotZones = scoredZones
-      .filter((zone) => zone.state === "热区")
-      .sort((left, right) => left.score - right.score);
-
-    for (const zone of weakestHotZones) {
-      if (hotCount <= Math.floor(neutralCount / 2)) break;
-      zone.state = "中性";
-      hotCount -= 1;
-      neutralCount += 1;
-    }
-  }
+  // Hot-zone charts describe relative strengths, so distribute a controlled
+  // number of extremes instead of classifying every zone independently.
+  const rankedZones = [...scoredZones].sort((left, right) => left.score - right.score);
+  const coldCount = random() < 0.7 ? 1 : 2;
+  const hotCount = random() < 0.5 ? 3 : 4;
+  rankedZones.slice(0, coldCount).forEach((zone) => { zone.state = "冷区"; });
+  rankedZones.slice(-hotCount).forEach((zone) => { zone.state = "热区"; });
 
   return Object.fromEntries(scoredZones.map(({ name, state }) => [name, state]));
 }
@@ -682,7 +665,7 @@ function createResult(
     : peakBadges
       .map((badge) => ({ ...badge, tier: downgradeTier(badge.tier, age, readiness) }))
       .filter((badge): badge is typeof badge & { tier: BadgeTier } => badge.tier !== null);
-  const hotZones = createHotZones(initialAttrs, initialStrength, position, secondary, hand, random);
+  const hotZones = createHotZones(initialAttrs, position, secondary, hand, random);
   return {
     age, position, secondary,
     hand, dunkHand, ...body,
