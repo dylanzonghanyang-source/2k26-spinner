@@ -1314,8 +1314,11 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
         role="tabpanel"
       >
         <div className="flex flex-col gap-3 px-3 py-3">
-          <div className="flex flex-wrap items-end gap-3 sm:gap-4">
-          <div className="min-w-[190px]">
+          <div className={`grid gap-4 ${isPrime ? "xl:grid-cols-[minmax(0,2.1fr)_minmax(260px,1fr)]" : "xl:grid-cols-[minmax(0,2.1fr)_minmax(400px,1fr)]"}`}>
+            <section aria-labelledby="player-identity-label">
+              <div className="section-label mb-2" id="player-identity-label">球员身份</div>
+              <div className="flex flex-wrap items-end gap-3 sm:gap-4">
+          <div className="min-w-[190px] flex-1">
             <div className="section-label mb-1">{isPrime ? "球员姓名" : "新秀姓名"}</div>
             <div className="flex h-7 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
               <input
@@ -1384,8 +1387,13 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
               ))}
             </div>
           </div>
+              </div>
+            </section>
+            <section aria-labelledby="ability-estimate-label" className="border-t border-ink-100 pt-3 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
+              <div className="section-label mb-2" id="ability-estimate-label">能力预估</div>
+              <div className={`grid items-end gap-3 ${isPrime ? "grid-cols-1" : "grid-cols-3"}`}>
           {isPrime ? (
-          <div className="min-w-[166px]">
+          <div className="min-w-0">
             <div className="section-label mb-1">属性阶段</div>
             <div className="flex h-7 items-center justify-between rounded-[5px] border border-court-200 bg-court-50 px-2 text-[10px] font-semibold text-court-800">
               <span>巅峰值直出</span>
@@ -1394,7 +1402,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
           </div>
           ) : (
           <>
-            <div className="min-w-[142px]">
+            <div className="min-w-0">
               <div className="section-label mb-1" title="生成球员最终可以达到的综评区间">巅峰综评</div>
               <div className="flex h-7 items-center justify-center gap-1 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
                 <CompactNumberInput ariaLabel="巅峰综评下限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMin} value={potentialRange.min} />
@@ -1402,7 +1410,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                 <CompactNumberInput ariaLabel="巅峰综评上限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMax} value={potentialRange.max} />
               </div>
             </div>
-            <div className="min-w-[142px]">
+            <div className="min-w-0">
               <div className="mb-1 flex items-center justify-between gap-1">
                 <div className="section-label flex items-center gap-1" title="即战力表示新秀已经兑现了多少巅峰能力；数值越高，开局越接近巅峰">
                   即战力 <CircleHelp className="h-3 w-3 text-ink-400" />
@@ -1414,7 +1422,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                 <button aria-label="随机即战力" className="flex w-7 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeReadiness} title="随机生成 1–100 即战力" type="button"><Shuffle className="h-3 w-3" /></button>
               </div>
             </div>
-            <div className="min-w-[112px]">
+            <div className="min-w-0">
               <div className="section-label mb-1">新秀综评</div>
               <div className="flex h-7 items-center justify-center rounded-[5px] border border-court-200 bg-court-50 px-2 font-mono text-[11px] font-semibold text-court-800" data-testid="projected-initial-range" title="由年龄、巅峰综评和即战力共同计算">
                 {projectedInitialRange.min}–{projectedInitialRange.max}
@@ -1422,14 +1430,18 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             </div>
           </>
           )}
-          <div className="min-w-[150px]">
-            <div className="flex justify-between text-[9px] font-semibold text-ink-500"><span>完成进度</span><span className="tabular-nums">{completed}/{bundles.length}</span></div>
-            <div className="mt-1.5 h-1 overflow-hidden rounded-sm bg-ink-200"><div className="h-full bg-court-600" style={{ width: `${(completed / bundles.length) * 100}%` }} /></div>
-          </div>
+              </div>
+            </section>
           </div>
           <div className="border-t border-ink-100 pt-2.5">
-            <div className="mb-2 flex items-center gap-1.5 text-[9px] font-medium text-ink-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-court-500" />{status}
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 text-[9px] font-medium text-ink-500">
+                <span className="h-1.5 w-1.5 rounded-full bg-court-500" />{status}
+              </div>
+              <div className="min-w-[150px] flex-1 sm:max-w-[260px]">
+                <div className="flex justify-between text-[9px] font-semibold text-ink-500"><span>完成进度</span><span className="tabular-nums">{completed}/{bundles.length}</span></div>
+                <div className="mt-1.5 h-1 overflow-hidden rounded-sm bg-ink-200"><div className="h-full bg-court-600" style={{ width: `${(completed / bundles.length) * 100}%` }} /></div>
+              </div>
             </div>
             <div className="flex w-full items-stretch gap-2" aria-label="设定操作">
               <div className="flex min-w-0 flex-[2] gap-2" aria-label="生成流程操作" role="group">
