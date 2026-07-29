@@ -225,27 +225,51 @@ input:focus-visible {
 }
 
 .builder-setup-footer {
-  display: grid;
-  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 10px 14px;
   border-top: 0;
 }
 
-.builder-setup-progress {
+.builder-setup-status {
+  flex: 1 1 140px;
   min-width: 0;
+}
+
+.builder-setup-progress {
+  flex: 1 1 180px;
+  min-width: 160px;
+  max-width: 320px;
+}
+
+.builder-setup-progress-track {
+  display: block;
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d8d8d1;
+}
+
+.builder-setup-progress-fill {
+  display: block;
+  height: 100%;
+  min-height: 6px;
+  border-radius: 999px;
+  background: #2b8969;
+  transition: width 300ms ease;
+}
+
+.builder-setup-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .growth-metric {
   display: flex;
   min-width: 0;
   flex-direction: column;
-}
-
-@media (min-width: 640px) {
-  .builder-setup-footer {
-    grid-template-columns: minmax(0, 1.1fr) minmax(140px, 0.7fr) auto;
-    gap: 14px;
-  }
 }
 
 /* Desktop: identity spans both right-column rows so growth no longer
@@ -715,6 +739,14 @@ html[data-theme="dark"] .builder-setup-footer,
 html[data-theme="dark"] .meta-chip {
   border-color: #39443e;
   background: #202622;
+}
+
+html[data-theme="dark"] .builder-setup-progress-track {
+  background: #39443e;
+}
+
+html[data-theme="dark"] .builder-setup-progress-fill {
+  background: #4ba781;
 }
 
 html[data-theme="dark"] .growth-metric {

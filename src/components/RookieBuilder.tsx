@@ -1483,20 +1483,23 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
           </section>
 
           <div className="builder-setup-footer bg-ink-50/80 px-3 py-2.5">
-            <div className="flex min-w-0 items-center gap-1.5 text-[10px] font-medium text-ink-500">
+            <div className="builder-setup-status flex min-w-0 items-center gap-1.5 text-[10px] font-medium text-ink-500">
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-court-500" />
               <span className="truncate">{status}</span>
             </div>
-            <div className="builder-setup-progress min-w-0">
+            <div className="builder-setup-progress" aria-label={`完成进度 ${completed}/${bundles.length}`}>
               <div className="mb-1 flex items-center justify-between gap-2 text-[9px] font-semibold text-ink-500">
                 <span>完成进度</span>
                 <span className="tabular-nums text-ink-700">{completed}/{bundles.length}</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-ink-200">
-                <div className="h-full rounded-full bg-court-600 transition-[width] duration-300" style={{ width: `${(completed / bundles.length) * 100}%` }} />
+              <div className="builder-setup-progress-track">
+                <div
+                  className="builder-setup-progress-fill"
+                  style={{ width: `${Math.max(0, Math.min(100, (completed / bundles.length) * 100))}%` }}
+                />
               </div>
             </div>
-            <div className="flex shrink-0 items-center justify-end gap-1.5" aria-label="设定操作">
+            <div className="builder-setup-actions flex shrink-0 items-center justify-end gap-1.5" aria-label="设定操作">
               {!settingsLocked && (
                 <button className="action-button primary-action justify-center px-3 py-1.5 text-[11px] font-semibold" onClick={confirmSettings} type="button">
                   <Check className="h-3.5 w-3.5" />确认并抽取
