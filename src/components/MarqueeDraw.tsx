@@ -146,19 +146,21 @@ function MarqueeDraw({
       Math.min(1480, Math.max(720, trackRect.width * 2.4)),
     );
     rail.style.transform = `translateX(${startOffset}px)`;
+    // Most of the spin is the long coast; keep the final overshoot short so
+    // the framed winner does not sway left/right for long after landing.
     animationRef.current = rail.animate([
       { transform: `translateX(${startOffset}px)` },
-      { transform: `translateX(${finalOffset + Math.min(420, trackRect.width * 0.55)}px)`, offset: 0.55 },
-      { transform: `translateX(${finalOffset - 28}px)`, offset: 0.82 },
-      { transform: `translateX(${finalOffset + 10}px)`, offset: 0.92 },
+      { transform: `translateX(${finalOffset + Math.min(360, trackRect.width * 0.48)}px)`, offset: 0.72 },
+      { transform: `translateX(${finalOffset - 12}px)`, offset: 0.9 },
+      { transform: `translateX(${finalOffset + 4}px)`, offset: 0.96 },
       { transform: `translateX(${finalOffset}px)` },
     ], {
       duration: durationMs,
-      easing: "cubic-bezier(0.12, 0.72, 0.08, 1)",
+      easing: "cubic-bezier(0.12, 0.78, 0.08, 1)",
       fill: "forwards",
     });
-    // Reveal only after the animation finishes, not at 84%.
-    const settleTimer = window.setTimeout(() => setSettled(true), durationMs);
+    // Reveal shortly after framing the winner, without waiting out the whole sway.
+    const settleTimer = window.setTimeout(() => setSettled(true), durationMs * 0.9);
 
     return () => {
       window.clearTimeout(settleTimer);

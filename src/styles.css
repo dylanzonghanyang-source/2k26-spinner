@@ -593,6 +593,18 @@ input:focus-visible {
   padding: 0;
 }
 
+.marquee-draw[data-kind="team"] .marquee-draw-mark {
+  background: #ffffff;
+  border: 1px solid #e5e5df;
+}
+
+.marquee-draw[data-kind="team"] .marquee-draw-mark img {
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
+  padding: 4px;
+}
+
 .marquee-draw[data-kind="wheel"] .marquee-draw-mark {
   border-radius: 8px;
 }
@@ -922,6 +934,15 @@ html[data-theme="dark"] .marquee-draw-item {
   border-color: #39443e;
   background: #242c27;
   color: #dfe8e1;
+}
+
+html[data-theme="dark"] .marquee-draw[data-kind="team"] .marquee-draw-mark {
+  border-color: #46534b;
+  background: #111512;
+}
+
+html[data-theme="dark"] .marquee-draw[data-kind="team"] .marquee-draw-mark img {
+  background: transparent;
 }
 
 html[data-theme="dark"] .marquee-draw-item[data-selected="true"] {

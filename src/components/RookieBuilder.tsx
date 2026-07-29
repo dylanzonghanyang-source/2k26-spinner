@@ -135,9 +135,12 @@ function teamMark(team: RookieBuilderTeam) {
     .toUpperCase() || team.id.slice(0, 3).toUpperCase();
 }
 
-function teamLogoUrl(team: RookieBuilderTeam) {
+function teamLogoUrl(team: RookieBuilderTeam, theme: "light" | "dark" = "light") {
   const code = teamLogoCodes[team.name];
-  return code ? `https://a.espncdn.com/i/teamlogos/nba/500/${code}.png` : undefined;
+  if (!code) return undefined;
+  // ESPN ships a dedicated 500-dark set that stays readable on dark panels.
+  const folder = theme === "dark" ? "500-dark" : "500";
+  return `https://a.espncdn.com/i/teamlogos/nba/${folder}/${code}.png`;
 }
 
 const naturalSecondaryPositions: Record<Position, Position[]> = {
@@ -1010,15 +1013,30 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     [teams],
   );
   const team = settingsLocked ? teamsById.get(round.teamId) : undefined;
+  const [logoTheme, setLogoTheme] = useState<"light" | "dark">(() => (
+    document.documentElement.dataset.theme === "dark" ? "dark" : "light"
+  ));
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const syncTheme = () => {
+      setLogoTheme(root.dataset.theme === "dark" ? "dark" : "light");
+    };
+    syncTheme();
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
+  }, []);
+
   const teamDrawItems = useMemo<MarqueeDrawItem[]>(() => teams
     .filter((candidate) => candidate.players.length > 0)
     .map((candidate) => ({
       id: candidate.id,
-      imageSrc: teamLogoUrl(candidate),
+      imageSrc: teamLogoUrl(candidate, logoTheme),
       label: teamNamesCN[candidate.name] ?? candidate.name,
       mark: teamMark(candidate),
       meta: `${candidate.players.length} 名球员`,
-    })), [teams]);
+    })), [logoTheme, teams]);
   const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : undefined;
   const usedBy = useMemo(() => new Map(Object.entries(locks).flatMap(([bundleId, lock]) => {
     if (lock.kind !== "player") return [];
