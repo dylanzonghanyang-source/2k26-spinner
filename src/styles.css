@@ -206,14 +206,39 @@ input:focus-visible {
   background: #fafaf8;
 }
 
+.builder-setup-grid {
+  display: grid;
+  gap: 1px;
+  background: #e5e5df;
+}
+
+.builder-setup-identity,
+.builder-setup-growth,
+.builder-setup-body,
+.builder-setup-footer {
+  min-width: 0;
+}
+
+.builder-setup-growth {
+  display: flex;
+  flex-direction: column;
+}
+
 .builder-setup-footer {
   display: grid;
   gap: 10px;
   align-items: center;
+  border-top: 0;
 }
 
 .builder-setup-progress {
   min-width: 0;
+}
+
+.growth-metric {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
 }
 
 @media (min-width: 640px) {
@@ -223,10 +248,35 @@ input:focus-visible {
   }
 }
 
-.growth-metric {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
+/* Desktop: identity spans both right-column rows so growth no longer
+   leaves a blank strip under the shorter metric cards. */
+@media (min-width: 1024px) {
+  .builder-setup-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-areas:
+      "identity growth"
+      "identity body"
+      "footer footer";
+  }
+
+  .builder-setup-identity {
+    grid-area: identity;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .builder-setup-growth {
+    grid-area: growth;
+  }
+
+  .builder-setup-body {
+    grid-area: body;
+  }
+
+  .builder-setup-footer {
+    grid-area: footer;
+  }
 }
 
 .builder-wizard-nav {

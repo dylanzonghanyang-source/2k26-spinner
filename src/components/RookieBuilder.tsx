@@ -1333,10 +1333,10 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
         id="builder-pane-settings"
         role="tabpanel"
       >
-        <div className="grid gap-px bg-ink-200 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-          <section aria-labelledby="player-identity-label" className="bg-white px-3 py-3">
+        <div className="builder-setup-grid">
+          <section aria-labelledby="player-identity-label" className="builder-setup-identity bg-white px-3 py-3">
             <div className="section-label mb-2" id="player-identity-label">球员身份</div>
-            <div className="grid gap-2.5 sm:grid-cols-2">
+            <div className="grid gap-2 sm:grid-cols-2">
               <div className="min-w-0 sm:col-span-2">
                 <div className="section-label mb-1">{isPrime ? "球员姓名" : "新秀姓名"}</div>
                 <div className="flex h-8 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
@@ -1409,15 +1409,17 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             </div>
           </section>
 
-          <section aria-labelledby="ability-estimate-label" className="bg-white px-3 py-3">
+          <section aria-labelledby="ability-estimate-label" className="builder-setup-growth bg-white px-3 py-3">
             <div className="mb-2 flex items-end justify-between gap-2">
               <div className="section-label" id="ability-estimate-label">成长设定</div>
               {!isPrime && (
-                <span className="text-[9px] font-medium text-ink-400">巅峰 → 即战力 → 新秀</span>
+                <span className="text-[9px] font-medium text-ink-400" title="新秀开局综评由巅峰区间、年龄与即战力推算">
+                  巅峰 → 即战力 → 新秀
+                </span>
               )}
             </div>
             {isPrime ? (
-              <div className="flex h-[5.25rem] items-center justify-between rounded-[6px] border border-court-200 bg-court-50 px-3">
+              <div className="flex min-h-[4.5rem] flex-1 items-center justify-between rounded-[6px] border border-court-200 bg-court-50 px-3">
                 <div>
                   <div className="text-[11px] font-semibold text-court-800">巅峰属性直出</div>
                   <div className="mt-0.5 text-[9px] text-court-700/80">年龄固定 28 岁，不走新秀成长曲线</div>
@@ -1425,91 +1427,85 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                 <span className="font-mono text-[18px] font-bold tabular-nums text-court-800">28</span>
               </div>
             ) : (
-              <div className="grid gap-2">
-                <div className="grid grid-cols-3 gap-2">
-                  <label className="growth-metric min-w-0 rounded-[6px] border border-ink-200 bg-ink-50 px-2 py-2">
-                    <span className="section-label flex items-center justify-between gap-1" title="生成球员最终可以达到的综评区间">
-                      巅峰综评
-                      <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-ink-400">目标</span>
+              <div className="grid flex-1 grid-cols-3 gap-2">
+                <label className="growth-metric min-w-0 rounded-[6px] border border-ink-200 bg-ink-50 px-2 py-2">
+                  <span className="section-label flex items-center justify-between gap-1" title="生成球员最终可以达到的综评区间">
+                    巅峰综评
+                    <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-ink-400">目标</span>
+                  </span>
+                  <span className="mt-1.5 flex h-8 items-center justify-center gap-0.5 overflow-hidden rounded-[5px] border border-ink-200 bg-white focus-within:border-court-500">
+                    <CompactNumberInput ariaLabel="巅峰综评下限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMin} value={potentialRange.min} />
+                    <span className="text-[10px] text-ink-300">–</span>
+                    <CompactNumberInput ariaLabel="巅峰综评上限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMax} value={potentialRange.max} />
+                  </span>
+                </label>
+                <label className="growth-metric min-w-0 rounded-[6px] border border-ink-200 bg-ink-50 px-2 py-2">
+                  <span className="section-label flex items-center justify-between gap-1" title="即战力表示新秀已经兑现了多少巅峰能力；数值越高，开局越接近巅峰">
+                    <span className="inline-flex items-center gap-1">即战力 <CircleHelp className="h-3 w-3 text-ink-400" /></span>
+                    <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-ink-400">成熟度</span>
+                  </span>
+                  <span className="mt-1.5 flex h-8 overflow-hidden rounded-[5px] border border-ink-200 bg-white focus-within:border-court-500">
+                    <span className="flex min-w-0 flex-1 items-center justify-center">
+                      <CompactNumberInput ariaLabel="即战力" disabled={settingsLocked} max={100} min={1} onChange={updateReadiness} value={readiness} />
                     </span>
-                    <span className="mt-1.5 flex h-8 items-center justify-center gap-0.5 overflow-hidden rounded-[5px] border border-ink-200 bg-white focus-within:border-court-500">
-                      <CompactNumberInput ariaLabel="巅峰综评下限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMin} value={potentialRange.min} />
-                      <span className="text-[10px] text-ink-300">–</span>
-                      <CompactNumberInput ariaLabel="巅峰综评上限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMax} value={potentialRange.max} />
-                    </span>
-                  </label>
-                  <label className="growth-metric min-w-0 rounded-[6px] border border-ink-200 bg-ink-50 px-2 py-2">
-                    <span className="section-label flex items-center justify-between gap-1" title="即战力表示新秀已经兑现了多少巅峰能力；数值越高，开局越接近巅峰">
-                      <span className="inline-flex items-center gap-1">即战力 <CircleHelp className="h-3 w-3 text-ink-400" /></span>
-                      <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-ink-400">成熟度</span>
-                    </span>
-                    <span className="mt-1.5 flex h-8 overflow-hidden rounded-[5px] border border-ink-200 bg-white focus-within:border-court-500">
-                      <span className="flex min-w-0 flex-1 items-center justify-center">
-                        <CompactNumberInput ariaLabel="即战力" disabled={settingsLocked} max={100} min={1} onChange={updateReadiness} value={readiness} />
-                      </span>
-                      <button aria-label="随机即战力" className="flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-50 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeReadiness} title="随机生成 1–100 即战力" type="button"><Shuffle className="h-3.5 w-3.5" /></button>
-                    </span>
-                  </label>
-                  <div className="growth-metric min-w-0 rounded-[6px] border border-court-200 bg-court-50 px-2 py-2">
-                    <div className="section-label flex items-center justify-between gap-1 text-court-700">
-                      新秀综评
-                      <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-court-600/80">推算</span>
-                    </div>
-                    <div
-                      className="mt-1.5 flex h-8 items-center justify-center rounded-[5px] border border-court-200/70 bg-white/70 font-mono text-[13px] font-bold tabular-nums text-court-800"
-                      data-testid="projected-initial-range"
-                      title="由年龄、巅峰综评和即战力共同计算"
-                    >
-                      {projectedInitialRange.min}–{projectedInitialRange.max}
-                    </div>
+                    <button aria-label="随机即战力" className="flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-50 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeReadiness} title="随机生成 1–100 即战力" type="button"><Shuffle className="h-3.5 w-3.5" /></button>
+                  </span>
+                </label>
+                <div className="growth-metric min-w-0 rounded-[6px] border border-court-200 bg-court-50 px-2 py-2" title="由年龄、巅峰综评和即战力共同计算；锁定属性后还会再按游戏 OVR 模型校准">
+                  <div className="section-label flex items-center justify-between gap-1 text-court-700">
+                    新秀综评
+                    <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-court-600/80">推算</span>
+                  </div>
+                  <div
+                    className="mt-1.5 flex h-8 items-center justify-center rounded-[5px] border border-court-200/70 bg-white/70 font-mono text-[13px] font-bold tabular-nums text-court-800"
+                    data-testid="projected-initial-range"
+                  >
+                    {projectedInitialRange.min}–{projectedInitialRange.max}
                   </div>
                 </div>
-                <p className="text-[9px] leading-4 text-ink-400">
-                  新秀开局综评由巅峰区间、年龄与即战力推算；锁定属性后还会再按游戏 OVR 模型校准。
-                </p>
               </div>
             )}
           </section>
-        </div>
 
-        <div className="workspace-toolbar border-t border-ink-200 px-3 py-3">
-          <div className="mb-2 flex items-center justify-between">
-            <div className="section-label">身体设定</div>
-            <button aria-label="随机身体" className="action-button h-7 w-7 justify-center" disabled={settingsLocked} onClick={randomizeBody} title="随机身体" type="button"><Shuffle className="h-3.5 w-3.5" /></button>
-          </div>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-            <BodyNumberInput disabled={settingsLocked} label="身高" max={300} min={150} onChange={(value) => updateBody("height", value)} unit="cm" value={body.height} />
-            <BodyNumberInput disabled={settingsLocked} label="体重" max={200} min={50} onChange={(value) => updateBody("weight", value)} unit="kg" value={body.weight} />
-            <BodyNumberInput disabled={settingsLocked} label="臂展" max={100} min={1} onChange={(value) => updateBody("wingspan", value)} value={body.wingspan} />
-            <BodyNumberInput disabled={settingsLocked} label="肩宽" max={100} min={1} onChange={(value) => updateBody("shoulder", value)} value={body.shoulder} />
-            <BodyNumberInput disabled={settingsLocked} label="颈长" max={100} min={1} onChange={(value) => updateBody("neck", value)} value={body.neck} />
-            <BodyNumberInput disabled={settingsLocked} label="躯干" max={100} min={1} onChange={(value) => updateBody("torso", value)} value={body.torso} />
-          </div>
-        </div>
+          <section aria-labelledby="body-settings-label" className="builder-setup-body bg-ink-50/60 px-3 py-3">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <div className="section-label" id="body-settings-label">身体设定</div>
+              <button aria-label="随机身体" className="action-button h-7 w-7 justify-center" disabled={settingsLocked} onClick={randomizeBody} title="随机身体" type="button"><Shuffle className="h-3.5 w-3.5" /></button>
+            </div>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-3 xl:grid-cols-6">
+              <BodyNumberInput disabled={settingsLocked} label="身高" max={300} min={150} onChange={(value) => updateBody("height", value)} unit="cm" value={body.height} />
+              <BodyNumberInput disabled={settingsLocked} label="体重" max={200} min={50} onChange={(value) => updateBody("weight", value)} unit="kg" value={body.weight} />
+              <BodyNumberInput disabled={settingsLocked} label="臂展" max={100} min={1} onChange={(value) => updateBody("wingspan", value)} value={body.wingspan} />
+              <BodyNumberInput disabled={settingsLocked} label="肩宽" max={100} min={1} onChange={(value) => updateBody("shoulder", value)} value={body.shoulder} />
+              <BodyNumberInput disabled={settingsLocked} label="颈长" max={100} min={1} onChange={(value) => updateBody("neck", value)} value={body.neck} />
+              <BodyNumberInput disabled={settingsLocked} label="躯干" max={100} min={1} onChange={(value) => updateBody("torso", value)} value={body.torso} />
+            </div>
+          </section>
 
-        <div className="builder-setup-footer border-t border-ink-200 bg-ink-50/80 px-3 py-2.5">
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 text-[10px] font-medium text-ink-500">
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-court-500" />
-            <span className="truncate">{status}</span>
-          </div>
-          <div className="builder-setup-progress min-w-0">
-            <div className="mb-1 flex items-center justify-between gap-2 text-[9px] font-semibold text-ink-500">
-              <span>完成进度</span>
-              <span className="tabular-nums text-ink-700">{completed}/{bundles.length}</span>
+          <div className="builder-setup-footer bg-ink-50/80 px-3 py-2.5">
+            <div className="flex min-w-0 items-center gap-1.5 text-[10px] font-medium text-ink-500">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-court-500" />
+              <span className="truncate">{status}</span>
             </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-ink-200">
-              <div className="h-full rounded-full bg-court-600 transition-[width] duration-300" style={{ width: `${(completed / bundles.length) * 100}%` }} />
+            <div className="builder-setup-progress min-w-0">
+              <div className="mb-1 flex items-center justify-between gap-2 text-[9px] font-semibold text-ink-500">
+                <span>完成进度</span>
+                <span className="tabular-nums text-ink-700">{completed}/{bundles.length}</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-ink-200">
+                <div className="h-full rounded-full bg-court-600 transition-[width] duration-300" style={{ width: `${(completed / bundles.length) * 100}%` }} />
+              </div>
             </div>
-          </div>
-          <div className="flex shrink-0 items-center gap-1.5" aria-label="设定操作">
-            {!settingsLocked && (
-              <button className="action-button primary-action justify-center px-3 py-1.5 text-[11px] font-semibold" onClick={confirmSettings} type="button">
-                <Check className="h-3.5 w-3.5" />确认并抽取
+            <div className="flex shrink-0 items-center justify-end gap-1.5" aria-label="设定操作">
+              {!settingsLocked && (
+                <button className="action-button primary-action justify-center px-3 py-1.5 text-[11px] font-semibold" onClick={confirmSettings} type="button">
+                  <Check className="h-3.5 w-3.5" />确认并抽取
+                </button>
+              )}
+              <button className="action-button justify-center px-3 py-1.5 text-[11px]" onClick={reset} type="button">
+                <RefreshCw className="h-3.5 w-3.5" />{settingsLocked ? "重新开始" : "重置"}
               </button>
-            )}
-            <button className="action-button justify-center px-3 py-1.5 text-[11px]" onClick={reset} type="button">
-              <RefreshCw className="h-3.5 w-3.5" />{settingsLocked ? "重新开始" : "重置"}
-            </button>
+            </div>
           </div>
         </div>
       </div>
