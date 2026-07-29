@@ -15,9 +15,16 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { badgeTierCN, getBadgeNameCN } from "../badges";
+import MarqueeDraw, { type MarqueeDrawItem } from "./MarqueeDraw";
 import { attrNameCN, type BadgeTier, type PlayerSource } from "../domain";
 import { getPlayerHeadshot } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
+import {
+  initialOverallForPotential,
+  initialOverallRange,
+  resolveOverallCalibration,
+} from "../rookieDevelopment";
+import { estimateGameOverall } from "../rookieOverall";
 import { generateRookieName } from "../rookieNames";
 
 export type RookieBuilderTeam = {
@@ -99,12 +106,38 @@ const bundles: Bundle[] = [
 const positions: Position[] = ["PG", "SG", "SF", "PF", "C"];
 const ages = [18, 19, 20, 21, 22, 23];
 const playerSwitchLimit = 3;
-const teamDrawDurationMs = 740;
+const teamDrawDurationMs = 2800;
 const secondaryPositionShare = 0.25;
 const defaultReadiness = 50;
 
 function randomReadiness() {
   return Math.floor(Math.random() * 100) + 1;
+}
+
+const teamLogoCodes: Record<string, string> = {
+  "Atlanta Hawks": "atl", "Boston Celtics": "bos", "Brooklyn Nets": "bkn", "Charlotte Hornets": "cha",
+  "Chicago Bulls": "chi", "Cleveland Cavaliers": "cle", "Dallas Mavericks": "dal", "Denver Nuggets": "den",
+  "Detroit Pistons": "det", "Golden State Warriors": "gs", "Houston Rockets": "hou", "Indiana Pacers": "ind",
+  "Los Angeles Clippers": "lac", "Los Angeles Lakers": "lal", "Memphis Grizzlies": "mem", "Miami Heat": "mia",
+  "Milwaukee Bucks": "mil", "Minnesota Timberwolves": "min", "New Orleans Pelicans": "no", "New York Knicks": "ny",
+  "Oklahoma City Thunder": "okc", "Orlando Magic": "orl", "Philadelphia 76ers": "phi", "Phoenix Suns": "phx",
+  "Portland Trail Blazers": "por", "Sacramento Kings": "sac", "San Antonio Spurs": "sa", "Toronto Raptors": "tor",
+  "Utah Jazz": "utah", "Washington Wizards": "wsh",
+};
+
+function teamMark(team: RookieBuilderTeam) {
+  return team.name
+    .split(/\s+/)
+    .filter((word) => !["Los", "Angeles", "New", "San"].includes(word))
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 3)
+    .toUpperCase() || team.id.slice(0, 3).toUpperCase();
+}
+
+function teamLogoUrl(team: RookieBuilderTeam) {
+  const code = teamLogoCodes[team.name];
+  return code ? `https://a.espncdn.com/i/teamlogos/nba/500/${code}.png` : undefined;
 }
 
 const naturalSecondaryPositions: Record<Position, Position[]> = {
@@ -186,25 +219,7 @@ const positionWeights: Record<Position, Record<string, number>> = {
   C: { three: 4, mid: 4, finishing: 10, dunk: 8, handle: 2, passing: 4, perimeter: 3, interior: 14, steal: 1, block: 12, rebound: 14, athletic: 18, stability: 6 },
 };
 
-// Fitted against 386 current 2KRatings players with complete attributes.
-// Five-fold validation: MAE 2.44 (previous raw weighted formula: 9.17).
-const overallCalibration: Record<Position, { intercept: number; slope: number }> = {
-  PG: { intercept: -28.9919, slope: 1.5280 },
-  SG: { intercept: -14.8482, slope: 1.3428 },
-  SF: { intercept: 2.1859, slope: 1.1230 },
-  PF: { intercept: -1.6571, slope: 1.1658 },
-  C: { intercept: 13.8012, slope: 0.9208 },
-};
-
 const defaultPotentialRange: PotentialRange = { min: 82, max: 87 };
-const developmentGapByAge: Record<number, { standard: number; elite: number }> = {
-  18: { standard: 14, elite: 17 },
-  19: { standard: 12, elite: 14 },
-  20: { standard: 9, elite: 12 },
-  21: { standard: 7, elite: 10 },
-  22: { standard: 5, elite: 8 },
-  23: { standard: 4, elite: 6 },
-};
 
 const teamNamesCN: Record<string, string> = {
   "Atlanta Hawks": "老鹰", "Boston Celtics": "凯尔特人", "Brooklyn Nets": "篮网",
@@ -434,53 +449,28 @@ function getValue(values: Record<string, number>, attrs: string[], fallbackValue
   return average(attrs.map((attr) => values[attr]).filter((value): value is number => typeof value === "number"), fallbackValue);
 }
 
-function calibratedOverall(values: Record<string, number>, position: Position, secondary: Position, fallbackValue = 65) {
-  const raw = bundles.reduce((total, bundle) => {
-    const bundleValue = getValue(values, bundle.attrs, fallbackValue);
-    return total + bundleValue * blendedPositionWeight(position, secondary, bundle.id);
-  }, 0) / 100;
-  const calibration = overallCalibration[position];
-  return clamp(calibration.intercept + calibration.slope * raw, 40, 99);
-}
-
-function developmentGap(potential: number, age: number) {
-  const gaps = developmentGapByAge[age] ?? developmentGapByAge[19];
-  const eliteFactor = Math.max(0, Math.min(1, (potential - 87) / 5));
-  return gaps.standard + (gaps.elite - gaps.standard) * eliteFactor;
-}
-
-function readinessOverallAdjustment(potential: number, age: number, readiness: number) {
-  if (readiness >= 50) return ((readiness - 50) / 50) * 4;
-  const eliteFactor = Math.max(0, Math.min(1, (potential - 87) / 5));
-  const rawProspectPenalty = 8 + eliteFactor * 14 + Math.max(0, age - 19) * 3;
-  return -((50 - readiness) / 49) * rawProspectPenalty;
-}
-
-function initialOverallRange(range: PotentialRange, age: number, readiness: number) {
-  return {
-    min: clamp(range.min - developmentGap(range.min, age) + readinessOverallAdjustment(range.min, age, readiness), 40, 95),
-    max: clamp(range.max - developmentGap(range.max, age) + readinessOverallAdjustment(range.max, age, readiness), 40, 95),
-  };
+function calibratedOverall(values: Record<string, number>, position: Position, fallbackValue = 65) {
+  return estimateGameOverall(values, position, fallbackValue);
 }
 
 function calibrateAttributesToOverall(
   values: Record<string, number>,
   position: Position,
-  secondary: Position,
   targetOverall: number,
+  lockedValues: Record<string, number> = {},
 ) {
   const ratingAttributes = [...new Set(bundles.flatMap((bundle) => bundle.attrs))];
   let best = { ...values };
-  let bestDistance = Math.abs(calibratedOverall(best, position, secondary) - targetOverall);
+  let bestDistance = Math.abs(calibratedOverall(best, position) - targetOverall);
 
   // A uniform offset preserves the selected player's attribute shape. Search
   // for the closest offset because the position calibration is not 1:1.
   for (let offset = -30; offset <= 30; offset += 1) {
     const candidate = { ...values };
     for (const attr of ratingAttributes) {
-      if (typeof candidate[attr] === "number") candidate[attr] = clamp(candidate[attr] + offset);
+      if (!(attr in lockedValues) && typeof candidate[attr] === "number") candidate[attr] = clamp(candidate[attr] + offset);
     }
-    const distance = Math.abs(calibratedOverall(candidate, position, secondary) - targetOverall);
+    const distance = Math.abs(calibratedOverall(candidate, position) - targetOverall);
     if (distance < bestDistance) {
       best = candidate;
       bestDistance = distance;
@@ -488,7 +478,12 @@ function calibrateAttributesToOverall(
     if (distance === 0) break;
   }
 
-  return best;
+  const actualOverall = calibratedOverall(best, position);
+  return {
+    values: best,
+    actualOverall,
+    distance: Math.abs(actualOverall - targetOverall),
+  };
 }
 
 function tierFor(score: number): BadgeTier {
@@ -598,18 +593,27 @@ function createResult(
   const random = makeRandom(hash(`${signature}|${age}|${position}|${secondary}|${readiness}`));
   const mean = average(scores, 71);
   const top = average([...scores].sort((a, b) => b - a).slice(0, 4), mean);
-  const sourcePeakOverall = calibratedOverall(peakAttrs, position, secondary, mean);
+  const sourcePeakOverall = calibratedOverall(peakAttrs, position, mean);
   const potentialSignal = sourcePeakOverall * 0.82 + top * 0.18;
   const rangePlacement = Math.max(0, Math.min(1, (potentialSignal - 65) / 30));
-  const minPotential = isPrime ? clamp(sourcePeakOverall, 60, 99) : potentialRange.min;
-  const maxPotential = isPrime ? minPotential : potentialRange.max;
-  const potential = isPrime
-    ? minPotential
-    : clamp(minPotential + (maxPotential - minPotential) * rangePlacement, minPotential, maxPotential);
+  const configuredMinPotential = isPrime ? clamp(sourcePeakOverall, 60, 99) : potentialRange.min;
+  const configuredMaxPotential = isPrime ? configuredMinPotential : potentialRange.max;
+  const configuredPotential = isPrime
+    ? configuredMinPotential
+    : clamp(
+      configuredMinPotential + (configuredMaxPotential - configuredMinPotential) * rangePlacement,
+      configuredMinPotential,
+      configuredMaxPotential,
+    );
+  let peakCalibration = {
+    values: peakAttrs,
+    actualOverall: sourcePeakOverall,
+    distance: 0,
+  };
 
   if (!isPrime) {
-    peakAttrs = calibrateAttributesToOverall(peakAttrs, position, secondary, potential);
-    Object.assign(peakAttrs, customFinalAttrs);
+    peakCalibration = calibrateAttributesToOverall(peakAttrs, position, configuredPotential, customFinalAttrs);
+    peakAttrs = peakCalibration.values;
     for (const bundle of bundles) {
       for (const attr of bundle.attrs) {
         const value = peakAttrs[attr];
@@ -622,21 +626,20 @@ function createResult(
     initialAttrs = { ...peakAttrs };
   }
 
-  const projectedInitialRange = initialOverallRange(potentialRange, age, readiness);
+  const configuredInitialRange = initialOverallRange(potentialRange, age, readiness);
   const targetInitialOverall = isPrime
-    ? calibratedOverall(initialAttrs, position, secondary, mean)
-    : clamp(
-      projectedInitialRange.min + (projectedInitialRange.max - projectedInitialRange.min) * rangePlacement,
-      projectedInitialRange.min,
-      projectedInitialRange.max,
-    );
-  const boom = isPrime ? 0 : clamp(28 + potential - 84 - (age - 18) * 2 + (50 - readiness) * 0.12 + (random() - 0.5) * 8, 10, 55);
-  const bust = isPrime ? 0 : clamp(18 - (age - 18) + (50 - readiness) * 0.18 + (random() - 0.5) * 8, 8, 40);
-  const normal = 100 - boom - bust;
-  const hand: "左手" | "右手" = random() < 0.11 ? "左手" : "右手";
-  const dunkHand: "左手" | "右手" = random() < 0.8 ? hand : hand === "左手" ? "右手" : "左手";
-  if (!isPrime) initialAttrs = calibrateAttributesToOverall(initialAttrs, position, secondary, targetInitialOverall);
+    ? calibratedOverall(initialAttrs, position, mean)
+    : initialOverallForPotential(configuredPotential, age, readiness);
   Object.assign(initialAttrs, customFinalAttrs);
+  let initialCalibration = {
+    values: initialAttrs,
+    actualOverall: calibratedOverall(initialAttrs, position, mean),
+    distance: 0,
+  };
+  if (!isPrime) {
+    initialCalibration = calibrateAttributesToOverall(initialAttrs, position, targetInitialOverall, customFinalAttrs);
+    initialAttrs = initialCalibration.values;
+  }
   const durability = initialAttrs["Overall Durability"] ?? 72;
   const bodyBase = bodyBases[position];
   const bodyStress = Math.max(0, (body.weight - bodyBase.weight) / 15) + Math.max(0, (body.height - bodyBase.height) / 12);
@@ -645,9 +648,39 @@ function createResult(
     initialAttrs[attr] = clamp(durability + (random() - 0.5) * 10 - bodyStress * 1.5);
   }
   initialAttrs["Overall Durability"] = durability;
-  const baseOverall = calibratedOverall(initialAttrs, position, secondary, mean);
+  const baseOverall = calibratedOverall(initialAttrs, position, mean);
   const initialStrength = baseOverall;
   const intangibles = 50;
+  const overallResolution = isPrime
+    ? {
+      hasConflict: false,
+      peakUnreachable: false,
+      initialUnreachable: false,
+      potential: baseOverall,
+      potentialRange: { min: baseOverall, max: baseOverall },
+      initialRange: { min: baseOverall, max: baseOverall },
+    }
+    : resolveOverallCalibration({
+      configuredPotential,
+      configuredPotentialRange: { min: configuredMinPotential, max: configuredMaxPotential },
+      projectedInitialRange: configuredInitialRange,
+      peakOverall: peakCalibration.actualOverall,
+      peakDistance: peakCalibration.distance,
+      initialOverall: baseOverall,
+      initialDistance: Math.abs(baseOverall - targetInitialOverall),
+    });
+  const potential = overallResolution.potential;
+  const minPotential = overallResolution.potentialRange.min;
+  const maxPotential = overallResolution.potentialRange.max;
+  const projectedInitialRange = overallResolution.initialRange;
+  const calibrationWarning = !isPrime && overallResolution.hasConflict
+    ? `自定义锁定值或属性上下限使${overallResolution.peakUnreachable && overallResolution.initialUnreachable ? "巅峰与新秀" : overallResolution.peakUnreachable ? "巅峰" : "新秀"}目标不可达，已按实际游戏 OVR 修正。`
+    : "";
+  const boom = isPrime ? 0 : clamp(28 + potential - 84 - (age - 18) * 2 + (50 - readiness) * 0.12 + (random() - 0.5) * 8, 10, 55);
+  const bust = isPrime ? 0 : clamp(18 - (age - 18) + (50 - readiness) * 0.18 + (random() - 0.5) * 8, 8, 40);
+  const normal = 100 - boom - bust;
+  const hand: "左手" | "右手" = random() < 0.11 ? "左手" : "右手";
+  const dunkHand: "左手" | "右手" = random() < 0.8 ? hand : hand === "左手" ? "右手" : "左手";
   const growthGap = Math.max(0, potential - initialStrength);
   const progressSpeed = isPrime
     ? 0
@@ -669,6 +702,7 @@ function createResult(
     age, position, secondary,
     hand, dunkHand, ...body,
     potential, minPotential, maxPotential, projectedInitialRange, readiness, growthGap, progressSpeed, boom, normal, bust, peakStart, peakEnd,
+    calibrationWarning, targetInitialOverall, peakOverall: peakCalibration.actualOverall,
     peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges, hotZones,
   };
 }
@@ -720,6 +754,7 @@ function createExportText(
       `巅峰综评区间: ${result.minPotential}-${result.maxPotential}`,
       `新秀综评区间: ${result.projectedInitialRange.min}-${result.projectedInitialRange.max}`,
       `预计进步速度: 每年 +${result.progressSpeed} 综评`,
+      ...(result.calibrationWarning ? [`校准提示: ${result.calibrationWarning}`] : []),
     ] : []),
     `潜力: ${result.potential}`, `最小潜力: ${result.minPotential}`, `最大潜力: ${result.maxPotential}`,
     `成长百分比: ${result.boom}%`, `平均百分比: ${result.normal}%`, `衰退百分比: ${result.bust}%`,
@@ -730,7 +765,7 @@ function createExportText(
       `-- ${group.label} --`,
       ...group.attrs.map((attr) => `${attrNameCN[attr] ?? attr}: ${result.initialAttrs[attr] ?? "--"}`),
     ]),
-    "", "[杂项]", `位置加权综评: ${result.baseOverall}`, `无形属性: ${result.intangibles}`,
+    "", "[杂项]", `预估游戏综评: ${result.baseOverall}`, `无形属性: ${result.intangibles}`,
     `${isPrime ? "巅峰综评" : "预计初始综评"}: ${result.initialStrength}`, `潜力: ${result.potential}`,
     "", "[热区]", ...Object.entries(result.hotZones).map(([name, state]) => `${name}: ${state}`),
     ...(isPrime ? [
@@ -783,7 +818,7 @@ function PlayerHeadshot({ name }: { name: string }) {
       alt={`${getPlayerNameCN(name)}头像`}
       className="h-9 w-9 shrink-0 rounded-[5px] border border-ink-200 bg-ink-100 object-cover object-top"
       decoding="async"
-      loading="lazy"
+      loading="eager"
       onError={() => setFailed(true)}
       referrerPolicy="no-referrer"
       src={src}
@@ -902,22 +937,19 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   const [locks, setLocks] = useState<LockState>({});
   const [round, setRound] = useState<TeamRound>(() => createRound(teams, Date.now()));
   const [isTeamDrawing, setIsTeamDrawing] = useState(false);
-  const [drawingTeamName, setDrawingTeamName] = useState<string | null>(null);
+  const [drawingTeamId, setDrawingTeamId] = useState<string | null>(null);
   const [switchesLeft, setSwitchesLeft] = useState(playerSwitchLimit);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [customizingBundleId, setCustomizingBundleId] = useState<string | null>(null);
   const [customDraft, setCustomDraft] = useState<Record<string, string>>({});
   const [status, setStatus] = useState(`确认${isPrime ? "巅峰球员" : "新秀"}设定后开始`);
   const [mobilePane, setMobilePane] = useState<MobilePane>("settings");
-  const drawIntervalRef = useRef<number | null>(null);
   const drawTimeoutRef = useRef<number | null>(null);
   const customDialogRef = useRef<HTMLElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
   const clearTeamDrawTimers = () => {
-    if (drawIntervalRef.current !== null) window.clearInterval(drawIntervalRef.current);
     if (drawTimeoutRef.current !== null) window.clearTimeout(drawTimeoutRef.current);
-    drawIntervalRef.current = null;
     drawTimeoutRef.current = null;
   };
 
@@ -971,6 +1003,15 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     [teams],
   );
   const team = settingsLocked ? teamsById.get(round.teamId) : undefined;
+  const teamDrawItems = useMemo<MarqueeDrawItem[]>(() => teams
+    .filter((candidate) => candidate.players.length > 0)
+    .map((candidate) => ({
+      id: candidate.id,
+      imageSrc: teamLogoUrl(candidate),
+      label: teamNamesCN[candidate.name] ?? candidate.name,
+      mark: teamMark(candidate),
+      meta: `${candidate.players.length} 名球员`,
+    })), [teams]);
   const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : undefined;
   const usedBy = useMemo(() => new Map(Object.entries(locks).flatMap(([bundleId, lock]) => {
     if (lock.kind !== "player") return [];
@@ -1080,32 +1121,35 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   const startTeamDraw = (previousTeamId: string | undefined, completionStatus: string) => {
     clearTeamDrawTimers();
     const seed = Date.now();
-    const selectableTeams = teams.filter((candidate) => candidate.players.length > 0);
-    const candidates = selectableTeams.filter((candidate) => candidate.id !== previousTeamId);
-    const previewCandidates = candidates.length ? candidates : selectableTeams;
-    const previewRandom = makeRandom(seed ^ 0x9e3779b9);
     const nextRound = createRound(teams, seed, previousTeamId);
-
-    const nextPreviewName = () => {
-      const candidate = previewCandidates[Math.floor(previewRandom() * previewCandidates.length)];
-      return candidate ? teamNamesCN[candidate.name] ?? candidate.name : "匹配中";
-    };
+    nextRound.playerOrder.slice(0, 7).forEach((id) => {
+      const src = playersById.get(id) ? getPlayerHeadshot(playersById.get(id)!.name) : undefined;
+      if (!src) return;
+      const image = new Image();
+      image.src = src;
+    });
 
     setIsTeamDrawing(true);
-    setDrawingTeamName(nextPreviewName());
+    setDrawingTeamId(nextRound.teamId);
     setSelectedPlayerId(null);
     setCustomizingBundleId(null);
     setStatus("正在随机抽取球队...");
     setMobilePane("players");
 
-    drawIntervalRef.current = window.setInterval(() => setDrawingTeamName(nextPreviewName()), 190);
-    drawTimeoutRef.current = window.setTimeout(() => {
+    const finishDraw = () => {
       clearTeamDrawTimers();
       setRound(nextRound);
-      setDrawingTeamName(null);
+      setDrawingTeamId(null);
       setIsTeamDrawing(false);
       setStatus(completionStatus);
-    }, teamDrawDurationMs);
+    };
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      finishDraw();
+      return;
+    }
+
+    drawTimeoutRef.current = window.setTimeout(finishDraw, teamDrawDurationMs);
   };
 
   const confirmSettings = () => {
@@ -1182,7 +1226,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     setRound(createRound(teams, seed));
     setSettingsLocked(false);
     setIsTeamDrawing(false);
-    setDrawingTeamName(null);
+    setDrawingTeamId(null);
     setLocks({});
     setSwitchesLeft(playerSwitchLimit);
     setSelectedPlayerId(null);
@@ -1514,7 +1558,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
           <div className="workspace-toolbar flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
             <div>
               <div className="flex items-center gap-2"><Shuffle className={`h-3.5 w-3.5 text-court-700 ${isTeamDrawing ? "animate-spin" : ""}`} /><h2 className="text-[14px] font-semibold text-ink-900">{isTeamDrawing ? "随机球队" : team ? teamNamesCN[team.name] ?? team.name : "等待开始"}</h2></div>
-              <div className="mt-0.5 font-mono text-[9px] text-ink-400">{!settingsLocked ? "基础设定待确认" : isTeamDrawing ? "球队轮盘转动中" : isComplete ? `已完成 / ${completed}/${bundles.length}` : `第 ${completed + 1} 轮 / 展示 ${shownPlayers.length}/${team?.players.length ?? 0}`}</div>
+              <div className="mt-0.5 font-mono text-[9px] text-ink-400">{!settingsLocked ? "基础设定待确认" : isTeamDrawing ? "球队跑马灯抽取中" : isComplete ? `已完成 / ${completed}/${bundles.length}` : `第 ${completed + 1} 轮 / 展示 ${shownPlayers.length}/${team?.players.length ?? 0}`}</div>
             </div>
             {settingsLocked && !isComplete && (
               <div className="flex items-center gap-1.5">
@@ -1523,11 +1567,18 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             )}
           </div>
 
-          {settingsLocked ? isTeamDrawing ? <div className="flex min-h-[300px] flex-1 flex-col items-center justify-center px-5 text-center">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full border border-court-500/35 bg-court-50 text-court-700"><Shuffle className="h-5 w-5 animate-spin" /></div>
-            <div className="mt-4 text-[10px] font-medium text-ink-400">正在抽取球队</div>
-            <div className="mt-1.5 max-w-full truncate text-[22px] font-semibold text-ink-800" data-testid="drawing-team-name">{drawingTeamName ?? "匹配中"}</div>
-            <div className="mt-3 h-1 w-32 overflow-hidden rounded-sm bg-ink-200"><div className="team-draw-progress h-full w-full bg-court-600" style={{ animationDuration: `${teamDrawDurationMs}ms` }} /></div>
+          {settingsLocked ? isTeamDrawing ? <div className="flex min-h-[300px] flex-1 items-center px-2.5 py-3 sm:px-4">
+            <MarqueeDraw
+              currentLabel={drawingTeamId ? teamDrawItems.find((item) => item.id === drawingTeamId)?.label : undefined}
+              dataKind="team"
+              durationMs={teamDrawDurationMs}
+              emptyText="没有可抽取球队"
+              isDrawing
+              items={teamDrawItems}
+              precedingItems={12}
+              selectedId={drawingTeamId ?? undefined}
+              title="正在抽取球队"
+            />
           </div> : <div className="grid flex-1 auto-rows-[62px] grid-cols-2 gap-2 p-2.5">
             {shownPlayers.map((player) => {
               const id = playerId(player);
@@ -1563,7 +1614,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                 <div className="mt-1 truncate text-[15px] font-semibold text-ink-800" data-testid="rookie-name">{rookieName}</div>
                 <div className="mt-2 flex items-end justify-between">
                   <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">{isPrime ? "巅峰综评" : "新秀综评"}</div></div>
-                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">位置加权 <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
+                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">游戏 OVR 估算 <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-px bg-ink-200 text-[10px]">
@@ -1579,6 +1630,12 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
               ) : (
                 <div className="border-b border-ink-200 px-3 py-2.5">
                   <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold text-ink-700">成长轨迹</span><span className="font-mono text-court-700">巅峰 {result.minPotential}–{result.maxPotential}</span></div>
+                  {result.calibrationWarning && (
+                    <div className="mb-2 flex items-start gap-1.5 rounded-[5px] border border-amber-200 bg-amber-50 px-2 py-1.5 text-[9px] leading-4 text-amber-800" data-testid="overall-calibration-warning">
+                      <AlertTriangle aria-hidden="true" className="mt-0.5 h-3 w-3 shrink-0" />
+                      <span>{result.calibrationWarning}</span>
+                    </div>
+                  )}
                   <div className="mb-2 grid grid-cols-2 gap-x-3 gap-y-1 border-y border-ink-100 py-1.5 text-[9px]">
                     <div className="flex justify-between gap-2"><span className="text-ink-400">即战力</span><strong className="tabular-nums text-ink-700">{result.readiness}</strong></div>
                     <div className="flex justify-between gap-2"><span className="text-ink-400">新秀区间</span><strong className="tabular-nums text-ink-700">{result.projectedInitialRange.min}–{result.projectedInitialRange.max}</strong></div>

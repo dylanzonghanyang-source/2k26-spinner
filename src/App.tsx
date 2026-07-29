@@ -1,6 +1,6 @@
-import { Award, BookOpen, Dice5, Disc3, Download, Sparkles, Upload, UserRoundPlus } from "lucide-react";
+import { Award, BookOpen, Dice5, Disc3, Download, Moon, Sparkles, Sun, Upload, UserRoundPlus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import PlayerWheel from "./components/PlayerWheel";
+import MarqueeDraw, { type MarqueeDrawItem } from "./components/MarqueeDraw";
 import RookieBuilder, { type RookieBuilderTeam } from "./components/RookieBuilder";
 import { badgeTierCN, getBadgeNameCN } from "./badges";
 import { getPlayerNameCN } from "./playerNames";
@@ -9,10 +9,8 @@ import {
   attributeGroups,
   attrGroupMap,
   attrNameCN,
-  buildWheelItems,
   createDraftFromSources,
   createRandomSourceMap,
-  getWheelTargetRotation,
   normalizeSourceMap,
   allHeights,
   randomWheelIndex,
@@ -54,12 +52,21 @@ const usageGuides = {
   wheel: [
     { title: "设定范围", detail: "调整身体范围和生涯阶段" },
     { title: "选择球员池", detail: "按阵容类型筛选可抽球员" },
-    { title: "转动轮盘", detail: "依次抽取身体与能力来源" },
+    { title: "跑马灯抽取", detail: "依次抽取身体与能力来源" },
     { title: "保存结果", detail: "复制清单、导出文件或全部重抽" },
   ],
 } as const;
 
 type AppMode = keyof typeof usageGuides;
+type Theme = "light" | "dark";
+
+const themeStorageKey = "2k26-spinner-theme";
+
+function getInitialTheme(): Theme {
+  const savedTheme = window.localStorage.getItem(themeStorageKey);
+  if (savedTheme === "light" || savedTheme === "dark") return savedTheme;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 function formatPlayerName(name: string): string {
   const suffixMap: Record<string, string> = {
@@ -362,7 +369,7 @@ function playerPoolLabel(player: PlayerSource): string {
   return player.rosterTeam ? `${name} · ${player.rosterTeam}` : name;
 }
 
-const spinDurationMs = 4200;
+const marqueeDrawDurationMs = 1240;
 
 type PhysicalWheelKey = "position" | "height" | "shoulder" | "wingspan" | "weight";
 type WheelKey = AttributeGroupKey | PhysicalWheelKey;
@@ -386,19 +393,6 @@ const physicalWheelNames: Record<PhysicalWheelKey, string> = {
   shoulder: "肩宽",
   wingspan: "臂展",
   weight: "体重",
-};
-
-const initialWheelRotations: Record<WheelKey, number> = {
-  shooting: 0,
-  athleticism: 0,
-  playmaking: 0,
-  defense: 0,
-  inside: 0,
-  position: 0,
-  height: 0,
-  shoulder: 0,
-  wingspan: 0,
-  weight: 0,
 };
 
 function isAttributeGroupKey(key: WheelKey): key is AttributeGroupKey {
@@ -671,6 +665,12 @@ function RangeSlider({
 
 const App = () => {
   const [appMode, setAppMode] = useState<AppMode>("rookie");
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem(themeStorageKey, theme);
+  }, [theme]);
   const [draft, setDraft] = useState<PlayerDraft>(() => createEmptyDraft());
   const [careerProfile, setCareerProfile] = useState<CareerProfile>(defaultCareerProfile);
   const [rosterScope, setRosterScope] = useState<RosterScope>("current");
@@ -679,7 +679,7 @@ const App = () => {
   const [sourceMap, setSourceMap] = useState<SourceMap | null>(null);
   const [bodyTemplate, setBodyTemplate] = useState<BodyTemplate>(initialBodyTemplate);
   const [poolSearch, setPoolSearch] = useState("");
-  const [wheelRotations, setWheelRotations] = useState<Record<WheelKey, number>>(initialWheelRotations);
+  const [wheelDraw, setWheelDraw] = useState<{ key: WheelKey; selectedId: string } | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [statusText, setStatusText] = useState("已载入 2KRatings 最新现役 roster");
   const spinTimerRef = useRef<number | null>(null);
@@ -726,7 +726,6 @@ const App = () => {
   ], []);
 
   const activeTab = allTabs.find((t) => t.key === activeGroupKey) ?? allTabs[0];
-  const activeWheelRotation = wheelRotations[activeGroupKey] ?? 0;
 
 
   const attrDefs = useMemo(() => {
@@ -807,12 +806,23 @@ const App = () => {
     weight: filteredWeights,
   }), [filteredHeights, filteredShoulders, filteredWeights, filteredWingspans, posOpts]);
 
-  const activeWheelItems = useMemo(() => {
-    if (isPhysicalWheelKey(activeTab.key)) {
-      return buildWheelItems(physicalOptionsByKey[activeTab.key]);
+  const activeMarqueeItems = useMemo<MarqueeDrawItem[]>(() => {
+    const key = activeTab.key;
+    if (isPhysicalWheelKey(key)) {
+      return physicalOptionsByKey[key].map((value) => ({
+        id: value,
+        label: `${value}${getStatusValueSuffix(key)}`,
+        mark: key === "position" ? value : undefined,
+        meta: physicalWheelNames[key],
+      }));
     }
 
-    return buildWheelItems(availablePlayers.map(playerPoolLabel));
+    return availablePlayers.map((player) => ({
+      id: playerSourceKey(player),
+      label: playerPoolLabel(player),
+      mark: player.position?.split("/")[0] ?? "NBA",
+      meta: typeof player.overall === "number" ? `${player.overall} OVR` : undefined,
+    }));
   }, [activeTab.key, availablePlayers, physicalOptionsByKey]);
 
   const activeCurrentLabel = isPhysicalWheelKey(activeTab.key)
@@ -826,6 +836,20 @@ const App = () => {
             ? wingspanVal
             : weightVal
     : activeSource ? playerPoolLabel(activeSource) : undefined;
+  const activePhysicalValue = isPhysicalWheelKey(activeTab.key)
+    ? activeTab.key === "position"
+      ? positionVal
+      : activeTab.key === "height"
+        ? heightVal
+        : activeTab.key === "shoulder"
+          ? shoulderVal
+          : activeTab.key === "wingspan"
+            ? wingspanVal
+            : weightVal
+    : undefined;
+  const activeMarqueeSelectedId = isSpinning && wheelDraw?.key === activeGroupKey
+    ? wheelDraw.selectedId
+    : activePhysicalValue ?? (activeSource ? playerSourceKey(activeSource) : undefined);
   const hasDraftBody = bodyTemplate.position !== initialBodyTemplate.position
     || bodyTemplate.height !== initialBodyTemplate.height
     || bodyTemplate.weight !== initialBodyTemplate.weight
@@ -945,42 +969,35 @@ const App = () => {
     setStatusText("球员池已清空");
   };
 
-  const startWheelSpin = useCallback(({
-    itemCount,
+  const startMarqueeDraw = useCallback(({
     key,
     onFinish,
-    spins = 5,
     status,
-    targetIndex,
+    targetId,
   }: {
-    itemCount: number;
     key: WheelKey;
     onFinish: () => void;
-    spins?: number;
     status?: string;
-    targetIndex: number;
+    targetId: string;
   }) => {
-    if (isSpinning || itemCount <= 0 || targetIndex < 0) return;
-
-    const currentRotation = wheelRotations[key] ?? 0;
-    const nextRotation = getWheelTargetRotation({
-      currentRotation,
-      fullTurns: spins,
-      itemCount,
-      targetIndex,
-    });
+    if (isSpinning) return;
 
     clearSpinTimer();
-    setWheelRotations((current) => ({ ...current, [key]: nextRotation }));
-    setIsSpinning(true);
+    setWheelDraw({ key, selectedId: targetId });
     if (status) setStatusText(status);
 
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      onFinish();
+      return;
+    }
+
+    setIsSpinning(true);
     spinTimerRef.current = window.setTimeout(() => {
       onFinish();
       setIsSpinning(false);
       spinTimerRef.current = null;
-    }, spinDurationMs);
-  }, [clearSpinTimer, isSpinning, wheelRotations]);
+    }, marqueeDrawDurationMs);
+  }, [clearSpinTimer, isSpinning]);
 
   const spinPhysicalWheel = useCallback((key: PhysicalWheelKey) => {
     const options = physicalOptionsByKey[key];
@@ -988,12 +1005,10 @@ const App = () => {
     const value = options[winnerIndex];
     if (!value) return;
 
-    startWheelSpin({
-      itemCount: options.length,
+    startMarqueeDraw({
       key,
       status: `正在抽取「${physicalWheelNames[key]}」`,
-      targetIndex: winnerIndex,
-      spins: 4 + Math.floor(Math.random() * 2),
+      targetId: value,
       onFinish: () => {
         if (key === "position") {
           setPositionVal(value);
@@ -1015,7 +1030,7 @@ const App = () => {
         setStatusText(`${physicalWheelNames[key]} → ${value}${getStatusValueSuffix(key)}`);
       },
     });
-  }, [applyBody, heightVal, physicalOptionsByKey, positionVal, shoulderVal, startWheelSpin, weightVal, wingspanVal]);
+  }, [applyBody, heightVal, physicalOptionsByKey, positionVal, shoulderVal, startMarqueeDraw, weightVal, wingspanVal]);
 
   const spinCurrentGroup = useCallback(() => {
     if (!isAttributeGroupKey(activeGroupKey) || availablePlayers.length === 0) return;
@@ -1024,12 +1039,10 @@ const App = () => {
     const target = availablePlayers[winnerIndex];
     if (!target) return;
 
-    startWheelSpin({
-      itemCount: availablePlayers.length,
+    startMarqueeDraw({
       key: activeGroupKey,
       status: `正在转出「${activeGroup.name}」来源`,
-      targetIndex: winnerIndex,
-      spins: 5 + Math.floor(Math.random() * 2),
+      targetId: playerSourceKey(target),
       onFinish: () => {
         const nextSources = {
           ...(sourceMap ?? createRandomSourceMap(selectedPool, allPlayerPool)),
@@ -1040,7 +1053,7 @@ const App = () => {
         setStatusText(`${activeGroup.name} → ${getPlayerNameCN(target.name)}`);
       },
     });
-  }, [activeGroup.name, activeGroupKey, availablePlayers, bodyTemplate, careerProfile, selectedPool, sourceMap, startWheelSpin]);
+  }, [activeGroup.name, activeGroupKey, availablePlayers, bodyTemplate, careerProfile, selectedPool, sourceMap, startMarqueeDraw]);
 
   const handleActiveWheelSpin = useCallback(() => {
     if (isPhysicalWheelKey(activeGroupKey)) {
@@ -1075,21 +1088,10 @@ const App = () => {
     setBodyTemplate(template);
     setDraft(createDraftFromSources(nextSources, template, careerProfile));
 
-    const activeTargetIndex = isPhysicalWheelKey(activeTab.key)
-      ? activeWheelItems.findIndex((item) => item.label === (activeTab.key === "position" ? pos : activeTab.key === "height" ? ht : activeTab.key === "shoulder" ? sw : activeTab.key === "wingspan" ? ws : wt))
-      : activeWheelItems.findIndex((item) => item.label === playerPoolLabel(nextSources[activeGroupKey as AttributeGroupKey]));
-
-    if (activeTargetIndex >= 0 && activeWheelItems.length > 0) {
-      setWheelRotations((current) => ({
-        ...current,
-        [activeTab.key]: getWheelTargetRotation({
-          currentRotation: current[activeTab.key] ?? 0,
-          fullTurns: 2 + Math.floor(Math.random() * 2),
-          itemCount: activeWheelItems.length,
-          targetIndex: activeTargetIndex,
-        }),
-      }));
-    }
+    const activeSelection = isPhysicalWheelKey(activeTab.key)
+      ? activeTab.key === "position" ? pos : activeTab.key === "height" ? ht : activeTab.key === "shoulder" ? sw : activeTab.key === "wingspan" ? ws : wt
+      : playerSourceKey(nextSources[activeGroupKey as AttributeGroupKey]);
+    setWheelDraw({ key: activeTab.key, selectedId: activeSelection });
 
     setStatusText("已重新洗牌");
   };
@@ -1160,17 +1162,17 @@ const App = () => {
           </div>
 
           <nav className="mode-nav" aria-label="生成模式">
-            <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} onClick={() => setAppMode("rookie")} type="button">
+            <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} disabled={isSpinning} onClick={() => setAppMode("rookie")} type="button">
               <UserRoundPlus className="h-3.5 w-3.5" />
               <span className="lg:hidden">新秀</span>
               <span className="hidden lg:inline">生成我的新秀</span>
             </button>
-            <button aria-pressed={appMode === "prime"} className="mode-nav-button" data-active={appMode === "prime"} onClick={() => setAppMode("prime")} type="button">
+            <button aria-pressed={appMode === "prime"} className="mode-nav-button" data-active={appMode === "prime"} disabled={isSpinning} onClick={() => setAppMode("prime")} type="button">
               <Award className="h-3.5 w-3.5" />
               <span className="lg:hidden">巅峰</span>
               <span className="hidden lg:inline">生成巅峰球员</span>
             </button>
-            <button aria-pressed={appMode === "wheel"} className="mode-nav-button" data-active={appMode === "wheel"} onClick={() => setAppMode("wheel")} type="button">
+            <button aria-pressed={appMode === "wheel"} className="mode-nav-button" data-active={appMode === "wheel"} disabled={isSpinning} onClick={() => setAppMode("wheel")} type="button">
               <Disc3 className="h-3.5 w-3.5" />
               <span className="lg:hidden">转盘</span>
               <span className="hidden lg:inline">球员转盘</span>
@@ -1179,6 +1181,16 @@ const App = () => {
 
           <div className="flex shrink-0 items-center justify-end gap-2">
             <span className="meta-chip">{appVersion} / {lastUpdated}</span>
+            <button
+              aria-label={theme === "light" ? "切换深色模式" : "切换浅色模式"}
+              aria-pressed={theme === "dark"}
+              className="theme-toggle"
+              onClick={() => setTheme((current) => current === "light" ? "dark" : "light")}
+              title={theme === "light" ? "切换深色模式" : "切换浅色模式"}
+              type="button"
+            >
+              {theme === "light" ? <Moon aria-hidden="true" /> : <Sun aria-hidden="true" />}
+            </button>
             <span className="hidden items-center gap-1.5 text-[10px] font-medium text-ink-600 xl:flex">
               <span className="h-1.5 w-1.5 rounded-full bg-court-500" />
               {appMode === "rookie" ? "新秀构建" : appMode === "prime" ? "巅峰构建" : statusText}
@@ -1209,7 +1221,7 @@ const App = () => {
 
         {appMode === "wheel" ? (
         /* TOP HALF — two columns: left=ranges, right=wheel */
-        <div className="grid gap-2.5 md:grid-cols-[300px_minmax(0,1fr)] md:grid-rows-[1fr_auto]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-2.5 md:grid-cols-[300px_minmax(0,1fr)] md:grid-rows-[1fr_auto]">
 
           {/* Left column — range sliders + player pool */}
           <aside className="contents md:flex md:h-full md:flex-col md:gap-2.5">
@@ -1451,19 +1463,19 @@ const App = () => {
               </div>
             </div>
 
-            {/* Wheel — full width, adapts to active tab */}
-            <div className="panel-surface flex flex-1 flex-col overflow-hidden p-3 sm:p-4">
-              <PlayerWheel
-                activeGroupName={activeTab.name}
+            {/* Marquee draw — full width, adapts to active tab */}
+            <div className="panel-surface overflow-hidden p-3 sm:p-4">
+              <MarqueeDraw
                 currentLabel={activeCurrentLabel}
-                disabled={activeWheelItems.length === 0}
+                dataKind="wheel"
+                disabled={activeMarqueeItems.length === 0}
+                drawLabel={activeTab.isPhysical ? "抽取" : "抽取来源"}
                 emptyText={activeTab.isPhysical ? "没有可用范围" : "先选择球员"}
-                isSpinning={isSpinning}
-                items={activeWheelItems}
-                mode={activeTab.isPhysical ? "physical" : "ability"}
-                onSpin={handleActiveWheelSpin}
-                rotation={activeWheelRotation}
-                spinLabel={activeTab.isPhysical ? "开始" : "转盘"}
+                isDrawing={isSpinning}
+                items={activeMarqueeItems}
+                onDraw={handleActiveWheelSpin}
+                selectedId={activeMarqueeSelectedId}
+                title={activeTab.isPhysical ? `${activeTab.name} 抽取` : `${activeTab.name} 来源抽取`}
               />
             </div>
             {/* Player card + actions — horizontal bar */}

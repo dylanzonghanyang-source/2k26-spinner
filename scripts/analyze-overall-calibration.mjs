@@ -1,5 +1,6 @@
 import detailedPlayers from "../src/data/players.json" with { type: "json" };
 import rosterCatalog from "../src/data/rosterCatalog.json" with { type: "json" };
+import rookieOverallModel from "../src/data/rookieOverallModel.json" with { type: "json" };
 
 const secondaryShare = 0.25;
 const folds = 5;
@@ -50,7 +51,9 @@ const samples = rosterCatalog.teams
       position,
       overall: player.overall,
       raw,
-      bundleMean: average(Object.values(values))
+      bundleMean: average(Object.values(values)),
+      detailed: detailed.detailed,
+      production: estimateProductionOverall(detailed.detailed, position)
     }];
   });
 
@@ -69,6 +72,13 @@ for (let fold = 0; fold < folds; fold += 1) {
 console.log(`Matched samples: ${samples.length}`);
 console.log(`Old formula: ${formatMetrics(metrics(predictions, "old"))}`);
 console.log(`${folds}-fold calibrated: ${formatMetrics(metrics(predictions, "calibrated"))}`);
+console.log(`Production model full-data fit: ${formatMetrics(metrics(samples, "production"))}`);
+console.log(`Production model recorded ${rookieOverallModel.crossValidation.folds}-fold validation: MAE=${rookieOverallModel.crossValidation.mae.toFixed(3)}, RMSE=${rookieOverallModel.crossValidation.rmse.toFixed(3)}`);
+const lowIntangibles = samples.filter((sample) => sample.detailed.Intangibles <= 50);
+console.log(`Production model Intangibles <= 50: n=${lowIntangibles.length}, ${formatMetrics(metrics(lowIntangibles, "production"))}`);
+const jordanWalsh = samples.find((sample) => sample.id === "jordan-walsh");
+const jordanWalshOld = predictions.find((sample) => sample.id === "jordan-walsh");
+if (jordanWalsh) console.log(`Jordan Walsh: official=${jordanWalsh.overall}, old=${jordanWalshOld?.calibrated.toFixed(2) ?? "n/a"}, production=${jordanWalsh.production}`);
 for (const position of Object.keys(weights)) {
   const positionSamples = predictions.filter((sample) => sample.position === position);
   const calibration = fit(samples.filter((sample) => sample.position === position));
@@ -89,6 +99,15 @@ for (const [minimum, maximum] of [[65, 70], [70, 75], [75, 80], [80, 85], [85, 1
 
 function average(values, fallback = 0) {
   return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : fallback;
+}
+
+function estimateProductionOverall(values, position) {
+  const positionModel = rookieOverallModel.positions[position] ?? rookieOverallModel.positions.SF;
+  const estimate = rookieOverallModel.attributes.reduce((total, attribute) => {
+    const value = Number.isFinite(values[attribute]) ? values[attribute] : attribute === "Intangibles" ? 50 : 65;
+    return total + Math.max(25, Math.min(99, value)) * (positionModel.coefficients[attribute] ?? 0);
+  }, positionModel.intercept);
+  return Math.round(Math.max(40, Math.min(99, estimate)));
 }
 
 function fit(data) {

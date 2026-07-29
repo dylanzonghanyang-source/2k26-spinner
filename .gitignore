@@ -11,3 +11,5 @@ vite.config.d.ts
 !.env.example
 
 data/2kratings/
+
+.superpowers/
