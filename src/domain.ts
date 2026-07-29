@@ -21,11 +21,6 @@ export type PlayerSource = {
   detailed: Record<string, number | null>;
 };
 
-export type WheelItem = {
-  id: string;
-  label: string;
-  weight: number;
-};
 
 export type AttributeGroupKey = "shooting" | "athleticism" | "playmaking" | "defense" | "inside";
 
@@ -243,47 +238,10 @@ export function randomWeight(): string {
 }
 
 
-export function buildWheelItems(names: readonly string[]): WheelItem[] {
-  return names.map((name, index) => ({
-    id: `${index}:${name}`,
-    label: name,
-    weight: 1
-  }));
-}
 
 export function randomWheelIndex(itemCount: number): number {
   if (itemCount <= 0) return -1;
   return Math.floor(Math.random() * itemCount);
-}
-
-export function getWheelTargetRotation({
-  currentRotation,
-  fullTurns,
-  itemCount,
-  targetIndex
-}: {
-  currentRotation: number;
-  fullTurns: number;
-  itemCount: number;
-  targetIndex: number;
-}): number {
-  if (itemCount <= 0) return currentRotation;
-
-  const boundedIndex = clamp(Math.floor(targetIndex), 0, itemCount - 1);
-  const segmentAngle = 360 / itemCount;
-  const targetCenterAngle = boundedIndex * segmentAngle + segmentAngle / 2;
-  const alignmentOffset = normalizeDegrees(-currentRotation - targetCenterAngle);
-
-  return currentRotation + Math.max(1, Math.floor(fullTurns)) * 360 + alignmentOffset;
-}
-
-export function getWheelPointerIndex(rotation: number, itemCount: number): number {
-  if (itemCount <= 0) return -1;
-
-  const segmentAngle = 360 / itemCount;
-  const pointerAngle = normalizeDegrees(-rotation);
-
-  return clamp(Math.floor(pointerAngle / segmentAngle), 0, itemCount - 1);
 }
 
 export function availablePlayers(selectedNames: string[], pool: PlayerSource[]) {
@@ -621,8 +579,4 @@ const bodyBiasByPosition: Record<
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
-}
-
-function normalizeDegrees(value: number) {
-  return ((value % 360) + 360) % 360;
 }

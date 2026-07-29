@@ -417,10 +417,13 @@ function valueColor(value: number) {
 function createRound(teams: RookieBuilderTeam[], seed: number, previousTeamId = ""): TeamRound {
   const valid = teams.filter((team) => team.players.length > 0);
   const random = makeRandom(seed);
-  let team = valid[Math.floor(random() * valid.length)] ?? valid[0];
-  if (valid.length > 1 && team?.id === previousTeamId) {
-    team = valid[(valid.findIndex((item) => item.id === team?.id) + 1) % valid.length];
-  }
+  // Exclude the previous team so every remaining team stays equally likely.
+  // Replacing a repeat with "next in array" doubled that neighbor's odds.
+  const candidates = valid.length > 1
+    ? valid.filter((team) => team.id !== previousTeamId)
+    : valid;
+  const pool = candidates.length > 0 ? candidates : valid;
+  const team = pool[Math.floor(random() * pool.length)] ?? pool[0];
   return {
     teamId: team?.id ?? "",
     playerOrder: team ? shuffle(team.players.map(playerId), random) : [],
@@ -745,10 +748,11 @@ function createExportText(
 ) {
   const isPrime = mode === "prime";
   return [
-    `NBA 2K26 ${isPrime ? "巅峰球员" : "新秀"}创建清单`, "", "[资料]",
+    `NBA 2K27 ${isPrime ? "巅峰球员" : "新秀"}创建清单`, "", "[资料]",
     `姓名: ${rookieName}`, `年龄: ${result.age}`, `位置: ${result.position}`, `次要位置: ${result.secondary}`,
     `惯用手: ${result.hand}`, `扣篮惯用手: ${result.dunkHand}`,
     `巅峰开始年龄: ${result.peakStart}`, `巅峰结束年龄: ${result.peakEnd}`,
+    `数据版本: NBA 2K27 Play Now`,
     ...(!isPrime ? [
       `即战力: ${result.readiness}`,
       `巅峰综评区间: ${result.minPotential}-${result.maxPotential}`,
@@ -789,6 +793,7 @@ function createExportText(
         bodyAdjustment ? `体型修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "",
         sourcePenaltyPercent ? `来源位置衰减 ${sourcePenaltyPercent}%` : "",
         secondaryPenaltyPercent ? `非常规次要位置衰减 ${secondaryPenaltyPercent}%` : "",
+        player?.isEstimated ? "估算属性" : "",
       ].filter(Boolean).join("，");
       return `${bundle.label}（权重 ${displayedPositionWeight(result.position, result.secondary, bundle.id)}%）: ${player ? getPlayerNameCN(player.name) : "--"}${adjustments ? `（${adjustments}）` : ""}`;
     }),
@@ -1587,7 +1592,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
               return (
                 <button key={id} className={`flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left transition ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : unavailable || isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`} disabled={unavailable || isComplete} onClick={() => choosePlayer(player)} type="button">
                   <PlayerHeadshot name={player.name} />
-                  <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(player.name)}</span><span className="block text-[9px] text-ink-400">{player.position ?? "--"}{unavailable ? " · 已使用" : ""}</span></span>
+                  <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(player.name)}</span><span className="block text-[9px] text-ink-400">{player.position ?? "--"}{player.isEstimated ? " · 估算" : ""}{unavailable ? " · 已使用" : ""}</span></span>
                   <span className={`shrink-0 text-[14px] font-bold tabular-nums ${typeof player.overall === "number" ? valueColor(player.overall) : "text-ink-400"}`}>{player.overall ?? "--"}</span>
                 </button>
               );

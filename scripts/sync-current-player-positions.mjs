@@ -125,7 +125,7 @@ for (const team of currentTeams) {
 }
 
 const positions = {
-  version: "NBA 2K26 Play Now positions",
+  version: "NBA 2K27 Play Now positions",
   generatedAt: new Date().toISOString(),
   sources: {
     nba2klab: "https://www.nba2klab.com/.netlify/functions/player-roster",

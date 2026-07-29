@@ -34,8 +34,9 @@ import rosterCatalog from "./data/rosterCatalog.json";
 import badgeProfiles from "./data/badgeProfiles.json";
 import detailedPlayers from "./data/players.json";
 
-const appVersion = "v0.3";
-const lastUpdated = "2026-07-22";
+const appVersion = "v0.4";
+const lastUpdated = "2026-07-29";
+const rosterDataVersion = "NBA 2K27 Play Now";
 const usageGuides = {
   rookie: [
     { title: "设定新秀", detail: "选择主次位置、年龄、潜力和身体" },
@@ -409,12 +410,22 @@ function getStatusValueSuffix(key: PhysicalWheelKey): string {
   return "";
 }
 
-function createDraftText(draft: PlayerDraft): string {
+function createDraftText(draft: PlayerDraft, sources: SourceMap | null): string {
+  const sourceLines = attributeGroups.map((group) => {
+    const player = sources?.[group.key];
+    if (!player) return `${group.name}: --`;
+    const estimateTag = player.isEstimated ? " [估算]" : "";
+    return `${group.name}: ${getPlayerNameCN(player.name)}${estimateTag}`;
+  });
+  const hasEstimatedSource = attributeGroups.some((group) => sources?.[group.key]?.isEstimated);
   return [
     `球员模板: ${draft.position} / ${draft.height}`,
     `体型: ${draft.weight ?? "--"} kg | ${draft.wingspan} 臂展 | ${draft.shoulderWidth} 肩宽`,
     `创建阶段: ${draft.careerStage === "rookie" ? "生涯起点" : "巅峰模板"}${draft.careerStage === "rookie" ? ` | 潜力 ${draft.potential}` : ""}`,
-    `来源: ${draft.sourceNames.map(getPlayerNameCN).join(" / ")}`,
+    `数据版本: ${rosterDataVersion}`,
+    `来源: ${draft.sourceNames.map(getPlayerNameCN).join(" / ") || "--"}`,
+    `来源估算: ${hasEstimatedSource || draft.badgesEstimated ? "含估算属性/徽章" : "均为详细属性来源"}`,
+    ...sourceLines,
     `当前徽章: ${draft.badges.map((badge) => `${getBadgeNameCN(badge.name)} (${badgeTierCN[badge.tier]})`).join(" / ") || "--"}`,
     `巅峰徽章: ${draft.peakBadges.map((badge) => `${getBadgeNameCN(badge.name)} (${badgeTierCN[badge.tier]})`).join(" / ") || "--"}`,
     "",
@@ -531,6 +542,10 @@ function RangeSlider({
 }) {
   const [minInput, setMinInput] = useState(String(min));
   const [maxInput, setMaxInput] = useState(String(max));
+  const [activeThumb, setActiveThumb] = useState<"min" | "max" | null>(null);
+  const span = Math.max(1, absoluteMax - absoluteMin);
+  const minPercent = ((min - absoluteMin) / span) * 100;
+  const maxPercent = ((max - absoluteMin) / span) * 100;
 
   useEffect(() => {
     setMinInput(String(min));
@@ -540,27 +555,33 @@ function RangeSlider({
     setMaxInput(String(max));
   }, [max]);
 
+  const commitMin = (value: number) => {
+    onMinChange(clampNumber(value, absoluteMin, max));
+  };
+
+  const commitMax = (value: number) => {
+    onMaxChange(clampNumber(value, min, absoluteMax));
+  };
+
   const handleMinInput = (value: string) => {
-    const next = clampNumber(parseRangeInput(value, min), absoluteMin, max);
-    onMinChange(next);
+    commitMin(parseRangeInput(value, min));
   };
 
   const handleMaxInput = (value: string) => {
-    const next = clampNumber(parseRangeInput(value, max), min, absoluteMax);
-    onMaxChange(next);
+    commitMax(parseRangeInput(value, max));
   };
 
   const syncMinWhileTyping = (value: string) => {
     const parsed = Number(value);
     if (value.trim() !== "" && Number.isFinite(parsed) && parsed >= absoluteMin && parsed <= max) {
-      onMinChange(Math.round(parsed));
+      commitMin(Math.round(parsed));
     }
   };
 
   const syncMaxWhileTyping = (value: string) => {
     const parsed = Number(value);
     if (value.trim() !== "" && Number.isFinite(parsed) && parsed >= min && parsed <= absoluteMax) {
-      onMaxChange(Math.round(parsed));
+      commitMax(Math.round(parsed));
     }
   };
 
@@ -623,40 +644,44 @@ function RangeSlider({
         </div>
       </div>
       <div className="relative h-7">
-        {/* 背景条 */}
         <div
           className="absolute top-1/2 left-0 right-0 h-1.5 -translate-y-1/2 rounded-full pointer-events-none"
           style={{
             background: `linear-gradient(to right,
               rgba(38,71,83,0.13) 0%,
-              rgba(38,71,83,0.13) ${((min - absoluteMin) / (absoluteMax - absoluteMin)) * 100}%,
-              ${color} ${((min - absoluteMin) / (absoluteMax - absoluteMin)) * 100}%,
-              ${color} ${((max - absoluteMin) / (absoluteMax - absoluteMin)) * 100}%,
-              rgba(38,71,83,0.13) ${((max - absoluteMin) / (absoluteMax - absoluteMin)) * 100}%
+              rgba(38,71,83,0.13) ${minPercent}%,
+              ${color} ${minPercent}%,
+              ${color} ${maxPercent}%,
+              rgba(38,71,83,0.13) ${maxPercent}%
             )`,
           }}
         />
-        {/* 最小值滑块 */}
+        {/* Min thumb sits above max on the left half so it remains draggable. */}
         <input
           type="range"
-          className="range-control absolute top-0 left-0 z-10 h-full w-full [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-[var(--slider-thumb)] [&::-webkit-slider-thumb]:shadow-[0_2px_10px_rgba(31,73,86,0.28)]"
+          aria-label={`${label}下限滑块`}
+          className={`range-control absolute top-0 left-0 h-full w-full [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-[var(--slider-thumb)] [&::-webkit-slider-thumb]:shadow-[0_2px_10px_rgba(31,73,86,0.28)] ${activeThumb === "min" ? "z-30" : "z-20"}`}
           style={{ "--slider-thumb": color, background: "transparent" } as React.CSSProperties}
           min={absoluteMin}
           max={absoluteMax}
           value={min}
           disabled={disabled}
-          onChange={(e) => onMinChange(Number(e.target.value))}
+          onPointerDown={() => setActiveThumb("min")}
+          onPointerUp={() => setActiveThumb(null)}
+          onChange={(e) => commitMin(Number(e.target.value))}
         />
-        {/* 最大值滑块 */}
         <input
           type="range"
-          className="range-control absolute top-0 left-0 z-20 h-full w-full [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-[var(--slider-thumb)] [&::-webkit-slider-thumb]:shadow-[0_2px_10px_rgba(31,73,86,0.28)]"
+          aria-label={`${label}上限滑块`}
+          className={`range-control absolute top-0 left-0 h-full w-full [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-[var(--slider-thumb)] [&::-webkit-slider-thumb]:shadow-[0_2px_10px_rgba(31,73,86,0.28)] ${activeThumb === "max" || activeThumb === null ? "z-30" : "z-10"}`}
           style={{ "--slider-thumb": color, background: "transparent" } as React.CSSProperties}
           min={absoluteMin}
           max={absoluteMax}
           value={max}
           disabled={disabled}
-          onChange={(e) => onMaxChange(Number(e.target.value))}
+          onPointerDown={() => setActiveThumb("max")}
+          onPointerUp={() => setActiveThumb(null)}
+          onChange={(e) => commitMax(Number(e.target.value))}
         />
       </div>
     </div>
@@ -776,24 +801,30 @@ const App = () => {
   }));
 
   const filteredHeights = useMemo(() => {
+    const low = Math.min(heightMin, heightMax);
+    const high = Math.max(heightMin, heightMax);
     return allHeights().filter((h) => {
       const cm = parseInt(h, 10);
-      return cm >= heightMin && cm <= heightMax;
+      return cm >= low && cm <= high;
     });
   }, [heightMin, heightMax]);
 
   const filteredShoulders = useMemo(() => {
-    return Array.from({length: shoulderMax - shoulderMin + 1}, (_, i) => `${shoulderMin + i}`);
+    const low = Math.min(shoulderMin, shoulderMax);
+    const high = Math.max(shoulderMin, shoulderMax);
+    return Array.from({ length: high - low + 1 }, (_, i) => `${low + i}`);
   }, [shoulderMin, shoulderMax]);
 
   const filteredWingspans = useMemo(() => {
-
-    return Array.from({length: wingspanMax - wingspanMin + 1}, (_, i) => `${wingspanMin + i}`);
+    const low = Math.min(wingspanMin, wingspanMax);
+    const high = Math.max(wingspanMin, wingspanMax);
+    return Array.from({ length: high - low + 1 }, (_, i) => `${low + i}`);
   }, [wingspanMin, wingspanMax]);
 
-
   const filteredWeights = useMemo(() => {
-    return Array.from({length: weightMax - weightMin + 1}, (_, i) => `${weightMin + i}`);
+    const low = Math.min(weightMin, weightMax);
+    const high = Math.max(weightMin, weightMax);
+    return Array.from({ length: high - low + 1 }, (_, i) => `${low + i}`);
   }, [weightMin, weightMax]);
 
   const posOpts = useMemo(() => posFilter, [posFilter]);
@@ -821,7 +852,10 @@ const App = () => {
       id: playerSourceKey(player),
       label: playerPoolLabel(player),
       mark: player.position?.split("/")[0] ?? "NBA",
-      meta: typeof player.overall === "number" ? `${player.overall} OVR` : undefined,
+      meta: [
+        typeof player.overall === "number" ? `${player.overall} OVR` : null,
+        player.isEstimated ? "估算" : null,
+      ].filter(Boolean).join(" · ") || undefined,
     }));
   }, [activeTab.key, availablePlayers, physicalOptionsByKey]);
 
@@ -835,7 +869,9 @@ const App = () => {
           : activeTab.key === "wingspan"
             ? wingspanVal
             : weightVal
-    : activeSource ? playerPoolLabel(activeSource) : undefined;
+    : activeSource
+      ? `${playerPoolLabel(activeSource)}${activeSource.isEstimated ? " · 估算" : ""}`
+      : undefined;
   const activePhysicalValue = isPhysicalWheelKey(activeTab.key)
     ? activeTab.key === "position"
       ? positionVal
@@ -869,6 +905,47 @@ const App = () => {
     setBodyTemplate(template);
     setDraft((current) => sourceMap ? createDraftFromSources(sourceMap, template, careerProfile) : { ...current, ...template });
   }, [bodyTemplate.weight, careerProfile, sourceMap]);
+
+  // When candidate ranges shrink, keep drawn values only if they remain
+  // selectable; otherwise clear them so the UI never shows an unreachable result.
+  useEffect(() => {
+    if (isSpinning) return;
+
+    const nextPos = posOpts.includes(positionVal) ? positionVal : initialBodyTemplate.position;
+    const nextHeight = filteredHeights.includes(heightVal) ? heightVal : initialBodyTemplate.height;
+    const nextShoulder = filteredShoulders.includes(shoulderVal) ? shoulderVal : initialBodyTemplate.shoulderWidth;
+    const nextWingspan = filteredWingspans.includes(wingspanVal) ? wingspanVal : initialBodyTemplate.wingspan;
+    const nextWeight = filteredWeights.includes(weightVal) ? weightVal : String(initialBodyTemplate.weight);
+
+    const cleared: string[] = [];
+    if (nextPos !== positionVal && positionVal !== initialBodyTemplate.position) cleared.push("位置");
+    if (nextHeight !== heightVal && heightVal !== initialBodyTemplate.height) cleared.push("身高");
+    if (nextShoulder !== shoulderVal && shoulderVal !== initialBodyTemplate.shoulderWidth) cleared.push("肩宽");
+    if (nextWingspan !== wingspanVal && wingspanVal !== initialBodyTemplate.wingspan) cleared.push("臂展");
+    if (nextWeight !== weightVal && weightVal !== String(initialBodyTemplate.weight)) cleared.push("体重");
+    if (cleared.length === 0) return;
+
+    setPositionVal(nextPos);
+    setHeightVal(nextHeight);
+    setShoulderVal(nextShoulder);
+    setWingspanVal(nextWingspan);
+    setWeightVal(nextWeight);
+    applyBody(nextPos, nextHeight, nextShoulder, nextWingspan, nextWeight);
+    setStatusText(`候选范围已变更，已清除超出范围的结果：${cleared.join("、")}`);
+  }, [
+    applyBody,
+    filteredHeights,
+    filteredShoulders,
+    filteredWeights,
+    filteredWingspans,
+    heightVal,
+    isSpinning,
+    posOpts,
+    positionVal,
+    shoulderVal,
+    weightVal,
+    wingspanVal,
+  ]);
 
   const randomizeFullBodyValue = useCallback((key: "height" | "shoulder" | "wingspan") => {
     if (isSpinning) return;
@@ -1097,7 +1174,7 @@ const App = () => {
   };
 
   const exportDraft = async () => {
-    await navigator.clipboard.writeText(createDraftText(draft));
+    await navigator.clipboard.writeText(createDraftText(draft, sourceMap));
     setStatusText("清单已复制");
   };
 
@@ -1112,7 +1189,7 @@ const App = () => {
   };
 
   const downloadDraftFile = async () => {
-    const blob = new Blob([createDraftText(draft)], { type: "text/plain;charset=utf-8" });
+    const blob = new Blob([createDraftText(draft, sourceMap)], { type: "text/plain;charset=utf-8" });
     const showSaveFilePicker = (window as Window & { showSaveFilePicker?: SaveFilePicker }).showSaveFilePicker;
 
     if (showSaveFilePicker) {
@@ -1427,7 +1504,10 @@ const App = () => {
                           <span className={"flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border transition " + (active ? "border-court-600 bg-court-600" : "border-ink-400/40 bg-white")}>
                 {active && <svg className="h-2.5 w-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}
               </span>
-                          <span className="truncate">{playerPoolLabel(player)}</span>
+                          <span className="truncate">
+                            {playerPoolLabel(player)}
+                            {player.isEstimated && <span className="ml-1 text-[10px] font-medium text-amber-700">估算</span>}
+                          </span>
                         </span>
                         {active && <span className="shrink-0 text-[10px] text-court-700">已选</span>}
                       </button>
@@ -1497,6 +1577,9 @@ const App = () => {
                       </div>
                       <div className="text-[11px] text-ink-500">
                         {draft.sourceNames.length > 0 ? draft.sourceNames.map(getPlayerNameCN).join(" · ") : "来源待抽取"}
+                        {(draft.badgesEstimated || sourceEntries.some(({ player }) => player?.isEstimated)) && (
+                          <span className="ml-1 text-amber-700">· 含估算来源</span>
+                        )}
                       </div>
                     </>
                   ) : (
@@ -1546,7 +1629,11 @@ const App = () => {
                   徽章
                 </div>
                 {draft.sourceNames.length > 0 && (
-                  <span className="text-[10px] text-ink-500">{draft.badgesEstimated ? "属性推导含部分来源" : "2KRatings 原始来源"}</span>
+                  <span className="text-[10px] text-ink-500">
+                    {draft.badgesEstimated || sourceEntries.some(({ player }) => player?.isEstimated)
+                      ? "含估算属性/徽章"
+                      : "2KRatings 详细属性来源"}
+                  </span>
                 )}
               </div>
               <div className="grid gap-px bg-ink-200 md:grid-cols-2">
@@ -1571,8 +1658,10 @@ const App = () => {
                     <div className={`mt-0.5 truncate text-[12px] font-medium ${player ? "text-ink-900" : "text-ink-400"}`}>
                       {player ? getPlayerNameCN(player.name) : "待抽取"}
                     </div>
+                    {player?.isEstimated && (
+                      <div className="mt-0.5 text-[9px] font-medium text-amber-700">估算属性</div>
+                    )}
                   </div>
-
                 ))}
               </div>
             </div>
@@ -1610,7 +1699,7 @@ const App = () => {
             <footer className="border-t border-ink-200 px-1 py-2.5 text-[10px] leading-5 text-ink-500">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <p>
-                  现役球队名单基于 {lastUpdated} 的 NBA 2K27 Play Now roster；经典与历史最佳球队保留原存档。部分属性和徽章由公开的 OVR、三分、扣篮等字段推导，不是完整官方属性表。
+                  现役球队名单基于 {lastUpdated} 的 {rosterDataVersion} roster；经典与历史最佳球队保留原存档。无详细属性表的球员会标记为「估算」，由 OVR / 三分 / 扣篮等公开字段推导。
                 </p>
                 <p className="shrink-0 text-ink-500">
                   反馈入口：中文名、属性翻译或球员缺失可以直接把截图和建议发给作者。

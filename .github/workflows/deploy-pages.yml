@@ -36,6 +36,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Validate data contracts
+        run: pnpm validate:data
+
+      - name: Test overall calibration
+        run: pnpm test:overall
+
       - name: Build site
         run: pnpm build
 

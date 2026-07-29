@@ -9,6 +9,9 @@
     "preview": "vite preview",
     "analyze:overall": "node scripts/analyze-overall-calibration.mjs",
     "test:overall": "node scripts/test-rookie-overall-calibration.mjs",
+    "validate:data": "node scripts/validate-data.mjs",
+    "convert:players": "node scripts/convert-raw-players.mjs",
+    "train:overall": "node scripts/train-rookie-overall-model.mjs",
     "scrape:2k": "node scripts/scrape-2kratings.mjs",
     "sync:positions": "node scripts/sync-current-player-positions.mjs",
     "update:rosters": "node scripts/update-current-rosters.mjs"

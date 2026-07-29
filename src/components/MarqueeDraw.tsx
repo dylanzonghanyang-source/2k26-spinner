@@ -24,7 +24,12 @@ type MarqueeDrawProps = {
   title: string;
 };
 
-function nearbyItems(items: MarqueeDrawItem[], selectedIndex: number, precedingItems: number) {
+function nearbyItems(
+  items: MarqueeDrawItem[],
+  selectedIndex: number,
+  precedingItems: number,
+  revealWinner: boolean,
+) {
   if (items.length === 0) return [];
   if (selectedIndex < 0) {
     return items.slice(0, Math.min(3, items.length)).map((item, index) => ({
@@ -37,7 +42,13 @@ function nearbyItems(items: MarqueeDrawItem[], selectedIndex: number, precedingI
   const itemCount = Math.max(5, precedingItems + 5);
   return Array.from({ length: itemCount }, (_, index) => {
     const sourceIndex = (selectedIndex - precedingItems + index + items.length * itemCount) % items.length;
-    return { ...items[sourceIndex], railId: `${index}:${items[sourceIndex].id}`, selected: index === precedingItems };
+    return {
+      ...items[sourceIndex],
+      railId: `${index}:${items[sourceIndex].id}`,
+      // Keep the winner in the center slot for animation, but only mark it
+      // as selected after the draw settles so the result is not leaked early.
+      selected: revealWinner && index === precedingItems,
+    };
   });
 }
 
@@ -61,10 +72,24 @@ function MarqueeDraw({
   const animationRef = useRef<Animation | null>(null);
   const [settled, setSettled] = useState(!isDrawing);
   const selectedIndex = items.findIndex((item) => item.id === selectedId);
-  const railItems = useMemo(() => nearbyItems(items, selectedIndex, precedingItems), [items, precedingItems, selectedIndex]);
+  const revealWinner = settled && !isDrawing;
+  const railItems = useMemo(
+    () => nearbyItems(items, selectedIndex, precedingItems, revealWinner),
+    [items, precedingItems, revealWinner, selectedIndex],
+  );
   const hasItems = items.length > 0;
   const hasSelection = selectedIndex >= 0;
   const canDraw = Boolean(onDraw) && !disabled && !isDrawing && hasItems;
+  const statusText = isDrawing || (hasSelection && !settled)
+    ? "正在筛选"
+    : hasSelection
+      ? currentLabel ?? emptyText
+      : "待抽取";
+  const liveStatus = isDrawing || (hasSelection && !settled)
+    ? `${title}正在筛选`
+    : hasSelection
+      ? `${title}结果：${currentLabel ?? selectedId}`
+      : `${title}待抽取`;
 
   useEffect(() => {
     const track = trackRef.current;
@@ -88,9 +113,9 @@ function MarqueeDraw({
       return;
     }
 
-    alignSelection();
     if (!isDrawing) {
       setSettled(true);
+      alignSelection();
       const resizeObserver = new ResizeObserver(alignSelection);
       resizeObserver.observe(track);
       return () => resizeObserver.disconnect();
@@ -99,15 +124,20 @@ function MarqueeDraw({
     setSettled(false);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) {
+      alignSelection();
       setSettled(true);
       return;
     }
 
-    const selected = selectedRef.current;
-    if (!selected) return;
+    // Anchor on the center rail slot (index === precedingItems), not on the
+    // highlighted winner, so animation still targets the correct card while
+    // the selected style stays hidden until settle.
+    const target = rail.children[precedingItems];
+    if (!(target instanceof HTMLDivElement)) return;
+    selectedRef.current = target;
     rail.style.transform = "translateX(0)";
     const trackRect = track.getBoundingClientRect();
-    const selectedRect = selected.getBoundingClientRect();
+    const selectedRect = target.getBoundingClientRect();
     const finalOffset = trackRect.left + trackRect.width / 2 - (selectedRect.left + selectedRect.width / 2);
     const startOffset = finalOffset + Math.max(
       selectedRect.left - rail.getBoundingClientRect().left,
@@ -124,31 +154,32 @@ function MarqueeDraw({
       easing: "cubic-bezier(0.2, 0.7, 0.15, 1)",
       fill: "forwards",
     });
-    const settleTimer = window.setTimeout(() => setSettled(true), durationMs * 0.84);
+    // Reveal only after the animation finishes, not at 84%.
+    const settleTimer = window.setTimeout(() => setSettled(true), durationMs);
 
     return () => {
       window.clearTimeout(settleTimer);
       animationRef.current?.cancel();
       animationRef.current = null;
     };
-  }, [durationMs, hasItems, hasSelection, isDrawing, railItems]);
+  }, [durationMs, hasItems, hasSelection, isDrawing, precedingItems, selectedId]);
 
   return (
     <div
-      aria-busy={isDrawing}
+      aria-busy={isDrawing || (hasSelection && !settled)}
       className="marquee-draw"
-      data-drawing={isDrawing}
+      data-drawing={isDrawing || (hasSelection && !settled)}
       data-has-selection={hasSelection}
       data-kind={dataKind}
-      data-settled={settled}
+      data-settled={settled && !isDrawing}
       data-testid="marquee-draw"
     >
       <span aria-live="polite" className="sr-only" role="status">
-        {isDrawing ? `${title}正在筛选` : hasSelection ? `${title}结果：${currentLabel ?? selectedId}` : `${title}待抽取`}
+        {liveStatus}
       </span>
       <div className="marquee-draw-header">
         <span>{title}</span>
-        <span className="marquee-draw-status">{isDrawing ? "正在筛选" : hasSelection ? currentLabel ?? emptyText : "待抽取"}</span>
+        <span className="marquee-draw-status">{statusText}</span>
       </div>
       <div className="marquee-draw-track" ref={trackRef}>
         <div className="marquee-draw-pointer" aria-hidden="true"><ChevronDown /></div>
