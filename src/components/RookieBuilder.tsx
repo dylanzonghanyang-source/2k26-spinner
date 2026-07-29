@@ -914,7 +914,7 @@ function CompactNumberInput({
   return (
     <input
       aria-label={ariaLabel}
-      className="h-7 w-12 bg-transparent px-1 text-center text-[11px] font-semibold tabular-nums text-ink-800 outline-none disabled:cursor-not-allowed disabled:text-ink-400"
+      className="h-full w-11 min-w-0 flex-1 bg-transparent px-0.5 text-center text-[12px] font-semibold tabular-nums text-ink-800 outline-none disabled:cursor-not-allowed disabled:text-ink-400"
       disabled={disabled}
       inputMode="numeric"
       onBlur={(event) => commit(event.currentTarget.value)}
@@ -1333,144 +1333,146 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
         id="builder-pane-settings"
         role="tabpanel"
       >
-        <div className="flex flex-col gap-3 px-3 py-3">
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,7fr)_minmax(420px,5fr)]">
-            <section aria-labelledby="player-identity-label">
-              <div className="section-label mb-2" id="player-identity-label">球员身份</div>
-              <div className="grid gap-3 sm:grid-cols-2">
-          <div className="min-w-0">
-            <div className="section-label mb-1">{isPrime ? "球员姓名" : "新秀姓名"}</div>
-            <div className="flex h-7 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
-              <input
-                aria-label={`${isPrime ? "巅峰球员" : "新秀"}英文姓名`}
-                className="min-w-0 flex-1 bg-transparent px-2 text-[11px] font-semibold text-ink-800 outline-none disabled:cursor-not-allowed disabled:text-ink-400"
-                disabled={settingsLocked}
-                maxLength={48}
-                onChange={(event) => setRookieName(event.target.value)}
-                spellCheck={false}
-                type="text"
-                value={rookieName}
-              />
-              <button aria-label="随机生成英文姓名" className="flex w-7 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeName} title="随机生成英文姓名" type="button"><RefreshCw className="h-3 w-3" /></button>
-            </div>
-          </div>
-          <div className="min-w-0 sm:col-start-1 sm:row-start-2">
-            <div className="section-label mb-1">主位置</div>
-            <div aria-label="主位置" className="flex w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
-              {positions.map((option) => {
-                const selected = position === option;
-                const stateClass = selected
-                  ? "bg-ink-900 text-white"
-                  : settingsLocked
-                    ? "bg-ink-50 text-ink-300"
-                    : "bg-white text-ink-500 hover:bg-ink-50 hover:text-ink-800";
-                return (
-                  <button key={option} aria-label={`主位置 ${option}`} aria-pressed={selected} className={`h-7 min-w-0 flex-1 px-2 text-[10px] font-semibold transition disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked} onClick={() => changePosition(option)} type="button">{option}</button>
-                );
-              })}
-            </div>
-          </div>
-          <div className="min-w-0 sm:col-start-2 sm:row-start-2">
-            <div className="section-label mb-1 flex items-center gap-1.5">
-              次要位置
-              {hasSecondaryMismatch && (
-                <span className="inline-flex items-center gap-0.5 text-[8px] font-semibold text-rose-700" title="非常规位置组合会对不匹配的属性额外衰减">
-                  <AlertTriangle className="h-2.5 w-2.5" />非常规
-                </span>
-              )}
-            </div>
-            <div aria-label="次要位置" className="flex w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
-              {positions.map((option) => {
-                const isPrimary = option === position;
-                const selected = secondaryPosition === option;
-                const natural = !isPrimary && isNaturalSecondaryPosition(position, option);
-                const stateClass = selected
-                  ? natural ? "bg-court-700 text-white" : "bg-rose-700 text-white"
-                  : settingsLocked || isPrimary
-                    ? "bg-ink-50 text-ink-300"
-                    : natural
-                      ? "bg-white text-ink-600 hover:bg-court-50 hover:text-court-800"
-                      : "bg-rose-50/60 text-rose-500 hover:bg-rose-100 hover:text-rose-800";
-                return (
-                  <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`h-7 min-w-0 flex-1 px-2 text-[10px] font-semibold transition disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked || isPrimary} onClick={() => changeSecondaryPosition(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规次要位置" : "非常规次要位置：部分能力会额外衰减"} type="button">{option}</button>
-                );
-              })}
-            </div>
-          </div>
-          <div className="min-w-0 sm:col-start-2 sm:row-start-1">
-            <div className="section-label mb-1">年龄</div>
-            <div className="flex w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200">
-              {isPrime ? (
-                <button aria-label="巅峰球员年龄固定为 28 岁" className="h-7 min-w-14 cursor-not-allowed bg-ink-900 px-3 text-[10px] font-semibold text-white" disabled title="巅峰球员年龄固定为 28 岁" type="button">28</button>
-              ) : ages.map((option) => (
-                <button key={option} className={`h-7 min-w-0 flex-1 px-2 text-[10px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-55 ${age === option ? "bg-ink-900 text-white" : "bg-white text-ink-500 hover:bg-ink-50 hover:text-ink-800"}`} disabled={settingsLocked} onClick={() => setAge(option)} type="button">{option}</button>
-              ))}
-            </div>
-          </div>
-              </div>
-            </section>
-            <section aria-labelledby="ability-estimate-label" className="border-t border-ink-100 pt-3 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
-              <div className="section-label mb-2" id="ability-estimate-label">成长设定</div>
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-                {isPrime ? (
-                  <div className="min-w-0">
-                    <div className="section-label mb-1">属性阶段</div>
-                    <div className="flex h-7 items-center justify-between rounded-[5px] border border-court-200 bg-court-50 px-2 text-[10px] font-semibold text-court-800">
-                      <span>巅峰值直出</span>
-                      <span className="font-mono">28 岁</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid min-w-0 grid-cols-3 gap-2">
-                    <div className="min-w-0">
-                      <div className="section-label mb-1" title="生成球员最终可以达到的综评区间">巅峰综评</div>
-                      <div className="flex h-7 items-center justify-center gap-0.5 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
-                        <CompactNumberInput ariaLabel="巅峰综评下限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMin} value={potentialRange.min} />
-                        <span className="text-[10px] text-ink-300">–</span>
-                        <CompactNumberInput ariaLabel="巅峰综评上限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMax} value={potentialRange.max} />
-                      </div>
-                    </div>
-                    <div className="min-w-0">
-                      <div className="mb-1 flex items-center gap-1">
-                        <div className="section-label flex items-center gap-1" title="即战力表示新秀已经兑现了多少巅峰能力；数值越高，开局越接近巅峰">
-                          即战力 <CircleHelp className="h-3 w-3 text-ink-400" />
-                        </div>
-                      </div>
-                      <div className="flex h-7 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
-                        <div className="flex min-w-0 flex-1 items-center justify-center">
-                          <CompactNumberInput ariaLabel="即战力" disabled={settingsLocked} max={100} min={1} onChange={updateReadiness} value={readiness} />
-                        </div>
-                        <button aria-label="随机即战力" className="flex w-7 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeReadiness} title="随机生成 1–100 即战力" type="button"><Shuffle className="h-3 w-3" /></button>
-                      </div>
-                    </div>
-                    <div className="min-w-0">
-                      <div className="section-label mb-1">新秀综评</div>
-                      <div className="flex h-7 items-center justify-center rounded-[5px] border border-court-200 bg-court-50 px-1.5 font-mono text-[11px] font-semibold text-court-800" data-testid="projected-initial-range" title="由年龄、巅峰综评和即战力共同计算">
-                        {projectedInitialRange.min}–{projectedInitialRange.max}
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div className="flex w-full items-stretch gap-2 sm:w-auto sm:flex-col" aria-label="设定操作">
-                  {!settingsLocked && (
-                    <button className="action-button primary-action flex-1 justify-center px-3 py-2 text-[11px] font-semibold sm:flex-none sm:min-w-[7.5rem]" onClick={confirmSettings} type="button"><Check className="h-3.5 w-3.5" />确认并抽取</button>
-                  )}
-                  <button className="action-button flex-1 justify-center px-3 py-2 text-[11px] sm:flex-none sm:min-w-[7.5rem]" onClick={reset} type="button"><RefreshCw className="h-3.5 w-3.5" />{settingsLocked ? "重新开始" : "重置设定"}</button>
+        <div className="grid gap-px bg-ink-200 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+          <section aria-labelledby="player-identity-label" className="bg-white px-3 py-3">
+            <div className="section-label mb-2" id="player-identity-label">球员身份</div>
+            <div className="grid gap-2.5 sm:grid-cols-2">
+              <div className="min-w-0 sm:col-span-2">
+                <div className="section-label mb-1">{isPrime ? "球员姓名" : "新秀姓名"}</div>
+                <div className="flex h-8 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
+                  <input
+                    aria-label={`${isPrime ? "巅峰球员" : "新秀"}英文姓名`}
+                    className="min-w-0 flex-1 bg-transparent px-2.5 text-[12px] font-semibold text-ink-800 outline-none disabled:cursor-not-allowed disabled:text-ink-400"
+                    disabled={settingsLocked}
+                    maxLength={48}
+                    onChange={(event) => setRookieName(event.target.value)}
+                    spellCheck={false}
+                    type="text"
+                    value={rookieName}
+                  />
+                  <button aria-label="随机生成英文姓名" className="flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeName} title="随机生成英文姓名" type="button"><RefreshCw className="h-3.5 w-3.5" /></button>
                 </div>
               </div>
-            </section>
-          </div>
-          <div className="grid gap-3 border-t border-ink-100 pt-3 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center">
-            <div className="flex items-center gap-1.5 text-[9px] font-medium text-ink-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-court-500" />{status}
+              <div className="min-w-0">
+                <div className="section-label mb-1">年龄</div>
+                <div className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200">
+                  {isPrime ? (
+                    <button aria-label="巅峰球员年龄固定为 28 岁" className="h-full min-w-14 cursor-not-allowed bg-ink-900 px-3 text-[11px] font-semibold text-white" disabled title="巅峰球员年龄固定为 28 岁" type="button">28</button>
+                  ) : ages.map((option) => (
+                    <button key={option} className={`h-full min-w-0 flex-1 px-1.5 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-55 ${age === option ? "bg-ink-900 text-white" : "bg-white text-ink-500 hover:bg-ink-50 hover:text-ink-800"}`} disabled={settingsLocked} onClick={() => setAge(option)} type="button">{option}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="min-w-0">
+                <div className="section-label mb-1">主位置</div>
+                <div aria-label="主位置" className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
+                  {positions.map((option) => {
+                    const selected = position === option;
+                    const stateClass = selected
+                      ? "bg-ink-900 text-white"
+                      : settingsLocked
+                        ? "bg-ink-50 text-ink-300"
+                        : "bg-white text-ink-500 hover:bg-ink-50 hover:text-ink-800";
+                    return (
+                      <button key={option} aria-label={`主位置 ${option}`} aria-pressed={selected} className={`h-full min-w-0 flex-1 px-1 text-[11px] font-semibold transition disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked} onClick={() => changePosition(option)} type="button">{option}</button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="min-w-0 sm:col-span-2">
+                <div className="section-label mb-1 flex items-center gap-1.5">
+                  次要位置
+                  {hasSecondaryMismatch && (
+                    <span className="inline-flex items-center gap-0.5 text-[8px] font-semibold text-rose-700" title="非常规位置组合会对不匹配的属性额外衰减">
+                      <AlertTriangle className="h-2.5 w-2.5" />非常规
+                    </span>
+                  )}
+                </div>
+                <div aria-label="次要位置" className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
+                  {positions.map((option) => {
+                    const isPrimary = option === position;
+                    const selected = secondaryPosition === option;
+                    const natural = !isPrimary && isNaturalSecondaryPosition(position, option);
+                    const stateClass = selected
+                      ? natural ? "bg-court-700 text-white" : "bg-rose-700 text-white"
+                      : settingsLocked || isPrimary
+                        ? "bg-ink-50 text-ink-300"
+                        : natural
+                          ? "bg-white text-ink-600 hover:bg-court-50 hover:text-court-800"
+                          : "bg-rose-50/60 text-rose-500 hover:bg-rose-100 hover:text-rose-800";
+                    return (
+                      <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`h-full min-w-0 flex-1 px-1 text-[11px] font-semibold transition disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked || isPrimary} onClick={() => changeSecondaryPosition(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规次要位置" : "非常规次要位置：部分能力会额外衰减"} type="button">{option}</button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-            <div className="min-w-0">
-              <div className="flex justify-between text-[9px] font-semibold text-ink-500"><span>完成进度</span><span className="tabular-nums">{completed}/{bundles.length}</span></div>
-              <div className="mt-1.5 h-1 overflow-hidden rounded-sm bg-ink-200"><div className="h-full bg-court-600" style={{ width: `${(completed / bundles.length) * 100}%` }} /></div>
+          </section>
+
+          <section aria-labelledby="ability-estimate-label" className="bg-white px-3 py-3">
+            <div className="mb-2 flex items-end justify-between gap-2">
+              <div className="section-label" id="ability-estimate-label">成长设定</div>
+              {!isPrime && (
+                <span className="text-[9px] font-medium text-ink-400">巅峰 → 即战力 → 新秀</span>
+              )}
             </div>
-          </div>
+            {isPrime ? (
+              <div className="flex h-[5.25rem] items-center justify-between rounded-[6px] border border-court-200 bg-court-50 px-3">
+                <div>
+                  <div className="text-[11px] font-semibold text-court-800">巅峰属性直出</div>
+                  <div className="mt-0.5 text-[9px] text-court-700/80">年龄固定 28 岁，不走新秀成长曲线</div>
+                </div>
+                <span className="font-mono text-[18px] font-bold tabular-nums text-court-800">28</span>
+              </div>
+            ) : (
+              <div className="grid gap-2">
+                <div className="grid grid-cols-3 gap-2">
+                  <label className="growth-metric min-w-0 rounded-[6px] border border-ink-200 bg-ink-50 px-2 py-2">
+                    <span className="section-label flex items-center justify-between gap-1" title="生成球员最终可以达到的综评区间">
+                      巅峰综评
+                      <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-ink-400">目标</span>
+                    </span>
+                    <span className="mt-1.5 flex h-8 items-center justify-center gap-0.5 overflow-hidden rounded-[5px] border border-ink-200 bg-white focus-within:border-court-500">
+                      <CompactNumberInput ariaLabel="巅峰综评下限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMin} value={potentialRange.min} />
+                      <span className="text-[10px] text-ink-300">–</span>
+                      <CompactNumberInput ariaLabel="巅峰综评上限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMax} value={potentialRange.max} />
+                    </span>
+                  </label>
+                  <label className="growth-metric min-w-0 rounded-[6px] border border-ink-200 bg-ink-50 px-2 py-2">
+                    <span className="section-label flex items-center justify-between gap-1" title="即战力表示新秀已经兑现了多少巅峰能力；数值越高，开局越接近巅峰">
+                      <span className="inline-flex items-center gap-1">即战力 <CircleHelp className="h-3 w-3 text-ink-400" /></span>
+                      <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-ink-400">成熟度</span>
+                    </span>
+                    <span className="mt-1.5 flex h-8 overflow-hidden rounded-[5px] border border-ink-200 bg-white focus-within:border-court-500">
+                      <span className="flex min-w-0 flex-1 items-center justify-center">
+                        <CompactNumberInput ariaLabel="即战力" disabled={settingsLocked} max={100} min={1} onChange={updateReadiness} value={readiness} />
+                      </span>
+                      <button aria-label="随机即战力" className="flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-50 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeReadiness} title="随机生成 1–100 即战力" type="button"><Shuffle className="h-3.5 w-3.5" /></button>
+                    </span>
+                  </label>
+                  <div className="growth-metric min-w-0 rounded-[6px] border border-court-200 bg-court-50 px-2 py-2">
+                    <div className="section-label flex items-center justify-between gap-1 text-court-700">
+                      新秀综评
+                      <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-court-600/80">推算</span>
+                    </div>
+                    <div
+                      className="mt-1.5 flex h-8 items-center justify-center rounded-[5px] border border-court-200/70 bg-white/70 font-mono text-[13px] font-bold tabular-nums text-court-800"
+                      data-testid="projected-initial-range"
+                      title="由年龄、巅峰综评和即战力共同计算"
+                    >
+                      {projectedInitialRange.min}–{projectedInitialRange.max}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-[9px] leading-4 text-ink-400">
+                  新秀开局综评由巅峰区间、年龄与即战力推算；锁定属性后还会再按游戏 OVR 模型校准。
+                </p>
+              </div>
+            )}
+          </section>
         </div>
-        <div className="workspace-toolbar px-3 py-3">
+
+        <div className="workspace-toolbar border-t border-ink-200 px-3 py-3">
           <div className="mb-2 flex items-center justify-between">
             <div className="section-label">身体设定</div>
             <button aria-label="随机身体" className="action-button h-7 w-7 justify-center" disabled={settingsLocked} onClick={randomizeBody} title="随机身体" type="button"><Shuffle className="h-3.5 w-3.5" /></button>
@@ -1482,6 +1484,32 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             <BodyNumberInput disabled={settingsLocked} label="肩宽" max={100} min={1} onChange={(value) => updateBody("shoulder", value)} value={body.shoulder} />
             <BodyNumberInput disabled={settingsLocked} label="颈长" max={100} min={1} onChange={(value) => updateBody("neck", value)} value={body.neck} />
             <BodyNumberInput disabled={settingsLocked} label="躯干" max={100} min={1} onChange={(value) => updateBody("torso", value)} value={body.torso} />
+          </div>
+        </div>
+
+        <div className="builder-setup-footer border-t border-ink-200 bg-ink-50/80 px-3 py-2.5">
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 text-[10px] font-medium text-ink-500">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-court-500" />
+            <span className="truncate">{status}</span>
+          </div>
+          <div className="builder-setup-progress min-w-0">
+            <div className="mb-1 flex items-center justify-between gap-2 text-[9px] font-semibold text-ink-500">
+              <span>完成进度</span>
+              <span className="tabular-nums text-ink-700">{completed}/{bundles.length}</span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-ink-200">
+              <div className="h-full rounded-full bg-court-600 transition-[width] duration-300" style={{ width: `${(completed / bundles.length) * 100}%` }} />
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-1.5" aria-label="设定操作">
+            {!settingsLocked && (
+              <button className="action-button primary-action justify-center px-3 py-1.5 text-[11px] font-semibold" onClick={confirmSettings} type="button">
+                <Check className="h-3.5 w-3.5" />确认并抽取
+              </button>
+            )}
+            <button className="action-button justify-center px-3 py-1.5 text-[11px]" onClick={reset} type="button">
+              <RefreshCw className="h-3.5 w-3.5" />{settingsLocked ? "重新开始" : "重置"}
+            </button>
           </div>
         </div>
       </div>

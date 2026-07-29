@@ -206,6 +206,29 @@ input:focus-visible {
   background: #fafaf8;
 }
 
+.builder-setup-footer {
+  display: grid;
+  gap: 10px;
+  align-items: center;
+}
+
+.builder-setup-progress {
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .builder-setup-footer {
+    grid-template-columns: minmax(0, 1.1fr) minmax(140px, 0.7fr) auto;
+    gap: 14px;
+  }
+}
+
+.growth-metric {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
 .builder-wizard-nav {
   position: sticky;
   top: 8px;
@@ -638,9 +661,15 @@ html[data-theme="dark"] .app-header {
 }
 
 html[data-theme="dark"] .workspace-toolbar,
+html[data-theme="dark"] .builder-setup-footer,
 html[data-theme="dark"] .meta-chip {
   border-color: #39443e;
   background: #202622;
+}
+
+html[data-theme="dark"] .growth-metric {
+  border-color: #39443e;
+  background: #1a201d;
 }
 
 html[data-theme="dark"] .mode-nav {
