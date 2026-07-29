@@ -17,7 +17,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { badgeTierCN, getBadgeNameCN } from "../badges";
 import MarqueeDraw, { type MarqueeDrawItem } from "./MarqueeDraw";
 import { attrNameCN, type BadgeTier, type PlayerSource } from "../domain";
-import { getPlayerHeadshot } from "../playerHeadshots";
+import { getPlayerHeadshot, prefetchPlayerHeadshots } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
 import {
   initialOverallForPotential,
@@ -106,7 +106,7 @@ const bundles: Bundle[] = [
 const positions: Position[] = ["PG", "SG", "SF", "PF", "C"];
 const ages = [18, 19, 20, 21, 22, 23];
 const playerSwitchLimit = 3;
-const teamDrawDurationMs = 2800;
+const teamDrawDurationMs = 4200;
 const secondaryPositionShare = 0.25;
 const defaultReadiness = 50;
 
@@ -800,7 +800,7 @@ function createExportText(
   ].join("\n");
 }
 
-function PlayerHeadshot({ name }: { name: string }) {
+function PlayerHeadshot({ name, priority = false }: { name: string; priority?: boolean }) {
   const [failed, setFailed] = useState(false);
   const src = getPlayerHeadshot(name);
 
@@ -823,7 +823,9 @@ function PlayerHeadshot({ name }: { name: string }) {
       alt={`${getPlayerNameCN(name)}头像`}
       className="h-9 w-9 shrink-0 rounded-[5px] border border-ink-200 bg-ink-100 object-cover object-top"
       decoding="async"
-      loading="eager"
+      // Visible roster cards should load immediately; later batches can wait.
+      fetchPriority={priority ? "high" : "low"}
+      loading={priority ? "eager" : "lazy"}
       onError={() => setFailed(true)}
       referrerPolicy="no-referrer"
       src={src}
@@ -1127,12 +1129,11 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     clearTeamDrawTimers();
     const seed = Date.now();
     const nextRound = createRound(teams, seed, previousTeamId);
-    nextRound.playerOrder.slice(0, 7).forEach((id) => {
-      const src = playersById.get(id) ? getPlayerHeadshot(playersById.get(id)!.name) : undefined;
-      if (!src) return;
-      const image = new Image();
-      image.src = src;
-    });
+    // Warm the full roster during the longer marquee so the first grid paints warm.
+    const drawnTeam = teamsById.get(nextRound.teamId);
+    if (drawnTeam) {
+      prefetchPlayerHeadshots(drawnTeam.players.map((player) => player.name));
+    }
 
     setIsTeamDrawing(true);
     setDrawingTeamId(nextRound.teamId);
@@ -1156,6 +1157,16 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
 
     drawTimeoutRef.current = window.setTimeout(finishDraw, teamDrawDurationMs);
   };
+
+  // Prefetch the next switch batch while the user browses the current seven.
+  useEffect(() => {
+    if (!settingsLocked || isTeamDrawing || !hasNextBatch) return;
+    const upcoming = round.playerOrder
+      .slice(round.offset + 7, round.offset + 14)
+      .map((id) => playersById.get(id)?.name)
+      .filter((name): name is string => Boolean(name));
+    prefetchPlayerHeadshots(upcoming);
+  }, [hasNextBatch, isTeamDrawing, playersById, round.offset, round.playerOrder, settingsLocked]);
 
   const confirmSettings = () => {
     setRookieName((current) => current.trim().replace(/\s+/g, " ") || generateRookieName());
@@ -1400,52 +1411,51 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             </section>
             <section aria-labelledby="ability-estimate-label" className="border-t border-ink-100 pt-3 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
               <div className="section-label mb-2" id="ability-estimate-label">成长设定</div>
-              <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_156px]">
-                <div className={`grid items-end gap-3 ${isPrime ? "grid-cols-1" : "grid-cols-2"}`}>
-          {isPrime ? (
-          <div className="min-w-0">
-            <div className="section-label mb-1">属性阶段</div>
-            <div className="flex h-7 items-center justify-between rounded-[5px] border border-court-200 bg-court-50 px-2 text-[10px] font-semibold text-court-800">
-              <span>巅峰值直出</span>
-              <span className="font-mono">28 岁</span>
-            </div>
-          </div>
-          ) : (
-          <>
-            <div className="min-w-0 col-span-2">
-              <div className="section-label mb-1" title="生成球员最终可以达到的综评区间">巅峰综评</div>
-              <div className="flex h-7 items-center justify-center gap-1 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
-                <CompactNumberInput ariaLabel="巅峰综评下限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMin} value={potentialRange.min} />
-                <span className="text-[10px] text-ink-300">–</span>
-                <CompactNumberInput ariaLabel="巅峰综评上限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMax} value={potentialRange.max} />
-              </div>
-            </div>
-            <div className="min-w-0">
-              <div className="mb-1 flex items-center justify-between gap-1">
-                <div className="section-label flex items-center gap-1" title="即战力表示新秀已经兑现了多少巅峰能力；数值越高，开局越接近巅峰">
-                  即战力 <CircleHelp className="h-3 w-3 text-ink-400" />
-                </div>
-                <span className="text-[8px] font-medium text-ink-400">越高越成熟</span>
-              </div>
-              <div className="flex h-7 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
-                <div className="flex flex-1 items-center justify-center"><CompactNumberInput ariaLabel="即战力" disabled={settingsLocked} max={100} min={1} onChange={updateReadiness} value={readiness} /></div>
-                <button aria-label="随机即战力" className="flex w-7 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeReadiness} title="随机生成 1–100 即战力" type="button"><Shuffle className="h-3 w-3" /></button>
-              </div>
-            </div>
-            <div className="min-w-0">
-              <div className="section-label mb-1">新秀综评</div>
-              <div className="flex h-7 items-center justify-center rounded-[5px] border border-court-200 bg-court-50 px-2 font-mono text-[11px] font-semibold text-court-800" data-testid="projected-initial-range" title="由年龄、巅峰综评和即战力共同计算">
-                {projectedInitialRange.min}–{projectedInitialRange.max}
-              </div>
-            </div>
-          </>
-          )}
-                </div>
-                <div className="flex w-full items-stretch gap-2 xl:flex-col" aria-label="设定操作">
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+                {isPrime ? (
+                  <div className="min-w-0">
+                    <div className="section-label mb-1">属性阶段</div>
+                    <div className="flex h-7 items-center justify-between rounded-[5px] border border-court-200 bg-court-50 px-2 text-[10px] font-semibold text-court-800">
+                      <span>巅峰值直出</span>
+                      <span className="font-mono">28 岁</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid min-w-0 grid-cols-3 gap-2">
+                    <div className="min-w-0">
+                      <div className="section-label mb-1" title="生成球员最终可以达到的综评区间">巅峰综评</div>
+                      <div className="flex h-7 items-center justify-center gap-0.5 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
+                        <CompactNumberInput ariaLabel="巅峰综评下限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMin} value={potentialRange.min} />
+                        <span className="text-[10px] text-ink-300">–</span>
+                        <CompactNumberInput ariaLabel="巅峰综评上限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMax} value={potentialRange.max} />
+                      </div>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="mb-1 flex items-center gap-1">
+                        <div className="section-label flex items-center gap-1" title="即战力表示新秀已经兑现了多少巅峰能力；数值越高，开局越接近巅峰">
+                          即战力 <CircleHelp className="h-3 w-3 text-ink-400" />
+                        </div>
+                      </div>
+                      <div className="flex h-7 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
+                        <div className="flex min-w-0 flex-1 items-center justify-center">
+                          <CompactNumberInput ariaLabel="即战力" disabled={settingsLocked} max={100} min={1} onChange={updateReadiness} value={readiness} />
+                        </div>
+                        <button aria-label="随机即战力" className="flex w-7 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeReadiness} title="随机生成 1–100 即战力" type="button"><Shuffle className="h-3 w-3" /></button>
+                      </div>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="section-label mb-1">新秀综评</div>
+                      <div className="flex h-7 items-center justify-center rounded-[5px] border border-court-200 bg-court-50 px-1.5 font-mono text-[11px] font-semibold text-court-800" data-testid="projected-initial-range" title="由年龄、巅峰综评和即战力共同计算">
+                        {projectedInitialRange.min}–{projectedInitialRange.max}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="flex w-full items-stretch gap-2 sm:w-auto sm:flex-col" aria-label="设定操作">
                   {!settingsLocked && (
-                    <button className="action-button primary-action flex-1 justify-center px-4 py-2 text-[11px] font-semibold xl:flex-none" onClick={confirmSettings} type="button"><Check className="h-3.5 w-3.5" />确认并抽取</button>
+                    <button className="action-button primary-action flex-1 justify-center px-3 py-2 text-[11px] font-semibold sm:flex-none sm:min-w-[7.5rem]" onClick={confirmSettings} type="button"><Check className="h-3.5 w-3.5" />确认并抽取</button>
                   )}
-                  <button className="action-button flex-1 justify-center px-4 py-2 text-[11px] xl:flex-none" onClick={reset} type="button"><RefreshCw className="h-3.5 w-3.5" />{settingsLocked ? "重新开始" : "重置设定"}</button>
+                  <button className="action-button flex-1 justify-center px-3 py-2 text-[11px] sm:flex-none sm:min-w-[7.5rem]" onClick={reset} type="button"><RefreshCw className="h-3.5 w-3.5" />{settingsLocked ? "重新开始" : "重置设定"}</button>
                 </div>
               </div>
             </section>
@@ -1567,7 +1577,30 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             </div>
             {settingsLocked && !isComplete && (
               <div className="flex items-center gap-1.5">
-                <button className="action-button px-2 py-1.5 text-[10px]" disabled={isTeamDrawing || switchesLeft <= 0 || !hasNextBatch} onClick={switchPlayers} title="仅在当前球队内换下一批球员，不会重新抽取球队" type="button"><UsersRound className="h-3 w-3" />换球员 {switchesLeft}</button>
+                {(() => {
+                  const switchDisabled = isTeamDrawing || switchesLeft <= 0 || !hasNextBatch;
+                  const switchTitle = isTeamDrawing
+                    ? "球队抽取中，请稍候"
+                    : !hasNextBatch
+                      ? "当前球队球员已全部展示过，无法再换一批"
+                      : switchesLeft <= 0
+                        ? "本轮换球员次数已用完"
+                        : "仅在当前球队内换下一批球员，不会重新抽取球队";
+                  // Disabled buttons often skip hover tooltips; wrap so the hint still appears.
+                  return (
+                    <span className="inline-flex" title={switchTitle}>
+                      <button
+                        className="action-button px-2 py-1.5 text-[10px]"
+                        disabled={switchDisabled}
+                        onClick={switchPlayers}
+                        type="button"
+                      >
+                        <UsersRound className="h-3 w-3" />
+                        换球员 {switchesLeft}
+                      </button>
+                    </span>
+                  );
+                })()}
               </div>
             )}
           </div>
@@ -1580,7 +1613,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
               emptyText="没有可抽取球队"
               isDrawing
               items={teamDrawItems}
-              precedingItems={12}
+              precedingItems={18}
               selectedId={drawingTeamId ?? undefined}
               title="正在抽取球队"
             />
@@ -1591,7 +1624,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
               const selected = selectedPlayerId === id;
               return (
                 <button key={id} className={`flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left transition ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : unavailable || isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`} disabled={unavailable || isComplete} onClick={() => choosePlayer(player)} type="button">
-                  <PlayerHeadshot name={player.name} />
+                  <PlayerHeadshot name={player.name} priority />
                   <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(player.name)}</span><span className="block text-[9px] text-ink-400">{player.position ?? "--"}{player.isEstimated ? " · 估算" : ""}{unavailable ? " · 已使用" : ""}</span></span>
                   <span className={`shrink-0 text-[14px] font-bold tabular-nums ${typeof player.overall === "number" ? valueColor(player.overall) : "text-ink-400"}`}>{player.overall ?? "--"}</span>
                 </button>

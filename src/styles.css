@@ -473,8 +473,8 @@ input:focus-visible {
 .marquee-draw-mark {
   position: relative;
   display: grid;
-  height: 42px;
-  width: 42px;
+  height: 48px;
+  width: 48px;
   place-items: center;
   overflow: hidden;
   border-radius: 50%;
@@ -490,9 +490,18 @@ input:focus-visible {
   z-index: 1;
   height: 100%;
   width: 100%;
-  object-fit: contain;
-  background: #ffffff;
-  padding: 2px;
+  object-fit: cover;
+  object-position: top center;
+  background: #f3f3ef;
+  padding: 0;
+}
+
+.marquee-draw[data-kind="wheel"] .marquee-draw-mark {
+  border-radius: 8px;
+}
+
+.marquee-draw[data-kind="wheel"] .marquee-draw-mark img {
+  border-radius: 8px;
 }
 
 .marquee-draw-mark span {

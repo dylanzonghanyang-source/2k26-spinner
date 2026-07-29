@@ -4,6 +4,7 @@ import MarqueeDraw, { type MarqueeDrawItem } from "./components/MarqueeDraw";
 import RookieBuilder, { type RookieBuilderTeam } from "./components/RookieBuilder";
 import { badgeTierCN, getBadgeNameCN } from "./badges";
 import { getPlayerNameCN } from "./playerNames";
+import { getPlayerHeadshot, prefetchPlayerHeadshots } from "./playerHeadshots";
 import rookieLogo from "./assets/rookie-26-logo.svg";
 import {
   attributeGroups,
@@ -370,7 +371,7 @@ function playerPoolLabel(player: PlayerSource): string {
   return player.rosterTeam ? `${name} · ${player.rosterTeam}` : name;
 }
 
-const marqueeDrawDurationMs = 1240;
+const marqueeDrawDurationMs = 3200;
 
 type PhysicalWheelKey = "position" | "height" | "shoulder" | "wingspan" | "weight";
 type WheelKey = AttributeGroupKey | PhysicalWheelKey;
@@ -851,6 +852,7 @@ const App = () => {
     return availablePlayers.map((player) => ({
       id: playerSourceKey(player),
       label: playerPoolLabel(player),
+      imageSrc: getPlayerHeadshot(player.name),
       mark: player.position?.split("/")[0] ?? "NBA",
       meta: [
         typeof player.overall === "number" ? `${player.overall} OVR` : null,
@@ -858,6 +860,12 @@ const App = () => {
       ].filter(Boolean).join(" · ") || undefined,
     }));
   }, [activeTab.key, availablePlayers, physicalOptionsByKey]);
+
+  // Warm headshots for the current ability pool so marquee cards paint faster.
+  useEffect(() => {
+    if (activeTab.isPhysical || availablePlayers.length === 0) return;
+    prefetchPlayerHeadshots(availablePlayers.slice(0, 48).map((player) => player.name));
+  }, [activeTab.isPhysical, availablePlayers]);
 
   const activeCurrentLabel = isPhysicalWheelKey(activeTab.key)
     ? activeTab.key === "position"

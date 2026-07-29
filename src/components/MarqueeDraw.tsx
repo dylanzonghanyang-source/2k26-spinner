@@ -39,7 +39,8 @@ function nearbyItems(
     }));
   }
 
-  const itemCount = Math.max(5, precedingItems + 5);
+  // Longer rails feel more random when the animation duration is extended.
+  const itemCount = Math.max(9, precedingItems + 8);
   return Array.from({ length: itemCount }, (_, index) => {
     const sourceIndex = (selectedIndex - precedingItems + index + items.length * itemCount) % items.length;
     return {
@@ -56,13 +57,13 @@ function MarqueeDraw({
   currentLabel,
   dataKind,
   disabled = false,
-  durationMs = 1240,
+  durationMs = 3200,
   drawLabel = "抽取",
   emptyText,
   isDrawing,
   items,
   onDraw,
-  precedingItems = 4,
+  precedingItems = 8,
   selectedId,
   title,
 }: MarqueeDrawProps) {
@@ -139,19 +140,21 @@ function MarqueeDraw({
     const trackRect = track.getBoundingClientRect();
     const selectedRect = target.getBoundingClientRect();
     const finalOffset = trackRect.left + trackRect.width / 2 - (selectedRect.left + selectedRect.width / 2);
+    // Travel farther across the rail so the spin reads as a real random roll.
     const startOffset = finalOffset + Math.max(
       selectedRect.left - rail.getBoundingClientRect().left,
-      Math.min(520, trackRect.width * 0.9),
+      Math.min(1480, Math.max(720, trackRect.width * 2.4)),
     );
     rail.style.transform = `translateX(${startOffset}px)`;
     animationRef.current = rail.animate([
       { transform: `translateX(${startOffset}px)` },
-      { transform: `translateX(${finalOffset - 38}px)`, offset: 0.72 },
-      { transform: `translateX(${finalOffset + 12}px)`, offset: 0.87 },
+      { transform: `translateX(${finalOffset + Math.min(420, trackRect.width * 0.55)}px)`, offset: 0.55 },
+      { transform: `translateX(${finalOffset - 28}px)`, offset: 0.82 },
+      { transform: `translateX(${finalOffset + 10}px)`, offset: 0.92 },
       { transform: `translateX(${finalOffset}px)` },
     ], {
       duration: durationMs,
-      easing: "cubic-bezier(0.2, 0.7, 0.15, 1)",
+      easing: "cubic-bezier(0.12, 0.72, 0.08, 1)",
       fill: "forwards",
     });
     // Reveal only after the animation finishes, not at 84%.
