@@ -8,7 +8,7 @@ import { estimateGameOverall } from "../src/rookieOverall.ts";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const model = JSON.parse(fs.readFileSync(path.join(root, "src/data/rookieOverallModel.json"), "utf8"));
 assert(model.positionsWithBadges?.PG?.badgeCoefficients, "model must expose positionsWithBadges with badge coefficients");
-assert.equal(model.badgeCombination, "monotonic-max", "model metadata must describe the production badge combination");
+assert.equal(model.badgeCombination, "monotonic-max-nonnegative", "model metadata must describe the production badge combination");
 assert(
   model.crossValidation.badgeSubsetMae < model.crossValidation.mae,
   "production badge model must improve held-out MAE over the attribute-only model",
@@ -58,5 +58,24 @@ assert(
   estimateGameOverall(balancedValues, "PG", shootingBadges) > estimateGameOverall(balancedValues, "PG"),
   "high-level shooting/playmaking badges must raise a balanced PG's OVR",
 );
+
+const detailedPlayers = JSON.parse(fs.readFileSync(path.join(root, "src/data/players.json"), "utf8"));
+const roster = JSON.parse(fs.readFileSync(path.join(root, "src/data/rosterCatalog.json"), "utf8"));
+const badgeProfiles = JSON.parse(fs.readFileSync(path.join(root, "src/data/badgeProfiles.2k27.json"), "utf8"));
+const detailedBySlug = new Map(detailedPlayers.map((player: { slug: string }) => [player.slug, player]));
+for (const player of roster.teams.filter((team: { category: string }) => team.category === "current").flatMap((team: { players: unknown[] }) => team.players)) {
+  const detailed = detailedBySlug.get(player.id) as { detailed: Record<string, number> } | undefined;
+  const playerBadges = badgeProfiles[player.id] ?? [];
+  if (!detailed || playerBadges.length === 0) continue;
+  const position = player.position.split("/")[0] as "PG" | "SG" | "SF" | "PF" | "C";
+  const fullOverall = estimateGameOverall(detailed.detailed, position, playerBadges);
+  for (let index = 0; index < playerBadges.length; index += 1) {
+    const withoutBadge = playerBadges.filter((_: unknown, badgeIndex: number) => badgeIndex !== index);
+    assert(
+      fullOverall >= estimateGameOverall(detailed.detailed, position, withoutBadge),
+      `${player.name}: adding ${playerBadges[index].name} must not lower OVR`,
+    );
+  }
+}
 
 console.log(`badge OVR contract OK: no-badges=${noBadges}, with-shooting-badges=${withBadges}`);

@@ -80,7 +80,7 @@ export function estimateGameOverall(
   }, badgeModel.intercept);
   const badgeFeatures = badgeFeatureValues(badges);
   const badgeAdjustedEstimate = model.badgeCategories.reduce((total, category, index) => (
-    total + badgeFeatures[index] * (badgeModel.badgeCoefficients?.[category] ?? 0)
+    total + badgeFeatures[index] * Math.max(0, badgeModel.badgeCoefficients?.[category] ?? 0)
   ), jointEstimate);
 
   return Math.round(clamp(Math.max(attributeEstimate, badgeAdjustedEstimate), 40, 99));

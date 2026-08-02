@@ -43,7 +43,7 @@ function estimateWithBadges(values, position, badges) {
     const resolved = Number.isFinite(raw) ? clamp(raw, 25, 99) : attribute === "Intangibles" ? 50 : 65;
     return total + resolved * (model.coefficients[attribute] ?? 0);
   }, model.intercept) + badgeCategories.reduce((total, category) => (
-    total + categoryPoints[category] * (model.badgeCoefficients[category] ?? 0)
+    total + categoryPoints[category] * Math.max(0, model.badgeCoefficients[category] ?? 0)
   ), 0);
   return Math.max(attributeEstimate, Math.round(clamp(jointEstimate, 40, 99)));
 }

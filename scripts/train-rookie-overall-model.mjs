@@ -107,9 +107,10 @@ for (let fold = 0; fold < folds; fold += 1) {
       holdoutPredictions.push({ overall: sample.overall, prediction });
       if (sample.badgeCount > 0) {
         const jointPrediction = predict(badgeModel, [...sample.features, ...sample.badgeFeatures]);
+        const productionJointPrediction = predict(badgeModel, [...sample.features, ...sample.badgeFeatures], true);
         holdoutBadgePredictions.push({
           overall: sample.overall,
-          prediction: Math.max(prediction, jointPrediction),
+          prediction: Math.max(prediction, productionJointPrediction),
         });
         holdoutJointBadgePredictions.push({ overall: sample.overall, prediction: jointPrediction });
       }
@@ -142,7 +143,7 @@ const model = {
   attributes,
   badgeCategories,
   tierPoints,
-  badgeCombination: "monotonic-max",
+  badgeCombination: "monotonic-max-nonnegative",
   positions: positionsModel,
   positionsWithBadges: positionsBadgeModel,
 };
@@ -203,11 +204,15 @@ function fitRidge(data, lambda, withBadges = false) {
   };
 }
 
-function predict(model, features) {
+function predict(model, features, nonnegativeBadges = false) {
   const estimate = attributes.reduce((total, attribute, index) => (
     total + features[index] * (model.coefficients[attribute] ?? 0)
   ), model.intercept) + badgeCategories.reduce((total, category, index) => (
-    total + (features[attributes.length + index] ?? 0) * (model.badgeCoefficients?.[category] ?? 0)
+    total + (features[attributes.length + index] ?? 0) * (
+      nonnegativeBadges
+        ? Math.max(0, model.badgeCoefficients?.[category] ?? 0)
+        : model.badgeCoefficients?.[category] ?? 0
+    )
   ), 0);
   return clamp(estimate, 40, 99);
 }
