@@ -191,14 +191,23 @@ function extractBadges(html) {
   for (const tag of imageTags) {
     const alt = matchAttribute(tag, "alt");
     const src = matchAttribute(tag, "data-src") ?? matchAttribute(tag, "src");
-    const tierMatch = src?.match(/\/([a-z0-9-]+)-(bronze|silver|gold|hall-of-fame)-badge\.png/i);
+    // 2KRatings lazy-loads badge art as {slug}-{tier}-badge.png (also hof/legendary).
+    const tierMatch = src?.match(/\/([a-z0-9-]+)-(bronze|silver|gold|hall-of-fame|hof|legendary)-badge\.png/i);
     if (!alt || !tierMatch) continue;
 
     const name = clean(alt);
+    // Skip summary counters like "Gold Badges" / sum icons.
+    if (!name || /badges$/i.test(name) || /sum\.png/i.test(src)) continue;
+
+    const rawTier = tierMatch[2].toLowerCase();
+    const tier = rawTier === "hall-of-fame" || rawTier === "hof" || rawTier === "legendary"
+      ? "HOF"
+      : `${rawTier[0].toUpperCase()}${rawTier.slice(1)}`;
+
     badges.push({
       name,
       category: BADGE_CATEGORY_BY_NAME[name] ?? "general",
-      tier: tierMatch[2].toLowerCase() === "hall-of-fame" ? "HOF" : `${tierMatch[2][0].toUpperCase()}${tierMatch[2].slice(1).toLowerCase()}`
+      tier
     });
   }
 

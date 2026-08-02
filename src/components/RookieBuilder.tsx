@@ -17,6 +17,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { badgeTierCN, getBadgeNameCN } from "../badges";
 import MarqueeDraw, { type MarqueeDrawItem } from "./MarqueeDraw";
 import { attrNameCN, type BadgeTier, type PlayerSource } from "../domain";
+import { tendencyBundleMap } from "./tendencyBundleMap";
 import { getPlayerHeadshot, prefetchPlayerHeadshots } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
 import {
@@ -576,6 +577,7 @@ function createResult(
   potentialRange: PotentialRange,
   readiness: number,
   mode: BuilderMode,
+  players: Map<string, PlayerSource>,
 ) {
   const isPrime = mode === "prime";
   let peakAttrs: Record<string, number> = {};
@@ -586,6 +588,21 @@ function createResult(
     if (!evaluation) continue;
     Object.assign(peakAttrs, evaluation.values);
     scores.push(evaluation.adjusted);
+  }
+
+  // Tendency inheritance: each slot inherits the tendencies mapped to its
+  // bundle from the player locked into that slot. No down-scaling applied.
+  const tendencies: Record<string, number> = {};
+  for (const bundle of bundles) {
+    const lock = locks[bundle.id];
+    if (lock?.kind !== "player") continue;
+    const player = players.get(lock.playerId);
+    if (!player?.tendencies) continue;
+    for (const [field, bundleId] of Object.entries(tendencyBundleMap)) {
+      if (bundleId !== bundle.id) continue;
+      const value = player.tendencies[field];
+      if (typeof value === "number") tendencies[field] = value;
+    }
   }
 
   const customFinalAttrs = Object.assign({}, ...Object.values(locks)
@@ -710,6 +727,7 @@ function createResult(
     potential, minPotential, maxPotential, projectedInitialRange, readiness, growthGap, progressSpeed, boom, normal, bust, peakStart, peakEnd,
     calibrationWarning, targetInitialOverall, peakOverall: peakCalibration.actualOverall,
     peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges, hotZones,
+    tendencies,
   };
 }
 
@@ -781,6 +799,10 @@ function createExportText(
       "", "[当前徽章]", ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
       "", "[巅峰徽章]", ...(result.peakBadges.length ? result.peakBadges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
     ]),
+    "", "[倾向（按属性来源继承，未降档）]",
+    ...(Object.keys(result.tendencies).length
+      ? Object.entries(result.tendencies).map(([field, value]) => `${field}: ${value}`)
+      : ["无倾向数据（来源球员无倾向档案）"]),
     "", "[属性来源]", ...bundles.map((bundle) => {
       const lock = locks[bundle.id];
       if (lock?.kind === "custom") {
@@ -1068,8 +1090,8 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     [effectiveAge, potentialRange, readiness],
   );
   const result = useMemo(
-    () => createResult(evaluations, locks, effectiveAge, position, secondaryPosition, body, potentialRange, readiness, mode),
-    [body, effectiveAge, evaluations, locks, mode, position, potentialRange, readiness, secondaryPosition],
+    () => createResult(evaluations, locks, effectiveAge, position, secondaryPosition, body, potentialRange, readiness, mode, playersById),
+    [body, effectiveAge, evaluations, locks, mode, playersById, position, potentialRange, readiness, secondaryPosition],
   );
   const completed = Object.keys(locks).length;
   const isComplete = completed === bundles.length;
@@ -1735,6 +1757,10 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
               <div className="border-b border-ink-200 px-3 py-2.5">
                 <div className="mb-1.5 text-[10px] font-semibold">热区</div>
                 <div className="grid grid-cols-3 gap-1 text-center text-[9px]"><div className="bg-blue-50 py-1.5 text-blue-700">冷 <span data-testid="cold-zone-count">{zoneCounts.冷区}</span></div><div className="bg-ink-50 py-1.5 text-ink-600">中 <span data-testid="neutral-zone-count">{zoneCounts.中性}</span></div><div className="bg-rose-50 py-1.5 text-rose-700">热 <span data-testid="hot-zone-count">{zoneCounts.热区}</span></div></div>
+              </div>
+              <div className="border-b border-ink-200 px-3 py-2.5">
+                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">倾向</span><span className="text-ink-400">{Object.keys(result.tendencies).length} 项 · 未降档</span></div>
+                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{Object.keys(result.tendencies).length ? Object.entries(result.tendencies).slice(0, 8).map(([field, value]) => <span key={field} className="border border-teal-500/20 bg-teal-50 px-1 py-0.5 text-[8px] text-teal-800">{field} {value}</span>) : <span className="text-[9px] text-ink-400">无倾向数据</span>}</div>
               </div>
             </>
           ) : (

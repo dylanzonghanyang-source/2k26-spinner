@@ -12,6 +12,8 @@
     "validate:data": "node scripts/validate-data.mjs",
     "convert:players": "node scripts/convert-raw-players.mjs",
     "train:overall": "node scripts/train-rookie-overall-model.mjs",
+    "backfill:badges": "node scripts/backfill-badges-from-wayback.mjs",
+    "analyze:badges": "node scripts/analyze-badge-ovr.mjs",
     "scrape:2k": "node scripts/scrape-2kratings.mjs",
     "sync:positions": "node scripts/sync-current-player-positions.mjs",
     "update:rosters": "node scripts/update-current-rosters.mjs"

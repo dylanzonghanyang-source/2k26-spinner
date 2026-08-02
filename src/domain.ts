@@ -19,6 +19,8 @@ export type PlayerSource = {
   defense: number | null;
   inside: number | null;
   detailed: Record<string, number | null>;
+  /** ATD 2K26 tendency profile (0-100), keyed by tendency field name. */
+  tendencies?: Record<string, number>;
 };
 
 

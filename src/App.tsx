@@ -33,6 +33,7 @@ import {
 } from "./domain";
 import rosterCatalog from "./data/rosterCatalog.json";
 import badgeProfiles from "./data/badgeProfiles.json";
+import tendencyProfiles from "./data/tendencyProfiles.min.json";
 import detailedPlayers from "./data/players.json";
 
 const appVersion = "v0.4";
@@ -288,6 +289,7 @@ function rosterPlayerSource(team: RosterCatalogTeam, player: RosterCatalogPlayer
     rosterTeam: team.name,
     isEstimated: !detailedPlayer,
     badges: sourceBadgeProfiles[player.id] ?? [],
+    tendencies: (tendencyProfiles as Record<string, Record<string, number>>)[player.id],
     overall,
     team: team.name,
     position: player.position,
