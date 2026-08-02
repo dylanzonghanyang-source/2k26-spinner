@@ -12,7 +12,7 @@ export default defineConfig({
           if (normalized.includes("/node_modules/")) return "vendor";
           if (normalized.endsWith("/src/data/players.json")) return "players-data";
           if (normalized.endsWith("/src/data/rosterCatalog.json")) return "roster-data";
-          if (normalized.endsWith("/src/data/badgeProfiles.json")) return "badge-data";
+          if (/\/src\/data\/badgeProfiles\.2k\d+\.json$/.test(normalized)) return "badge-data";
           return undefined;
         },
       },

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Merge 2K26 in-game badge exports (from Amir0705/NBA-2K26-Tendency-Generator
- * data/2k_exports/*.txt) into src/data/badgeProfiles.json.
+ * data/2k_exports/*.txt) into src/data/badgeProfiles.2k26.json.
  *
  * Each export is a JSON dump of a player read from the game (categories.Badges:
  * {name: 0-4} where 0=none, 1=Bronze, 2=Silver, 3=Gold, 4=HOF).
@@ -19,7 +19,8 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const SRC = path.join(ROOT, "src", "data");
-const OUT = path.join(SRC, "badgeProfiles.json");
+const OUT = path.join(SRC, "badgeProfiles.2k26.json");
+const OVERRIDES_OUT = path.join(SRC, "badgeProfiles.2k26.game-export.json");
 const EXPORTS_DIR = process.argv[2] || "/tmp/2k_exports";
 
 const TIER = { 0: null, 1: "Bronze", 2: "Silver", 3: "Gold", 4: "HOF" };
@@ -49,10 +50,16 @@ function categoryFor(name) {
 }
 
 function slugify(file) {
-  return file.replace(/\.txt$/i, "").toLowerCase().replace(/\./g, "").replace(/[\s_]+/g, "-");
+  const slug = file.replace(/\.txt$/i, "").toLowerCase().replace(/\./g, "").replace(/[\s_]+/g, "-");
+  return {
+    "cj-mccullum": "cj-mccollum",
+    "giannis-antetokumpo": "giannis-antetokounmpo",
+    "kyle-fillipowski": "kyle-filipowski",
+  }[slug] ?? slug;
 }
 
 const files = fs.readdirSync(EXPORTS_DIR).filter((f) => f.toLowerCase().endsWith(".txt"));
+const overrides = {};
 let added = 0;
 let overridden = 0;
 const merged = [];
@@ -78,10 +85,12 @@ for (const file of files) {
   if (existed) overridden++;
   else added++;
   profiles[slug] = list;
+  overrides[slug] = list;
   merged.push(slug);
 }
 
 fs.writeFileSync(OUT, JSON.stringify(profiles, null, 2) + "\n");
+fs.writeFileSync(OVERRIDES_OUT, JSON.stringify(Object.fromEntries(Object.entries(overrides).sort()), null, 2) + "\n");
 
 console.log(JSON.stringify({
   exportedFiles: files.length,

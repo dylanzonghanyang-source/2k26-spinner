@@ -14,7 +14,14 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { badgeTierCN, getBadgeNameCN } from "../badges";
+import {
+  badgeTierCN,
+  buildBadgesByBundle,
+  downgradeBadgesForRookie,
+  getBadgeNameCN,
+  type PlayerBadgeLike,
+  type RookieBadgeTier,
+} from "../badges";
 import MarqueeDraw, { type MarqueeDrawItem } from "./MarqueeDraw";
 import { attrNameCN, type BadgeTier, type PlayerSource } from "../domain";
 import {
@@ -23,6 +30,7 @@ import {
   type TendencyLookup,
 } from "../tendencies";
 import { tendencyBundleMap } from "./tendencyBundleMap";
+import { badgeBundleMap } from "./badgeBundleMap";
 import { getPlayerHeadshot, prefetchPlayerHeadshots } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
 import {
@@ -462,8 +470,13 @@ function getValue(values: Record<string, number>, attrs: string[], fallbackValue
   return average(attrs.map((attr) => values[attr]).filter((value): value is number => typeof value === "number"), fallbackValue);
 }
 
-function calibratedOverall(values: Record<string, number>, position: Position, fallbackValue = 65) {
-  return estimateGameOverall(values, position, fallbackValue);
+function calibratedOverall(
+  values: Record<string, number>,
+  position: Position,
+  badges?: Array<{ category?: string; tier: string }>,
+  fallbackValue = 65,
+) {
+  return estimateGameOverall(values, position, badges, fallbackValue);
 }
 
 function calibrateAttributesToOverall(
@@ -471,10 +484,11 @@ function calibrateAttributesToOverall(
   position: Position,
   targetOverall: number,
   lockedValues: Record<string, number> = {},
+  badges?: PlayerBadgeLike[],
 ) {
   const ratingAttributes = [...new Set(bundles.flatMap((bundle) => bundle.attrs))];
   let best = { ...values };
-  let bestDistance = Math.abs(calibratedOverall(best, position) - targetOverall);
+  let bestDistance = Math.abs(calibratedOverall(best, position, badges) - targetOverall);
 
   // A uniform offset preserves the selected player's attribute shape. Search
   // for the closest offset because the position calibration is not 1:1.
@@ -483,7 +497,7 @@ function calibrateAttributesToOverall(
     for (const attr of ratingAttributes) {
       if (!(attr in lockedValues) && typeof candidate[attr] === "number") candidate[attr] = clamp(candidate[attr] + offset);
     }
-    const distance = Math.abs(calibratedOverall(candidate, position) - targetOverall);
+    const distance = Math.abs(calibratedOverall(candidate, position, badges) - targetOverall);
     if (distance < bestDistance) {
       best = candidate;
       bestDistance = distance;
@@ -491,7 +505,7 @@ function calibrateAttributesToOverall(
     if (distance === 0) break;
   }
 
-  const actualOverall = calibratedOverall(best, position);
+  const actualOverall = calibratedOverall(best, position, badges);
   return {
     values: best,
     actualOverall,
@@ -506,29 +520,29 @@ function tierFor(score: number): BadgeTier {
   return "Bronze";
 }
 
-function createBadges(attrs: Record<string, number>) {
+function createBadges(attrs: Record<string, number>): PlayerBadgeLike[] {
   const rules = [
-    ["Set Shot Specialist", getValue(attrs, ["Three-Point Shot", "Mid-Range Shot"])],
-    ["Deadeye", getValue(attrs, ["Mid-Range Shot", "Shot IQ"])],
-    ["Limitless Range", getValue(attrs, ["Three-Point Shot"]) - 2],
-    ["Physical Finisher", getValue(attrs, ["Layup", "Strength"])],
-    ["Posterizer", getValue(attrs, ["Driving Dunk", "Vertical"])],
-    ["Handles For Days", getValue(attrs, ["Ball Handle", "Stamina"])],
-    ["Dimer", getValue(attrs, ["Pass Accuracy", "Pass IQ", "Pass Vision"])],
-    ["Challenger", getValue(attrs, ["Perimeter Defense", "Agility"])],
-    ["Interceptor", getValue(attrs, ["Steal", "Pass Perception"])],
-    ["Paint Patroller", getValue(attrs, ["Block", "Interior Defense"])],
-    ["Rebound Chaser", getValue(attrs, ["Offensive Rebound", "Defensive Rebound"])],
+    ["Set Shot Specialist", "shooting", getValue(attrs, ["Three-Point Shot", "Mid-Range Shot"])],
+    ["Deadeye", "shooting", getValue(attrs, ["Mid-Range Shot", "Shot IQ"])],
+    ["Limitless Range", "shooting", getValue(attrs, ["Three-Point Shot"]) - 2],
+    ["Physical Finisher", "inside", getValue(attrs, ["Layup", "Strength"])],
+    ["Posterizer", "inside", getValue(attrs, ["Driving Dunk", "Vertical"])],
+    ["Handles For Days", "playmaking", getValue(attrs, ["Ball Handle", "Stamina"])],
+    ["Dimer", "playmaking", getValue(attrs, ["Pass Accuracy", "Pass IQ", "Pass Vision"])],
+    ["Challenger", "defense", getValue(attrs, ["Perimeter Defense", "Agility"])],
+    ["Interceptor", "defense", getValue(attrs, ["Steal", "Pass Perception"])],
+    ["Paint Patroller", "defense", getValue(attrs, ["Block", "Interior Defense"])],
+    ["Rebound Chaser", "rebounding", getValue(attrs, ["Offensive Rebound", "Defensive Rebound"])],
   ] as const;
-  return rules.filter(([, score]) => score >= 78).map(([name, score]) => ({ name, score, tier: tierFor(score) }));
+  return rules
+    .filter(([, , score]) => score >= 78)
+    .map(([name, category, score]) => ({ name, category, score, tier: tierFor(score) }));
 }
 
-function downgradeTier(tier: BadgeTier, age: number, readiness: number): BadgeTier | null {
-  const order: BadgeTier[] = ["Bronze", "Silver", "Gold", "HOF"];
-  const ageDrop = age <= 19 ? 1 : 0;
-  const readinessDrop = readiness < 35 ? 2 : readiness < 70 ? 1 : 0;
-  const index = order.indexOf(tier) - ageDrop - readinessDrop;
-  return index >= 0 ? order[index] : null;
+function rookieTierForPotentialRange(range: PotentialRange): RookieBadgeTier {
+  if (range.max >= 94) return "generational";
+  if (range.max >= 87) return "lottery";
+  return "rotation";
 }
 
 function createHotZones(
@@ -615,6 +629,23 @@ function createResult(
     .filter((lock): lock is CustomLock => lock.kind === "custom")
     .map((lock) => lock.values));
   Object.assign(peakAttrs, customFinalAttrs);
+  const badgeSources = bundles.map((bundle) => {
+    const lock = locks[bundle.id];
+    return {
+      bundleId: bundle.id,
+      playerId: lock?.kind === "player" ? lock.playerId : undefined,
+    };
+  });
+  const resolvePeakBadges = (attrs: Record<string, number>) => buildBadgesByBundle({
+    sources: badgeSources,
+    badgeToBundle: badgeBundleMap,
+    badgesForPlayer: (id) => players.get(id)?.badges,
+    profileKnown: (id) => players.get(id)?.badgesKnown === true,
+    fallbackBadges: createBadges(attrs),
+  });
+  let peakBadgeResolution = resolvePeakBadges(peakAttrs);
+  let peakBadges = peakBadgeResolution.badges;
+  const rookieTier = rookieTierForPotentialRange(potentialRange);
   const signature = `${bundles.map((bundle) => {
     const lock = locks[bundle.id];
     return lock?.kind === "player" ? lock.playerId : lock?.kind === "custom" ? JSON.stringify(lock.values) : "-";
@@ -622,7 +653,7 @@ function createResult(
   const random = makeRandom(hash(`${signature}|${age}|${position}|${secondary}|${readiness}`));
   const mean = average(scores, 71);
   const top = average([...scores].sort((a, b) => b - a).slice(0, 4), mean);
-  const sourcePeakOverall = calibratedOverall(peakAttrs, position, mean);
+  const sourcePeakOverall = calibratedOverall(peakAttrs, position, peakBadges, mean);
   const potentialSignal = sourcePeakOverall * 0.82 + top * 0.18;
   const rangePlacement = Math.max(0, Math.min(1, (potentialSignal - 65) / 30));
   const configuredMinPotential = isPrime ? clamp(sourcePeakOverall, 60, 99) : potentialRange.min;
@@ -641,8 +672,15 @@ function createResult(
   };
 
   if (!isPrime) {
-    peakCalibration = calibrateAttributesToOverall(peakAttrs, position, configuredPotential, customFinalAttrs);
+    peakCalibration = calibrateAttributesToOverall(peakAttrs, position, configuredPotential, customFinalAttrs, peakBadges);
     peakAttrs = peakCalibration.values;
+    peakBadgeResolution = resolvePeakBadges(peakAttrs);
+    peakBadges = peakBadgeResolution.badges;
+    peakCalibration = {
+      ...peakCalibration,
+      actualOverall: calibratedOverall(peakAttrs, position, peakBadges, mean),
+    };
+    peakCalibration.distance = Math.abs(peakCalibration.actualOverall - configuredPotential);
     for (const bundle of bundles) {
       for (const attr of bundle.attrs) {
         const value = peakAttrs[attr];
@@ -655,18 +693,19 @@ function createResult(
     initialAttrs = { ...peakAttrs };
   }
 
+  const badges = isPrime ? peakBadges : downgradeBadgesForRookie(peakBadges, rookieTier);
   const configuredInitialRange = initialOverallRange(potentialRange, age, readiness);
   const targetInitialOverall = isPrime
-    ? calibratedOverall(initialAttrs, position, mean)
+    ? calibratedOverall(initialAttrs, position, badges, mean)
     : initialOverallForPotential(configuredPotential, age, readiness);
   Object.assign(initialAttrs, customFinalAttrs);
   let initialCalibration = {
     values: initialAttrs,
-    actualOverall: calibratedOverall(initialAttrs, position, mean),
+    actualOverall: calibratedOverall(initialAttrs, position, badges, mean),
     distance: 0,
   };
   if (!isPrime) {
-    initialCalibration = calibrateAttributesToOverall(initialAttrs, position, targetInitialOverall, customFinalAttrs);
+    initialCalibration = calibrateAttributesToOverall(initialAttrs, position, targetInitialOverall, customFinalAttrs, badges);
     initialAttrs = initialCalibration.values;
   }
   const durability = initialAttrs["Overall Durability"] ?? 72;
@@ -677,7 +716,7 @@ function createResult(
     initialAttrs[attr] = clamp(durability + (random() - 0.5) * 10 - bodyStress * 1.5);
   }
   initialAttrs["Overall Durability"] = durability;
-  const baseOverall = calibratedOverall(initialAttrs, position, mean);
+  const baseOverall = calibratedOverall(initialAttrs, position, badges, mean);
   const initialStrength = baseOverall;
   const intangibles = 50;
   const overallResolution = isPrime
@@ -720,19 +759,14 @@ function createResult(
   const peakEnd = clamp(peakStart + peakDuration, peakStart, 40);
   initialAttrs.Intangibles = intangibles;
   initialAttrs.Potential = potential;
-  const peakBadges = createBadges(peakAttrs);
-  const badges = isPrime
-    ? peakBadges
-    : peakBadges
-      .map((badge) => ({ ...badge, tier: downgradeTier(badge.tier, age, readiness) }))
-      .filter((badge): badge is typeof badge & { tier: BadgeTier } => badge.tier !== null);
   const hotZones = createHotZones(initialAttrs, position, secondary, hand, random);
   return {
     age, position, secondary,
     hand, dunkHand, ...body,
     potential, minPotential, maxPotential, projectedInitialRange, readiness, growthGap, progressSpeed, boom, normal, bust, peakStart, peakEnd,
     calibrationWarning, targetInitialOverall, peakOverall: peakCalibration.actualOverall,
-    peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges, hotZones,
+    peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges,
+    badgesEstimated: peakBadgeResolution.estimated, rookieTier, hotZones,
     tendencies,
   };
 }
@@ -808,10 +842,10 @@ function createExportText(
     `${isPrime ? "巅峰综评" : "预计初始综评"}: ${result.initialStrength}`, `潜力: ${result.potential}`,
     "", "[热区]", ...Object.entries(result.hotZones).map(([name, state]) => `${name}: ${state}`),
     ...(isPrime ? [
-      "", "[巅峰徽章]", ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
+      "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
     ] : [
-      "", "[当前徽章]", ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
-      "", "[巅峰徽章]", ...(result.peakBadges.length ? result.peakBadges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
+      "", `[当前徽章（${result.rookieTier} 档降级）]`, ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
+      "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.peakBadges.length ? result.peakBadges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
     ]),
     "", "[倾向（按属性来源继承，未降档）]",
     ...tendencyLines,
@@ -1813,7 +1847,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                 </div>
               )}
               <div className="border-b border-ink-200 px-3 py-2.5">
-                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">{isPrime ? "巅峰徽章" : "当前徽章"}</span><span className="text-ink-400">{result.badges.length}</span></div>
+                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">{isPrime ? "巅峰徽章" : "当前徽章"}</span><span className="text-ink-400" data-testid="badge-status">{result.badgesEstimated ? "含推算" : "按槽继承"} · {result.badges.length}</span></div>
                 <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{result.badges.length ? result.badges.slice(0, 7).map((badge) => <span key={`${badge.name}:${badge.tier}`} className="border border-amber-500/20 bg-amber-50 px-1 py-0.5 text-[8px] text-amber-800">{getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier]}</span>) : <span className="text-[9px] text-ink-400">无</span>}</div>
               </div>
               <div className="border-b border-ink-200 px-3 py-2.5">

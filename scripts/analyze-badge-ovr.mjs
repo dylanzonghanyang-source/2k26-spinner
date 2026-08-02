@@ -1,15 +1,15 @@
 /**
- * Compare production attribute OVR vs official OVR, and test whether badge
- * points from badgeProfiles.json reduce residual error.
+ * Compare production attribute/monotonic-badge OVR vs official 2KRatings OVR.
  */
 import detailedPlayers from "../src/data/players.json" with { type: "json" };
 import rosterCatalog from "../src/data/rosterCatalog.json" with { type: "json" };
 import rookieOverallModel from "../src/data/rookieOverallModel.json" with { type: "json" };
-import badgeProfiles from "../src/data/badgeProfiles.json" with { type: "json" };
+import badgeProfiles from "../src/data/badgeProfiles.2k27.json" with { type: "json" };
 
 const attributes = rookieOverallModel.attributes;
 const positions = ["PG", "SG", "SF", "PF", "C"];
-const tierPoints = { Bronze: 1, Silver: 2, Gold: 3, HOF: 4 };
+const tierPoints = { Bronze: 1, Silver: 2, Gold: 3, HOF: 4, Legendary: 5 };
+const badgeCategories = rookieOverallModel.badgeCategories;
 const detailedBySlug = new Map(detailedPlayers.map((player) => [player.slug, player]));
 
 function clamp(value, min, max) {
@@ -28,6 +28,24 @@ function estimate(values, position) {
     return total + resolved * (model.coefficients[attribute] ?? 0);
   }, model.intercept);
   return Math.round(clamp(estimateValue, 40, 99));
+}
+
+function estimateWithBadges(values, position, badges) {
+  const attributeEstimate = estimate(values, position);
+  if (!badges.length) return attributeEstimate;
+  const model = rookieOverallModel.positionsWithBadges[position] ?? rookieOverallModel.positionsWithBadges.SF;
+  const categoryPoints = Object.fromEntries(badgeCategories.map((category) => [category, 0]));
+  for (const badge of badges) {
+    if (categoryPoints[badge.category] !== undefined) categoryPoints[badge.category] += tierPoints[badge.tier] ?? 0;
+  }
+  const jointEstimate = attributes.reduce((total, attribute) => {
+    const raw = values[attribute];
+    const resolved = Number.isFinite(raw) ? clamp(raw, 25, 99) : attribute === "Intangibles" ? 50 : 65;
+    return total + resolved * (model.coefficients[attribute] ?? 0);
+  }, model.intercept) + badgeCategories.reduce((total, category) => (
+    total + categoryPoints[category] * (model.badgeCoefficients[category] ?? 0)
+  ), 0);
+  return Math.max(attributeEstimate, Math.round(clamp(jointEstimate, 40, 99)));
 }
 
 function badgePoints(badges) {
@@ -52,6 +70,7 @@ const samples = rosterCatalog.teams
     if (!positions.includes(position)) return [];
     const badges = badgeProfiles[player.id] ?? [];
     const pred = estimate(detailed.detailed ?? {}, position);
+    const predProduction = estimateWithBadges(detailed.detailed ?? {}, position, badges);
     const points = badgePoints(badges);
     const defensePoints = defenseBadgePoints(badges);
     return [{
@@ -60,6 +79,7 @@ const samples = rosterCatalog.teams
       position,
       official: player.overall,
       pred,
+      predProduction,
       residual: player.overall - pred,
       points,
       defensePoints,
@@ -182,6 +202,10 @@ console.log("\n=== Attribute-only production model ===");
 console.log(`all: ${format(metrics(samples))}`);
 if (withBadges.length) console.log(`badge subset attr-only: ${format(metrics(withBadges))}`);
 if (withoutBadges.length) console.log(`no-badge subset attr-only: ${format(metrics(withoutBadges))}`);
+
+console.log("\n=== Monotonic attribute + badge production model ===");
+console.log(`badge subset production: ${format(metrics(withBadges, "predProduction"))}`);
+console.log(`5-fold CV: attr-only MAE=${rookieOverallModel.crossValidation.mae.toFixed(3)}; monotonic badge subset MAE=${rookieOverallModel.crossValidation.badgeSubsetMae.toFixed(3)}; unconstrained joint diagnostic MAE=${rookieOverallModel.crossValidation.jointBadgeSubsetMae.toFixed(3)}`);
 
 if (withBadges.length >= 30) {
   const model = fitBadgeAdjustment(withBadges, "points");

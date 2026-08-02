@@ -1,4 +1,6 @@
-import type { BadgeTier } from "./domain";
+import { badgeTierCN, badgeTierRank, type BadgeTier } from "./badgeTiers.ts";
+
+export { badgeTierCN };
 
 // English keys stay aligned with the source data; all user-facing text uses Chinese.
 export const badgeNameCN: Record<string, string> = {
@@ -49,13 +51,111 @@ export const badgeNameCN: Record<string, string> = {
   "Slippery Off-Ball": "无球跑位",
 };
 
-export const badgeTierCN: Record<BadgeTier, string> = {
-  HOF: "名人堂",
-  Gold: "金",
-  Silver: "银",
-  Bronze: "铜",
-};
-
 export function getBadgeNameCN(name: string): string {
   return badgeNameCN[name] ?? "未知徽章";
+}
+
+export type PlayerBadgeLike = {
+  name: string;
+  category?: string;
+  tier: BadgeTier;
+};
+
+export type RookieBadgeTier = "rotation" | "lottery" | "generational";
+
+export type BadgeBundleSource = {
+  bundleId: string;
+  playerId?: string;
+};
+
+/**
+ * Collect inherited badges per attribute slot: each badge is inherited from
+ * the player locked into its mapped slot. Duplicate names keep the highest
+ * tier. Players without a badge profile contribute nothing.
+ */
+export function collectBadgesByBundle({
+  sources,
+  badgeToBundle,
+  badgesForPlayer,
+}: {
+  sources: BadgeBundleSource[];
+  badgeToBundle: Record<string, string>;
+  badgesForPlayer: (playerId: string) => PlayerBadgeLike[] | undefined;
+}): PlayerBadgeLike[] {
+  const badgeByBundle = new Map<string, PlayerBadgeLike[]>();
+  for (const source of sources) {
+    if (!source.playerId) continue;
+    const playerBadges = badgesForPlayer(source.playerId);
+    if (!playerBadges) continue;
+    for (const badge of playerBadges) {
+      if (badgeToBundle[badge.name] !== source.bundleId) continue;
+      const list = badgeByBundle.get(source.bundleId) ?? [];
+      list.push(badge);
+      badgeByBundle.set(source.bundleId, list);
+    }
+  }
+
+  return uniqueBadges([...badgeByBundle.values()].flat());
+}
+
+export function buildBadgesByBundle({
+  sources,
+  badgeToBundle,
+  badgesForPlayer,
+  profileKnown,
+  fallbackBadges,
+}: {
+  sources: BadgeBundleSource[];
+  badgeToBundle: Record<string, string>;
+  badgesForPlayer: (playerId: string) => PlayerBadgeLike[] | undefined;
+  profileKnown: (playerId: string) => boolean;
+  fallbackBadges: PlayerBadgeLike[];
+}): { badges: PlayerBadgeLike[]; estimated: boolean } {
+  const inherited = collectBadgesByBundle({ sources, badgeToBundle, badgesForPlayer });
+  const missingBundles = new Set(sources
+    .filter((source) => !source.playerId || !profileKnown(source.playerId))
+    .map((source) => source.bundleId));
+  const fallback = fallbackBadges.filter((badge) => missingBundles.has(badgeToBundle[badge.name]));
+  return {
+    badges: uniqueBadges([...inherited, ...fallback]),
+    estimated: missingBundles.size > 0,
+  };
+}
+
+export function downgradeBadgesForRookie(
+  badges: PlayerBadgeLike[],
+  tier: RookieBadgeTier,
+): PlayerBadgeLike[] {
+  const config = {
+    rotation: { drop: 2, limit: 3 },
+    lottery: { drop: 1, limit: 5 },
+    generational: { drop: 1, limit: 7 },
+  }[tier];
+  const badgeTierByRank: Record<number, BadgeTier> = {
+    1: "Bronze",
+    2: "Silver",
+    3: "Gold",
+    4: "HOF",
+    5: "Legendary",
+  };
+  return uniqueBadges(badges)
+    .slice(0, config.limit)
+    .map((badge) => ({
+      ...badge,
+      tier: badgeTierByRank[Math.max(1, badgeTierRank[badge.tier] - config.drop)],
+    }));
+}
+
+function uniqueBadges(badges: PlayerBadgeLike[]): PlayerBadgeLike[] {
+  const unique = new Map<string, PlayerBadgeLike>();
+  for (const badge of badges) {
+    const existing = unique.get(badge.name);
+    if (!existing || badgeTierRank[badge.tier] > badgeTierRank[existing.tier]) {
+      unique.set(badge.name, badge);
+    }
+  }
+
+  return [...unique.values()].sort(
+    (left, right) => badgeTierRank[right.tier] - badgeTierRank[left.tier] || left.name.localeCompare(right.name),
+  );
 }

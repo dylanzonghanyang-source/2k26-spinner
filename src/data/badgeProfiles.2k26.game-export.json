@@ -1,0 +1,3727 @@
+{
+  "alex-caruso": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "andrew-wiggins": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Bronze"
+    }
+  ],
+  "anthony-edwards": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Silver"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "HOF"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "anthony-gill": [],
+  "ausar-thompson": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "ben-saraf": [
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "brandon-ingram": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "christian-braun": [
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Mini Marksman",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Gold"
+    }
+  ],
+  "cj-mccollum": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Mini Marksman",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "collin-sexton": [
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Mini Marksman",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "cooper-flagg": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Bronze"
+    }
+  ],
+  "dangelo-russell": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "derrick-white": [
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Mini Marksman",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "devin-carter": [
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Bronze"
+    }
+  ],
+  "dillon-brooks": [
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Gold"
+    }
+  ],
+  "draymond-green": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Paint Patroller",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Gold"
+    }
+  ],
+  "dylan-harper": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "emanuel-miller": [],
+  "evan-mobley": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Hook Specialist",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Bronze"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Paint Patroller",
+      "category": "defense",
+      "tier": "HOF"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "HOF"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Rise Up",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "giannis-antetokounmpo": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Gold"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Hook Specialist",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Gold"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Paint Patroller",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "HOF"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Powerhouse",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Rise Up",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "jaden-mcdaniels": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Bronze"
+    }
+  ],
+  "jalen-brunson": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Silver"
+    },
+    {
+      "name": "Mini Marksman",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Gold"
+    }
+  ],
+  "james-harden": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Gold"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Gold"
+    }
+  ],
+  "javonte-green": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Bronze"
+    }
+  ],
+  "jay-huff": [
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Bronze"
+    }
+  ],
+  "jayson-kent": [],
+  "jayson-tatum": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Silver"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "jd-davison": [],
+  "jeremiah-fears": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Mini Marksman",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "jett-howard": [
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Bronze"
+    }
+  ],
+  "joel-embiid": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Hook Specialist",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Silver"
+    },
+    {
+      "name": "Paint Patroller",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Powerhouse",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rise Up",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "jonathan-kuminga": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Gold"
+    }
+  ],
+  "josh-hart": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Gold"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "jrue-holiday": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "justin-edwards": [
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Bronze"
+    }
+  ],
+  "jusuf-nurkic": [
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Hook Specialist",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Powerhouse",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Bronze"
+    }
+  ],
+  "kawhi-leonard": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Silver"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "keegan-murray": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "kevin-durant": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "HOF"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "HOF"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "HOF"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "kevin-porter-jr": [
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "kobe-brown": [],
+  "kon-knueppel": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "kris-dunn": [
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "kyle-filipowski": [
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    }
+  ],
+  "lamelo-ball": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Gold"
+    }
+  ],
+  "luguentz-dort": [
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "HOF"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Bronze"
+    }
+  ],
+  "luka-doncic": [
+    {
+      "name": "Ankle Breaker",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "HOF"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Handles For Days",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Hook Specialist",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "HOF"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Gold"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Powerhouse",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "HOF"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Unpluckable",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Gold"
+    }
+  ],
+  "luke-kennard": [
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Gold"
+    }
+  ],
+  "mark-williams": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Gold"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Paint Patroller",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Powerhouse",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Posterizer",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rise Up",
+      "category": "inside",
+      "tier": "Gold"
+    }
+  ],
+  "michael-porter-jr": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "moussa-cisse": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Paint Patroller",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    }
+  ],
+  "myron-gardner": [],
+  "nikola-jokic": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Gold"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "HOF"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "HOF"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "HOF"
+    },
+    {
+      "name": "Hook Specialist",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Limitless Range",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Marketability",
+      "category": "general",
+      "tier": "Silver"
+    },
+    {
+      "name": "Paint Patroller",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "HOF"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Powerhouse",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "HOF"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rise Up",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Gold"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "HOF"
+    }
+  ],
+  "og-anunoby": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Deadeye",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Off Ball Pest",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "On Ball Menace",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Slippery Off Ball",
+      "category": "shooting",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handles",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "quinten-post": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rise Up",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Gold"
+    }
+  ],
+  "rudy-gobert": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Gold"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Hook Specialist",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Paint Patroller",
+      "category": "defense",
+      "tier": "HOF"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Lockdown",
+      "category": "defense",
+      "tier": "Gold"
+    },
+    {
+      "name": "Post Powerhouse",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Rise Up",
+      "category": "inside",
+      "tier": "Gold"
+    }
+  ],
+  "sandro-mamukelashvili": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Powerhouse",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rise Up",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    }
+  ],
+  "scotty-pippen-jr": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Glove",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Interceptor",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pick Dodger",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Silver"
+    }
+  ],
+  "tre-jones": [
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Dimer",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Lightning Launch",
+      "category": "athleticism",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Gold"
+    }
+  ],
+  "vit-krejci": [
+    {
+      "name": "Bail Out",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Break Starter",
+      "category": "playmaking",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Silver"
+    },
+    {
+      "name": "Versatile Visionary",
+      "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "wendell-carter-jr": [
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Hook Specialist",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Fade Phenom",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Post Powerhouse",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rise Up",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "category": "shooting",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Shifty Shooter",
+      "category": "shooting",
+      "tier": "Bronze"
+    }
+  ],
+  "yves-missi": [
+    {
+      "name": "Aerial Wizard",
+      "category": "athleticism",
+      "tier": "Gold"
+    },
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Silver"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "High Flying Denier",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Gold"
+    }
+  ],
+  "zach-edey": [
+    {
+      "name": "Boxout Beast",
+      "category": "rebounding",
+      "tier": "Gold"
+    },
+    {
+      "name": "Brick Wall",
+      "category": "inside",
+      "tier": "Gold"
+    },
+    {
+      "name": "Hook Specialist",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Paint Patroller",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Paint Prodigy",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Powerhouse",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Post Up Poet",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rebound Chaser",
+      "category": "rebounding",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Rise Up",
+      "category": "inside",
+      "tier": "Silver"
+    }
+  ]
+}

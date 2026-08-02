@@ -32,10 +32,10 @@ import {
   type SourceMap
 } from "./domain";
 import rosterCatalog from "./data/rosterCatalog.json";
-import badgeProfiles from "./data/badgeProfiles.json";
+import badgeProfiles2k27 from "./data/badgeProfiles.2k27.json";
 import detailedPlayers from "./data/players.json";
 
-const appVersion = "v0.5";
+const appVersion = "v0.6";
 const lastUpdated = "2026-08-02";
 const rosterDataVersion = "NBA 2K27 Play Now";
 const usageGuides = {
@@ -217,7 +217,9 @@ type DetailedPlayerRecord = {
   detailed: Record<string, number | null>;
 };
 
-const sourceBadgeProfiles = badgeProfiles as BadgeProfileMap;
+const sourceBadgeProfiles = rosterDataVersion.startsWith("NBA 2K27")
+  ? badgeProfiles2k27 as BadgeProfileMap
+  : {};
 const detailedPlayerBySlug = new Map(
   (detailedPlayers as DetailedPlayerRecord[]).map((player) => [player.slug, player]),
 );
@@ -236,6 +238,7 @@ const rookieTierOptions: Array<{ key: RookieTier; label: string }> = [
 ];
 
 const badgeTierStyles: Record<PlayerBadge["tier"], string> = {
+  Legendary: "border-cyan-500/30 bg-cyan-50 text-cyan-900",
   HOF: "border-fuchsia-500/25 bg-fuchsia-50 text-fuchsia-800",
   Gold: "border-amber-500/25 bg-amber-50 text-amber-800",
   Silver: "border-slate-400/25 bg-slate-100 text-slate-700",
@@ -288,6 +291,7 @@ function rosterPlayerSource(team: RosterCatalogTeam, player: RosterCatalogPlayer
     rosterTeam: team.name,
     isEstimated: !detailedPlayer,
     badges: sourceBadgeProfiles[player.id] ?? [],
+    badgesKnown: Object.hasOwn(sourceBadgeProfiles, player.id),
     overall,
     team: team.name,
     position: player.position,

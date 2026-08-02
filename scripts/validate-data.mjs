@@ -7,7 +7,9 @@ const requiredFiles = [
   "src/data/rosterCatalog.json",
   "src/data/rookieOverallModel.json",
   "src/data/currentPlayerPositions.json",
-  "src/data/badgeProfiles.json",
+  "src/data/badgeProfiles.2k26.json",
+  "src/data/badgeProfiles.2k27.json",
+  "src/data/badgeProfiles.meta.json",
 ];
 
 for (const relativePath of requiredFiles) {

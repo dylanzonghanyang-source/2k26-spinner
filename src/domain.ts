@@ -1,3 +1,6 @@
+import { badgeTierRank, type BadgeTier } from "./badgeTiers";
+export type { BadgeTier } from "./badgeTiers";
+
 export type PlayerSource = {
   id?: string;
   name: string;
@@ -6,6 +9,7 @@ export type PlayerSource = {
   rosterTeam?: string;
   isEstimated?: boolean;
   badges?: PlayerBadge[];
+  badgesKnown?: boolean;
   overall?: number | null;
   team?: string | null;
   position?: string | null;
@@ -24,7 +28,6 @@ export type PlayerSource = {
 
 export type AttributeGroupKey = "shooting" | "athleticism" | "playmaking" | "defense" | "inside";
 
-export type BadgeTier = "Bronze" | "Silver" | "Gold" | "HOF";
 export type BadgeCategory = AttributeGroupKey | "general" | "rebounding";
 export type PlayerBadge = {
   name: string;
@@ -360,18 +363,12 @@ export function createDraftFromSources(
   return applyCareerProfile(peakDraft, sources, profile);
 }
 
-const badgeTierRank: Record<BadgeTier, number> = {
-  Bronze: 1,
-  Silver: 2,
-  Gold: 3,
-  HOF: 4,
-};
-
 const badgeTierByRank: Record<number, BadgeTier> = {
   1: "Bronze",
   2: "Silver",
   3: "Gold",
   4: "HOF",
+  5: "Legendary",
 };
 
 function applyCareerProfile(draft: PlayerDraft, sources: SourceMap, profile: CareerProfile): PlayerDraft {
@@ -456,7 +453,7 @@ function buildPeakBadges(sources: SourceMap): { badges: PlayerBadge[]; estimated
   for (const group of attributeGroups) {
     const source = sources[group.key];
     const exact = source.badges?.filter((badge) => badgeMatchesGroup(badge, group.key)) ?? [];
-    if (exact.length > 0) {
+    if (source.badgesKnown) {
       result.push(...exact);
     } else {
       estimated = true;

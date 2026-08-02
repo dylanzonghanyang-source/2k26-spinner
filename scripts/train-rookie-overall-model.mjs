@@ -4,8 +4,10 @@ import path from "node:path";
 const root = path.resolve(process.cwd());
 const playersPath = path.resolve(root, "src/data/players.json");
 const rosterPath = path.resolve(root, "src/data/rosterCatalog.json");
+const badgesPath = path.resolve(root, "src/data/badgeProfiles.2k27.json");
 const outputPath = path.resolve(root, process.argv[2] ?? "src/data/rookieOverallModel.json");
-const ridge = Number(process.argv[3] ?? 10);
+const ridge = Number(process.argv[3] ?? 100);
+const badgeRidge = Number(process.argv[4] ?? 100);
 const folds = 5;
 
 const attributes = [
@@ -47,9 +49,12 @@ const attributes = [
   "Intangibles",
 ];
 
+const badgeCategories = ["shooting", "playmaking", "inside", "defense", "rebounding", "athleticism"];
+const tierPoints = { Bronze: 1, Silver: 2, Gold: 3, HOF: 4, Legendary: 5 };
 const positions = ["PG", "SG", "SF", "PF", "C"];
 const detailedPlayers = JSON.parse(await readFile(playersPath, "utf8"));
 const rosterCatalog = JSON.parse(await readFile(rosterPath, "utf8"));
+const badgeProfiles = JSON.parse(await readFile(badgesPath, "utf8"));
 const detailedBySlug = new Map(detailedPlayers.map((player) => [player.slug, player]));
 
 const samples = rosterCatalog.teams
@@ -65,6 +70,9 @@ const samples = rosterCatalog.teams
       position,
       overall: player.overall,
       features: attributes.map((attribute) => featureValue(detailed.detailed?.[attribute], attribute)),
+      badgeFeatures: badgeFeaturesFor(badgeProfiles[player.id] ?? []),
+      badgeCount: (badgeProfiles[player.id] ?? []).length,
+      values: detailed.detailed ?? {},
     }];
   });
 
@@ -78,56 +86,97 @@ const positionsModel = Object.fromEntries(positions.map((position) => {
   return [position, model];
 }));
 
+const positionsBadgeModel = Object.fromEntries(positions.map((position) => {
+  const positionSamples = samples.filter((sample) => sample.position === position);
+  const model = fitRidge(positionSamples, ridge, true);
+  return [position, model];
+}));
+
 const holdoutPredictions = [];
+const holdoutBadgePredictions = [];
+const holdoutJointBadgePredictions = [];
 for (let fold = 0; fold < folds; fold += 1) {
   for (const position of positions) {
     const training = samples.filter((sample) => sample.position === position && foldFor(sample.id) !== fold);
     const testing = samples.filter((sample) => sample.position === position && foldFor(sample.id) === fold);
     if (training.length < attributes.length || testing.length === 0) continue;
     const model = fitRidge(training, ridge);
+    const badgeModel = fitRidge(training, badgeRidge, true);
     for (const sample of testing) {
-      holdoutPredictions.push({
-        overall: sample.overall,
-        prediction: predict(model, sample.features),
-      });
+      const prediction = predict(model, sample.features);
+      holdoutPredictions.push({ overall: sample.overall, prediction });
+      if (sample.badgeCount > 0) {
+        const jointPrediction = predict(badgeModel, [...sample.features, ...sample.badgeFeatures]);
+        holdoutBadgePredictions.push({
+          overall: sample.overall,
+          prediction: Math.max(prediction, jointPrediction),
+        });
+        holdoutJointBadgePredictions.push({ overall: sample.overall, prediction: jointPrediction });
+      }
     }
   }
 }
 
 const mae = average(holdoutPredictions.map((row) => Math.abs(row.prediction - row.overall)));
 const rmse = Math.sqrt(average(holdoutPredictions.map((row) => (row.prediction - row.overall) ** 2)));
+const badgeMae = average(holdoutBadgePredictions.map((row) => Math.abs(row.prediction - row.overall)));
+const badgeRmse = Math.sqrt(average(holdoutBadgePredictions.map((row) => (row.prediction - row.overall) ** 2)));
+const jointBadgeMae = average(holdoutJointBadgePredictions.map((row) => Math.abs(row.prediction - row.overall)));
+const jointBadgeRmse = Math.sqrt(average(holdoutJointBadgePredictions.map((row) => (row.prediction - row.overall) ** 2)));
 
 const model = {
-  version: 1,
+  version: 2,
   trainingSamples: samples.length,
   crossValidation: {
     folds,
     mae: round(mae, 3),
     rmse: round(rmse, 3),
+    badgeSubsetMae: round(badgeMae, 3),
+    badgeSubsetRmse: round(badgeRmse, 3),
+    badgeSubsetCount: holdoutBadgePredictions.length,
+    jointBadgeSubsetMae: round(jointBadgeMae, 3),
+    jointBadgeSubsetRmse: round(jointBadgeRmse, 3),
   },
   ridge,
+  badgeRidge,
   attributes,
+  badgeCategories,
+  tierPoints,
+  badgeCombination: "monotonic-max",
   positions: positionsModel,
+  positionsWithBadges: positionsBadgeModel,
 };
 
 await writeFile(outputPath, `${JSON.stringify(model, null, 2)}\n`, "utf8");
 console.log(`Trained model on ${samples.length} samples → ${path.relative(root, outputPath)}`);
 console.log(`${folds}-fold CV: MAE=${mae.toFixed(3)}, RMSE=${rmse.toFixed(3)}`);
+console.log(`${folds}-fold CV (badge subset n=${holdoutBadgePredictions.length}): attr+badge MAE=${badgeMae.toFixed(3)}, RMSE=${badgeRmse.toFixed(3)}`);
+console.log(`${folds}-fold CV (unconstrained joint diagnostic): MAE=${jointBadgeMae.toFixed(3)}, RMSE=${jointBadgeRmse.toFixed(3)}`);
+
+function badgeFeaturesFor(badges) {
+  const points = Object.fromEntries(badgeCategories.map((category) => [category, 0]));
+  for (const badge of badges) {
+    const tier = tierPoints[badge.tier];
+    if (tier && badgeCategories.includes(badge.category)) points[badge.category] += tier;
+  }
+  return badgeCategories.map((category) => points[category]);
+}
 
 function featureValue(value, attribute) {
   if (Number.isFinite(value)) return clamp(value, 25, 99);
   return attribute === "Intangibles" ? 50 : 65;
 }
 
-function fitRidge(data, lambda) {
+function fitRidge(data, lambda, withBadges = false) {
   const n = data.length;
-  const p = attributes.length;
-  // Design matrix with intercept column.
+  const p = withBadges ? attributes.length + badgeCategories.length : attributes.length;
   const xtx = Array.from({ length: p + 1 }, () => Array(p + 1).fill(0));
   const xty = Array(p + 1).fill(0);
 
   for (const sample of data) {
-    const row = [1, ...sample.features];
+    const row = withBadges
+      ? [1, ...sample.features, ...sample.badgeFeatures]
+      : [1, ...sample.features];
     for (let i = 0; i <= p; i += 1) {
       xty[i] += row[i] * sample.overall;
       for (let j = 0; j <= p; j += 1) {
@@ -141,6 +190,13 @@ function fitRidge(data, lambda) {
   }
 
   const coefficients = solveLinearSystem(xtx, xty);
+  if (withBadges) {
+    return {
+      intercept: coefficients[0],
+      coefficients: Object.fromEntries(attributes.map((attribute, index) => [attribute, coefficients[index + 1]])),
+      badgeCoefficients: Object.fromEntries(badgeCategories.map((category, index) => [category, coefficients[index + 1 + attributes.length]])),
+    };
+  }
   return {
     intercept: coefficients[0],
     coefficients: Object.fromEntries(attributes.map((attribute, index) => [attribute, coefficients[index + 1]])),
@@ -150,7 +206,9 @@ function fitRidge(data, lambda) {
 function predict(model, features) {
   const estimate = attributes.reduce((total, attribute, index) => (
     total + features[index] * (model.coefficients[attribute] ?? 0)
-  ), model.intercept);
+  ), model.intercept) + badgeCategories.reduce((total, category, index) => (
+    total + (features[attributes.length + index] ?? 0) * (model.badgeCoefficients?.[category] ?? 0)
+  ), 0);
   return clamp(estimate, 40, 99);
 }
 

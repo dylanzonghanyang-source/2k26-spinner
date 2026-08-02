@@ -1,0 +1,32 @@
+{
+  "2K26": {
+    "gameVersion": "2K26",
+    "source": "https://raw.githubusercontent.com/Rush-Shaw/nba-player-attributes/cd6e02c14ea65022b1263d05c1add35acd1728d6/data/raw/2k26_roster_raw.json",
+    "sourceLastUpdated": "2026-05-19T17:00:21.142Z",
+    "knownProfiles": 496,
+    "positiveProfiles": 415,
+    "zeroBadgeProfiles": 81,
+    "totalBadges": 3691,
+    "gameExportOverrides": 63,
+    "unmatchedSlugs": []
+  },
+  "2K27": {
+    "gameVersion": "2K27",
+    "source": "https://api.nba2kapi.com/api/public/players?teamType=curr&limit=100",
+    "sourceLastUpdated": "2026-08-01T06:21:08.781Z",
+    "knownProfiles": 515,
+    "positiveProfiles": 421,
+    "zeroBadgeProfiles": 94,
+    "totalBadges": 3714,
+    "gameExportOverrides": 0,
+    "unmatchedSlugs": [
+      "alex-antetokounmpo",
+      "andre-jackson-jr",
+      "isaiah-crawford",
+      "jahmir-young",
+      "lachlan-olbrich",
+      "marjon-beauchamp",
+      "tyson-etienne"
+    ]
+  }
+}

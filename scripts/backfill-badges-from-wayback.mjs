@@ -1,6 +1,6 @@
 /**
  * Live 2kratings.com is behind Cloudflare. This backfills player badges from
- * the Wayback Machine into data/2kratings/*.json and src/data/badgeProfiles.json.
+ * the Wayback Machine into data/2kratings/*.json and src/data/badgeProfiles.2k26.json.
  *
  * Usage:
  *   node scripts/backfill-badges-from-wayback.mjs [--limit N] [--concurrency N] [--slugs a,b] [--retry-failed]
@@ -18,7 +18,7 @@ const root = path.resolve(process.cwd());
 const rawDir = path.join(root, "data", "2kratings");
 const rosterPath = path.join(root, "src", "data", "rosterCatalog.json");
 const playersPath = path.join(root, "src", "data", "players.json");
-const badgeProfilesPath = path.join(root, "src", "data", "badgeProfiles.json");
+const badgeProfilesPath = path.join(root, "src", "data", "badgeProfiles.2k26.json");
 
 const BADGE_CATEGORY_BY_NAME = {
   "Set Shot Specialist": "shooting",
@@ -81,7 +81,7 @@ const profiles = { ...existingProfiles };
 
 await mkdir(rawDir, { recursive: true });
 
-// Sync any raw badge rows that never made it into badgeProfiles.json.
+// Sync any raw badge rows that never made it into badgeProfiles.2k26.json.
 for (const slug of currentIds) {
   if (Array.isArray(profiles[slug]) && profiles[slug].length > 0) continue;
   try {

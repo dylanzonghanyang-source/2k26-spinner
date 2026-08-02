@@ -1,12 +1,13 @@
 {
   "name": "2k26-spinner",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test:tendencies": "node scripts/test-tendency-table.mjs && node --experimental-strip-types scripts/test-tendency-lookup.mts",
+    "test:badges": "node scripts/test-badge-profiles.mjs && node --experimental-strip-types scripts/test-badge-tiers.mts && node --experimental-strip-types scripts/test-badge-inheritance.mts && node --experimental-strip-types scripts/test-badge-ovr-model.mts",
     "test:bundle": "node scripts/test-bundle-budget.mjs",
     "check:bundle": "node scripts/check-bundle-size.mjs",
     "build:budget": "pnpm run build && pnpm run check:bundle",
@@ -17,6 +18,7 @@
     "convert:players": "node scripts/convert-raw-players.mjs",
     "train:overall": "node scripts/train-rookie-overall-model.mjs",
     "backfill:badges": "node scripts/backfill-badges-from-wayback.mjs",
+    "sync:badges": "node scripts/sync-versioned-badges.mjs",
     "analyze:badges": "node scripts/analyze-badge-ovr.mjs",
     "scrape:2k": "node scripts/scrape-2kratings.mjs",
     "sync:positions": "node scripts/sync-current-player-positions.mjs",
