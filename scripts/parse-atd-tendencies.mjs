@@ -190,13 +190,21 @@ for (let i = dataStart; i < lines.length; i++) {
 fs.writeFileSync(OUT, JSON.stringify(profiles, null, 2) + "\n");
 const OUT_UNMATCHED = path.join(SRC, "tendencyProfilesByName.json");
 fs.writeFileSync(OUT_UNMATCHED, JSON.stringify(unmatchedByName, null, 2) + "\n");
-// Compact build used by the app: slug -> tendencies only (smaller bundle).
+// Compact build used by the app: shared field names + aligned value rows.
+// This avoids repeating ~96 tendency keys for every player.
 const OUT_MIN = path.join(SRC, "tendencyProfiles.min.json");
-const compact = {};
-for (const [slug, profile] of Object.entries(profiles)) {
-  compact[slug] = profile.tendencies;
-}
-fs.writeFileSync(OUT_MIN, JSON.stringify(compact) + "\n");
+const compactSlugs = Object.keys(profiles).sort();
+const compactFields = [...new Set(
+  compactSlugs.flatMap((slug) => Object.keys(profiles[slug].tendencies)),
+)].sort();
+const compactRows = compactSlugs.map((slug) =>
+  compactFields.map((field) => profiles[slug].tendencies[field] ?? null),
+);
+fs.writeFileSync(OUT_MIN, JSON.stringify({
+  slugs: compactSlugs,
+  fields: compactFields,
+  rows: compactRows,
+}) + "\n");
 
 console.log(JSON.stringify({
   output: OUT,

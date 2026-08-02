@@ -1,11 +1,15 @@
 {
   "name": "2k26-spinner",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.5.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test:tendencies": "node scripts/test-tendency-table.mjs && node --experimental-strip-types scripts/test-tendency-lookup.mts",
+    "test:bundle": "node scripts/test-bundle-budget.mjs",
+    "check:bundle": "node scripts/check-bundle-size.mjs",
+    "build:budget": "pnpm run build && pnpm run check:bundle",
     "preview": "vite preview",
     "analyze:overall": "node scripts/analyze-overall-calibration.mjs",
     "test:overall": "node scripts/test-rookie-overall-calibration.mjs",

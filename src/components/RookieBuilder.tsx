@@ -17,6 +17,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { badgeTierCN, getBadgeNameCN } from "../badges";
 import MarqueeDraw, { type MarqueeDrawItem } from "./MarqueeDraw";
 import { attrNameCN, type BadgeTier, type PlayerSource } from "../domain";
+import {
+  collectTendenciesByBundle,
+  loadTendencyLookup,
+  type TendencyLookup,
+} from "../tendencies";
 import { tendencyBundleMap } from "./tendencyBundleMap";
 import { getPlayerHeadshot, prefetchPlayerHeadshots } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
@@ -75,6 +80,7 @@ type TeamRound = {
   offset: number;
 };
 type HotZoneState = "冷区" | "中性" | "热区";
+type TendencyLoadState = "idle" | "loading" | "ready" | "error";
 type SaveFilePicker = (options?: {
   suggestedName?: string;
   types?: Array<{
@@ -578,6 +584,7 @@ function createResult(
   readiness: number,
   mode: BuilderMode,
   players: Map<string, PlayerSource>,
+  tendencyLookup: TendencyLookup | null,
 ) {
   const isPrime = mode === "prime";
   let peakAttrs: Record<string, number> = {};
@@ -590,20 +597,19 @@ function createResult(
     scores.push(evaluation.adjusted);
   }
 
-  // Tendency inheritance: each slot inherits the tendencies mapped to its
-  // bundle from the player locked into that slot. No down-scaling applied.
-  const tendencies: Record<string, number> = {};
-  for (const bundle of bundles) {
-    const lock = locks[bundle.id];
-    if (lock?.kind !== "player") continue;
-    const player = players.get(lock.playerId);
-    if (!player?.tendencies) continue;
-    for (const [field, bundleId] of Object.entries(tendencyBundleMap)) {
-      if (bundleId !== bundle.id) continue;
-      const value = player.tendencies[field];
-      if (typeof value === "number") tendencies[field] = value;
-    }
-  }
+  // Tendency inheritance: each slot reads only its mapped fields from the
+  // compact lookup. Values are inherited verbatim, without rookie down-scaling.
+  const tendencies = tendencyLookup
+    ? collectTendenciesByBundle({
+      sources: bundles.map((bundle) => {
+        const lock = locks[bundle.id];
+        const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
+        return { bundleId: bundle.id, playerSlug: player?.slug };
+      }),
+      fieldToBundle: tendencyBundleMap,
+      lookup: tendencyLookup,
+    })
+    : {};
 
   const customFinalAttrs = Object.assign({}, ...Object.values(locks)
     .filter((lock): lock is CustomLock => lock.kind === "custom")
@@ -766,8 +772,16 @@ function createExportText(
   evaluations: Record<string, Evaluation>,
   players: Map<string, PlayerSource>,
   mode: BuilderMode,
+  tendencyLoadState: TendencyLoadState,
 ) {
   const isPrime = mode === "prime";
+  const tendencyLines = tendencyLoadState === "loading"
+    ? ["倾向数据加载中"]
+    : tendencyLoadState === "error"
+      ? ["倾向数据加载失败，请刷新后重试"]
+      : Object.keys(result.tendencies).length
+        ? Object.entries(result.tendencies).map(([field, value]) => `${field}: ${value}`)
+        : ["无倾向数据（来源球员无倾向档案）"];
   return [
     `NBA 2K27 ${isPrime ? "巅峰球员" : "新秀"}创建清单`, "", "[资料]",
     `姓名: ${rookieName}`, `年龄: ${result.age}`, `位置: ${result.position}`, `次要位置: ${result.secondary}`,
@@ -800,9 +814,7 @@ function createExportText(
       "", "[巅峰徽章]", ...(result.peakBadges.length ? result.peakBadges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
     ]),
     "", "[倾向（按属性来源继承，未降档）]",
-    ...(Object.keys(result.tendencies).length
-      ? Object.entries(result.tendencies).map(([field, value]) => `${field}: ${value}`)
-      : ["无倾向数据（来源球员无倾向档案）"]),
+    ...tendencyLines,
     "", "[属性来源]", ...bundles.map((bundle) => {
       const lock = locks[bundle.id];
       if (lock?.kind === "custom") {
@@ -966,6 +978,8 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   const [readiness, setReadiness] = useState(defaultReadiness);
   const [body, setBody] = useState<BodySettings>(() => createBodySettings("PG", Date.now()));
   const [settingsLocked, setSettingsLocked] = useState(false);
+  const [tendencyLookup, setTendencyLookup] = useState<TendencyLookup | null>(null);
+  const [tendencyLoadError, setTendencyLoadError] = useState(false);
   const [locks, setLocks] = useState<LockState>({});
   const [round, setRound] = useState<TeamRound>(() => createRound(teams, Date.now()));
   const [isTeamDrawing, setIsTeamDrawing] = useState(false);
@@ -986,6 +1000,21 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   };
 
   useEffect(() => () => clearTeamDrawTimers(), []);
+
+  useEffect(() => {
+    if (!settingsLocked || tendencyLookup || tendencyLoadError) return;
+    let active = true;
+    loadTendencyLookup()
+      .then((lookup) => {
+        if (active) setTendencyLookup(lookup);
+      })
+      .catch(() => {
+        if (active) setTendencyLoadError(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [settingsLocked, tendencyLoadError, tendencyLookup]);
 
   useEffect(() => {
     if (!customizingBundleId) return;
@@ -1090,11 +1119,44 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     [effectiveAge, potentialRange, readiness],
   );
   const result = useMemo(
-    () => createResult(evaluations, locks, effectiveAge, position, secondaryPosition, body, potentialRange, readiness, mode, playersById),
-    [body, effectiveAge, evaluations, locks, mode, playersById, position, potentialRange, readiness, secondaryPosition],
+    () => createResult(
+      evaluations,
+      locks,
+      effectiveAge,
+      position,
+      secondaryPosition,
+      body,
+      potentialRange,
+      readiness,
+      mode,
+      playersById,
+      tendencyLookup,
+    ),
+    [body, effectiveAge, evaluations, locks, mode, playersById, position, potentialRange, readiness, secondaryPosition, tendencyLookup],
   );
+  const tendencyLoadState: TendencyLoadState = tendencyLookup
+    ? "ready"
+    : tendencyLoadError
+      ? "error"
+      : settingsLocked
+        ? "loading"
+        : "idle";
+  const tendencyCount = Object.keys(result.tendencies).length;
+  const tendencyStatusLabel = tendencyLoadState === "ready"
+    ? `${tendencyCount} 项 · 未降档`
+    : tendencyLoadState === "error"
+      ? "加载失败"
+      : tendencyLoadState === "loading"
+        ? "加载中…"
+        : "未加载";
+  const tendencyEmptyText = tendencyLoadState === "error"
+    ? "倾向数据加载失败，请刷新后重试"
+    : tendencyLoadState === "loading"
+      ? "倾向数据加载中…"
+      : "无倾向数据";
   const completed = Object.keys(locks).length;
   const isComplete = completed === bundles.length;
+  const exportReady = isComplete && tendencyLoadState !== "loading";
   const shownIds = round.playerOrder.slice(round.offset, round.offset + 7);
   const shownPlayers = settingsLocked
     ? shownIds.map((id) => playersById.get(id)).filter((player): player is PlayerSource => Boolean(player))
@@ -1294,7 +1356,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
 
   const copyResult = async () => {
     try {
-      await copyText(createExportText(rookieName, result, locks, evaluations, playersById, mode));
+      await copyText(createExportText(rookieName, result, locks, evaluations, playersById, mode, tendencyLoadState));
       setStatus("清单已复制");
     } catch {
       setStatus("复制失败，请手动复制");
@@ -1302,7 +1364,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   };
 
   const downloadResult = async () => {
-    const blob = new Blob([createExportText(rookieName, result, locks, evaluations, playersById, mode)], { type: "text/plain;charset=utf-8" });
+    const blob = new Blob([createExportText(rookieName, result, locks, evaluations, playersById, mode, tendencyLoadState)], { type: "text/plain;charset=utf-8" });
     const nameSlug = rookieName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     const suggestedName = `2k26-${isPrime ? "prime" : "rookie"}-${nameSlug || position.toLowerCase()}.txt`;
     const showSaveFilePicker = (window as Window & { showSaveFilePicker?: SaveFilePicker }).showSaveFilePicker;
@@ -1758,9 +1820,9 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                 <div className="mb-1.5 text-[10px] font-semibold">热区</div>
                 <div className="grid grid-cols-3 gap-1 text-center text-[9px]"><div className="bg-blue-50 py-1.5 text-blue-700">冷 <span data-testid="cold-zone-count">{zoneCounts.冷区}</span></div><div className="bg-ink-50 py-1.5 text-ink-600">中 <span data-testid="neutral-zone-count">{zoneCounts.中性}</span></div><div className="bg-rose-50 py-1.5 text-rose-700">热 <span data-testid="hot-zone-count">{zoneCounts.热区}</span></div></div>
               </div>
-              <div className="border-b border-ink-200 px-3 py-2.5">
-                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">倾向</span><span className="text-ink-400">{Object.keys(result.tendencies).length} 项 · 未降档</span></div>
-                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{Object.keys(result.tendencies).length ? Object.entries(result.tendencies).slice(0, 8).map(([field, value]) => <span key={field} className="border border-teal-500/20 bg-teal-50 px-1 py-0.5 text-[8px] text-teal-800">{field} {value}</span>) : <span className="text-[9px] text-ink-400">无倾向数据</span>}</div>
+              <div aria-live="polite" className="border-b border-ink-200 px-3 py-2.5" data-tendency-state={tendencyLoadState}>
+                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">倾向</span><span className="text-ink-400" data-testid="tendency-status">{tendencyStatusLabel}</span></div>
+                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{tendencyCount ? Object.entries(result.tendencies).slice(0, 8).map(([field, value]) => <span key={field} className="border border-teal-500/20 bg-teal-50 px-1 py-0.5 text-[8px] text-teal-800">{field} {value}</span>) : <span className="text-[9px] text-ink-400">{tendencyEmptyText}</span>}</div>
               </div>
             </>
           ) : (
@@ -1775,8 +1837,8 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             </div>
           )}
           <div className="flex gap-1.5 px-3 py-2.5">
-            <button className="action-button flex-1 justify-center px-1.5 py-1.5 text-[10px]" disabled={!isComplete} onClick={copyResult} type="button"><Copy className="h-3 w-3" />复制</button>
-            <button className="action-button flex-1 justify-center px-1.5 py-1.5 text-[10px]" disabled={!isComplete} onClick={downloadResult} type="button"><Download className="h-3 w-3" />导出</button>
+            <button className="action-button flex-1 justify-center px-1.5 py-1.5 text-[10px]" disabled={!exportReady} onClick={copyResult} type="button"><Copy className="h-3 w-3" />复制</button>
+            <button className="action-button flex-1 justify-center px-1.5 py-1.5 text-[10px]" disabled={!exportReady} onClick={downloadResult} type="button"><Download className="h-3 w-3" />导出</button>
           </div>
         </aside>
         {isComplete && (
