@@ -29,6 +29,7 @@ import {
   loadTendencyLookup,
   type TendencyLookup,
 } from "../tendencies";
+import { getTendencyNameCN } from "../tendencyNames";
 import { tendencyBundleMap } from "./tendencyBundleMap";
 import { badgeBundleMap } from "./badgeBundleMap";
 import { getPlayerHeadshot, prefetchPlayerHeadshots } from "../playerHeadshots";
@@ -814,7 +815,9 @@ function createExportText(
     : tendencyLoadState === "error"
       ? ["倾向数据加载失败，请刷新后重试"]
       : Object.keys(result.tendencies).length
-        ? Object.entries(result.tendencies).map(([field, value]) => `${field}: ${value}`)
+        ? Object.entries(result.tendencies)
+          .sort(([left], [right]) => getTendencyNameCN(left).localeCompare(getTendencyNameCN(right), "zh"))
+          .map(([field, value]) => `${getTendencyNameCN(field)}: ${value}`)
         : ["无倾向数据（来源球员无倾向档案）"];
   return [
     `NBA 2K27 ${isPrime ? "巅峰球员" : "新秀"}创建清单`, "", "[资料]",
@@ -1856,7 +1859,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
               </div>
               <div aria-live="polite" className="border-b border-ink-200 px-3 py-2.5" data-tendency-state={tendencyLoadState}>
                 <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">倾向</span><span className="text-ink-400" data-testid="tendency-status">{tendencyStatusLabel}</span></div>
-                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{tendencyCount ? Object.entries(result.tendencies).slice(0, 8).map(([field, value]) => <span key={field} className="border border-teal-500/20 bg-teal-50 px-1 py-0.5 text-[8px] text-teal-800">{field} {value}</span>) : <span className="text-[9px] text-ink-400">{tendencyEmptyText}</span>}</div>
+                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{tendencyCount ? Object.entries(result.tendencies).slice(0, 8).map(([field, value]) => <span key={field} className="border border-teal-500/20 bg-teal-50 px-1 py-0.5 text-[8px] text-teal-800">{getTendencyNameCN(field)} {value}</span>) : <span className="text-[9px] text-ink-400">{tendencyEmptyText}</span>}</div>
               </div>
             </>
           ) : (

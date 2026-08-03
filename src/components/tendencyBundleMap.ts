@@ -124,7 +124,8 @@ export const tendencyBundleMap: Record<string, string> = {
   "Iso vs Elite Defender": "stability",
   "Iso vs Good Defender": "stability",
   "Iso vs Average Defender": "stability",
-  "Iso vs Poor Defender": "stability",
+  // Iso vs Poor Defender exists in some game UIs / older maps but is not in
+  // the current ATD 96-field table (tendencyProfiles.min.json).
 };
 
 /** All bundle ids that appear in the map (in bundles order). */

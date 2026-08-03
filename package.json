@@ -1,12 +1,12 @@
 {
   "name": "2k26-spinner",
   "private": true,
-  "version": "0.6.1",
+  "version": "0.6.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test:tendencies": "node scripts/test-tendency-table.mjs && node --experimental-strip-types scripts/test-tendency-lookup.mts",
+    "test:tendencies": "node scripts/test-tendency-table.mjs && node --experimental-strip-types scripts/test-tendency-lookup.mts && node --experimental-strip-types scripts/test-tendency-names.mts",
     "test:badges": "node scripts/test-badge-profiles.mjs && node --experimental-strip-types scripts/test-badge-tiers.mts && node --experimental-strip-types scripts/test-badge-inheritance.mts && node --experimental-strip-types scripts/test-badge-ovr-model.mts",
     "test:bundle": "node scripts/test-bundle-budget.mjs",
     "check:bundle": "node scripts/check-bundle-size.mjs",

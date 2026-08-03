@@ -35,7 +35,7 @@ import rosterCatalog from "./data/rosterCatalog.json";
 import badgeProfiles2k27 from "./data/badgeProfiles.2k27.json";
 import detailedPlayers from "./data/players.json";
 
-const appVersion = "v0.6.1";
+const appVersion = "v0.6.2";
 const lastUpdated = "2026-08-02";
 const rosterDataVersion = "NBA 2K27 Play Now";
 const usageGuides = {
