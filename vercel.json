@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/nba-headshots/:id.png",
+      "destination": "https://cdn.nba.com/headshots/nba/latest/260x190/:id.png"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/nba-headshots/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { ChevronDown, Shuffle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { buildMarqueeReel } from "../marqueeMotion";
 
 export type MarqueeDrawItem = {
   id: string;
@@ -19,78 +20,82 @@ type MarqueeDrawProps = {
   isDrawing: boolean;
   items: MarqueeDrawItem[];
   onDraw?: () => void;
+  onPhaseChange?: (phase: "idle" | "rolling" | "landing" | "settled") => void;
+  onSettled?: () => void;
   precedingItems?: number;
   selectedId?: string;
+  settleHoldMs?: number;
   title: string;
 };
-
-function nearbyItems(
-  items: MarqueeDrawItem[],
-  selectedIndex: number,
-  precedingItems: number,
-  revealWinner: boolean,
-) {
-  if (items.length === 0) return [];
-  if (selectedIndex < 0) {
-    return items.slice(0, Math.min(3, items.length)).map((item, index) => ({
-      ...item,
-      railId: `${index}:${item.id}`,
-      selected: false,
-    }));
-  }
-
-  // Longer rails feel more random when the animation duration is extended.
-  const itemCount = Math.max(9, precedingItems + 8);
-  return Array.from({ length: itemCount }, (_, index) => {
-    const sourceIndex = (selectedIndex - precedingItems + index + items.length * itemCount) % items.length;
-    return {
-      ...items[sourceIndex],
-      railId: `${index}:${items[sourceIndex].id}`,
-      // Keep the winner in the center slot for animation, but only mark it
-      // as selected after the draw settles so the result is not leaked early.
-      selected: revealWinner && index === precedingItems,
-    };
-  });
-}
 
 function MarqueeDraw({
   currentLabel,
   dataKind,
   disabled = false,
-  durationMs = 3200,
+  durationMs = 2400,
   drawLabel = "抽取",
   emptyText,
   isDrawing,
   items,
   onDraw,
-  precedingItems = 8,
+  onPhaseChange,
+  onSettled,
+  precedingItems = 12,
   selectedId,
+  settleHoldMs = 220,
   title,
 }: MarqueeDrawProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const railRef = useRef<HTMLDivElement | null>(null);
   const selectedRef = useRef<HTMLDivElement | null>(null);
   const animationRef = useRef<Animation | null>(null);
+  const completionRef = useRef(onSettled);
   const [settled, setSettled] = useState(!isDrawing);
   const selectedIndex = items.findIndex((item) => item.id === selectedId);
-  const revealWinner = settled && !isDrawing;
-  const railItems = useMemo(
-    () => nearbyItems(items, selectedIndex, precedingItems, revealWinner),
-    [items, precedingItems, revealWinner, selectedIndex],
-  );
   const hasItems = items.length > 0;
   const hasSelection = selectedIndex >= 0;
+  const revealWinner = settled && hasSelection;
+  const visualReel = useMemo(
+    () => buildMarqueeReel(items, selectedId, {
+      precedingItems,
+      revealWinner: false,
+      trailingItems: 6,
+    }),
+    [items, precedingItems, selectedId],
+  );
+  const railItems = useMemo(
+    () => visualReel.map((item) => ({
+      ...item,
+      selected: revealWinner && item.landing,
+    })),
+    [revealWinner, visualReel],
+  );
+  const phase = !hasSelection
+    ? "idle"
+    : isDrawing
+      ? settled ? "landing" : "rolling"
+      : "settled";
   const canDraw = Boolean(onDraw) && !disabled && !isDrawing && hasItems;
-  const statusText = isDrawing || (hasSelection && !settled)
+  const statusText = phase === "rolling"
     ? "正在筛选"
-    : hasSelection
-      ? currentLabel ?? emptyText
-      : "待抽取";
-  const liveStatus = isDrawing || (hasSelection && !settled)
+    : phase === "landing"
+      ? `已抽中：${currentLabel ?? emptyText}`
+      : phase === "settled"
+        ? currentLabel ?? emptyText
+        : "待抽取";
+  const liveStatus = phase === "rolling"
     ? `${title}正在筛选`
     : hasSelection
       ? `${title}结果：${currentLabel ?? selectedId}`
       : `${title}待抽取`;
+
+  useEffect(() => {
+    completionRef.current = onSettled;
+  }, [onSettled]);
+
+  useEffect(() => {
+    onPhaseChange?.(phase);
+  }, [onPhaseChange, phase]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -98,19 +103,33 @@ function MarqueeDraw({
     if (!track || !rail || !hasItems) return;
 
     animationRef.current?.cancel();
+    animationRef.current = null;
+    let cancelled = false;
+    let settleTimer: number | null = null;
+
     const alignSelection = () => {
       const selected = selectedRef.current;
       rail.style.transform = "translateX(0)";
-      if (!selected) return;
+      if (!selected) return 0;
 
       const trackRect = track.getBoundingClientRect();
       const selectedRect = selected.getBoundingClientRect();
       const finalOffset = trackRect.left + trackRect.width / 2 - (selectedRect.left + selectedRect.width / 2);
       rail.style.transform = `translateX(${finalOffset}px)`;
+      return finalOffset;
+    };
+
+    const finishWithoutMotion = () => {
+      alignSelection();
+      setSettled(true);
+      queueMicrotask(() => {
+        if (!cancelled) completionRef.current?.();
+      });
     };
 
     if (!hasSelection) {
       setSettled(true);
+      if (isDrawing) finishWithoutMotion();
       return;
     }
 
@@ -123,60 +142,73 @@ function MarqueeDraw({
     }
 
     setSettled(false);
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reducedMotion) {
-      alignSelection();
-      setSettled(true);
-      return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      finishWithoutMotion();
+      return () => {
+        cancelled = true;
+      };
     }
 
-    // Anchor on the center rail slot (index === precedingItems), not on the
-    // highlighted winner, so animation still targets the correct card while
-    // the selected style stays hidden until settle.
-    const target = rail.children[precedingItems];
-    if (!(target instanceof HTMLDivElement)) return;
-    selectedRef.current = target;
+    const target = selectedRef.current;
+    if (!target) {
+      finishWithoutMotion();
+      return () => {
+        cancelled = true;
+      };
+    }
+
     rail.style.transform = "translateX(0)";
     const trackRect = track.getBoundingClientRect();
     const selectedRect = target.getBoundingClientRect();
+    const railRect = rail.getBoundingClientRect();
     const finalOffset = trackRect.left + trackRect.width / 2 - (selectedRect.left + selectedRect.width / 2);
-    // Travel farther across the rail so the spin reads as a real random roll.
-    const startOffset = finalOffset + Math.max(
-      selectedRect.left - rail.getBoundingClientRect().left,
-      Math.min(1480, Math.max(720, trackRect.width * 2.4)),
+    const leadDistance = Math.max(
+      selectedRect.left - railRect.left,
+      Math.min(1520, Math.max(820, trackRect.width * 2.35)),
     );
+    const startOffset = finalOffset + leadDistance;
+    const middleOffset = startOffset - leadDistance * 0.62;
+    const nearOffset = finalOffset + Math.min(220, Math.max(84, trackRect.width * 0.22));
     rail.style.transform = `translateX(${startOffset}px)`;
-    // Most of the spin is the long coast; keep the final overshoot short so
-    // the framed winner does not sway left/right for long after landing.
-    animationRef.current = rail.animate([
-      { transform: `translateX(${startOffset}px)` },
-      { transform: `translateX(${finalOffset + Math.min(360, trackRect.width * 0.48)}px)`, offset: 0.72 },
-      { transform: `translateX(${finalOffset - 12}px)`, offset: 0.9 },
-      { transform: `translateX(${finalOffset + 4}px)`, offset: 0.96 },
-      { transform: `translateX(${finalOffset}px)` },
+
+    const animation = rail.animate([
+      { transform: `translateX(${startOffset}px)`, offset: 0, easing: "linear" },
+      { transform: `translateX(${middleOffset}px)`, offset: 0.46, easing: "linear" },
+      { transform: `translateX(${nearOffset}px)`, offset: 0.82, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+      { transform: `translateX(${finalOffset}px)`, offset: 1 },
     ], {
       duration: durationMs,
-      easing: "cubic-bezier(0.12, 0.78, 0.08, 1)",
+      easing: "linear",
       fill: "forwards",
     });
-    // Reveal shortly after framing the winner, without waiting out the whole sway.
-    const settleTimer = window.setTimeout(() => setSettled(true), durationMs * 0.9);
+    animationRef.current = animation;
+
+    animation.addEventListener("finish", () => {
+      if (cancelled) return;
+      rail.style.transform = `translateX(${finalOffset}px)`;
+      setSettled(true);
+      settleTimer = window.setTimeout(() => {
+        if (!cancelled) completionRef.current?.();
+      }, settleHoldMs);
+    }, { once: true });
 
     return () => {
-      window.clearTimeout(settleTimer);
-      animationRef.current?.cancel();
-      animationRef.current = null;
+      cancelled = true;
+      if (settleTimer !== null) window.clearTimeout(settleTimer);
+      animation.cancel();
+      if (animationRef.current === animation) animationRef.current = null;
     };
-  }, [durationMs, hasItems, hasSelection, isDrawing, precedingItems, selectedId]);
+  }, [durationMs, hasItems, hasSelection, isDrawing, selectedId, settleHoldMs, visualReel]);
 
   return (
     <div
-      aria-busy={isDrawing || (hasSelection && !settled)}
+      aria-busy={isDrawing}
       className="marquee-draw"
-      data-drawing={isDrawing || (hasSelection && !settled)}
+      data-drawing={isDrawing}
       data-has-selection={hasSelection}
       data-kind={dataKind}
-      data-settled={settled && !isDrawing}
+      data-phase={phase}
+      data-settled={settled}
       data-testid="marquee-draw"
     >
       <span aria-live="polite" className="sr-only" role="status">
@@ -187,17 +219,30 @@ function MarqueeDraw({
         <span className="marquee-draw-status">{statusText}</span>
       </div>
       <div className="marquee-draw-track" ref={trackRef}>
-        <div className="marquee-draw-pointer" aria-hidden="true"><ChevronDown /></div>
+        <div className="marquee-draw-pointer" aria-hidden="true">
+          <span>落点</span>
+          <ChevronDown />
+        </div>
         <div className="marquee-draw-rail" ref={railRef}>
           {railItems.map((item) => (
             <div
               className="marquee-draw-item"
+              data-item-id={item.id}
+              data-landing={item.landing}
               data-selected={item.selected}
               key={item.railId}
-              ref={item.selected ? selectedRef : undefined}
+              ref={item.landing ? selectedRef : undefined}
             >
               <span className="marquee-draw-mark">
-                {item.imageSrc && <img alt="" onError={(event) => { event.currentTarget.style.display = "none"; }} src={item.imageSrc} />}
+                {item.imageSrc && (
+                  <img
+                    alt=""
+                    decoding="async"
+                    loading="eager"
+                    onError={(event) => { event.currentTarget.style.display = "none"; }}
+                    src={item.imageSrc}
+                  />
+                )}
                 <span>{item.mark ?? item.label.slice(0, 2)}</span>
               </span>
               <span className="marquee-draw-copy">

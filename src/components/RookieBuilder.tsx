@@ -11,7 +11,7 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   badgeTierCN,
   buildBadgesByBundle,
@@ -31,7 +31,7 @@ import {
 import { getTendencyNameCN } from "../tendencyNames";
 import { tendencyBundleMap } from "./tendencyBundleMap";
 import { badgeBundleMap } from "./badgeBundleMap";
-import { getPlayerHeadshot, prefetchPlayerHeadshots } from "../playerHeadshots";
+import { getPlayerHeadshotSources, prefetchPlayerHeadshots } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
 import { estimateGameOverall, type OverallDataVersion } from "../rookieOverall";
 import { generateRookieName } from "../rookieNames";
@@ -45,6 +45,9 @@ import {
   generateDurabilityAttributes,
   generateRookieDurability,
 } from "../rookieDurability";
+import {
+  constrainRookieInitialAttributes,
+} from "../rookieInitialOverall";
 
 export type RookieBuilderTeam = {
   id: string;
@@ -103,29 +106,30 @@ type SaveFilePicker = (options?: {
 }>;
 
 export const bundles: Bundle[] = [
-  { id: "three", label: "三分", attrs: ["Three-Point Shot"], category: "technical", color: "#2f9d83" },
-  { id: "mid", label: "中投", attrs: ["Mid-Range Shot", "Free Throw"], category: "technical", color: "#4f9f95" },
-  { id: "face", label: "面框", attrs: ["Layup", "Close Shot", "Draw Foul", "Hands"], category: "technical", color: "#8f72be" },
-  { id: "post", label: "背身", attrs: ["Post Fade", "Post Hook", "Post Control"], category: "technical", color: "#9b6f8d" },
-  { id: "dunk", label: "扣篮", attrs: ["Driving Dunk", "Standing Dunk"], category: "physical", color: "#b86f5a" },
-  { id: "handle", label: "控球", attrs: ["Ball Handle", "Speed with Ball"], category: "technical", color: "#4b83b8" },
-  { id: "passing", label: "传球", attrs: ["Pass Accuracy", "Pass IQ", "Pass Vision"], category: "mental", color: "#6487b3" },
-  { id: "perimeter", label: "外防", attrs: ["Perimeter Defense"], category: "technical", color: "#3f8b82" },
-  { id: "interior", label: "内防", attrs: ["Interior Defense"], category: "technical", color: "#756d9a" },
-  { id: "steal", label: "抢断", attrs: ["Steal", "Pass Perception"], category: "technical", color: "#3f8f70" },
-  { id: "block", label: "盖帽", attrs: ["Block"], category: "physical", color: "#547fa6" },
-  { id: "rebound", label: "篮板", attrs: ["Offensive Rebound", "Defensive Rebound"], category: "physical", color: "#a78145" },
-  { id: "athletic", label: "运动", attrs: ["Speed", "Agility", "Vertical", "Stamina", "Hustle"], category: "physical", color: "#3e8eaa" },
-  { id: "strength", label: "力量", attrs: ["Strength"], category: "physical", color: "#9b6840" },
-  { id: "stability", label: "稳定性", attrs: ["Offensive Consistency", "Defensive Consistency", "Shot IQ", "Help Defense IQ", "Overall Durability"], category: "mental", color: "#6d7d87" },
-  { id: "potential", label: "潜力", attrs: ["Potential"], category: "mental", color: "#c08a3e" },
+  { id: "three", label: "三分", attrs: ["Three-Point Shot"], category: "technical", color: "#26785f" },
+  { id: "mid", label: "中投", attrs: ["Mid-Range Shot", "Free Throw"], category: "technical", color: "#26785f" },
+  { id: "face", label: "面框", attrs: ["Layup", "Close Shot", "Draw Foul", "Hands"], category: "technical", color: "#9a6424" },
+  { id: "post", label: "背身", attrs: ["Post Fade", "Post Hook", "Post Control"], category: "technical", color: "#9a6424" },
+  { id: "dunk", label: "扣篮", attrs: ["Driving Dunk", "Standing Dunk"], category: "physical", color: "#9a6424" },
+  { id: "handle", label: "控球", attrs: ["Ball Handle", "Speed with Ball"], category: "technical", color: "#4b6f91" },
+  { id: "passing", label: "传球", attrs: ["Pass Accuracy", "Pass IQ", "Pass Vision"], category: "mental", color: "#4b6f91" },
+  { id: "perimeter", label: "外防", attrs: ["Perimeter Defense"], category: "technical", color: "#3b776f" },
+  { id: "interior", label: "内防", attrs: ["Interior Defense"], category: "technical", color: "#3b776f" },
+  { id: "steal", label: "抢断", attrs: ["Steal", "Pass Perception"], category: "technical", color: "#3b776f" },
+  { id: "block", label: "盖帽", attrs: ["Block"], category: "physical", color: "#3b776f" },
+  { id: "rebound", label: "篮板", attrs: ["Offensive Rebound", "Defensive Rebound"], category: "physical", color: "#3b776f" },
+  { id: "athletic", label: "运动", attrs: ["Speed", "Agility", "Vertical", "Stamina", "Hustle"], category: "physical", color: "#8a6a3a" },
+  { id: "strength", label: "力量", attrs: ["Strength"], category: "physical", color: "#8a6a3a" },
+  { id: "stability", label: "稳定性", attrs: ["Offensive Consistency", "Defensive Consistency", "Shot IQ", "Help Defense IQ", "Overall Durability"], category: "mental", color: "#68737d" },
+  { id: "potential", label: "潜力", attrs: ["Potential"], category: "mental", color: "#9a6424" },
 ];
 
 const positions: Position[] = ["PG", "SG", "SF", "PF", "C"];
 const ages = [18, 19, 20, 21, 22, 23];
 const playersPerRound = 8;
 const playerSwitchLimit = 3;
-const teamDrawDurationMs = 4200;
+const teamDrawDurationMs = 2400;
+const teamDrawSettleHoldMs = 360;
 const secondaryPositionShare = 0.25;
 
 const teamLogoCodes: Record<string, string> = {
@@ -398,10 +402,10 @@ function evaluateCustom(bundle: Bundle, customValues: Record<string, number>, bo
 }
 
 function valueColor(value: number) {
-  if (value >= 90) return "text-fuchsia-700";
-  if (value >= 80) return "text-rose-700";
-  if (value >= 70) return "text-emerald-700";
-  if (value >= 60) return "text-blue-700";
+  if (value >= 90) return "text-warning-600";
+  if (value >= 80) return "text-court-600";
+  if (value >= 70) return "text-ink-800";
+  if (value >= 60) return "text-ink-600";
   return "text-ink-600";
 }
 
@@ -622,6 +626,26 @@ function createResult(
     : generateRookieDurability(sourceDurability, bodyStress, random);
   Object.assign(initialAttrs, durabilityValues);
   const durability = durabilityValues["Overall Durability"] ?? 82;
+  const rookieOverallConstraint = isPrime
+    ? null
+    : constrainRookieInitialAttributes({
+      values: initialAttrs,
+      potential,
+      age,
+      adjustableAttributes: bundles
+        .filter((bundle) => bundle.id !== "potential")
+        .flatMap((bundle) => bundle.attrs),
+      lockedValues: customFinalAttrs,
+      badges,
+      estimateOverall: (values, candidateBadges) => calibratedOverall(
+        values,
+        position,
+        candidateBadges,
+        mean,
+        overallVersion,
+      ),
+    });
+  if (rookieOverallConstraint) Object.assign(initialAttrs, rookieOverallConstraint.values);
   const baseOverall = calibratedOverall(initialAttrs, position, badges, mean, overallVersion);
   const initialStrength = baseOverall;
   const intangibles = 50;
@@ -647,6 +671,9 @@ function createResult(
     potential, growthGap, progressSpeed, boom, normal, bust, peakStart, peakEnd,
     peakOverall: sourcePeakOverall,
     peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges,
+    initialOverallTarget: rookieOverallConstraint?.targetOverall ?? initialStrength,
+    initialOverallConstraintApplied: rookieOverallConstraint?.changed ?? false,
+    initialOverallConstraintReachable: rookieOverallConstraint?.reachable ?? true,
     badgesEstimated: peakBadgeResolution.estimated, rookieTier, hotZones,
     tendencies,
   };
@@ -720,6 +747,10 @@ function createExportText(
     ]),
     "", "[杂项]", `预估游戏综评: ${result.baseOverall}`, `无形属性: ${result.intangibles}`,
     `${isPrime ? "巅峰综评" : "预计初始综评"}: ${result.initialStrength}`, `潜力: ${result.potential}`,
+    ...(!isPrime ? [
+      `新秀初始综评目标: ${result.initialOverallTarget}`,
+      ...(result.initialOverallConstraintReachable ? [] : ["警告: 自定义锁定值使初始综评目标不可完全达到"]),
+    ] : []),
     "", "[热区]", ...Object.entries(result.hotZones).map(([name, state]) => `${name}: ${state}`),
     ...(isPrime ? [
       "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
@@ -754,13 +785,29 @@ function createExportText(
   ].join("\n");
 }
 
+const headshotSourceTimeoutMs = 2500;
+
 function PlayerHeadshot({ name, priority = false }: { name: string; priority?: boolean }) {
-  const [failed, setFailed] = useState(false);
-  const src = getPlayerHeadshot(name);
+  const sources = useMemo(() => getPlayerHeadshotSources(name), [name]);
+  const [sourceIndex, setSourceIndex] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const src = sources[sourceIndex];
 
-  useEffect(() => setFailed(false), [src]);
+  useLayoutEffect(() => {
+    setSourceIndex(0);
+    setLoaded(false);
+  }, [name, sources]);
 
-  if (!src || failed) {
+  useEffect(() => {
+    if (!priority || !src || loaded) return;
+    const timeout = window.setTimeout(() => {
+      setLoaded(false);
+      setSourceIndex((current) => sources[current] === src ? current + 1 : current);
+    }, headshotSourceTimeoutMs);
+    return () => window.clearTimeout(timeout);
+  }, [loaded, priority, sources, src]);
+
+  if (!src) {
     return (
       <span
         aria-label={`${getPlayerNameCN(name)}默认头像`}
@@ -772,6 +819,7 @@ function PlayerHeadshot({ name, priority = false }: { name: string; priority?: b
       </span>
     );
   }
+
   return (
     <img
       alt={`${getPlayerNameCN(name)}头像`}
@@ -780,7 +828,12 @@ function PlayerHeadshot({ name, priority = false }: { name: string; priority?: b
       // Visible roster cards should load immediately; later batches can wait.
       fetchPriority={priority ? "high" : "low"}
       loading={priority ? "eager" : "lazy"}
-      onError={() => setFailed(true)}
+      onError={() => {
+        // Advance through proxy → primary CDN → secondary CDN; past the end shows the default avatar.
+        setLoaded(false);
+        setSourceIndex((current) => sources[current] === src ? current + 1 : current);
+      }}
+      onLoad={() => setLoaded(true)}
       referrerPolicy="no-referrer"
       src={src}
     />
@@ -918,6 +971,7 @@ function RookieBuilder({
   const [locks, setLocks] = useState<LockState>({});
   const [round, setRound] = useState<TeamRound>(() => createRound(teams, Date.now()));
   const [isTeamDrawing, setIsTeamDrawing] = useState(false);
+  const [teamDrawPhase, setTeamDrawPhase] = useState<"rolling" | "landing">("rolling");
   const [drawingTeamId, setDrawingTeamId] = useState<string | null>(null);
   const [switchesLeft, setSwitchesLeft] = useState(playerSwitchLimit);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
@@ -927,7 +981,7 @@ function RookieBuilder({
   const [playerSearch, setPlayerSearch] = useState("");
   const [status, setStatus] = useState(`确认${isPrime ? "巅峰球员" : "新秀"}设定后开始`);
   const [mobilePane, setMobilePane] = useState<MobilePane>("settings");
-  const drawTimeoutRef = useRef<number | null>(null);
+  const pendingTeamDrawRef = useRef<{ round: TeamRound; completionStatus: string } | null>(null);
   const customDialogRef = useRef<HTMLElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -937,12 +991,9 @@ function RookieBuilder({
 
   useEffect(() => () => onFlowActiveChange?.(false), [onFlowActiveChange]);
 
-  const clearTeamDrawTimers = () => {
-    if (drawTimeoutRef.current !== null) window.clearTimeout(drawTimeoutRef.current);
-    drawTimeoutRef.current = null;
-  };
-
-  useEffect(() => () => clearTeamDrawTimers(), []);
+  useEffect(() => () => {
+    pendingTeamDrawRef.current = null;
+  }, []);
 
   useEffect(() => {
     if (!settingsLocked || tendencyLookup || tendencyLoadError) return;
@@ -1063,6 +1114,16 @@ function RookieBuilder({
       mark: teamMark(candidate),
       meta: `${candidate.players.length} 名球员`,
     })), [logoTheme, teams]);
+  const drawingTeamLabel = drawingTeamId
+    ? teamDrawItems.find((item) => item.id === drawingTeamId)?.label
+    : undefined;
+  const handleTeamDrawPhaseChange = useCallback((phase: "idle" | "rolling" | "landing" | "settled") => {
+    if (phase === "landing") setTeamDrawPhase("landing");
+    else if (phase === "rolling") setTeamDrawPhase("rolling");
+  }, []);
+  const displayStatus = isTeamDrawing && teamDrawPhase === "landing"
+    ? `已抽中${drawingTeamLabel ?? "球队"}`
+    : status;
   const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : undefined;
   const usedBy = useMemo(() => new Map(Object.entries(locks).flatMap(([bundleId, lock]) => {
     if (lock.kind !== "player") return [];
@@ -1193,16 +1254,29 @@ function RookieBuilder({
     setRookieName(generateRookieName());
   };
 
+  const finishTeamDraw = () => {
+    const pendingDraw = pendingTeamDrawRef.current;
+    if (!pendingDraw) return;
+    pendingTeamDrawRef.current = null;
+    setRound(pendingDraw.round);
+    setDrawingTeamId(null);
+    setIsTeamDrawing(false);
+    setTeamDrawPhase("rolling");
+    setStatus(pendingDraw.completionStatus);
+  };
+
   const startTeamDraw = (previousTeamId: string | undefined, completionStatus: string) => {
-    clearTeamDrawTimers();
     const seed = Date.now();
     const nextRound = createRound(teams, seed, previousTeamId);
-    // Warm the full roster during the longer marquee so the first grid paints warm.
-    const drawnTeam = teamsById.get(nextRound.teamId);
-    if (drawnTeam) {
-      prefetchPlayerHeadshots(drawnTeam.players.map((player) => player.name));
-    }
+    // Warm only the first visible roster batch during the marquee. Prefetching the
+    // full team can saturate the local proxy and delay the cards the user can see.
+    const visiblePlayerNames = nextRound.playerOrder
+      .slice(0, playersPerRound)
+      .map((id) => playersById.get(id)?.name)
+      .filter((name): name is string => Boolean(name));
+    prefetchPlayerHeadshots(visiblePlayerNames);
 
+    setTeamDrawPhase("rolling");
     setIsTeamDrawing(true);
     setDrawingTeamId(nextRound.teamId);
     setSelectedPlayerId(null);
@@ -1210,21 +1284,11 @@ function RookieBuilder({
     setCustomizingBundleId(null);
     setStatus("正在随机抽取球队...");
     setMobilePane("players");
-
-    const finishDraw = () => {
-      clearTeamDrawTimers();
-      setRound(nextRound);
-      setDrawingTeamId(null);
-      setIsTeamDrawing(false);
-      setStatus(completionStatus);
-    };
+    pendingTeamDrawRef.current = { round: nextRound, completionStatus };
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      finishDraw();
-      return;
+      finishTeamDraw();
     }
-
-    drawTimeoutRef.current = window.setTimeout(finishDraw, teamDrawDurationMs);
   };
 
   // Prefetch the next switch batch while the user browses the current eight.
@@ -1317,7 +1381,7 @@ function RookieBuilder({
 
   const reset = () => {
     const seed = Date.now();
-    clearTeamDrawTimers();
+    pendingTeamDrawRef.current = null;
     setRookieName(generateRookieName());
     setPosition("PG");
     setSecondaryPosition(defaultSecondaryPosition("PG"));
@@ -1326,6 +1390,7 @@ function RookieBuilder({
     setRound(createRound(teams, seed));
     setSettingsLocked(false);
     setIsTeamDrawing(false);
+    setTeamDrawPhase("rolling");
     setDrawingTeamId(null);
     setLocks({});
     setSwitchesLeft(playerSwitchLimit);
@@ -1436,7 +1501,7 @@ function RookieBuilder({
                     type="text"
                     value={rookieName}
                   />
-                  <button aria-label="随机生成英文姓名" className="flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeName} title="随机生成英文姓名" type="button"><RefreshCw className="h-3.5 w-3.5" /></button>
+                  <button aria-label="随机生成英文姓名" className="icon-button flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeName} title="随机生成英文姓名" type="button"><RefreshCw className="h-3.5 w-3.5" /></button>
                 </div>
               </div>
               <div className="min-w-0">
@@ -1445,7 +1510,7 @@ function RookieBuilder({
                   {isPrime ? (
                     <button aria-label="巅峰球员年龄固定为 28 岁" className="h-full min-w-14 cursor-not-allowed bg-ink-900 px-3 text-[11px] font-semibold text-white" disabled title="巅峰球员年龄固定为 28 岁" type="button">28</button>
                   ) : ages.map((option) => (
-                    <button key={option} className={`h-full min-w-0 flex-1 px-1.5 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-55 ${age === option ? "bg-ink-900 text-white" : "bg-white text-ink-500 hover:bg-ink-50 hover:text-ink-800"}`} disabled={settingsLocked} onClick={() => setAge(option)} type="button">{option}</button>
+                    <button key={option} className={`segmented-button h-full min-w-0 flex-1 px-1.5 text-[11px] font-semibold disabled:cursor-not-allowed disabled:opacity-55 ${age === option ? "bg-ink-900 text-white" : "bg-white text-ink-500 hover:bg-ink-50 hover:text-ink-800"}`} disabled={settingsLocked} onClick={() => setAge(option)} type="button">{option}</button>
                   ))}
                 </div>
               </div>
@@ -1460,7 +1525,7 @@ function RookieBuilder({
                         ? "bg-ink-50 text-ink-300"
                         : "bg-white text-ink-500 hover:bg-ink-50 hover:text-ink-800";
                     return (
-                      <button key={option} aria-label={`主位置 ${option}`} aria-pressed={selected} className={`h-full min-w-0 flex-1 px-1 text-[11px] font-semibold transition disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked} onClick={() => changePosition(option)} type="button">{option}</button>
+                      <button key={option} aria-label={`主位置 ${option}`} aria-pressed={selected} className={`segmented-button h-full min-w-0 flex-1 px-1 text-[11px] font-semibold disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked} onClick={() => changePosition(option)} type="button">{option}</button>
                     );
                   })}
                 </div>
@@ -1475,14 +1540,14 @@ function RookieBuilder({
                     const selected = secondaryPosition === option;
                     const natural = !isPrimary && isNaturalSecondaryPosition(position, option);
                     const stateClass = selected
-                      ? natural ? "bg-court-700 text-white" : "bg-rose-700 text-white"
+                      ? natural ? "bg-court-700 text-white" : "bg-warning-600 text-white"
                       : settingsLocked || isPrimary
                         ? "bg-ink-50 text-ink-300"
                         : natural
                           ? "bg-white text-ink-600 hover:bg-court-50 hover:text-court-800"
-                          : "bg-rose-50/60 text-rose-500 hover:bg-rose-100 hover:text-rose-800";
+                          : "bg-warning-50/70 text-warning-600 hover:bg-warning-100 hover:text-warning-800";
                     return (
-                      <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`h-full min-w-0 flex-1 px-1 text-[11px] font-semibold transition disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked || isPrimary} onClick={() => changeSecondaryPosition(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规次要位置" : "非常规次要位置：仍按来源属性与目标体型计算"} type="button">{option}</button>
+                      <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`segmented-button h-full min-w-0 flex-1 px-1 text-[11px] font-semibold disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked || isPrimary} onClick={() => changeSecondaryPosition(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规次要位置" : "非常规次要位置：仍按来源属性与目标体型计算"} type="button">{option}</button>
                     );
                   })}
                 </div>
@@ -1509,17 +1574,17 @@ function RookieBuilder({
           <div className="builder-setup-footer bg-ink-50/80 px-3 py-2.5">
             <div className="builder-setup-status flex min-w-0 items-center gap-1.5 text-[10px] font-medium text-ink-500">
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-court-500" />
-              <span className="truncate">{status}</span>
+              <span className="truncate">{displayStatus}</span>
             </div>
             <div className="builder-setup-progress" aria-label={`完成进度 ${completed}/${bundles.length}`}>
               <div className="mb-1 flex items-center justify-between gap-2 text-[9px] font-semibold text-ink-500">
                 <span>完成进度</span>
                 <span className="tabular-nums text-ink-700">{completed}/{bundles.length}</span>
               </div>
-              <div className="builder-setup-progress-track">
+              <div aria-valuemax={bundles.length} aria-valuemin={0} aria-valuenow={completed} className="builder-setup-progress-track" role="progressbar">
                 <div
                   className="builder-setup-progress-fill"
-                  style={{ width: `${Math.max(0, Math.min(100, (completed / bundles.length) * 100))}%` }}
+                  style={{ transform: `scaleX(${Math.max(0, Math.min(1, completed / bundles.length))})` }}
                 />
               </div>
             </div>
@@ -1624,8 +1689,8 @@ function RookieBuilder({
         >
           <div className="workspace-toolbar flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
             <div>
-              <div className="flex items-center gap-2"><UsersRound className={`h-3.5 w-3.5 text-court-700 ${isTeamDrawing ? "animate-spin" : ""}`} /><h2 className="text-[14px] font-semibold text-ink-900">{isManualSelection ? "自选来源" : isTeamDrawing ? "随机球队" : team ? teamNamesCN[team.name] ?? team.name : "等待开始"}</h2></div>
-              <div className="mt-0.5 font-mono text-[9px] text-ink-400">{!settingsLocked ? "基础设定待确认" : isManualSelection ? isComplete ? `已完成 / ${completed}/${bundles.length}` : "搜索球员，选择后点击右侧属性槽" : isTeamDrawing ? "球队跑马灯抽取中" : isComplete ? `已完成 / ${completed}/${bundles.length}` : `第 ${completed + 1} 轮 / 展示 ${shownPlayers.length}/${team?.players.length ?? 0}`}</div>
+              <div className="flex items-center gap-2"><span className="draw-status-icon" data-active={isTeamDrawing}><UsersRound className="h-3.5 w-3.5" /></span><h2 className="text-[14px] font-semibold text-ink-900">{isManualSelection ? "自选来源" : isTeamDrawing ? "随机球队" : team ? teamNamesCN[team.name] ?? team.name : "等待开始"}</h2></div>
+              <div className="mt-0.5 font-mono text-[9px] text-ink-400">{!settingsLocked ? "基础设定待确认" : isManualSelection ? isComplete ? `已完成 / ${completed}/${bundles.length}` : "搜索球员，选择后点击右侧属性槽" : isTeamDrawing ? teamDrawPhase === "landing" ? "落点已确认" : "球队跑马灯抽取中" : isComplete ? `已完成 / ${completed}/${bundles.length}` : `第 ${completed + 1} 轮 / 展示 ${shownPlayers.length}/${team?.players.length ?? 0}`}</div>
             </div>
             {settingsLocked && !isComplete && !isManualSelection && (
               <div className="flex items-center gap-1.5">
@@ -1680,7 +1745,7 @@ function RookieBuilder({
                     key={group.key}
                     aria-label={`选择${getPlayerNameCN(representative.name)}，${group.variants.length}个版本`}
                     aria-pressed={selected}
-                    className={`flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left transition ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`}
+                    className={`interactive-card flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`}
                     disabled={isComplete}
                     onClick={() => openPlayerVersionPicker(group)}
                     title={`${getPlayerNameCN(representative.name)} · 点击选择版本`}
@@ -1702,15 +1767,18 @@ function RookieBuilder({
             </div>
           </> : isTeamDrawing ? <div className="flex min-h-[300px] flex-1 items-center px-2.5 py-3 sm:px-4">
             <MarqueeDraw
-              currentLabel={drawingTeamId ? teamDrawItems.find((item) => item.id === drawingTeamId)?.label : undefined}
+              currentLabel={drawingTeamLabel}
               dataKind="team"
               durationMs={teamDrawDurationMs}
               emptyText="没有可抽取球队"
               isDrawing
               items={teamDrawItems}
+              onPhaseChange={handleTeamDrawPhaseChange}
+              onSettled={finishTeamDraw}
               precedingItems={18}
               selectedId={drawingTeamId ?? undefined}
-              title="正在抽取球队"
+              settleHoldMs={teamDrawSettleHoldMs}
+              title={teamDrawPhase === "landing" ? "抽取完成" : "正在抽取球队"}
             />
           </div> : <div className="grid flex-1 auto-rows-[62px] grid-cols-2 gap-2 p-2.5">
             {shownPlayers.map((player) => {
@@ -1718,17 +1786,17 @@ function RookieBuilder({
               const unavailable = usedBy.has(playerIdentity(player));
               const selected = selectedPlayerId === id;
               return (
-                <button key={id} className={`flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left transition ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : unavailable || isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`} disabled={unavailable || isComplete} onClick={() => choosePlayer(player)} type="button">
+                <button key={id} className={`interactive-card flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : unavailable || isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`} disabled={unavailable || isComplete} onClick={() => choosePlayer(player)} type="button">
                   <PlayerHeadshot name={player.name} priority />
                   <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(player.name)}</span><span className="block text-[9px] text-ink-400">{player.position ?? "--"}{player.isEstimated ? " · 估算" : ""}{unavailable ? " · 已使用" : ""}</span></span>
                   <span className={`shrink-0 text-[14px] font-bold tabular-nums ${typeof player.overall === "number" ? valueColor(player.overall) : "text-ink-400"}`}>{player.overall ?? "--"}</span>
                 </button>
               );
             })}
-          </div> : <div className="flex min-h-[300px] flex-1 flex-col items-center justify-center px-4 text-center"><Check className="h-7 w-7 text-ink-300" /><div className="mt-3 text-[14px] font-semibold text-ink-600">确认设定后开始</div><div className="mt-1 text-[10px] text-ink-400">{position}/{secondaryPosition} · {effectiveAge}岁 · {body.height} cm</div></div>}
+          </div> : <div className="builder-empty-state flex min-h-[300px] flex-1 flex-col items-center justify-center px-5 text-center"><span className="builder-empty-icon"><Shuffle className="h-4 w-4" /></span><div className="mt-3 text-[15px] font-semibold text-ink-700">从一支球队开始</div><div className="mt-1 max-w-[310px] text-[10px] leading-5 text-ink-400">确认球员画像后抽取球队，再从候选球员中锁定 16 个属性槽。</div><div className="builder-empty-steps" aria-hidden="true"><span data-current="true">设定</span><ChevronRight /><span>抽球队</span><ChevronRight /><span>锁属性</span></div></div>}
 
           <div className="flex min-h-11 items-center justify-between gap-2 border-t border-ink-200 bg-ink-50 px-3 py-2">
-            <div className="min-w-0 truncate text-[10px] text-ink-500">{selectedPlayer ? `${getPlayerNameCN(selectedPlayer.name)} · 请选择要锁定的属性` : status}</div>
+            <div className="min-w-0 truncate text-[10px] text-ink-500">{selectedPlayer ? `${getPlayerNameCN(selectedPlayer.name)} · 请选择要锁定的属性` : displayStatus}</div>
             {selectedPlayer && <button className="action-button shrink-0 px-2 py-1.5 text-[10px] lg:hidden" onClick={() => setMobilePane("attributes")} type="button">选择属性</button>}
           </div>
         </div>
@@ -1741,7 +1809,7 @@ function RookieBuilder({
           role="tabpanel"
         >
           {isComplete ? (
-            <>
+            <div className="builder-result-reveal">
               <div className="workspace-toolbar px-3 py-2.5">
                 <div className="section-label">{isPrime ? "巅峰球员卡片" : "新秀卡片"}</div>
                 <div className="mt-1 truncate text-[15px] font-semibold text-ink-800" data-testid="rookie-name">{rookieName}</div>
@@ -1768,12 +1836,12 @@ function RookieBuilder({
                     <div className="flex justify-between gap-2"><span className="text-ink-400">巅峰年龄</span><strong className="tabular-nums text-ink-700">{result.peakStart}–{result.peakEnd}</strong></div>
                     <div className="flex justify-between gap-2"><span className="text-ink-400">进步速度</span><strong className="tabular-nums text-ink-700">+{result.progressSpeed}/年</strong></div>
                   </div>
-                  <div className="grid grid-cols-3 gap-1.5 text-center text-[9px]"><div className="rounded-[5px] border border-emerald-200 bg-emerald-50 py-1.5 text-emerald-700"><strong className="block text-[12px]">{result.boom}%</strong>成长</div><div className="rounded-[5px] border border-blue-200 bg-blue-50 py-1.5 text-blue-700"><strong className="block text-[12px]">{result.normal}%</strong>平均</div><div className="rounded-[5px] border border-rose-200 bg-rose-50 py-1.5 text-rose-700"><strong className="block text-[12px]">{result.bust}%</strong>衰退</div></div>
+                  <div className="grid grid-cols-3 gap-1.5 text-center text-[9px]"><div className="rounded-[5px] border border-court-200 bg-court-50 py-1.5 text-court-700"><strong className="block text-[12px]">{result.boom}%</strong>成长</div><div className="rounded-[5px] border border-ink-200 bg-ink-50 py-1.5 text-ink-700"><strong className="block text-[12px]">{result.normal}%</strong>平均</div><div className="rounded-[5px] border border-rose-200 bg-rose-50 py-1.5 text-rose-700"><strong className="block text-[12px]">{result.bust}%</strong>衰退</div></div>
                 </div>
               )}
               <div className="border-b border-ink-200 px-3 py-2.5">
                 <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">{isPrime ? "巅峰徽章" : "当前徽章"}</span><span className="text-ink-400" data-testid="badge-status">{result.badgesEstimated ? "含推算" : "按槽继承"} · {result.badges.length}</span></div>
-                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{result.badges.length ? result.badges.slice(0, 7).map((badge) => <span key={`${badge.name}:${badge.tier}`} className="border border-amber-500/20 bg-amber-50 px-1 py-0.5 text-[8px] text-amber-800">{getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier]}</span>) : <span className="text-[9px] text-ink-400">无</span>}</div>
+                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{result.badges.length ? result.badges.slice(0, 7).map((badge) => <span key={`${badge.name}:${badge.tier}`} className="border border-warning-500/20 bg-warning-50 px-1 py-0.5 text-[8px] text-warning-800">{getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier]}</span>) : <span className="text-[9px] text-ink-400">无</span>}</div>
               </div>
               <div className="border-b border-ink-200 px-3 py-2.5">
                 <div className="mb-1.5 text-[10px] font-semibold">热区</div>
@@ -1781,16 +1849,16 @@ function RookieBuilder({
               </div>
               <div aria-live="polite" className="border-b border-ink-200 px-3 py-2.5" data-tendency-state={tendencyLoadState}>
                 <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">倾向</span><span className="text-ink-400" data-testid="tendency-status">{tendencyStatusLabel}</span></div>
-                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{tendencyCount ? Object.entries(result.tendencies).slice(0, 8).map(([field, value]) => <span key={field} className="border border-teal-500/20 bg-teal-50 px-1 py-0.5 text-[8px] text-teal-800">{getTendencyNameCN(field)} {value}</span>) : <span className="text-[9px] text-ink-400">{tendencyEmptyText}</span>}</div>
+                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{tendencyCount ? Object.entries(result.tendencies).slice(0, 8).map(([field, value]) => <span key={field} className="border border-court-500/20 bg-court-50 px-1 py-0.5 text-[8px] text-court-800">{getTendencyNameCN(field)} {value}</span>) : <span className="text-[9px] text-ink-400">{tendencyEmptyText}</span>}</div>
               </div>
-            </>
+            </div>
           ) : (
             <div className="flex min-h-[300px] flex-col items-center justify-center px-5 text-center">
               <Unlock className="h-7 w-7 text-ink-300" />
               <div className="mt-3 text-[15px] font-semibold text-ink-600">待生成</div>
               <div className="mt-1 max-w-full truncate text-[12px] font-semibold text-ink-700">{rookieName}</div>
               <div className="mt-1 text-[10px] leading-5 text-ink-400">已锁定 {completed}/{bundles.length} 项属性</div>
-              <div className="mt-3 h-1 w-full max-w-[150px] overflow-hidden rounded-sm bg-ink-200"><div className="h-full bg-court-600" style={{ width: `${(completed / bundles.length) * 100}%` }} /></div>
+              <div aria-valuemax={bundles.length} aria-valuemin={0} aria-valuenow={completed} className="builder-result-progress-track" role="progressbar"><div className="builder-result-progress-fill" style={{ transform: `scaleX(${Math.max(0, Math.min(1, completed / bundles.length))})` }} /></div>
               <div className="mt-3 text-[11px] font-medium text-court-700">{position}/{secondaryPosition} · {effectiveAge}岁</div>
               <div className="mt-1 text-[9px] text-ink-400">{body.height} cm · {body.weight} kg · 臂展 {body.wingspan}</div>
             </div>
@@ -1802,7 +1870,7 @@ function RookieBuilder({
         </aside>
         {isComplete && (
         <section
-          className="builder-pane builder-full-preview panel-surface overflow-hidden"
+          className="builder-pane builder-full-preview builder-result-reveal panel-surface overflow-hidden"
           data-mobile-active={mobilePane === "result"}
           data-testid="full-attribute-preview"
         >
@@ -1836,8 +1904,8 @@ function RookieBuilder({
         )}
       </div>
       {playerVersionGroup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
-          <section aria-label={`选择${getPlayerNameCN(playerVersionGroup.representative.name)}版本`} aria-modal="true" className="w-full max-w-[520px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={customDialogRef} role="dialog">
+        <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
+          <section aria-label={`选择${getPlayerNameCN(playerVersionGroup.representative.name)}版本`} aria-modal="true" className="dialog-surface w-full max-w-[520px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={customDialogRef} role="dialog">
             <div className="workspace-toolbar flex items-center justify-between gap-3 px-3 py-2.5">
               <div className="flex min-w-0 items-center gap-2">
                 <PlayerHeadshot name={playerVersionGroup.representative.name} priority />
@@ -1847,7 +1915,7 @@ function RookieBuilder({
                   <div className="truncate text-[9px] text-ink-400">{playerVersionGroup.representative.name} · {playerVersionGroup.variants.length} 个版本</div>
                 </div>
               </div>
-              <button aria-label="关闭球员版本选择" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-ink-500 hover:bg-ink-200 hover:text-ink-800" onClick={() => setPlayerVersionGroupKey(null)} type="button"><X className="h-4 w-4" /></button>
+              <button aria-label="关闭球员版本选择" className="dialog-close-button flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-ink-500 hover:bg-ink-200 hover:text-ink-800" onClick={() => setPlayerVersionGroupKey(null)} type="button"><X className="h-4 w-4" /></button>
             </div>
             <div className="max-h-[58vh] space-y-1.5 overflow-y-auto border-t border-ink-200 p-3">
               {playerVersionGroup.variants.map((variant) => {
@@ -1856,7 +1924,7 @@ function RookieBuilder({
                 return (
                   <button
                     aria-pressed={selected}
-                    className={`flex w-full items-center gap-2 rounded-[5px] border px-2.5 py-2 text-left transition ${selected ? "border-court-600 bg-court-50 shadow-[inset_3px_0_0_#2b8969]" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`}
+                    className={`interactive-card flex w-full items-center gap-2 rounded-[5px] border px-2.5 py-2 text-left ${selected ? "border-court-600 bg-court-50 shadow-[inset_3px_0_0_#2b8969]" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`}
                     key={id}
                     onClick={() => choosePlayer(variant)}
                     type="button"
@@ -1880,11 +1948,11 @@ function RookieBuilder({
         </div>
       )}
       {customizingBundle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
-          <section aria-label={`自定义${customizingBundle.label}`} aria-modal="true" className="w-full max-w-[430px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={customDialogRef} role="dialog">
+        <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
+          <section aria-label={`自定义${customizingBundle.label}`} aria-modal="true" className="dialog-surface w-full max-w-[430px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={customDialogRef} role="dialog">
             <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">
               <div className="section-label">自定义{customizingBundle.label}</div>
-              <button aria-label="关闭自定义编辑器" className="flex h-7 w-7 items-center justify-center rounded-[5px] text-ink-500 hover:bg-ink-200 hover:text-ink-800" onClick={() => setCustomizingBundleId(null)} type="button"><X className="h-4 w-4" /></button>
+              <button aria-label="关闭自定义编辑器" className="dialog-close-button flex h-7 w-7 items-center justify-center rounded-[5px] text-ink-500 hover:bg-ink-200 hover:text-ink-800" onClick={() => setCustomizingBundleId(null)} type="button"><X className="h-4 w-4" /></button>
             </div>
             <div className="grid max-h-[55vh] grid-cols-2 gap-2 overflow-y-auto p-3 sm:grid-cols-3">
               {customizingBundle.attrs.map((attr) => (
