@@ -22,17 +22,22 @@ const giannisBadges: PlayerBadgeLike[] = [
 const athleteBadges: PlayerBadgeLike[] = [
   { name: "Aerial Wizard", category: "athleticism", tier: "Gold" },
 ];
+const midShooterBadges: PlayerBadgeLike[] = [
+  { name: "Deadeye", category: "shooting", tier: "Gold" },
+  { name: "Set Shot Specialist", category: "shooting", tier: "HOF" },
+];
 const byPlayer = new Map([
   ["stephen-curry", curryBadges],
   ["giannis-antetokounmpo", giannisBadges],
   ["elite-athlete", athleteBadges],
+  ["mid-shooter", midShooterBadges],
   ["known-zero", []],
 ]);
 
 const inherited = collectBadgesByBundle({
   sources: [
     { bundleId: "three", playerId: "stephen-curry" },
-    { bundleId: "finishing", playerId: "giannis-antetokounmpo" },
+    { bundleId: "face", playerId: "giannis-antetokounmpo" },
     { bundleId: "handle", playerId: undefined },
   ],
   badgeToBundle: badgeBundleMap,
@@ -42,14 +47,25 @@ const inherited = collectBadgesByBundle({
 const names = inherited.map((badge) => badge.name);
 assert(names.includes("Deadeye"), "three slot must inherit Deadeye from Curry");
 assert(names.includes("Limitless Range"), "three slot must inherit Limitless Range from Curry");
-assert(names.includes("Physical Finisher"), "finishing slot must inherit Physical Finisher from Giannis");
-assert(!names.includes("Dimer"), "Dimer belongs to passing slot, not three/finishing");
+assert(names.includes("Physical Finisher"), "face slot must inherit Physical Finisher from Giannis");
+assert(!names.includes("Dimer"), "Dimer belongs to passing slot, not three/face");
 assert(!names.includes("Handles For Days"), "handle slot has no source, so nothing inherited");
 assert.equal(
   inherited.find((badge) => badge.name === "Physical Finisher")?.tier,
   "HOF",
   "inherited tier must be preserved",
 );
+
+const sharedShooting = collectBadgesByBundle({
+  sources: [
+    { bundleId: "three", playerId: "stephen-curry" },
+    { bundleId: "mid", playerId: "mid-shooter" },
+  ],
+  badgeToBundle: badgeBundleMap,
+  badgesForPlayer: (playerId) => byPlayer.get(playerId),
+});
+assert.equal(sharedShooting.find((badge) => badge.name === "Deadeye")?.tier, "HOF", "shared Deadeye must keep the highest tier across three/mid");
+assert.equal(sharedShooting.find((badge) => badge.name === "Set Shot Specialist")?.tier, "HOF", "shared Set Shot Specialist must inherit from mid");
 
 // Same badge name from two slot sources must keep the highest tier.
 const mixed = collectBadgesByBundle({

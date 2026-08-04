@@ -1,6 +1,10 @@
 import playerNamesCN from "./data/playerNamesCN.json";
+import playerPresentation from "./data/playerPresentation.json";
 
-const names = playerNamesCN as Record<string, string>;
+const names = {
+  ...(playerPresentation.namesCN as Record<string, string>),
+  ...(playerNamesCN as Record<string, string>),
+};
 const normalizedNames = new Map(
   Object.entries(names).map(([english, chinese]) => [normalizeName(english), chinese]),
 );

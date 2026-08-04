@@ -13,3 +13,4 @@ vite.config.d.ts
 data/2kratings/
 
 .superpowers/
+.vercel

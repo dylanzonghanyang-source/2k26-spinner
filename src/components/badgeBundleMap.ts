@@ -1,29 +1,31 @@
-// Badge name -> attribute bundle (slot) mapping for the 13-slot builder.
+// Badge name -> attribute bundle (slot) mapping for the multi-slot builder.
 // Each slot inherits badges from the player locked into that slot, mirroring
 // how tendencies are inherited via tendencyBundleMap. A badge belongs to one
-// primary slot; the same badge from two slots keeps the highest tier.
+// primary slot(s); the same badge from multiple slots keeps the highest tier.
 //
-// Slot ids match RookieBuilder bundles: three, mid, finishing, dunk, handle,
+// Slot ids match RookieBuilder bundles: three, mid, face, post, dunk, handle,
 // passing, perimeter, interior, steal, block, rebound, athletic, stability.
 
-export const badgeBundleMap: Record<string, string> = {
+export const badgeBundleMap: Record<string, string | string[]> = {
   // —— 三分 (three) ——
-  "Set Shot Specialist": "three",
-  Deadeye: "three",
+  "Set Shot Specialist": ["three", "mid"],
+  Deadeye: ["three", "mid"],
   "Limitless Range": "three",
-  "Mini Marksman": "three",
-  "Shifty Shooter": "three",
-  "Slippery Off-Ball": "three",
+  "Mini Marksman": ["three", "mid"],
+  "Shifty Shooter": ["three", "mid"],
+  "Slippery Off-Ball": ["three", "mid"],
 
-  // —— 终结 (finishing) ——
-  "Float Game": "finishing",
-  "Layup Mixmaster": "finishing",
-  "Paint Prodigy": "finishing",
-  "Physical Finisher": "finishing",
-  "Hook Specialist": "finishing",
-  "Post Fade Phenom": "finishing",
-  "Post Powerhouse": "finishing",
-  "Post-Up Poet": "finishing",
+  // —— 面框 (face) ——
+  "Float Game": "face",
+  "Layup Mixmaster": "face",
+  "Paint Prodigy": "face",
+  "Physical Finisher": "face",
+
+  // —— 背身 (post) ——
+  "Hook Specialist": "post",
+  "Post Fade Phenom": "post",
+  "Post Powerhouse": "post",
+  "Post-Up Poet": "post",
 
   // —— 扣篮 (dunk) ——
   Posterizer: "dunk",

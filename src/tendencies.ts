@@ -9,6 +9,7 @@ export type TendencyTable = {
 export type TendencyLookup = {
   get(playerSlug: string, field: string): number | undefined;
   countFor(playerSlug: string): number;
+  available?: boolean;
 };
 
 type TendencyTableModule = { default: TendencyTable };
@@ -22,9 +23,16 @@ export function createTendencyLoader(importTable: TendencyTableImporter): () => 
   };
 }
 
-export const loadTendencyLookup = createTendencyLoader(
-  () => import("./data/tendencyProfiles.min.json") as Promise<TendencyTableModule>,
-);
+export type TendencyDataVersion = "2k26" | "2k27";
+
+const tendencyImporters: Record<TendencyDataVersion, TendencyTableImporter> = {
+  "2k26": () => import("./data/versions/2k26/tendencyProfiles.min.json") as Promise<TendencyTableModule>,
+  "2k27": () => import("./data/versions/2k27-play-now/tendencyProfiles.min.json") as Promise<TendencyTableModule>,
+};
+
+export function loadTendencyLookup(version: TendencyDataVersion = "2k26"): Promise<TendencyLookup> {
+  return createTendencyLoader(tendencyImporters[version])();
+}
 
 export type TendencyBundleSource = {
   bundleId: string;
@@ -58,6 +66,7 @@ export function createTendencyLookup(table: TendencyTable): TendencyLookup {
   const fieldIndex = new Map(table.fields.map((field, index) => [field, index]));
 
   return {
+    available: table.slugs.length > 0 && table.fields.length > 0,
     get(playerSlug, field) {
       const rowIndex = slugIndex.get(playerSlug);
       const columnIndex = fieldIndex.get(field);

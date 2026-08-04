@@ -11,6 +11,7 @@ export type PlayerSource = {
   badges?: PlayerBadge[];
   badgesKnown?: boolean;
   overall?: number | null;
+  potential?: number | null;
   team?: string | null;
   position?: string | null;
   archetype?: string | null;

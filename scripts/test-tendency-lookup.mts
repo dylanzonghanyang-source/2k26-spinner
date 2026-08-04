@@ -27,12 +27,12 @@ assert.equal(lookup.countFor("missing-player"), 0);
 const inherited = collectTendenciesByBundle({
   sources: [
     { bundleId: "three", playerSlug: "stephen-curry" },
-    { bundleId: "finishing", playerSlug: "giannis-antetokounmpo" },
+    { bundleId: "face", playerSlug: "giannis-antetokounmpo" },
     { bundleId: "custom", playerSlug: undefined },
   ],
   fieldToBundle: {
     "Shot Three": "three",
-    "Driving Layup": "finishing",
+    "Driving Layup": "face",
     "Block Shot": "block",
   },
   lookup,

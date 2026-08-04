@@ -1,13 +1,14 @@
-import detailedPlayers from "../src/data/players.json" with { type: "json" };
-import rosterCatalog from "../src/data/rosterCatalog.json" with { type: "json" };
-import rookieOverallModel from "../src/data/rookieOverallModel.json" with { type: "json" };
+import detailedPlayers from "../src/data/versions/2k26/players.json" with { type: "json" };
+import rosterCatalog from "../src/data/versions/2k26/rosterCatalog.json" with { type: "json" };
+import rookieOverallModel from "../src/data/versions/2k26/rookieOverallModel.json" with { type: "json" };
 
 const secondaryShare = 0.25;
 const folds = 5;
 const bundles = [
   ["three", ["Three-Point Shot"]],
   ["mid", ["Mid-Range Shot", "Free Throw"]],
-  ["finishing", ["Layup", "Close Shot", "Draw Foul", "Hands", "Post Fade", "Post Hook", "Post Control"]],
+  ["face", ["Layup", "Close Shot", "Draw Foul", "Hands"]],
+  ["post", ["Post Fade", "Post Hook", "Post Control"]],
   ["dunk", ["Driving Dunk", "Standing Dunk"]],
   ["handle", ["Ball Handle", "Speed with Ball"]],
   ["passing", ["Pass Accuracy", "Pass IQ", "Pass Vision"]],
@@ -21,11 +22,11 @@ const bundles = [
 ];
 
 const weights = {
-  PG: { three: 10, mid: 10, finishing: 8, dunk: 4, handle: 14, passing: 14, perimeter: 7, interior: 4, steal: 3, block: 2, rebound: 4, athletic: 12, stability: 8 },
-  SG: { three: 12, mid: 12, finishing: 10, dunk: 6, handle: 10, passing: 8, perimeter: 7, interior: 4, steal: 3, block: 2, rebound: 4, athletic: 12, stability: 10 },
-  SF: { three: 10, mid: 10, finishing: 10, dunk: 8, handle: 8, passing: 6, perimeter: 7, interior: 8, steal: 3, block: 4, rebound: 6, athletic: 14, stability: 6 },
-  PF: { three: 8, mid: 6, finishing: 12, dunk: 6, handle: 6, passing: 4, perimeter: 7, interior: 12, steal: 3, block: 8, rebound: 10, athletic: 14, stability: 4 },
-  C: { three: 4, mid: 4, finishing: 10, dunk: 8, handle: 2, passing: 4, perimeter: 3, interior: 14, steal: 1, block: 12, rebound: 14, athletic: 18, stability: 6 }
+  PG: { three: 10, mid: 10, face: 6, post: 2, dunk: 4, handle: 14, passing: 14, perimeter: 7, interior: 4, steal: 3, block: 2, rebound: 4, athletic: 12, stability: 8 },
+  SG: { three: 12, mid: 12, face: 7, post: 3, dunk: 6, handle: 10, passing: 8, perimeter: 7, interior: 4, steal: 3, block: 2, rebound: 4, athletic: 12, stability: 10 },
+  SF: { three: 10, mid: 10, face: 7, post: 3, dunk: 8, handle: 8, passing: 6, perimeter: 7, interior: 8, steal: 3, block: 4, rebound: 6, athletic: 14, stability: 6 },
+  PF: { three: 8, mid: 6, face: 6, post: 6, dunk: 6, handle: 6, passing: 4, perimeter: 7, interior: 12, steal: 3, block: 8, rebound: 10, athletic: 14, stability: 4 },
+  C: { three: 4, mid: 4, face: 4, post: 6, dunk: 8, handle: 2, passing: 4, perimeter: 3, interior: 14, steal: 1, block: 12, rebound: 14, athletic: 18, stability: 6 }
 };
 
 const detailedBySlug = new Map(detailedPlayers.map((player) => [player.slug, player]));
@@ -75,7 +76,9 @@ console.log(`${folds}-fold calibrated: ${formatMetrics(metrics(predictions, "cal
 console.log(`Production model full-data fit: ${formatMetrics(metrics(samples, "production"))}`);
 console.log(`Production model recorded ${rookieOverallModel.crossValidation.folds}-fold validation: MAE=${rookieOverallModel.crossValidation.mae.toFixed(3)}, RMSE=${rookieOverallModel.crossValidation.rmse.toFixed(3)}`);
 const lowIntangibles = samples.filter((sample) => sample.detailed.Intangibles <= 50);
-console.log(`Production model Intangibles <= 50: n=${lowIntangibles.length}, ${formatMetrics(metrics(lowIntangibles, "production"))}`);
+console.log(lowIntangibles.length > 0
+  ? `Production model Intangibles <= 50: n=${lowIntangibles.length}, ${formatMetrics(metrics(lowIntangibles, "production"))}`
+  : "Production model Intangibles <= 50: n=0, no observed subset");
 const jordanWalsh = samples.find((sample) => sample.id === "jordan-walsh");
 const jordanWalshOld = predictions.find((sample) => sample.id === "jordan-walsh");
 if (jordanWalsh) console.log(`Jordan Walsh: official=${jordanWalsh.overall}, old=${jordanWalshOld?.calibrated.toFixed(2) ?? "n/a"}, production=${jordanWalsh.production}`);

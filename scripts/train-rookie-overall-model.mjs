@@ -2,12 +2,24 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const root = path.resolve(process.cwd());
-const playersPath = path.resolve(root, "src/data/players.json");
-const rosterPath = path.resolve(root, "src/data/rosterCatalog.json");
-const badgesPath = path.resolve(root, "src/data/badgeProfiles.2k27.json");
-const outputPath = path.resolve(root, process.argv[2] ?? "src/data/rookieOverallModel.json");
-const ridge = Number(process.argv[3] ?? 100);
-const badgeRidge = Number(process.argv[4] ?? 100);
+const versionArgument = process.argv[2];
+const mode = ["2k26", "2k27", "combined"].includes(versionArgument) ? versionArgument : null;
+const versionKey = mode === "2k26" || mode === "2k27" ? mode : null;
+const isCombined = mode === "combined";
+const legacyDirectory = path.resolve(root, "src/data");
+const versionDirectories = {
+  "2k26": path.resolve(root, "src/data/versions/2k26"),
+  "2k27": path.resolve(root, "src/data/versions/2k27-play-now"),
+};
+const datasetSpecs = isCombined
+  ? ["2k26", "2k27"].map((key) => ({ key, directory: versionDirectories[key] }))
+  : [{ key: versionKey ?? "legacy", directory: versionKey ? versionDirectories[versionKey] : legacyDirectory }];
+const outputPath = mode
+  ? path.resolve(root, process.argv[3] ?? (isCombined ? "src/data/rookieOverallModel.combined.json" : path.join(datasetSpecs[0].directory, "rookieOverallModel.json")))
+  : path.resolve(root, process.argv[2] ?? "src/data/rookieOverallModel.json");
+const argumentOffset = mode ? 4 : 3;
+const ridge = Number(process.argv[argumentOffset] ?? 100);
+const badgeRidge = Number(process.argv[argumentOffset + 1] ?? 100);
 const folds = 5;
 
 const attributes = [
@@ -28,7 +40,6 @@ const attributes = [
   "Mid-Range Shot",
   "Offensive Consistency",
   "Offensive Rebound",
-  "Overall Durability",
   "Pass Accuracy",
   "Pass IQ",
   "Pass Perception",
@@ -52,29 +63,31 @@ const attributes = [
 const badgeCategories = ["shooting", "playmaking", "inside", "defense", "rebounding", "athleticism"];
 const tierPoints = { Bronze: 1, Silver: 2, Gold: 3, HOF: 4, Legendary: 5 };
 const positions = ["PG", "SG", "SF", "PF", "C"];
-const detailedPlayers = JSON.parse(await readFile(playersPath, "utf8"));
-const rosterCatalog = JSON.parse(await readFile(rosterPath, "utf8"));
-const badgeProfiles = JSON.parse(await readFile(badgesPath, "utf8"));
-const detailedBySlug = new Map(detailedPlayers.map((player) => [player.slug, player]));
-
-const samples = rosterCatalog.teams
-  .filter((team) => team.category === "current")
-  .flatMap((team) => team.players)
-  .flatMap((player) => {
-    const detailed = detailedBySlug.get(player.id);
-    if (!detailed || typeof player.overall !== "number") return [];
-    const [position] = String(player.position ?? "SF").split("/");
-    if (!positions.includes(position)) return [];
-    return [{
-      id: player.id,
-      position,
-      overall: player.overall,
-      features: attributes.map((attribute) => featureValue(detailed.detailed?.[attribute], attribute)),
-      badgeFeatures: badgeFeaturesFor(badgeProfiles[player.id] ?? []),
-      badgeCount: (badgeProfiles[player.id] ?? []).length,
-      values: detailed.detailed ?? {},
-    }];
-  });
+const samples = (await Promise.all(datasetSpecs.map(async ({ key, directory }) => {
+  const detailedPlayers = JSON.parse(await readFile(path.join(directory, "players.json"), "utf8"));
+  const rosterCatalog = JSON.parse(await readFile(path.join(directory, "rosterCatalog.json"), "utf8"));
+  const badgeFile = key === "legacy" ? "badgeProfiles.2k27.json" : "badges.json";
+  const badgeProfiles = JSON.parse(await readFile(path.join(directory, badgeFile), "utf8"));
+  const detailedBySlug = new Map(detailedPlayers.map((player) => [player.slug, player]));
+  return rosterCatalog.teams
+    .filter((team) => team.category === "current")
+    .flatMap((team) => team.players)
+    .flatMap((player) => {
+      const detailed = detailedBySlug.get(player.id);
+      if (!detailed || typeof player.overall !== "number") return [];
+      const [position] = String(player.position ?? "SF").split("/");
+      if (!positions.includes(position)) return [];
+      return [{
+        id: player.id,
+        position,
+        overall: player.overall,
+        features: attributes.map((attribute) => featureValue(detailed.detailed?.[attribute], attribute)),
+        badgeFeatures: badgeFeaturesFor(badgeProfiles[player.id] ?? []),
+        badgeCount: (badgeProfiles[player.id] ?? []).length,
+        values: detailed.detailed ?? {},
+      }];
+    });
+}))).flat();
 
 if (samples.length < 50) {
   throw new Error(`Not enough training samples: ${samples.length}`);
@@ -127,6 +140,9 @@ const jointBadgeRmse = Math.sqrt(average(holdoutJointBadgePredictions.map((row) 
 
 const model = {
   version: 2,
+  dataVersion: isCombined ? "2K26 + 2K27 combined" : versionKey === "2k27" ? "2K27 Play Now" : versionKey === "2k26" ? "2K26" : "legacy",
+  sourceVersions: datasetSpecs.map(({ key }) => key),
+  foldStrategy: "player-id",
   trainingSamples: samples.length,
   crossValidation: {
     folds,

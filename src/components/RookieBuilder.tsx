@@ -1,8 +1,6 @@
 import {
-  AlertTriangle,
-  ArrowDown,
   Check,
-  CircleHelp,
+  ChevronRight,
   Copy,
   Download,
   Pencil,
@@ -27,6 +25,7 @@ import { attrNameCN, type BadgeTier, type PlayerSource } from "../domain";
 import {
   collectTendenciesByBundle,
   loadTendencyLookup,
+  type TendencyDataVersion,
   type TendencyLookup,
 } from "../tendencies";
 import { getTendencyNameCN } from "../tendencyNames";
@@ -34,13 +33,18 @@ import { tendencyBundleMap } from "./tendencyBundleMap";
 import { badgeBundleMap } from "./badgeBundleMap";
 import { getPlayerHeadshot, prefetchPlayerHeadshots } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
-import {
-  initialOverallForPotential,
-  initialOverallRange,
-  resolveOverallCalibration,
-} from "../rookieDevelopment";
-import { estimateGameOverall } from "../rookieOverall";
+import { estimateGameOverall, type OverallDataVersion } from "../rookieOverall";
 import { generateRookieName } from "../rookieNames";
+import {
+  applyBodyConstraints,
+  parsePlayerBody,
+  type BuilderBody as BodySettings,
+} from "../rookieBodyConstraints";
+import {
+  DURABILITY_ATTRIBUTES,
+  generateDurabilityAttributes,
+  generateRookieDurability,
+} from "../rookieDurability";
 
 export type RookieBuilderTeam = {
   id: string;
@@ -50,20 +54,11 @@ export type RookieBuilderTeam = {
 
 type Position = "PG" | "SG" | "SF" | "PF" | "C";
 export type BuilderMode = "rookie" | "prime";
+export type SourceSelectionMode = "random" | "manual";
 type BundleCategory = "technical" | "physical" | "mental";
 type MobilePane = "settings" | "players" | "attributes" | "result";
-type BodySettings = {
-  height: number;
-  weight: number;
-  wingspan: number;
-  shoulder: number;
-  neck: number;
-  torso: number;
-};
-type PotentialRange = {
-  min: number;
-  max: number;
-};
+
+
 type Bundle = {
   id: string;
   label: string;
@@ -77,10 +72,9 @@ type LockState = Record<string, PlayerLock | CustomLock>;
 type Evaluation = {
   raw: number;
   adjusted: number;
-  penaltyRate: number;
-  sourcePenaltyRate: number;
-  secondaryPenaltyRate: number;
   bodyAdjustment: number;
+  bodyAdjustments: Record<string, number>;
+  bodyCaps: Partial<Record<string, number>>;
   values: Record<string, number>;
 };
 type TeamRound = {
@@ -88,8 +82,13 @@ type TeamRound = {
   playerOrder: string[];
   offset: number;
 };
+type ManualPlayerGroup = {
+  key: string;
+  representative: PlayerSource;
+  variants: PlayerSource[];
+};
 type HotZoneState = "冷区" | "中性" | "热区";
-type TendencyLoadState = "idle" | "loading" | "ready" | "error";
+type TendencyLoadState = "idle" | "loading" | "ready" | "unavailable" | "error";
 type SaveFilePicker = (options?: {
   suggestedName?: string;
   types?: Array<{
@@ -103,10 +102,11 @@ type SaveFilePicker = (options?: {
   }>;
 }>;
 
-const bundles: Bundle[] = [
+export const bundles: Bundle[] = [
   { id: "three", label: "三分", attrs: ["Three-Point Shot"], category: "technical", color: "#2f9d83" },
   { id: "mid", label: "中投", attrs: ["Mid-Range Shot", "Free Throw"], category: "technical", color: "#4f9f95" },
-  { id: "finishing", label: "终结", attrs: ["Layup", "Close Shot", "Draw Foul", "Hands", "Post Fade", "Post Hook", "Post Control"], category: "technical", color: "#8f72be" },
+  { id: "face", label: "面框", attrs: ["Layup", "Close Shot", "Draw Foul", "Hands"], category: "technical", color: "#8f72be" },
+  { id: "post", label: "背身", attrs: ["Post Fade", "Post Hook", "Post Control"], category: "technical", color: "#9b6f8d" },
   { id: "dunk", label: "扣篮", attrs: ["Driving Dunk", "Standing Dunk"], category: "physical", color: "#b86f5a" },
   { id: "handle", label: "控球", attrs: ["Ball Handle", "Speed with Ball"], category: "technical", color: "#4b83b8" },
   { id: "passing", label: "传球", attrs: ["Pass Accuracy", "Pass IQ", "Pass Vision"], category: "mental", color: "#6487b3" },
@@ -115,20 +115,18 @@ const bundles: Bundle[] = [
   { id: "steal", label: "抢断", attrs: ["Steal", "Pass Perception"], category: "technical", color: "#3f8f70" },
   { id: "block", label: "盖帽", attrs: ["Block"], category: "physical", color: "#547fa6" },
   { id: "rebound", label: "篮板", attrs: ["Offensive Rebound", "Defensive Rebound"], category: "physical", color: "#a78145" },
-  { id: "athletic", label: "运动", attrs: ["Speed", "Agility", "Vertical", "Strength", "Stamina", "Hustle"], category: "physical", color: "#3e8eaa" },
+  { id: "athletic", label: "运动", attrs: ["Speed", "Agility", "Vertical", "Stamina", "Hustle"], category: "physical", color: "#3e8eaa" },
+  { id: "strength", label: "力量", attrs: ["Strength"], category: "physical", color: "#9b6840" },
   { id: "stability", label: "稳定性", attrs: ["Offensive Consistency", "Defensive Consistency", "Shot IQ", "Help Defense IQ", "Overall Durability"], category: "mental", color: "#6d7d87" },
+  { id: "potential", label: "潜力", attrs: ["Potential"], category: "mental", color: "#c08a3e" },
 ];
 
 const positions: Position[] = ["PG", "SG", "SF", "PF", "C"];
 const ages = [18, 19, 20, 21, 22, 23];
+const playersPerRound = 8;
 const playerSwitchLimit = 3;
 const teamDrawDurationMs = 4200;
 const secondaryPositionShare = 0.25;
-const defaultReadiness = 50;
-
-function randomReadiness() {
-  return Math.floor(Math.random() * 100) + 1;
-}
 
 const teamLogoCodes: Record<string, string> = {
   "Atlanta Hawks": "atl", "Boston Celtics": "bos", "Brooklyn Nets": "bkn", "Charlotte Hornets": "cha",
@@ -175,23 +173,6 @@ function isNaturalSecondaryPosition(position: Position, secondary: Position) {
   return naturalSecondaryPositions[position].includes(secondary);
 }
 
-function secondaryMismatchSteps(position: Position, secondary: Position) {
-  if (isNaturalSecondaryPosition(position, secondary)) return 0;
-  const secondaryIndex = positions.indexOf(secondary);
-  const naturalIndices = naturalSecondaryPositions[position].map((candidate) => positions.indexOf(candidate));
-  return Math.min(...naturalIndices.map((index) => Math.abs(index - secondaryIndex)));
-}
-
-function getSecondaryMismatchPenalty(position: Position, secondary: Position, bundleId: string) {
-  const steps = secondaryMismatchSteps(position, secondary);
-  if (steps === 0) return 0;
-  const secondaryIsBigger = positions.indexOf(secondary) > positions.indexOf(position);
-  const ratePerStep = secondaryIsBigger
-    ? ({ three: 0.05, mid: 0.05, finishing: 0.025, handle: 0.06, passing: 0.05, perimeter: 0.05, steal: 0.03, athletic: 0.03, stability: 0.02 } as Record<string, number>)[bundleId] ?? 0
-    : ({ finishing: 0.03, dunk: 0.04, interior: 0.05, block: 0.05, rebound: 0.05, athletic: 0.03, stability: 0.02 } as Record<string, number>)[bundleId] ?? 0;
-  return Math.min(0.18, ratePerStep * steps);
-}
-
 function blendedPositionWeight(position: Position, secondary: Position, bundleId: string) {
   return positionWeights[position][bundleId] * (1 - secondaryPositionShare) + positionWeights[secondary][bundleId] * secondaryPositionShare;
 }
@@ -208,37 +189,28 @@ const bodyBases: Record<Position, BodySettings> = {
   C: { height: 211, weight: 116, wingspan: 61, shoulder: 62, neck: 53, torso: 58 },
 };
 
-const durabilityAttrs = [
-  "Head Durability", "Neck Durability", "Back Durability",
-  "Left Shoulder Durability", "Right Shoulder Durability",
-  "Left Elbow Durability", "Right Elbow Durability",
-  "Left Hip Durability", "Right Hip Durability",
-  "Left Knee Durability", "Right Knee Durability",
-  "Left Ankle Durability", "Right Ankle Durability",
-  "Left Foot Durability", "Right Foot Durability", "Overall Durability",
-];
+const durabilityAttrs = [...DURABILITY_ATTRIBUTES];
 
 const fullAttributeGroups = [
   { key: "offense", label: "进攻", attrs: ["Layup", "Post Fade", "Post Hook", "Post Control", "Draw Foul", "Close Shot", "Mid-Range Shot", "Three-Point Shot", "Free Throw", "Ball Handle", "Pass IQ", "Pass Accuracy", "Offensive Rebound", "Standing Dunk", "Driving Dunk", "Shot IQ", "Pass Vision", "Hands"] },
   { key: "defense", label: "防守", attrs: ["Defensive Rebound", "Interior Defense", "Perimeter Defense", "Block", "Steal"] },
-  { key: "athletic", label: "运动", attrs: ["Speed", "Speed with Ball", "Vertical", "Strength", "Stamina", "Hustle", "Agility"] },
+  { key: "athletic", label: "运动", attrs: ["Speed", "Speed with Ball", "Vertical", "Stamina", "Hustle", "Agility"] },
+  { key: "strength", label: "力量", attrs: ["Strength"] },
   { key: "durability", label: "耐久", attrs: durabilityAttrs },
   { key: "mental", label: "精神", attrs: ["Pass Perception", "Defensive Consistency", "Help Defense IQ", "Offensive Consistency"] },
-  { key: "misc", label: "杂项", attrs: ["Intangibles", "Potential"] },
+  { key: "misc", label: "杂项", attrs: ["Intangibles"] },
 ] as const;
 
 // PG-SF and PF weights are adapted from the supplied mobile-game tables.
-// Strength is folded into athleticism; perimeter-defense weight is split with steals.
+// Strength is kept separate from athleticism so body weight can constrain it independently.
 // The missing C table is conservatively inferred from the PF distribution.
 const positionWeights: Record<Position, Record<string, number>> = {
-  PG: { three: 10, mid: 10, finishing: 8, dunk: 4, handle: 14, passing: 14, perimeter: 7, interior: 4, steal: 3, block: 2, rebound: 4, athletic: 12, stability: 8 },
-  SG: { three: 12, mid: 12, finishing: 10, dunk: 6, handle: 10, passing: 8, perimeter: 7, interior: 4, steal: 3, block: 2, rebound: 4, athletic: 12, stability: 10 },
-  SF: { three: 10, mid: 10, finishing: 10, dunk: 8, handle: 8, passing: 6, perimeter: 7, interior: 8, steal: 3, block: 4, rebound: 6, athletic: 14, stability: 6 },
-  PF: { three: 8, mid: 6, finishing: 12, dunk: 6, handle: 6, passing: 4, perimeter: 7, interior: 12, steal: 3, block: 8, rebound: 10, athletic: 14, stability: 4 },
-  C: { three: 4, mid: 4, finishing: 10, dunk: 8, handle: 2, passing: 4, perimeter: 3, interior: 14, steal: 1, block: 12, rebound: 14, athletic: 18, stability: 6 },
+  PG: { three: 10, mid: 10, face: 6, post: 2, dunk: 4, handle: 14, passing: 14, perimeter: 7, interior: 4, steal: 3, block: 2, rebound: 4, athletic: 10, strength: 2, stability: 8, potential: 0 },
+  SG: { three: 12, mid: 12, face: 7, post: 3, dunk: 6, handle: 10, passing: 8, perimeter: 7, interior: 4, steal: 3, block: 2, rebound: 4, athletic: 10, strength: 2, stability: 10, potential: 0 },
+  SF: { three: 10, mid: 10, face: 7, post: 3, dunk: 8, handle: 8, passing: 6, perimeter: 7, interior: 8, steal: 3, block: 4, rebound: 6, athletic: 11, strength: 3, stability: 6, potential: 0 },
+  PF: { three: 8, mid: 6, face: 6, post: 6, dunk: 6, handle: 6, passing: 4, perimeter: 7, interior: 12, steal: 3, block: 8, rebound: 10, athletic: 10, strength: 4, stability: 4, potential: 0 },
+  C: { three: 4, mid: 4, face: 4, post: 6, dunk: 8, handle: 2, passing: 4, perimeter: 3, interior: 14, steal: 1, block: 12, rebound: 14, athletic: 11, strength: 7, stability: 6, potential: 0 },
 };
-
-const defaultPotentialRange: PotentialRange = { min: 82, max: 87 };
 
 const teamNamesCN: Record<string, string> = {
   "Atlanta Hawks": "老鹰", "Boston Celtics": "凯尔特人", "Brooklyn Nets": "篮网",
@@ -251,6 +223,23 @@ const teamNamesCN: Record<string, string> = {
   "Orlando Magic": "魔术", "Philadelphia 76ers": "76人", "Phoenix Suns": "太阳",
   "Portland Trail Blazers": "开拓者", "Sacramento Kings": "国王", "San Antonio Spurs": "马刺",
   "Toronto Raptors": "猛龙", "Utah Jazz": "爵士", "Washington Wizards": "奇才",
+};
+
+const teamAliasesCN: Record<string, string> = {
+  "76ers": "76人", "Bucks": "雄鹿", "Bulls": "公牛", "Cavaliers": "骑士", "Celtics": "凯尔特人",
+  "Clippers": "快船", "Grizzlies": "灰熊", "Hawks": "老鹰", "Heat": "热火", "Hornets": "黄蜂",
+  "Jazz": "爵士", "Kings": "国王", "Knicks": "尼克斯", "Lakers": "湖人", "Magic": "魔术",
+  "Mavericks": "独行侠", "Nets": "篮网", "Nuggets": "掘金", "Pacers": "步行者", "Pelicans": "鹈鹕",
+  "Pistons": "活塞", "Raptors": "猛龙", "Rockets": "火箭", "Spurs": "马刺", "Suns": "太阳",
+  "Thunder": "雷霆", "Timberwolves": "森林狼", "Trail Blazers": "开拓者", "Warriors": "勇士",
+  "Wizards": "奇才", "New Jersey Nets": "篮网", "Charlotte Bobcats": "黄蜂", "Seattle SuperSonics": "超音速",
+  "New Orleans Hornets": "鹈鹕", "Vancouver Grizzlies": "灰熊", "Washington Bullets": "奇才",
+};
+
+const rosterCategoryCN: Record<NonNullable<PlayerSource["rosterCategory"]>, string> = {
+  current: "现役",
+  classic: "经典赛季",
+  allTime: "历史阵容",
 };
 
 const aliases: Record<string, string[]> = {
@@ -310,55 +299,55 @@ function createBodySettings(position: Position, seed: number): BodySettings {
   };
 }
 
-function getBodyAttributeAdjustmentForPosition(attr: string, position: Position, body: BodySettings) {
-  const base = bodyBases[position];
-  const height = (body.height - base.height) / 5;
-  const weight = (body.weight - base.weight) / 10;
-  const wingspan = (body.wingspan - base.wingspan) / 10;
-  const shoulder = (body.shoulder - base.shoulder) / 10;
-  const adjustments: Record<string, number> = {
-    Block: height * 0.8 + wingspan * 1.2,
-    "Interior Defense": height * 0.65 + weight * 0.55 + shoulder * 0.55,
-    "Offensive Rebound": height * 0.7 + wingspan + weight * 0.3,
-    "Defensive Rebound": height * 0.75 + wingspan + weight * 0.35,
-    "Standing Dunk": height * 0.5 + weight * 0.45 + shoulder * 0.45,
-    "Driving Dunk": height * 0.15 - weight * 0.15,
-    Strength: weight * 0.9 + shoulder * 0.8,
-    Speed: -height * 0.55 - weight * 0.7,
-    Agility: -height * 0.65 - weight * 0.55,
-    "Speed with Ball": -height * 0.55 - weight * 0.45,
-    "Ball Handle": -height * 0.45 - weight * 0.25,
-    "Perimeter Defense": -height * 0.2 - weight * 0.35 + wingspan * 0.35,
-    Steal: wingspan * 0.55,
-    "Pass Perception": wingspan * 0.4,
-    "Post Control": height * 0.35 + weight * 0.4 + shoulder * 0.3,
-    "Post Hook": height * 0.3 + wingspan * 0.35,
-    "Close Shot": height * 0.2 + wingspan * 0.2,
-    Layup: height * 0.1 - weight * 0.1,
-  };
-  return Math.max(-5, Math.min(5, adjustments[attr] ?? 0));
-}
-
-function getBodyAttributeAdjustment(attr: string, position: Position, secondary: Position, body: BodySettings) {
-  if (!isNaturalSecondaryPosition(position, secondary)) {
-    return getBodyAttributeAdjustmentForPosition(attr, position, body);
-  }
-  return getBodyAttributeAdjustmentForPosition(attr, position, body) * (1 - secondaryPositionShare)
-    + getBodyAttributeAdjustmentForPosition(attr, secondary, body) * secondaryPositionShare;
-}
-
 function playerId(player: PlayerSource) {
   return player.id ?? `${player.rosterTeam ?? player.team ?? "team"}:${player.slug ?? player.name}`;
 }
 
 function playerIdentity(player: PlayerSource) {
-  return (player.slug ?? player.name).trim().toLowerCase();
+  return player.name
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
 }
 
-function playerPositions(player: PlayerSource): Position[] {
-  const candidates = player.position?.split(/[\/\-]/).map((value) => value.trim()) ?? [];
-  const valid = candidates.filter((candidate): candidate is Position => positions.includes(candidate as Position));
-  return valid.length ? valid : ["SF"];
+function normalizePlayerSearch(value: string) {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/[.'’\-]/g, "");
+}
+
+function matchesPlayerSearch(player: PlayerSource, query: string) {
+  const normalizedQuery = normalizePlayerSearch(query);
+  if (!normalizedQuery) return true;
+  return [player.name, getPlayerNameCN(player.name), player.rosterTeam ?? "", player.position ?? ""]
+    .some((value) => normalizePlayerSearch(value).includes(normalizedQuery));
+}
+
+function matchesPlayerGroupSearch(group: ManualPlayerGroup, query: string) {
+  const normalizedQuery = normalizePlayerSearch(query);
+  if (!normalizedQuery) return true;
+  return group.variants.some((player) => matchesPlayerSearch(player, query))
+    || normalizePlayerSearch(getPlayerNameCN(group.representative.name)).includes(normalizedQuery);
+}
+
+function localizedTeamName(team: string) {
+  return teamNamesCN[team]
+    ?? teamAliasesCN[team]
+    ?? team.replace(/^(?:All-Time\s+)?(?:\d{4}-\d{2}\s+)?/, "");
+}
+
+function playerVariantLabel(player: PlayerSource) {
+  const rawTeam = player.rosterTeam ?? player.team ?? "未知球队版本";
+  const category = player.rosterCategory ? rosterCategoryCN[player.rosterCategory] : "球员版本";
+  const allTimeTeam = rawTeam.replace(/^All-Time\s+/, "");
+  const classicMatch = rawTeam.match(/^(\d{4}-\d{2})\s+(.+)$/);
+  if (player.rosterCategory === "allTime") return `${category} · ${localizedTeamName(allTimeTeam)}`;
+  if (classicMatch) return `${category} · ${classicMatch[1]} · ${localizedTeamName(classicMatch[2])}`;
+  return `${category} · ${localizedTeamName(rawTeam)}`;
 }
 
 function fallback(player: PlayerSource, attr: string) {
@@ -370,6 +359,7 @@ function fallback(player: PlayerSource, attr: string) {
 }
 
 function getAttr(player: PlayerSource, attr: string) {
+  if (attr === "Potential") return clamp(player.potential ?? player.overall ?? 75);
   for (const name of aliases[attr] ?? [attr]) {
     const value = player.detailed?.[name];
     if (typeof value === "number") return clamp(value);
@@ -377,52 +367,34 @@ function getAttr(player: PlayerSource, attr: string) {
   return clamp(fallback(player, attr));
 }
 
-function getPenaltyRateForPosition(position: Position, player: PlayerSource, bundleId: string) {
-  const target = positions.indexOf(position);
-  const source = playerPositions(player)
-    .map((candidate) => positions.indexOf(candidate))
-    .sort((left, right) => Math.abs(left - target) - Math.abs(right - target))[0];
-  const bigger = source - target;
-  const smaller = target - source;
-  const bigSkills: Record<string, number> = { block: 0.018, interior: 0.018, rebound: 0.015, dunk: 0.01, finishing: 0.006, athletic: 0.02 };
-  const smallSkills: Record<string, number> = { handle: 0.018, perimeter: 0.018, athletic: 0.02, passing: 0.01, three: 0.008, mid: 0.006 };
-  if (bigger > 0 && bundleId in bigSkills) return Math.min(0.05, bigger * bigSkills[bundleId]);
-  if (smaller > 0 && bundleId in smallSkills) return Math.min(0.05, smaller * smallSkills[bundleId]);
-  return 0;
-}
-
-function getSourcePenaltyRate(position: Position, secondary: Position, player: PlayerSource, bundleId: string) {
-  const primaryPenalty = getPenaltyRateForPosition(position, player, bundleId);
-  if (!isNaturalSecondaryPosition(position, secondary)) return primaryPenalty;
-  return primaryPenalty * (1 - secondaryPositionShare)
-    + getPenaltyRateForPosition(secondary, player, bundleId) * secondaryPositionShare;
-}
-
-function evaluate(player: PlayerSource, bundle: Bundle, position: Position, secondary: Position, body: BodySettings): Evaluation {
-  const sourcePenaltyRate = getSourcePenaltyRate(position, secondary, player, bundle.id);
-  const secondaryPenaltyRate = getSecondaryMismatchPenalty(position, secondary, bundle.id);
-  const penaltyRate = 1 - (1 - sourcePenaltyRate) * (1 - secondaryPenaltyRate);
+function evaluate(player: PlayerSource, bundle: Bundle, body: BodySettings): Evaluation {
   const rawValues = Object.fromEntries(bundle.attrs.map((attr) => [attr, getAttr(player, attr)]));
-  const bodyValues = Object.fromEntries(Object.entries(rawValues).map(([attr, value]) => [attr, clamp(value + getBodyAttributeAdjustment(attr, position, secondary, body))]));
-  const values = Object.fromEntries(Object.entries(bodyValues).map(([attr, value]) => [attr, clamp(value * (1 - penaltyRate))]));
+  const constrained = applyBodyConstraints(rawValues, body, parsePlayerBody(player));
   const raw = Math.round(average(Object.values(rawValues)));
-  const bodyAdjusted = Math.round(average(Object.values(bodyValues)));
-  const adjusted = Math.round(average(Object.values(values)));
+  const adjusted = Math.round(average(Object.values(constrained.values)));
   return {
     raw,
     adjusted,
-    penaltyRate,
-    sourcePenaltyRate,
-    secondaryPenaltyRate,
-    bodyAdjustment: bodyAdjusted - raw,
-    values,
+    bodyAdjustment: adjusted - raw,
+    bodyAdjustments: constrained.adjustments,
+    bodyCaps: constrained.caps,
+    values: constrained.values,
   };
 }
 
-function evaluateCustom(bundle: Bundle, customValues: Record<string, number>): Evaluation {
-  const values = Object.fromEntries(bundle.attrs.map((attr) => [attr, clamp(customValues[attr] ?? 75)]));
-  const adjusted = Math.round(average(Object.values(values)));
-  return { raw: adjusted, adjusted, penaltyRate: 0, sourcePenaltyRate: 0, secondaryPenaltyRate: 0, bodyAdjustment: 0, values };
+function evaluateCustom(bundle: Bundle, customValues: Record<string, number>, body: BodySettings): Evaluation {
+  const rawValues = Object.fromEntries(bundle.attrs.map((attr) => [attr, clamp(customValues[attr] ?? 75)]));
+  const constrained = applyBodyConstraints(rawValues, body, null);
+  const raw = Math.round(average(Object.values(rawValues)));
+  const adjusted = Math.round(average(Object.values(constrained.values)));
+  return {
+    raw,
+    adjusted,
+    bodyAdjustment: adjusted - raw,
+    bodyAdjustments: constrained.adjustments,
+    bodyCaps: constrained.caps,
+    values: constrained.values,
+  };
 }
 
 function valueColor(value: number) {
@@ -450,20 +422,14 @@ function createRound(teams: RookieBuilderTeam[], seed: number, previousTeamId = 
   };
 }
 
-function rookieValue(value: number, age: number, category: BundleCategory, readiness: number) {
+function rookieValue(value: number, age: number, category: BundleCategory) {
   const progressByCategory: Record<BundleCategory, number[]> = {
     technical: [0.82, 0.85, 0.88, 0.91, 0.93, 0.95],
     physical: [0.92, 0.94, 0.96, 0.97, 0.98, 0.99],
     mental: [0.77, 0.81, 0.85, 0.88, 0.9, 0.92],
   };
-  const readinessSensitivity: Record<BundleCategory, number> = {
-    technical: 0.1,
-    physical: 0.05,
-    mental: 0.12,
-  };
   const ageIndex = Math.max(0, Math.min(ages.length - 1, age - ages[0]));
-  const readinessOffset = ((readiness - 50) / 50) * readinessSensitivity[category];
-  const progress = Math.max(0.55, Math.min(1, progressByCategory[category][ageIndex] + readinessOffset));
+  const progress = Math.max(0.55, Math.min(1, progressByCategory[category][ageIndex]));
   return clamp(25 + (value - 25) * progress);
 }
 
@@ -476,42 +442,9 @@ function calibratedOverall(
   position: Position,
   badges?: Array<{ category?: string; tier: string }>,
   fallbackValue = 65,
+  version: OverallDataVersion = "legacy",
 ) {
-  return estimateGameOverall(values, position, badges, fallbackValue);
-}
-
-function calibrateAttributesToOverall(
-  values: Record<string, number>,
-  position: Position,
-  targetOverall: number,
-  lockedValues: Record<string, number> = {},
-  badges?: PlayerBadgeLike[],
-) {
-  const ratingAttributes = [...new Set(bundles.flatMap((bundle) => bundle.attrs))];
-  let best = { ...values };
-  let bestDistance = Math.abs(calibratedOverall(best, position, badges) - targetOverall);
-
-  // A uniform offset preserves the selected player's attribute shape. Search
-  // for the closest offset because the position calibration is not 1:1.
-  for (let offset = -30; offset <= 30; offset += 1) {
-    const candidate = { ...values };
-    for (const attr of ratingAttributes) {
-      if (!(attr in lockedValues) && typeof candidate[attr] === "number") candidate[attr] = clamp(candidate[attr] + offset);
-    }
-    const distance = Math.abs(calibratedOverall(candidate, position, badges) - targetOverall);
-    if (distance < bestDistance) {
-      best = candidate;
-      bestDistance = distance;
-    }
-    if (distance === 0) break;
-  }
-
-  const actualOverall = calibratedOverall(best, position, badges);
-  return {
-    values: best,
-    actualOverall,
-    distance: Math.abs(actualOverall - targetOverall),
-  };
+  return estimateGameOverall(values, position, badges, fallbackValue, version);
 }
 
 function tierFor(score: number): BadgeTier {
@@ -540,9 +473,9 @@ function createBadges(attrs: Record<string, number>): PlayerBadgeLike[] {
     .map(([name, category, score]) => ({ name, category, score, tier: tierFor(score) }));
 }
 
-function rookieTierForPotentialRange(range: PotentialRange): RookieBadgeTier {
-  if (range.max >= 94) return "generational";
-  if (range.max >= 87) return "lottery";
+function rookieTierForPotential(potential: number): RookieBadgeTier {
+  if (potential >= 94) return "generational";
+  if (potential >= 87) return "lottery";
   return "rotation";
 }
 
@@ -595,11 +528,10 @@ function createResult(
   position: Position,
   secondary: Position,
   body: BodySettings,
-  potentialRange: PotentialRange,
-  readiness: number,
   mode: BuilderMode,
   players: Map<string, PlayerSource>,
   tendencyLookup: TendencyLookup | null,
+  overallVersion: OverallDataVersion,
 ) {
   const isPrime = mode === "prime";
   let peakAttrs: Record<string, number> = {};
@@ -609,14 +541,14 @@ function createResult(
     const evaluation = evaluations[bundle.id];
     if (!evaluation) continue;
     Object.assign(peakAttrs, evaluation.values);
-    scores.push(evaluation.adjusted);
+    if (bundle.id !== "potential") scores.push(evaluation.adjusted);
   }
 
   // Tendency inheritance: each slot reads only its mapped fields from the
   // compact lookup. Values are inherited verbatim, without rookie down-scaling.
   const tendencies = tendencyLookup
     ? collectTendenciesByBundle({
-      sources: bundles.map((bundle) => {
+      sources: bundles.filter((bundle) => bundle.id !== "potential").map((bundle) => {
         const lock = locks[bundle.id];
         const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
         return { bundleId: bundle.id, playerSlug: player?.slug };
@@ -626,11 +558,13 @@ function createResult(
     })
     : {};
 
-  const customFinalAttrs = Object.assign({}, ...Object.values(locks)
+  const rawCustomFinalAttrs = Object.assign({}, ...Object.values(locks)
     .filter((lock): lock is CustomLock => lock.kind === "custom")
     .map((lock) => lock.values));
+  const customFinalAttrs = applyBodyConstraints(rawCustomFinalAttrs, body, null).values;
   Object.assign(peakAttrs, customFinalAttrs);
-  const badgeSources = bundles.map((bundle) => {
+  peakAttrs = applyBodyConstraints(peakAttrs, body, null).values;
+  const badgeSources = bundles.filter((bundle) => bundle.id !== "potential").map((bundle) => {
     const lock = locks[bundle.id];
     return {
       bundleId: bundle.id,
@@ -646,46 +580,27 @@ function createResult(
   });
   let peakBadgeResolution = resolvePeakBadges(peakAttrs);
   let peakBadges = peakBadgeResolution.badges;
-  const rookieTier = rookieTierForPotentialRange(potentialRange);
   const signature = `${bundles.map((bundle) => {
     const lock = locks[bundle.id];
     return lock?.kind === "player" ? lock.playerId : lock?.kind === "custom" ? JSON.stringify(lock.values) : "-";
   }).join("|")}|${Object.values(body).join("|")}`;
-  const random = makeRandom(hash(`${signature}|${age}|${position}|${secondary}|${readiness}`));
+  const random = makeRandom(hash(`${signature}|${age}|${position}|${secondary}`));
   const mean = average(scores, 71);
-  const top = average([...scores].sort((a, b) => b - a).slice(0, 4), mean);
-  const sourcePeakOverall = calibratedOverall(peakAttrs, position, peakBadges, mean);
-  const potentialSignal = sourcePeakOverall * 0.82 + top * 0.18;
-  const rangePlacement = Math.max(0, Math.min(1, (potentialSignal - 65) / 30));
-  const configuredMinPotential = isPrime ? clamp(sourcePeakOverall, 60, 99) : potentialRange.min;
-  const configuredMaxPotential = isPrime ? configuredMinPotential : potentialRange.max;
-  const configuredPotential = isPrime
-    ? configuredMinPotential
-    : clamp(
-      configuredMinPotential + (configuredMaxPotential - configuredMinPotential) * rangePlacement,
-      configuredMinPotential,
-      configuredMaxPotential,
-    );
-  let peakCalibration = {
-    values: peakAttrs,
-    actualOverall: sourcePeakOverall,
-    distance: 0,
-  };
+  const sourcePeakOverall = calibratedOverall(peakAttrs, position, peakBadges, mean, overallVersion);
+  const potential = clamp(
+    typeof peakAttrs.Potential === "number" ? peakAttrs.Potential : Math.round(sourcePeakOverall),
+    40,
+    99,
+  );
+  const rookieTier = rookieTierForPotential(potential);
 
   if (!isPrime) {
-    peakCalibration = calibrateAttributesToOverall(peakAttrs, position, configuredPotential, customFinalAttrs, peakBadges);
-    peakAttrs = peakCalibration.values;
     peakBadgeResolution = resolvePeakBadges(peakAttrs);
     peakBadges = peakBadgeResolution.badges;
-    peakCalibration = {
-      ...peakCalibration,
-      actualOverall: calibratedOverall(peakAttrs, position, peakBadges, mean),
-    };
-    peakCalibration.distance = Math.abs(peakCalibration.actualOverall - configuredPotential);
     for (const bundle of bundles) {
       for (const attr of bundle.attrs) {
         const value = peakAttrs[attr];
-        if (typeof value === "number") initialAttrs[attr] = rookieValue(value, age, bundle.category, readiness);
+        if (typeof value === "number") initialAttrs[attr] = rookieValue(value, age, bundle.category);
       }
     }
   } else {
@@ -695,68 +610,33 @@ function createResult(
   }
 
   const badges = isPrime ? peakBadges : downgradeBadgesForRookie(peakBadges, rookieTier);
-  const configuredInitialRange = initialOverallRange(potentialRange, age, readiness);
-  const targetInitialOverall = isPrime
-    ? calibratedOverall(initialAttrs, position, badges, mean)
-    : initialOverallForPotential(configuredPotential, age, readiness);
   Object.assign(initialAttrs, customFinalAttrs);
-  let initialCalibration = {
-    values: initialAttrs,
-    actualOverall: calibratedOverall(initialAttrs, position, badges, mean),
-    distance: 0,
-  };
-  if (!isPrime) {
-    initialCalibration = calibrateAttributesToOverall(initialAttrs, position, targetInitialOverall, customFinalAttrs, badges);
-    initialAttrs = initialCalibration.values;
-  }
-  const durability = initialAttrs["Overall Durability"] ?? 72;
+  initialAttrs = applyBodyConstraints(initialAttrs, body, null).values;
+  const sourceDurability = peakAttrs["Overall Durability"] ?? 80;
   const bodyBase = bodyBases[position];
   const bodyStress = Math.max(0, (body.weight - bodyBase.weight) / 15) + Math.max(0, (body.height - bodyBase.height) / 12);
-  for (const attr of durabilityAttrs) {
-    if (attr === "Overall Durability") continue;
-    initialAttrs[attr] = clamp(durability + (random() - 0.5) * 10 - bodyStress * 1.5);
-  }
-  initialAttrs["Overall Durability"] = durability;
-  const baseOverall = calibratedOverall(initialAttrs, position, badges, mean);
+  // Durability is calibrated separately from the generic rookie age curve.
+  // Applying the mental curve first turns a source mean of ~80 into the high 60s.
+  const durabilityValues = isPrime
+    ? generateDurabilityAttributes(sourceDurability, random)
+    : generateRookieDurability(sourceDurability, bodyStress, random);
+  Object.assign(initialAttrs, durabilityValues);
+  const durability = durabilityValues["Overall Durability"] ?? 82;
+  const baseOverall = calibratedOverall(initialAttrs, position, badges, mean, overallVersion);
   const initialStrength = baseOverall;
   const intangibles = 50;
-  const overallResolution = isPrime
-    ? {
-      hasConflict: false,
-      peakUnreachable: false,
-      initialUnreachable: false,
-      potential: baseOverall,
-      potentialRange: { min: baseOverall, max: baseOverall },
-      initialRange: { min: baseOverall, max: baseOverall },
-    }
-    : resolveOverallCalibration({
-      configuredPotential,
-      configuredPotentialRange: { min: configuredMinPotential, max: configuredMaxPotential },
-      projectedInitialRange: configuredInitialRange,
-      peakOverall: peakCalibration.actualOverall,
-      peakDistance: peakCalibration.distance,
-      initialOverall: baseOverall,
-      initialDistance: Math.abs(baseOverall - targetInitialOverall),
-    });
-  const potential = overallResolution.potential;
-  const minPotential = overallResolution.potentialRange.min;
-  const maxPotential = overallResolution.potentialRange.max;
-  const projectedInitialRange = overallResolution.initialRange;
-  const calibrationWarning = !isPrime && overallResolution.hasConflict
-    ? `自定义锁定值或属性上下限使${overallResolution.peakUnreachable && overallResolution.initialUnreachable ? "巅峰与新秀" : overallResolution.peakUnreachable ? "巅峰" : "新秀"}目标不可达，已按实际游戏 OVR 修正。`
-    : "";
-  const boom = isPrime ? 0 : clamp(28 + potential - 84 - (age - 18) * 2 + (50 - readiness) * 0.12 + (random() - 0.5) * 8, 10, 55);
-  const bust = isPrime ? 0 : clamp(18 - (age - 18) + (50 - readiness) * 0.18 + (random() - 0.5) * 8, 8, 40);
+  const boom = isPrime ? 0 : clamp(28 + potential - 84 - (age - 18) * 2 + (random() - 0.5) * 8, 10, 55);
+  const bust = isPrime ? 0 : clamp(18 - (age - 18) + (random() - 0.5) * 8, 8, 40);
   const normal = 100 - boom - bust;
   const hand: "左手" | "右手" = random() < 0.11 ? "左手" : "右手";
   const dunkHand: "左手" | "右手" = random() < 0.8 ? hand : hand === "左手" ? "右手" : "左手";
   const growthGap = Math.max(0, potential - initialStrength);
   const progressSpeed = isPrime
     ? 0
-    : Math.round(Math.max(2.2, Math.min(5.4, 2.4 + readiness * 0.018 + Math.max(0, (potential - 87) / 10) + (random() - 0.5) * 0.6)) * 10) / 10;
+    : Math.round(Math.max(2.2, Math.min(5.4, 2.4 + Math.max(0, (potential - 87) / 10) + (random() - 0.5) * 0.6)) * 10) / 10;
   const yearsToPeak = isPrime || progressSpeed === 0 ? 0 : Math.ceil(growthGap / progressSpeed);
   const peakStart = isPrime ? 28 : clamp(Math.max(24, age + yearsToPeak), age, 30);
-  const peakDuration = isPrime ? 7 : Math.max(5, Math.min(11, 7 + (durability - 70) / 15 + (readiness - 50) / 50 + random() * 1.5));
+  const peakDuration = isPrime ? 7 : Math.max(5, Math.min(11, 7 + (durability - 70) / 15 + random() * 1.5));
   const peakEnd = clamp(peakStart + peakDuration, peakStart, 40);
   initialAttrs.Intangibles = intangibles;
   initialAttrs.Potential = potential;
@@ -764,8 +644,8 @@ function createResult(
   return {
     age, position, secondary,
     hand, dunkHand, ...body,
-    potential, minPotential, maxPotential, projectedInitialRange, readiness, growthGap, progressSpeed, boom, normal, bust, peakStart, peakEnd,
-    calibrationWarning, targetInitialOverall, peakOverall: peakCalibration.actualOverall,
+    potential, growthGap, progressSpeed, boom, normal, bust, peakStart, peakEnd,
+    peakOverall: sourcePeakOverall,
     peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges,
     badgesEstimated: peakBadgeResolution.estimated, rookieTier, hotZones,
     tendencies,
@@ -808,31 +688,28 @@ function createExportText(
   players: Map<string, PlayerSource>,
   mode: BuilderMode,
   tendencyLoadState: TendencyLoadState,
+  dataVersionLabel: string,
 ) {
   const isPrime = mode === "prime";
   const tendencyLines = tendencyLoadState === "loading"
     ? ["倾向数据加载中"]
     : tendencyLoadState === "error"
       ? ["倾向数据加载失败，请刷新后重试"]
-      : Object.keys(result.tendencies).length
+      : tendencyLoadState === "unavailable"
+        ? ["当前版本暂无独立倾向数据（未复用其他版本）"]
+        : Object.keys(result.tendencies).length
         ? Object.entries(result.tendencies)
           .sort(([left], [right]) => getTendencyNameCN(left).localeCompare(getTendencyNameCN(right), "zh"))
           .map(([field, value]) => `${getTendencyNameCN(field)}: ${value}`)
         : ["无倾向数据（来源球员无倾向档案）"];
   return [
-    `NBA 2K27 ${isPrime ? "巅峰球员" : "新秀"}创建清单`, "", "[资料]",
+    `${dataVersionLabel} ${isPrime ? "巅峰球员" : "新秀"}创建清单`, "", "[资料]",
     `姓名: ${rookieName}`, `年龄: ${result.age}`, `位置: ${result.position}`, `次要位置: ${result.secondary}`,
     `惯用手: ${result.hand}`, `扣篮惯用手: ${result.dunkHand}`,
     `巅峰开始年龄: ${result.peakStart}`, `巅峰结束年龄: ${result.peakEnd}`,
-    `数据版本: NBA 2K27 Play Now`,
-    ...(!isPrime ? [
-      `即战力: ${result.readiness}`,
-      `巅峰综评区间: ${result.minPotential}-${result.maxPotential}`,
-      `新秀综评区间: ${result.projectedInitialRange.min}-${result.projectedInitialRange.max}`,
-      `预计进步速度: 每年 +${result.progressSpeed} 综评`,
-      ...(result.calibrationWarning ? [`校准提示: ${result.calibrationWarning}`] : []),
-    ] : []),
-    `潜力: ${result.potential}`, `最小潜力: ${result.minPotential}`, `最大潜力: ${result.maxPotential}`,
+    `数据版本: ${dataVersionLabel}`,
+    ...(!isPrime ? [`预计进步速度: 每年 +${result.progressSpeed} 综评`] : []),
+    `潜力来源值: ${result.potential}`,
     `成长百分比: ${result.boom}%`, `平均百分比: ${result.normal}%`, `衰退百分比: ${result.bust}%`,
     "", "[身体]", `身高: ${result.height} cm`, `体重: ${result.weight} kg`, `臂展: ${result.wingspan}`,
     `肩宽: ${result.shoulder}`, `颈部长度: ${result.neck}`, `躯干长度: ${result.torso}`,
@@ -860,16 +737,19 @@ function createExportText(
       }
       const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
       const evaluation = evaluations[bundle.id];
-      const sourcePenaltyPercent = evaluation?.sourcePenaltyRate ? Math.round(evaluation.sourcePenaltyRate * 100) : 0;
-      const secondaryPenaltyPercent = evaluation?.secondaryPenaltyRate ? Math.round(evaluation.secondaryPenaltyRate * 100) : 0;
       const bodyAdjustment = evaluation?.bodyAdjustment ?? 0;
+      const capLabel = Object.entries(evaluation?.bodyCaps ?? {})
+        .map(([attr, cap]) => `${attrNameCN[attr] ?? attr}上限 ${cap}`)
+        .join(" / ");
       const adjustments = [
         bodyAdjustment ? `体型修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "",
-        sourcePenaltyPercent ? `来源位置衰减 ${sourcePenaltyPercent}%` : "",
-        secondaryPenaltyPercent ? `非常规次要位置衰减 ${secondaryPenaltyPercent}%` : "",
+        capLabel,
         player?.isEstimated ? "估算属性" : "",
       ].filter(Boolean).join("，");
-      return `${bundle.label}（权重 ${displayedPositionWeight(result.position, result.secondary, bundle.id)}%）: ${player ? getPlayerNameCN(player.name) : "--"}${adjustments ? `（${adjustments}）` : ""}`;
+      const weightLabel = bundle.id === "potential"
+        ? "独立潜力来源"
+        : `权重 ${displayedPositionWeight(result.position, result.secondary, bundle.id)}%`;
+      return `${bundle.label}（${weightLabel}）: ${player ? getPlayerNameCN(player.name) : "--"}${adjustments ? `（${adjustments}）` : ""}`;
     }),
   ].join("\n");
 }
@@ -1005,14 +885,32 @@ function CompactNumberInput({
   );
 }
 
-function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[]; mode?: BuilderMode }) {
+function RookieBuilder({
+  teams,
+  mode = "rookie",
+  tendencyVersion = "2k26",
+  overallVersion = "2k26",
+  dataVersionLabel = "NBA 2K26",
+  selectionMode = "random",
+  availablePlayers = [],
+  onFlowActiveChange,
+}: {
+  teams: RookieBuilderTeam[];
+  mode?: BuilderMode;
+  selectionMode?: SourceSelectionMode;
+  availablePlayers?: PlayerSource[];
+  tendencyVersion?: TendencyDataVersion;
+  overallVersion?: OverallDataVersion;
+  dataVersionLabel?: string;
+  onFlowActiveChange?: (active: boolean) => void;
+}) {
   const isPrime = mode === "prime";
+  const isManualSelection = selectionMode === "manual";
   const [rookieName, setRookieName] = useState(() => generateRookieName());
   const [position, setPosition] = useState<Position>("PG");
   const [secondaryPosition, setSecondaryPosition] = useState<Position>(() => defaultSecondaryPosition("PG"));
   const [age, setAge] = useState(19);
-  const [potentialRange, setPotentialRange] = useState<PotentialRange>(defaultPotentialRange);
-  const [readiness, setReadiness] = useState(defaultReadiness);
+
   const [body, setBody] = useState<BodySettings>(() => createBodySettings("PG", Date.now()));
   const [settingsLocked, setSettingsLocked] = useState(false);
   const [tendencyLookup, setTendencyLookup] = useState<TendencyLookup | null>(null);
@@ -1023,13 +921,21 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   const [drawingTeamId, setDrawingTeamId] = useState<string | null>(null);
   const [switchesLeft, setSwitchesLeft] = useState(playerSwitchLimit);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [playerVersionGroupKey, setPlayerVersionGroupKey] = useState<string | null>(null);
   const [customizingBundleId, setCustomizingBundleId] = useState<string | null>(null);
   const [customDraft, setCustomDraft] = useState<Record<string, string>>({});
+  const [playerSearch, setPlayerSearch] = useState("");
   const [status, setStatus] = useState(`确认${isPrime ? "巅峰球员" : "新秀"}设定后开始`);
   const [mobilePane, setMobilePane] = useState<MobilePane>("settings");
   const drawTimeoutRef = useRef<number | null>(null);
   const customDialogRef = useRef<HTMLElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    onFlowActiveChange?.(settingsLocked);
+  }, [onFlowActiveChange, settingsLocked]);
+
+  useEffect(() => () => onFlowActiveChange?.(false), [onFlowActiveChange]);
 
   const clearTeamDrawTimers = () => {
     if (drawTimeoutRef.current !== null) window.clearTimeout(drawTimeoutRef.current);
@@ -1041,7 +947,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   useEffect(() => {
     if (!settingsLocked || tendencyLookup || tendencyLoadError) return;
     let active = true;
-    loadTendencyLookup()
+    loadTendencyLookup(tendencyVersion)
       .then((lookup) => {
         if (active) setTendencyLookup(lookup);
       })
@@ -1051,10 +957,10 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     return () => {
       active = false;
     };
-  }, [settingsLocked, tendencyLoadError, tendencyLookup]);
+  }, [settingsLocked, tendencyLoadError, tendencyLookup, tendencyVersion]);
 
   useEffect(() => {
-    if (!customizingBundleId) return;
+    if (!customizingBundleId && !playerVersionGroupKey) return;
 
     previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const focusDialog = () => {
@@ -1065,7 +971,8 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        setCustomizingBundleId(null);
+        if (customizingBundleId) setCustomizingBundleId(null);
+        else setPlayerVersionGroupKey(null);
         return;
       }
       if (event.key !== "Tab") return;
@@ -1093,13 +1000,44 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
       if (previousFocusRef.current?.isConnected) previousFocusRef.current.focus();
       previousFocusRef.current = null;
     };
-  }, [customizingBundleId]);
+  }, [customizingBundleId, playerVersionGroupKey]);
 
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const playersById = useMemo(
-    () => new Map(teams.flatMap((team) => team.players.map((player) => [playerId(player), player] as const))),
-    [teams],
+    () => new Map([
+      ...teams.flatMap((team) => team.players.map((player) => [playerId(player), player] as const)),
+      ...availablePlayers.map((player) => [playerId(player), player] as const),
+    ]),
+    [availablePlayers, teams],
   );
+  const manualPlayerGroups = useMemo<ManualPlayerGroup[]>(
+    () => {
+      const grouped = new Map<string, Map<string, PlayerSource>>();
+      for (const player of availablePlayers) {
+        const identity = playerIdentity(player);
+        const variants = grouped.get(identity) ?? new Map<string, PlayerSource>();
+        variants.set(playerId(player), player);
+        grouped.set(identity, variants);
+      }
+
+      return [...grouped.entries()]
+        .map(([key, variantsById]) => {
+          const variants = [...variantsById.values()].sort((left, right) => (
+            (left.rosterCategory === "current" ? 0 : left.rosterCategory === "classic" ? 1 : 2)
+            - (right.rosterCategory === "current" ? 0 : right.rosterCategory === "classic" ? 1 : 2)
+          ) || (right.overall ?? 0) - (left.overall ?? 0) || left.name.localeCompare(right.name));
+          return { key, representative: variants[0], variants };
+        })
+        .sort((left, right) => (
+          (right.variants.reduce((max, player) => Math.max(max, player.overall ?? 0), 0))
+          - (left.variants.reduce((max, player) => Math.max(max, player.overall ?? 0), 0))
+        ) || getPlayerNameCN(left.representative.name).localeCompare(getPlayerNameCN(right.representative.name)));
+    },
+    [availablePlayers],
+  );
+  const playerVersionGroup = playerVersionGroupKey
+    ? manualPlayerGroups.find((group) => group.key === playerVersionGroupKey)
+    : undefined;
   const team = settingsLocked ? teamsById.get(round.teamId) : undefined;
   const [logoTheme, setLogoTheme] = useState<"light" | "dark">(() => (
     document.documentElement.dataset.theme === "dark" ? "dark" : "light"
@@ -1136,25 +1074,28 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     for (const bundle of bundles) {
       const lock = locks[bundle.id];
       if (lock?.kind === "custom") {
-        next[bundle.id] = evaluateCustom(bundle, lock.values);
+        next[bundle.id] = evaluateCustom(bundle, lock.values, body);
         continue;
       }
       const player = lock?.kind === "player" ? playersById.get(lock.playerId) : undefined;
-      if (player) next[bundle.id] = evaluate(player, bundle, position, secondaryPosition, body);
+      if (player) next[bundle.id] = evaluate(player, bundle, body);
     }
     return next;
-  }, [body, locks, playersById, position, secondaryPosition]);
+  }, [body, locks, playersById]);
   const selectedEvaluations = useMemo(() => Object.fromEntries(
-    selectedPlayer ? bundles.map((bundle) => [bundle.id, evaluate(selectedPlayer, bundle, position, secondaryPosition, body)]) : [],
-  ) as Record<string, Evaluation>, [body, position, secondaryPosition, selectedPlayer]);
-  const penalizedAttributes = useMemo(() => new Set(
-    bundles.flatMap((bundle) => evaluations[bundle.id]?.penaltyRate > 0 ? bundle.attrs : []),
+    selectedPlayer ? bundles.map((bundle) => [bundle.id, evaluate(selectedPlayer, bundle, body)]) : [],
+  ) as Record<string, Evaluation>, [body, selectedPlayer]);
+  const bodyAdjustedAttributes = useMemo(() => new Set(
+    bundles.flatMap((bundle) => {
+      const evaluation = evaluations[bundle.id];
+      if (!evaluation) return [];
+      return bundle.attrs.filter((attr) => (
+        (evaluation.bodyAdjustments[attr] ?? 0) !== 0
+        || Object.prototype.hasOwnProperty.call(evaluation.bodyCaps, attr)
+      ));
+    }),
   ), [evaluations]);
   const effectiveAge = isPrime ? 28 : age;
-  const projectedInitialRange = useMemo(
-    () => initialOverallRange(potentialRange, effectiveAge, readiness),
-    [effectiveAge, potentialRange, readiness],
-  );
   const result = useMemo(
     () => createResult(
       evaluations,
@@ -1163,47 +1104,55 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
       position,
       secondaryPosition,
       body,
-      potentialRange,
-      readiness,
       mode,
       playersById,
       tendencyLookup,
+      overallVersion,
     ),
-    [body, effectiveAge, evaluations, locks, mode, playersById, position, potentialRange, readiness, secondaryPosition, tendencyLookup],
+    [body, effectiveAge, evaluations, locks, mode, overallVersion, playersById, position, secondaryPosition, tendencyLookup],
   );
-  const tendencyLoadState: TendencyLoadState = tendencyLookup
-    ? "ready"
-    : tendencyLoadError
-      ? "error"
-      : settingsLocked
-        ? "loading"
-        : "idle";
+  const tendencyLoadState: TendencyLoadState = tendencyLookup?.available === false
+    ? "unavailable"
+    : tendencyLookup
+      ? "ready"
+      : tendencyLoadError
+        ? "error"
+        : settingsLocked
+          ? "loading"
+          : "idle";
   const tendencyCount = Object.keys(result.tendencies).length;
   const tendencyStatusLabel = tendencyLoadState === "ready"
     ? `${tendencyCount} 项 · 未降档`
-    : tendencyLoadState === "error"
-      ? "加载失败"
-      : tendencyLoadState === "loading"
-        ? "加载中…"
-        : "未加载";
+    : tendencyLoadState === "unavailable"
+      ? "当前版本暂无"
+      : tendencyLoadState === "error"
+        ? "加载失败"
+        : tendencyLoadState === "loading"
+          ? "加载中…"
+          : "未加载";
   const tendencyEmptyText = tendencyLoadState === "error"
     ? "倾向数据加载失败，请刷新后重试"
     : tendencyLoadState === "loading"
       ? "倾向数据加载中…"
-      : "无倾向数据";
+      : tendencyLoadState === "unavailable"
+        ? "当前版本暂无独立倾向数据（未复用其他版本）"
+        : "无倾向数据";
   const completed = Object.keys(locks).length;
   const isComplete = completed === bundles.length;
   const exportReady = isComplete && tendencyLoadState !== "loading";
-  const shownIds = round.playerOrder.slice(round.offset, round.offset + 7);
+  const shownIds = round.playerOrder.slice(round.offset, round.offset + playersPerRound);
   const shownPlayers = settingsLocked
     ? shownIds.map((id) => playersById.get(id)).filter((player): player is PlayerSource => Boolean(player))
     : [];
-  const hasNextBatch = settingsLocked && round.offset + 7 < round.playerOrder.length;
+  const filteredManualPlayerGroups = useMemo(
+    () => manualPlayerGroups.filter((group) => matchesPlayerGroupSearch(group, playerSearch)),
+    [manualPlayerGroups, playerSearch],
+  );
+  const hasNextBatch = settingsLocked && round.offset + playersPerRound < round.playerOrder.length;
   const zoneCounts = Object.values(result.hotZones).reduce<Record<HotZoneState, number>>(
     (counts, state) => ({ ...counts, [state]: counts[state] + 1 }),
     { 冷区: 0, 中性: 0, 热区: 0 },
   );
-  const hasSecondaryMismatch = !isNaturalSecondaryPosition(position, secondaryPosition);
   const customizingBundle = bundles.find((bundle) => bundle.id === customizingBundleId);
   const customDraftIsValid = Boolean(customizingBundle?.attrs.every((attr) => {
     const value = Number(customDraft[attr]);
@@ -1233,25 +1182,6 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     setBody((current) => ({ ...current, [key]: value }));
   };
 
-  const updatePotentialMin = (value: number) => {
-    if (settingsLocked) return;
-    setPotentialRange((current) => ({ min: value, max: Math.max(value, current.max) }));
-  };
-
-  const updatePotentialMax = (value: number) => {
-    if (settingsLocked) return;
-    setPotentialRange((current) => ({ min: Math.min(current.min, value), max: value }));
-  };
-
-  const updateReadiness = (value: number) => {
-    if (settingsLocked) return;
-    setReadiness(clamp(value, 1, 100));
-  };
-
-  const randomizeReadiness = () => {
-    if (settingsLocked) return;
-    setReadiness(randomReadiness());
-  };
 
   const randomizeBody = () => {
     if (settingsLocked) return;
@@ -1261,7 +1191,6 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   const randomizeName = () => {
     if (settingsLocked) return;
     setRookieName(generateRookieName());
-    setReadiness(defaultReadiness);
   };
 
   const startTeamDraw = (previousTeamId: string | undefined, completionStatus: string) => {
@@ -1277,6 +1206,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     setIsTeamDrawing(true);
     setDrawingTeamId(nextRound.teamId);
     setSelectedPlayerId(null);
+    setPlayerVersionGroupKey(null);
     setCustomizingBundleId(null);
     setStatus("正在随机抽取球队...");
     setMobilePane("players");
@@ -1297,11 +1227,11 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     drawTimeoutRef.current = window.setTimeout(finishDraw, teamDrawDurationMs);
   };
 
-  // Prefetch the next switch batch while the user browses the current seven.
+  // Prefetch the next switch batch while the user browses the current eight.
   useEffect(() => {
     if (!settingsLocked || isTeamDrawing || !hasNextBatch) return;
     const upcoming = round.playerOrder
-      .slice(round.offset + 7, round.offset + 14)
+      .slice(round.offset + playersPerRound, round.offset + playersPerRound * 2)
       .map((id) => playersById.get(id)?.name)
       .filter((name): name is string => Boolean(name));
     prefetchPlayerHeadshots(upcoming);
@@ -1310,7 +1240,12 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   const confirmSettings = () => {
     setRookieName((current) => current.trim().replace(/\s+/g, " ") || generateRookieName());
     setSettingsLocked(true);
-    startTeamDraw(undefined, "第 1 轮球队已抽取");
+    if (isManualSelection) {
+      setStatus("请选择每个属性槽的来源球员");
+      setMobilePane("players");
+    } else {
+      startTeamDraw(undefined, "第 1 轮球队已抽取");
+    }
   };
 
   const drawNextTeam = () => {
@@ -1322,7 +1257,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     setRound((current) => ({
       teamId: current.teamId,
       playerOrder: current.playerOrder,
-      offset: current.offset + 7,
+      offset: current.offset + playersPerRound,
     }));
     setSwitchesLeft((current) => current - 1);
     setSelectedPlayerId(null);
@@ -1331,19 +1266,30 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
 
   const choosePlayer = (player: PlayerSource) => {
     const id = playerId(player);
-    if (!settingsLocked || isTeamDrawing || usedBy.has(playerIdentity(player))) return;
+    if (!settingsLocked || isTeamDrawing || (!isManualSelection && usedBy.has(playerIdentity(player)))) return;
     setSelectedPlayerId(id);
+    setPlayerVersionGroupKey(null);
     setStatus(`${getPlayerNameCN(player.name)} 已选择`);
     setMobilePane("attributes");
+  };
+
+  const openPlayerVersionPicker = (group: ManualPlayerGroup) => {
+    if (!settingsLocked || isTeamDrawing || isComplete) return;
+    setCustomizingBundleId(null);
+    setPlayerVersionGroupKey(group.key);
   };
 
   const finishLock = (nextLocks: LockState) => {
     setLocks(nextLocks);
     setSelectedPlayerId(null);
+    setPlayerVersionGroupKey(null);
     setCustomizingBundleId(null);
     if (Object.keys(nextLocks).length === bundles.length) {
       setStatus(`${isPrime ? "巅峰球员" : "新秀"}已揭晓`);
       setMobilePane("result");
+    } else if (isManualSelection) {
+      setStatus("已锁定，请继续选择下一个属性槽的来源球员");
+      setMobilePane("players");
     } else {
       drawNextTeam();
     }
@@ -1356,14 +1302,15 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   };
 
   const openCustomEditor = (bundle: Bundle) => {
-    if (locks[bundle.id] || !settingsLocked || isTeamDrawing) return;
+    if (bundle.id === "potential" || locks[bundle.id] || !settingsLocked || isTeamDrawing) return;
     const preview = selectedEvaluations[bundle.id];
     setCustomDraft(Object.fromEntries(bundle.attrs.map((attr) => [attr, String(preview?.values[attr] ?? 75)])));
+    setPlayerVersionGroupKey(null);
     setCustomizingBundleId(bundle.id);
   };
 
   const confirmCustomLock = () => {
-    if (!customizingBundle || !customDraftIsValid || locks[customizingBundle.id] || isTeamDrawing) return;
+    if (!customizingBundle || customizingBundle.id === "potential" || !customDraftIsValid || locks[customizingBundle.id] || isTeamDrawing) return;
     const values = Object.fromEntries(customizingBundle.attrs.map((attr) => [attr, clamp(Number(customDraft[attr]))]));
     finishLock({ ...locks, [customizingBundle.id]: { kind: "custom", values } });
   };
@@ -1375,8 +1322,6 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     setPosition("PG");
     setSecondaryPosition(defaultSecondaryPosition("PG"));
     setAge(19);
-    setPotentialRange(defaultPotentialRange);
-    setReadiness(defaultReadiness);
     setBody(createBodySettings("PG", seed));
     setRound(createRound(teams, seed));
     setSettingsLocked(false);
@@ -1385,15 +1330,17 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
     setLocks({});
     setSwitchesLeft(playerSwitchLimit);
     setSelectedPlayerId(null);
+    setPlayerVersionGroupKey(null);
     setCustomizingBundleId(null);
     setCustomDraft({});
+    setPlayerSearch("");
     setStatus(`确认${isPrime ? "巅峰球员" : "新秀"}设定后开始`);
     setMobilePane("settings");
   };
 
   const copyResult = async () => {
     try {
-      await copyText(createExportText(rookieName, result, locks, evaluations, playersById, mode, tendencyLoadState));
+      await copyText(createExportText(rookieName, result, locks, evaluations, playersById, mode, tendencyLoadState, dataVersionLabel));
       setStatus("清单已复制");
     } catch {
       setStatus("复制失败，请手动复制");
@@ -1401,7 +1348,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
   };
 
   const downloadResult = async () => {
-    const blob = new Blob([createExportText(rookieName, result, locks, evaluations, playersById, mode, tendencyLoadState)], { type: "text/plain;charset=utf-8" });
+    const blob = new Blob([createExportText(rookieName, result, locks, evaluations, playersById, mode, tendencyLoadState, dataVersionLabel)], { type: "text/plain;charset=utf-8" });
     const nameSlug = rookieName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     const suggestedName = `2k26-${isPrime ? "prime" : "rookie"}-${nameSlug || position.toLowerCase()}.txt`;
     const showSaveFilePicker = (window as Window & { showSaveFilePicker?: SaveFilePicker }).showSaveFilePicker;
@@ -1521,11 +1468,6 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
               <div className="min-w-0 sm:col-span-2">
                 <div className="section-label mb-1 flex items-center gap-1.5">
                   次要位置
-                  {hasSecondaryMismatch && (
-                    <span className="inline-flex items-center gap-0.5 text-[8px] font-semibold text-rose-700" title="非常规位置组合会对不匹配的属性额外衰减">
-                      <AlertTriangle className="h-2.5 w-2.5" />非常规
-                    </span>
-                  )}
                 </div>
                 <div aria-label="次要位置" className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
                   {positions.map((option) => {
@@ -1540,7 +1482,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                           ? "bg-white text-ink-600 hover:bg-court-50 hover:text-court-800"
                           : "bg-rose-50/60 text-rose-500 hover:bg-rose-100 hover:text-rose-800";
                     return (
-                      <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`h-full min-w-0 flex-1 px-1 text-[11px] font-semibold transition disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked || isPrimary} onClick={() => changeSecondaryPosition(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规次要位置" : "非常规次要位置：部分能力会额外衰减"} type="button">{option}</button>
+                      <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`h-full min-w-0 flex-1 px-1 text-[11px] font-semibold transition disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked || isPrimary} onClick={() => changeSecondaryPosition(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规次要位置" : "非常规次要位置：仍按来源属性与目标体型计算"} type="button">{option}</button>
                     );
                   })}
                 </div>
@@ -1548,63 +1490,6 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             </div>
           </section>
 
-          <section aria-labelledby="ability-estimate-label" className="builder-setup-growth bg-white px-3 py-3">
-            <div className="mb-2 flex items-end justify-between gap-2">
-              <div className="section-label" id="ability-estimate-label">成长设定</div>
-              {!isPrime && (
-                <span className="text-[9px] font-medium text-ink-400" title="新秀开局综评由巅峰区间、年龄与即战力推算">
-                  巅峰 → 即战力 → 新秀
-                </span>
-              )}
-            </div>
-            {isPrime ? (
-              <div className="flex min-h-[4.5rem] flex-1 items-center justify-between rounded-[6px] border border-court-200 bg-court-50 px-3">
-                <div>
-                  <div className="text-[11px] font-semibold text-court-800">巅峰属性直出</div>
-                  <div className="mt-0.5 text-[9px] text-court-700/80">年龄固定 28 岁，不走新秀成长曲线</div>
-                </div>
-                <span className="font-mono text-[18px] font-bold tabular-nums text-court-800">28</span>
-              </div>
-            ) : (
-              <div className="grid flex-1 grid-cols-3 gap-2">
-                <label className="growth-metric min-w-0 rounded-[6px] border border-ink-200 bg-ink-50 px-2 py-2">
-                  <span className="section-label flex items-center justify-between gap-1" title="生成球员最终可以达到的综评区间">
-                    巅峰综评
-                    <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-ink-400">目标</span>
-                  </span>
-                  <span className="mt-1.5 flex h-8 items-center justify-center gap-0.5 overflow-hidden rounded-[5px] border border-ink-200 bg-white focus-within:border-court-500">
-                    <CompactNumberInput ariaLabel="巅峰综评下限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMin} value={potentialRange.min} />
-                    <span className="text-[10px] text-ink-300">–</span>
-                    <CompactNumberInput ariaLabel="巅峰综评上限" disabled={settingsLocked} max={99} min={60} onChange={updatePotentialMax} value={potentialRange.max} />
-                  </span>
-                </label>
-                <label className="growth-metric min-w-0 rounded-[6px] border border-ink-200 bg-ink-50 px-2 py-2">
-                  <span className="section-label flex items-center justify-between gap-1" title="即战力表示新秀已经兑现了多少巅峰能力；数值越高，开局越接近巅峰">
-                    <span className="inline-flex items-center gap-1">即战力 <CircleHelp className="h-3 w-3 text-ink-400" /></span>
-                    <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-ink-400">成熟度</span>
-                  </span>
-                  <span className="mt-1.5 flex h-8 overflow-hidden rounded-[5px] border border-ink-200 bg-white focus-within:border-court-500">
-                    <span className="flex min-w-0 flex-1 items-center justify-center">
-                      <CompactNumberInput ariaLabel="即战力" disabled={settingsLocked} max={100} min={1} onChange={updateReadiness} value={readiness} />
-                    </span>
-                    <button aria-label="随机即战力" className="flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 transition hover:bg-ink-50 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeReadiness} title="随机生成 1–100 即战力" type="button"><Shuffle className="h-3.5 w-3.5" /></button>
-                  </span>
-                </label>
-                <div className="growth-metric min-w-0 rounded-[6px] border border-court-200 bg-court-50 px-2 py-2" title="由年龄、巅峰综评和即战力共同计算；锁定属性后还会再按游戏 OVR 模型校准">
-                  <div className="section-label flex items-center justify-between gap-1 text-court-700">
-                    新秀综评
-                    <span className="font-mono text-[8px] font-medium normal-case tracking-normal text-court-600/80">推算</span>
-                  </div>
-                  <div
-                    className="mt-1.5 flex h-8 items-center justify-center rounded-[5px] border border-court-200/70 bg-white/70 font-mono text-[13px] font-bold tabular-nums text-court-800"
-                    data-testid="projected-initial-range"
-                  >
-                    {projectedInitialRange.min}–{projectedInitialRange.max}
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
 
           <section aria-labelledby="body-settings-label" className="builder-setup-body bg-ink-50/60 px-3 py-3">
             <div className="mb-2 flex items-center justify-between gap-2">
@@ -1671,18 +1556,19 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
               const lockedEvaluation = evaluations[bundle.id];
               const preview = selectedEvaluations[bundle.id];
               const value = lockedEvaluation?.adjusted ?? preview?.adjusted;
-              const penaltyPercent = Math.round((lockedEvaluation?.penaltyRate ?? preview?.penaltyRate ?? 0) * 100);
-              const sourcePenaltyPercent = Math.round((lockedEvaluation?.sourcePenaltyRate ?? preview?.sourcePenaltyRate ?? 0) * 100);
-              const secondaryPenaltyPercent = Math.round((lockedEvaluation?.secondaryPenaltyRate ?? preview?.secondaryPenaltyRate ?? 0) * 100);
-              const hasPositionPenalty = penaltyPercent > 0;
+              const activeEvaluation = lockedEvaluation ?? preview;
               const bodyAdjustment = lockedEvaluation?.bodyAdjustment ?? preview?.bodyAdjustment ?? 0;
               const sourceLabel = lock?.kind === "custom" ? "用户自定义" : lockedPlayer ? getPlayerNameCN(lockedPlayer.name) : (selectedPlayer ? "可锁定" : "待选择");
-              const weightLabel = `主次位置综合权重 ${displayedPositionWeight(position, secondaryPosition, bundle.id)}%`;
+              const weightLabel = bundle.id === "potential"
+                ? "独立潜力来源，不参与位置 OVR 权重"
+                : `主次位置综合权重 ${displayedPositionWeight(position, secondaryPosition, bundle.id)}%`;
               const bodyAdjustmentLabel = bodyAdjustment ? `体型 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "";
+              const capLabels = Object.entries(activeEvaluation?.bodyCaps ?? {})
+                .map(([attr, cap]) => `${attrNameCN[attr] ?? attr}上限 ${cap}`);
+              const hasBodyConstraint = bodyAdjustment !== 0 || capLabels.length > 0;
               const adjustmentLabel = [
                 bodyAdjustmentLabel,
-                sourcePenaltyPercent ? `来源位置衰减 ${sourcePenaltyPercent}%` : "",
-                secondaryPenaltyPercent ? `非常规次要位置衰减 ${secondaryPenaltyPercent}%` : "",
+                ...capLabels,
               ].filter(Boolean).join(" · ");
               return (
                 <div
@@ -1703,13 +1589,13 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                       <span className="block truncate text-[8px] text-ink-400">{sourceLabel}{bodyAdjustmentLabel ? ` · ${bodyAdjustmentLabel}` : ""}</span>
                     </span>
                     {typeof value === "number" ? (
-                      <span className="flex shrink-0 items-center gap-0.5" title={hasPositionPenalty ? adjustmentLabel : undefined}>
-                        {hasPositionPenalty && <ArrowDown aria-hidden="true" className="h-3 w-3 stroke-[2.5] text-rose-600" />}
+                      <span className="flex shrink-0 items-center gap-1" title={hasBodyConstraint ? adjustmentLabel : undefined}>
+                        {hasBodyConstraint && <span className="text-[8px] font-semibold text-court-600">体型</span>}
                         <span className={`text-[13px] font-bold tabular-nums ${valueColor(value)}`}>{value}</span>
                       </span>
                     ) : <span className="text-ink-300">--</span>}
                   </button>
-                  {!lock && (
+                  {!lock && bundle.id !== "potential" && (
                     <button
                       aria-label={`自定义${bundle.label}`}
                       className="absolute right-1 top-1/2 z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-[4px] text-ink-400 transition hover:bg-ink-200 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-200"
@@ -1738,10 +1624,10 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
         >
           <div className="workspace-toolbar flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
             <div>
-              <div className="flex items-center gap-2"><Shuffle className={`h-3.5 w-3.5 text-court-700 ${isTeamDrawing ? "animate-spin" : ""}`} /><h2 className="text-[14px] font-semibold text-ink-900">{isTeamDrawing ? "随机球队" : team ? teamNamesCN[team.name] ?? team.name : "等待开始"}</h2></div>
-              <div className="mt-0.5 font-mono text-[9px] text-ink-400">{!settingsLocked ? "基础设定待确认" : isTeamDrawing ? "球队跑马灯抽取中" : isComplete ? `已完成 / ${completed}/${bundles.length}` : `第 ${completed + 1} 轮 / 展示 ${shownPlayers.length}/${team?.players.length ?? 0}`}</div>
+              <div className="flex items-center gap-2"><UsersRound className={`h-3.5 w-3.5 text-court-700 ${isTeamDrawing ? "animate-spin" : ""}`} /><h2 className="text-[14px] font-semibold text-ink-900">{isManualSelection ? "自选来源" : isTeamDrawing ? "随机球队" : team ? teamNamesCN[team.name] ?? team.name : "等待开始"}</h2></div>
+              <div className="mt-0.5 font-mono text-[9px] text-ink-400">{!settingsLocked ? "基础设定待确认" : isManualSelection ? isComplete ? `已完成 / ${completed}/${bundles.length}` : "搜索球员，选择后点击右侧属性槽" : isTeamDrawing ? "球队跑马灯抽取中" : isComplete ? `已完成 / ${completed}/${bundles.length}` : `第 ${completed + 1} 轮 / 展示 ${shownPlayers.length}/${team?.players.length ?? 0}`}</div>
             </div>
-            {settingsLocked && !isComplete && (
+            {settingsLocked && !isComplete && !isManualSelection && (
               <div className="flex items-center gap-1.5">
                 {(() => {
                   const switchDisabled = isTeamDrawing || switchesLeft <= 0 || !hasNextBatch;
@@ -1771,7 +1657,50 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
             )}
           </div>
 
-          {settingsLocked ? isTeamDrawing ? <div className="flex min-h-[300px] flex-1 items-center px-2.5 py-3 sm:px-4">
+          {settingsLocked ? isManualSelection ? <>
+            <div className="flex items-center gap-2 border-b border-ink-200 px-3 py-2">
+              <input
+                aria-label="搜索来源球员"
+                className="min-w-0 flex-1 bg-transparent text-[12px] text-ink-900 outline-none placeholder:text-ink-400"
+                onChange={(event) => setPlayerSearch(event.target.value)}
+                placeholder="搜索中文名、英文名、位置或球队"
+                type="search"
+                value={playerSearch}
+              />
+              <span className="shrink-0 text-[9px] tabular-nums text-ink-400">{filteredManualPlayerGroups.length}/{manualPlayerGroups.length}</span>
+            </div>
+            <div className="grid flex-1 auto-rows-[62px] grid-cols-2 gap-2 overflow-y-auto p-2.5">
+              {filteredManualPlayerGroups.map((group) => {
+                const selected = selectedPlayer ? playerIdentity(selectedPlayer) === group.key : false;
+                const representative = group.representative;
+                const maxOverall = group.variants.reduce((max, player) => Math.max(max, player.overall ?? 0), 0);
+                const positionSummary = [...new Set(group.variants.map((player) => player.position).filter(Boolean))].join("/");
+                return (
+                  <button
+                    key={group.key}
+                    aria-label={`选择${getPlayerNameCN(representative.name)}，${group.variants.length}个版本`}
+                    aria-pressed={selected}
+                    className={`flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left transition ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`}
+                    disabled={isComplete}
+                    onClick={() => openPlayerVersionPicker(group)}
+                    title={`${getPlayerNameCN(representative.name)} · 点击选择版本`}
+                    type="button"
+                  >
+                    <PlayerHeadshot name={representative.name} priority={false} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(representative.name)}</span>
+                      <span className="block truncate text-[9px] text-ink-400">{representative.name} · {group.variants.length} 个版本{positionSummary ? ` · ${positionSummary}` : ""}</span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-1">
+                      <span className={`text-[14px] font-bold tabular-nums ${maxOverall ? valueColor(maxOverall) : "text-ink-400"}`}>{maxOverall || "--"}</span>
+                      <ChevronRight aria-hidden="true" className="h-3.5 w-3.5 text-ink-300" />
+                    </span>
+                  </button>
+                );
+              })}
+              {filteredManualPlayerGroups.length === 0 && <div className="col-span-2 flex min-h-[180px] items-center justify-center text-[11px] text-ink-400">没有匹配的球员</div>}
+            </div>
+          </> : isTeamDrawing ? <div className="flex min-h-[300px] flex-1 items-center px-2.5 py-3 sm:px-4">
             <MarqueeDraw
               currentLabel={drawingTeamId ? teamDrawItems.find((item) => item.id === drawingTeamId)?.label : undefined}
               dataKind="team"
@@ -1796,7 +1725,7 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                 </button>
               );
             })}
-          </div> : <div className="flex min-h-[300px] flex-1 flex-col items-center justify-center px-4 text-center"><Check className="h-7 w-7 text-ink-300" /><div className="mt-3 text-[14px] font-semibold text-ink-600">确认设定后抽取球队</div><div className="mt-1 text-[10px] text-ink-400">{position}/{secondaryPosition} · {effectiveAge}岁 · {body.height} cm</div></div>}
+          </div> : <div className="flex min-h-[300px] flex-1 flex-col items-center justify-center px-4 text-center"><Check className="h-7 w-7 text-ink-300" /><div className="mt-3 text-[14px] font-semibold text-ink-600">确认设定后开始</div><div className="mt-1 text-[10px] text-ink-400">{position}/{secondaryPosition} · {effectiveAge}岁 · {body.height} cm</div></div>}
 
           <div className="flex min-h-11 items-center justify-between gap-2 border-t border-ink-200 bg-ink-50 px-3 py-2">
             <div className="min-w-0 truncate text-[10px] text-ink-500">{selectedPlayer ? `${getPlayerNameCN(selectedPlayer.name)} · 请选择要锁定的属性` : status}</div>
@@ -1833,16 +1762,9 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                 </div>
               ) : (
                 <div className="border-b border-ink-200 px-3 py-2.5">
-                  <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold text-ink-700">成长轨迹</span><span className="font-mono text-court-700">巅峰 {result.minPotential}–{result.maxPotential}</span></div>
-                  {result.calibrationWarning && (
-                    <div className="mb-2 flex items-start gap-1.5 rounded-[5px] border border-amber-200 bg-amber-50 px-2 py-1.5 text-[9px] leading-4 text-amber-800" data-testid="overall-calibration-warning">
-                      <AlertTriangle aria-hidden="true" className="mt-0.5 h-3 w-3 shrink-0" />
-                      <span>{result.calibrationWarning}</span>
-                    </div>
-                  )}
+                  <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold text-ink-700">成长轨迹</span><span className="font-mono text-court-700">潜力来源 {result.potential}</span></div>
                   <div className="mb-2 grid grid-cols-2 gap-x-3 gap-y-1 border-y border-ink-100 py-1.5 text-[9px]">
-                    <div className="flex justify-between gap-2"><span className="text-ink-400">即战力</span><strong className="tabular-nums text-ink-700">{result.readiness}</strong></div>
-                    <div className="flex justify-between gap-2"><span className="text-ink-400">新秀区间</span><strong className="tabular-nums text-ink-700">{result.projectedInitialRange.min}–{result.projectedInitialRange.max}</strong></div>
+                    <div className="flex justify-between gap-2"><span className="text-ink-400">预计初始综评</span><strong className="tabular-nums text-ink-700">{result.initialStrength}</strong></div>
                     <div className="flex justify-between gap-2"><span className="text-ink-400">巅峰年龄</span><strong className="tabular-nums text-ink-700">{result.peakStart}–{result.peakEnd}</strong></div>
                     <div className="flex justify-between gap-2"><span className="text-ink-400">进步速度</span><strong className="tabular-nums text-ink-700">+{result.progressSpeed}/年</strong></div>
                   </div>
@@ -1895,12 +1817,12 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
                 <div className={group.key === "durability" ? "grid gap-x-5 sm:grid-cols-2" : ""}>
                   {group.attrs.map((attr) => {
                     const value = result.initialAttrs[attr];
-                    const hasPositionPenalty = penalizedAttributes.has(attr);
+                    const hasBodyAdjustment = bodyAdjustedAttributes.has(attr);
                     return (
                       <div key={attr} className="flex min-h-6 items-center justify-between gap-3 border-t border-ink-700/5 py-1 text-[10px]">
                         <span className="min-w-0 text-ink-500">{attrNameCN[attr] ?? attr}</span>
-                        <span className="flex shrink-0 items-center gap-0.5" title={hasPositionPenalty ? "该属性包含来源位置或非常规次要位置衰减" : undefined}>
-                          {hasPositionPenalty && <ArrowDown aria-hidden="true" className="h-3 w-3 stroke-[2.5] text-rose-600" />}
+                        <span className="flex shrink-0 items-center gap-1" title={hasBodyAdjustment ? "该属性包含目标身体带来的修正或物理上限" : undefined}>
+                          {hasBodyAdjustment && <span className="text-[8px] font-semibold text-court-600">体型</span>}
                           <span className={`font-semibold tabular-nums ${typeof value === "number" ? valueColor(value) : "text-ink-300"}`}>{value ?? "--"}</span>
                         </span>
                       </div>
@@ -1913,6 +1835,50 @@ function RookieBuilder({ teams, mode = "rookie" }: { teams: RookieBuilderTeam[];
         </section>
         )}
       </div>
+      {playerVersionGroup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
+          <section aria-label={`选择${getPlayerNameCN(playerVersionGroup.representative.name)}版本`} aria-modal="true" className="w-full max-w-[520px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={customDialogRef} role="dialog">
+            <div className="workspace-toolbar flex items-center justify-between gap-3 px-3 py-2.5">
+              <div className="flex min-w-0 items-center gap-2">
+                <PlayerHeadshot name={playerVersionGroup.representative.name} priority />
+                <div className="min-w-0">
+                  <div className="section-label">选择球员版本</div>
+                  <div className="truncate text-[14px] font-semibold text-ink-800">{getPlayerNameCN(playerVersionGroup.representative.name)}</div>
+                  <div className="truncate text-[9px] text-ink-400">{playerVersionGroup.representative.name} · {playerVersionGroup.variants.length} 个版本</div>
+                </div>
+              </div>
+              <button aria-label="关闭球员版本选择" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-ink-500 hover:bg-ink-200 hover:text-ink-800" onClick={() => setPlayerVersionGroupKey(null)} type="button"><X className="h-4 w-4" /></button>
+            </div>
+            <div className="max-h-[58vh] space-y-1.5 overflow-y-auto border-t border-ink-200 p-3">
+              {playerVersionGroup.variants.map((variant) => {
+                const id = playerId(variant);
+                const selected = selectedPlayerId === id;
+                return (
+                  <button
+                    aria-pressed={selected}
+                    className={`flex w-full items-center gap-2 rounded-[5px] border px-2.5 py-2 text-left transition ${selected ? "border-court-600 bg-court-50 shadow-[inset_3px_0_0_#2b8969]" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`}
+                    key={id}
+                    onClick={() => choosePlayer(variant)}
+                    type="button"
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[11px] font-semibold text-ink-800">{playerVariantLabel(variant)}</span>
+                      <span className="mt-0.5 block truncate text-[9px] text-ink-400">{variant.position ?? "--"} · {variant.height ?? "身高未知"}{variant.isEstimated ? " · 部分属性为估算" : ""}</span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-2">
+                      <span className={`text-[16px] font-bold tabular-nums ${typeof variant.overall === "number" ? valueColor(variant.overall) : "text-ink-400"}`}>{variant.overall ?? "--"}</span>
+                      {selected ? <Check aria-hidden="true" className="h-3.5 w-3.5 text-court-600" /> : <ChevronRight aria-hidden="true" className="h-3.5 w-3.5 text-ink-300" />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="border-t border-ink-200 bg-ink-50 px-3 py-2.5 text-[10px] text-ink-500">
+              选择版本后会返回属性槽，再点击目标属性完成锁定。
+            </div>
+          </section>
+        </div>
+      )}
       {customizingBundle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
           <section aria-label={`自定义${customizingBundle.label}`} aria-modal="true" className="w-full max-w-[430px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={customDialogRef} role="dialog">

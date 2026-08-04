@@ -1,0 +1,26 @@
+{
+  "version": "2K26",
+  "label": "NBA 2K26",
+  "roster": {
+    "source": "https://raw.githubusercontent.com/Rush-Shaw/nba-player-attributes/cd6e02c14ea65022b1263d05c1add35acd1728d6/data/raw/2k26_roster_raw.json",
+    "generatedAt": "2026-05-19T17:00:21.142Z",
+    "teams": 30,
+    "players": 495
+  },
+  "players": {
+    "source": "https://raw.githubusercontent.com/Rush-Shaw/nba-player-attributes/cd6e02c14ea65022b1263d05c1add35acd1728d6/data/raw/2k26_roster_raw.json",
+    "profiles": 495
+  },
+  "badges": {
+    "source": "src/data/badgeProfiles.2k26.json",
+    "profiles": 495
+  },
+  "tendencies": {
+    "source": "ATD 2K26 committee export",
+    "available": true,
+    "profiles": 445
+  },
+  "overallModel": {
+    "file": "rookieOverallModel.json"
+  }
+}

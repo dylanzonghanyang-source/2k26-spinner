@@ -1,6 +1,10 @@
 import playerHeadshots from "./data/playerHeadshots.json";
+import playerPresentation from "./data/playerPresentation.json";
 
-const playerIds = playerHeadshots as Record<string, string>;
+const playerIds = {
+  ...(playerPresentation.headshotIds as Record<string, string>),
+  ...(playerHeadshots as Record<string, string>),
+};
 const normalizedHeadshots = new Map(
   Object.entries(playerIds).map(([name, playerId]) => [normalizeName(name), playerId]),
 );

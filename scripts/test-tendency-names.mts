@@ -33,5 +33,7 @@ assert.equal(getTendencyNameCN("Spot Up Drive"), "切入定点投");
 assert.equal(getTendencyNameCN("Crash"), "冲抢进攻篮板");
 assert.equal(getTendencyNameCN("Touches"), "球感");
 assert.equal(getTendencyNameCN("Hard Foul"), "强硬犯规");
+assert.equal(getTendencyNameCN("Driving Crossover"), "变相切入");
+assert.equal(getTendencyNameCN("Driving Double Crossover"), "二次变相切入");
 
 console.log(`tendency Chinese names OK: ${fields.length} fields`);

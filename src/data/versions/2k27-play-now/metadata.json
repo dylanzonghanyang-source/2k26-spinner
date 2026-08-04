@@ -1,0 +1,26 @@
+{
+  "version": "2K27",
+  "label": "NBA 2K27 Play Now",
+  "roster": {
+    "source": "https://api.nba2kapi.com/api/public/players?teamType=curr&limit=100 (paginated)",
+    "generatedAt": "2026-08-01T06:16:48.290Z",
+    "teams": 126,
+    "players": 1686
+  },
+  "players": {
+    "source": "https://api.nba2kapi.com/api/public/players?teamType=curr&limit=100 (paginated)",
+    "profiles": 457
+  },
+  "badges": {
+    "source": "https://api.nba2kapi.com/api/public/players?teamType=curr&limit=100 (paginated)",
+    "profiles": 457
+  },
+  "tendencies": {
+    "available": false,
+    "profiles": 0,
+    "note": "目前没有独立的 2K27 Play Now 倾向来源；不复用 2K26 倾向。"
+  },
+  "overallModel": {
+    "file": "rookieOverallModel.json"
+  }
+}

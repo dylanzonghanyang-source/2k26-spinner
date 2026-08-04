@@ -68,10 +68,18 @@ export type BadgeBundleSource = {
   playerId?: string;
 };
 
+export type BadgeBundleMap = Record<string, string | string[]>;
+
+function mappedBundleIds(badgeToBundle: BadgeBundleMap, badgeName: string): string[] {
+  const mapping = badgeToBundle[badgeName];
+  if (!mapping) return [];
+  return Array.isArray(mapping) ? mapping : [mapping];
+}
+
 /**
- * Collect inherited badges per attribute slot: each badge is inherited from
- * the player locked into its mapped slot. Duplicate names keep the highest
- * tier. Players without a badge profile contribute nothing.
+ * Collect inherited badges per attribute slot. A badge may be mapped to one
+ * or more related slots (for example, Deadeye belongs to both three and mid),
+ * and duplicate names keep the highest tier.
  */
 export function collectBadgesByBundle({
   sources,
@@ -79,7 +87,7 @@ export function collectBadgesByBundle({
   badgesForPlayer,
 }: {
   sources: BadgeBundleSource[];
-  badgeToBundle: Record<string, string>;
+  badgeToBundle: BadgeBundleMap;
   badgesForPlayer: (playerId: string) => PlayerBadgeLike[] | undefined;
 }): PlayerBadgeLike[] {
   const badgeByBundle = new Map<string, PlayerBadgeLike[]>();
@@ -88,7 +96,7 @@ export function collectBadgesByBundle({
     const playerBadges = badgesForPlayer(source.playerId);
     if (!playerBadges) continue;
     for (const badge of playerBadges) {
-      if (badgeToBundle[badge.name] !== source.bundleId) continue;
+      if (!mappedBundleIds(badgeToBundle, badge.name).includes(source.bundleId)) continue;
       const list = badgeByBundle.get(source.bundleId) ?? [];
       list.push(badge);
       badgeByBundle.set(source.bundleId, list);
@@ -106,7 +114,7 @@ export function buildBadgesByBundle({
   fallbackBadges,
 }: {
   sources: BadgeBundleSource[];
-  badgeToBundle: Record<string, string>;
+  badgeToBundle: BadgeBundleMap;
   badgesForPlayer: (playerId: string) => PlayerBadgeLike[] | undefined;
   profileKnown: (playerId: string) => boolean;
   fallbackBadges: PlayerBadgeLike[];
@@ -115,7 +123,10 @@ export function buildBadgesByBundle({
   const missingBundles = new Set(sources
     .filter((source) => !source.playerId || !profileKnown(source.playerId))
     .map((source) => source.bundleId));
-  const fallback = fallbackBadges.filter((badge) => missingBundles.has(badgeToBundle[badge.name]));
+  const fallback = fallbackBadges.filter((badge) => {
+    const mappedBundles = mappedBundleIds(badgeToBundle, badge.name);
+    return mappedBundles.length > 0 && mappedBundles.every((bundleId) => missingBundles.has(bundleId));
+  });
   return {
     badges: uniqueBadges([...inherited, ...fallback]),
     estimated: missingBundles.size > 0,

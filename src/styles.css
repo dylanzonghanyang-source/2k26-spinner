@@ -720,6 +720,75 @@ input:focus-visible {
   width: 14px;
 }
 
+/* Data version toggle */
+.data-version-toggle {
+  display: inline-flex;
+  gap: 1px;
+  border: 1px solid #d8d8d1;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #d8d8d1;
+}
+
+.version-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 24px;
+  padding: 0 8px;
+  border: none;
+  background: #ffffff;
+  color: #6b6b65;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 140ms ease, color 140ms ease;
+  cursor: pointer;
+}
+
+.version-option:hover {
+  background: #f7f7f4;
+  color: #20201d;
+}
+
+.version-active {
+  background: #20201d;
+  color: #ffffff;
+}
+
+.version-active:hover {
+  background: #343430;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .data-version-toggle {
+  border-color: #46534b;
+  background: #46534b;
+}
+
+html[data-theme="dark"] .version-option {
+  background: #1b211d;
+  color: #aab6ae;
+}
+
+html[data-theme="dark"] .version-option:hover {
+  background: #2a332d;
+  color: #e7ebe7;
+}
+
+html[data-theme="dark"] .version-active {
+  border-color: #63746a;
+  background: #303b35;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .version-active:hover {
+  background: #3d4a41;
+  color: #ffffff;
+}
+
 html[data-theme="dark"] {
   color-scheme: dark;
   background: #141816;
