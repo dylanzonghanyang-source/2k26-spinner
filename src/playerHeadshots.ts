@@ -22,31 +22,17 @@ function resolvePlayerId(name: string) {
   return playerIds[name] ?? normalizedHeadshots.get(normalizeName(name));
 }
 
-/**
- * Build ordered headshot URL candidates for a player.
- *
- * Local/dev first tries the same-origin Vite/Vercel proxy to avoid browser HTTP/2
- * failures against cdn.nba.com (common with local proxies). Then fall back to the
- * global CDN and a secondary NBA static host.
- */
+/** Use the same-origin proxy in dev and production; failures end in the explicit fallback avatar. */
 export function getPlayerHeadshotSources(name: string): string[] {
   const playerId = resolvePlayerId(name);
   if (!playerId) return [];
 
   const base = typeof import.meta !== "undefined" && import.meta.env?.BASE_URL ? import.meta.env.BASE_URL : "/";
   const proxyPrefix = `${base.endsWith("/") ? base : `${base}/`}nba-headshots`;
-
-  const proxiedSource = `${proxyPrefix}/${playerId}.png`;
-  if (import.meta.env.DEV) return [proxiedSource];
-
-  return [
-    proxiedSource,
-    `https://cdn.nba.com/headshots/nba/latest/260x190/${playerId}.png`,
-    `https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/${playerId}.png`,
-  ];
+  return [`${proxyPrefix}/${playerId}.png`];
 }
 
-/** Prefer the same-origin proxy, then fall back to public NBA CDN hosts. */
+/** Load through the same-origin proxy so local and production browsers share one fallback path. */
 export function getPlayerHeadshot(name: string) {
   return getPlayerHeadshotSources(name)[0];
 }
