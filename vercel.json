@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/nba-headshots/:id.png",
-      "destination": "https://cdn.nba.com/headshots/nba/latest/260x190/:id.png"
+      "destination": "/api/nba-headshots/:id"
     }
   ],
   "headers": [
