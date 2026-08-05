@@ -14,3 +14,9 @@ data/2kratings/
 
 .superpowers/
 .vercel
+
+# local artifacts
+logs/
+test-results/
+spikes/
+.hermes/
