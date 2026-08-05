@@ -13,12 +13,13 @@
   --color-accent-soft: #eef8f3;
   --color-warning: #80501d;
   --color-warning-soft: #fbf6eb;
-  /* Rating text: tuned for AA+ on white and warm-gray panels */
-  --rating-elite: #6b3a0f;
-  --rating-good: #145a45;
-  --rating-solid: #1d4f91;
-  --rating-fair: #62438f;
-  --rating-low: #a33d4f;
+  /* Classic game rarity scale: gold, red, purple, blue, green, common. */
+  --rating-gold: #6b3a0f;
+  --rating-red: #a33d4f;
+  --rating-purple: #62438f;
+  --rating-blue: #1d4f91;
+  --rating-green: #1b6b46;
+  --rating-common: #4f5752;
   --motion-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --motion-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --motion-fast: 140ms;
@@ -50,24 +51,28 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.value-rating-elite {
-  color: var(--rating-elite) !important;
+.value-rating-gold {
+  color: var(--rating-gold) !important;
 }
 
-.value-rating-good {
-  color: var(--rating-good) !important;
+.value-rating-red {
+  color: var(--rating-red) !important;
 }
 
-.value-rating-solid {
-  color: var(--rating-solid) !important;
+.value-rating-purple {
+  color: var(--rating-purple) !important;
 }
 
-.value-rating-fair {
-  color: var(--rating-fair) !important;
+.value-rating-blue {
+  color: var(--rating-blue) !important;
 }
 
-.value-rating-low {
-  color: var(--rating-low) !important;
+.value-rating-green {
+  color: var(--rating-green) !important;
+}
+
+.value-rating-common {
+  color: var(--rating-common) !important;
 }
 
 button {
@@ -1118,11 +1123,12 @@ html[data-theme="dark"] {
   --color-accent-soft: #193f32;
   --color-warning: #ffd36a;
   --color-warning-soft: #382a18;
-  --rating-elite: #ffd36a;
-  --rating-good: #6fdbab;
-  --rating-solid: #8db8ff;
-  --rating-fair: #c3a5f5;
-  --rating-low: #ff9b9f;
+  --rating-gold: #ffd36a;
+  --rating-red: #ff9b9f;
+  --rating-purple: #c3a5f5;
+  --rating-blue: #8db8ff;
+  --rating-green: #82dfaa;
+  --rating-common: #f3f7f4;
 }
 
 html[data-theme="dark"] body {
@@ -1323,24 +1329,28 @@ html[data-theme="dark"] [class*="text-court-500"] {
   color: #6fdbab !important;
 }
 
-html[data-theme="dark"] .value-rating-elite {
-  color: var(--rating-elite) !important;
+html[data-theme="dark"] .value-rating-gold {
+  color: var(--rating-gold) !important;
 }
 
-html[data-theme="dark"] .value-rating-good {
-  color: var(--rating-good) !important;
+html[data-theme="dark"] .value-rating-red {
+  color: var(--rating-red) !important;
 }
 
-html[data-theme="dark"] .value-rating-solid {
-  color: var(--rating-solid) !important;
+html[data-theme="dark"] .value-rating-purple {
+  color: var(--rating-purple) !important;
 }
 
-html[data-theme="dark"] .value-rating-fair {
-  color: var(--rating-fair) !important;
+html[data-theme="dark"] .value-rating-blue {
+  color: var(--rating-blue) !important;
 }
 
-html[data-theme="dark"] .value-rating-low {
-  color: var(--rating-low) !important;
+html[data-theme="dark"] .value-rating-green {
+  color: var(--rating-green) !important;
+}
+
+html[data-theme="dark"] .value-rating-common {
+  color: var(--rating-common) !important;
 }
 
 html[data-theme="dark"] [class*="border-ink-"],
@@ -1459,22 +1469,26 @@ html[data-theme="dark"] .marquee-draw-mark img {
 }
 
 /* Keep rating semantics after the broad legacy text utility overrides above. */
-html[data-theme="dark"] .value-rating-elite {
-  color: var(--rating-elite) !important;
+html[data-theme="dark"] .value-rating-gold {
+  color: var(--rating-gold) !important;
 }
 
-html[data-theme="dark"] .value-rating-good {
-  color: var(--rating-good) !important;
+html[data-theme="dark"] .value-rating-red {
+  color: var(--rating-red) !important;
 }
 
-html[data-theme="dark"] .value-rating-solid {
-  color: var(--rating-solid) !important;
+html[data-theme="dark"] .value-rating-purple {
+  color: var(--rating-purple) !important;
 }
 
-html[data-theme="dark"] .value-rating-fair {
-  color: var(--rating-fair) !important;
+html[data-theme="dark"] .value-rating-blue {
+  color: var(--rating-blue) !important;
 }
 
-html[data-theme="dark"] .value-rating-low {
-  color: var(--rating-low) !important;
+html[data-theme="dark"] .value-rating-green {
+  color: var(--rating-green) !important;
+}
+
+html[data-theme="dark"] .value-rating-common {
+  color: var(--rating-common) !important;
 }

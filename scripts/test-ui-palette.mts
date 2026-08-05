@@ -24,18 +24,20 @@ const white = "#ffffff";
 const darkPanel = "#1c211f";
 
 const lightRatingColors: Record<string, string> = {
-  elite: "#6b3a0f",
-  good: "#145a45",
-  solid: "#1d4f91",
-  fair: "#62438f",
-  low: "#a33d4f",
+  gold: "#6b3a0f",
+  red: "#a33d4f",
+  purple: "#62438f",
+  blue: "#1d4f91",
+  green: "#1b6b46",
+  common: "#4f5752",
 };
 const lightRatings: [string, string, string][] = [
-  ["90+ light-elite", lightRatingColors.elite, white],
-  ["80+ light-good", lightRatingColors.good, white],
-  ["70+ light-solid", lightRatingColors.solid, white],
-  ["60+ light-fair", lightRatingColors.fair, white],
-  ["<60 light-low", lightRatingColors.low, white],
+  ["90-99 light-gold", lightRatingColors.gold, white],
+  ["80-89 light-red", lightRatingColors.red, white],
+  ["70-79 light-purple", lightRatingColors.purple, white],
+  ["60-69 light-blue", lightRatingColors.blue, white],
+  ["50-59 light-green", lightRatingColors.green, white],
+  ["<50 light-common", lightRatingColors.common, white],
 ];
 for (const [label, fg, bg] of lightRatings) {
   const ratio = contrastRatio(fg, bg);
@@ -44,18 +46,20 @@ for (const [label, fg, bg] of lightRatings) {
 
 // Dark mode rating colors — must pass AA (≥4.5) on dark panel
 const darkRatingColors: Record<string, string> = {
-  elite: "#ffd36a",
-  good: "#6fdbab",
-  solid: "#8db8ff",
-  fair: "#c3a5f5",
-  low: "#ff9b9f",
+  gold: "#ffd36a",
+  red: "#ff9b9f",
+  purple: "#c3a5f5",
+  blue: "#8db8ff",
+  green: "#82dfaa",
+  common: "#f3f7f4",
 };
 const darkRatings: [string, string, string][] = [
-  ["90+ dark-elite", darkRatingColors.elite, darkPanel],
-  ["80+ dark-good", darkRatingColors.good, darkPanel],
-  ["70+ dark-solid", darkRatingColors.solid, darkPanel],
-  ["60+ dark-fair", darkRatingColors.fair, darkPanel],
-  ["<60 dark-low", darkRatingColors.low, darkPanel],
+  ["90-99 dark-gold", darkRatingColors.gold, darkPanel],
+  ["80-89 dark-red", darkRatingColors.red, darkPanel],
+  ["70-79 dark-purple", darkRatingColors.purple, darkPanel],
+  ["60-69 dark-blue", darkRatingColors.blue, darkPanel],
+  ["50-59 dark-green", darkRatingColors.green, darkPanel],
+  ["<50 dark-common", darkRatingColors.common, darkPanel],
 ];
 for (const [label, fg, bg] of darkRatings) {
   const ratio = contrastRatio(fg, bg);
@@ -74,17 +78,19 @@ console.log(JSON.stringify({
   warning500Contrast: Number(contrastRatio(colors.warning[500], white).toFixed(2)),
   ink500Contrast: Number(contrastRatio(colors.ink[500], white).toFixed(2)),
   ratingLight: {
-    elite: Number(contrastRatio(lightRatingColors.elite, white).toFixed(2)),
-    good: Number(contrastRatio(lightRatingColors.good, white).toFixed(2)),
-    solid: Number(contrastRatio(lightRatingColors.solid, white).toFixed(2)),
-    fair: Number(contrastRatio(lightRatingColors.fair, white).toFixed(2)),
-    low: Number(contrastRatio(lightRatingColors.low, white).toFixed(2)),
+    gold: Number(contrastRatio(lightRatingColors.gold, white).toFixed(2)),
+    red: Number(contrastRatio(lightRatingColors.red, white).toFixed(2)),
+    purple: Number(contrastRatio(lightRatingColors.purple, white).toFixed(2)),
+    blue: Number(contrastRatio(lightRatingColors.blue, white).toFixed(2)),
+    green: Number(contrastRatio(lightRatingColors.green, white).toFixed(2)),
+    common: Number(contrastRatio(lightRatingColors.common, white).toFixed(2)),
   },
   ratingDark: {
-    elite: Number(contrastRatio(darkRatingColors.elite, darkPanel).toFixed(2)),
-    good: Number(contrastRatio(darkRatingColors.good, darkPanel).toFixed(2)),
-    solid: Number(contrastRatio(darkRatingColors.solid, darkPanel).toFixed(2)),
-    fair: Number(contrastRatio(darkRatingColors.fair, darkPanel).toFixed(2)),
-    low: Number(contrastRatio(darkRatingColors.low, darkPanel).toFixed(2)),
+    gold: Number(contrastRatio(darkRatingColors.gold, darkPanel).toFixed(2)),
+    red: Number(contrastRatio(darkRatingColors.red, darkPanel).toFixed(2)),
+    purple: Number(contrastRatio(darkRatingColors.purple, darkPanel).toFixed(2)),
+    blue: Number(contrastRatio(darkRatingColors.blue, darkPanel).toFixed(2)),
+    green: Number(contrastRatio(darkRatingColors.green, darkPanel).toFixed(2)),
+    common: Number(contrastRatio(darkRatingColors.common, darkPanel).toFixed(2)),
   },
 }, null, 2));
