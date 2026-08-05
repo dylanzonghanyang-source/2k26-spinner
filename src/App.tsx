@@ -342,12 +342,12 @@ const App = () => {
               </button>
               <button
                 aria-checked={dataVersion === "2k27"}
-                aria-label="2K27 数据（暂不可用）"
+                aria-label="2K27 数据（暂未开放）"
                 className={`version-option ${dataVersion === "2k27" ? "version-active" : ""}`}
                 disabled
                 onClick={() => setDataVersion("2k27")}
                 role="radio"
-                title="2K27 数据暂不可用"
+                title="2K27 数据暂未开放"
                 type="button"
               >
                 2K27
