@@ -59,7 +59,6 @@ type Position = "PG" | "SG" | "SF" | "PF" | "C";
 export type BuilderMode = "rookie" | "prime";
 export type SourceSelectionMode = "random" | "manual";
 type BundleCategory = "technical" | "physical" | "mental";
-type MobilePane = "settings" | "players" | "attributes" | "result";
 
 
 type Bundle = {
@@ -982,7 +981,7 @@ function RookieBuilder({
   const [customDraft, setCustomDraft] = useState<Record<string, string>>({});
   const [playerSearch, setPlayerSearch] = useState("");
   const [status, setStatus] = useState(`确认${isPrime ? "巅峰球员" : "新秀"}设置后开始生成`);
-  const [mobilePane, setMobilePane] = useState<MobilePane>("settings");
+
   const pendingTeamDrawRef = useRef<{ round: TeamRound; completionStatus: string } | null>(null);
   const customDialogRef = useRef<HTMLElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -1221,13 +1220,6 @@ function RookieBuilder({
     const value = Number(customDraft[attr]);
     return Number.isFinite(value) && value >= 25 && value <= 99;
   }));
-  const wizardSteps: Array<{ key: MobilePane; label: string; enabled: boolean }> = [
-    { key: "settings", label: "基础设置", enabled: true },
-    { key: "players", label: "球队与球员", enabled: settingsLocked },
-    { key: "attributes", label: "锁定属性", enabled: settingsLocked },
-    { key: "result", label: isPrime ? "巅峰结果" : "新秀结果", enabled: isComplete },
-  ];
-
   const changePosition = (nextPosition: Position) => {
     if (settingsLocked) return;
     setPosition(nextPosition);
@@ -1285,7 +1277,6 @@ function RookieBuilder({
     setPlayerVersionGroupKey(null);
     setCustomizingBundleId(null);
     setStatus("正在抽取球队…");
-    setMobilePane("players");
     pendingTeamDrawRef.current = { round: nextRound, completionStatus };
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -1308,7 +1299,6 @@ function RookieBuilder({
     setSettingsLocked(true);
     if (isManualSelection) {
       setStatus("请为每个属性槽选择来源球员");
-      setMobilePane("players");
     } else {
       startTeamDraw(undefined, "第 1 轮球队已确定");
     }
@@ -1336,7 +1326,6 @@ function RookieBuilder({
     setSelectedPlayerId(id);
     setPlayerVersionGroupKey(null);
     setStatus(`已选择${getPlayerNameCN(player.name)}`);
-    setMobilePane("attributes");
   };
 
   const openPlayerVersionPicker = (group: ManualPlayerGroup) => {
@@ -1352,10 +1341,8 @@ function RookieBuilder({
     setCustomizingBundleId(null);
     if (Object.keys(nextLocks).length === bundles.length) {
       setStatus(`${isPrime ? "巅峰球员" : "新秀"}已生成`);
-      setMobilePane("result");
     } else if (isManualSelection) {
       setStatus("已锁定。请继续为下一个属性槽选择来源球员");
-      setMobilePane("players");
     } else {
       drawNextTeam();
     }
@@ -1402,7 +1389,6 @@ function RookieBuilder({
     setCustomDraft({});
     setPlayerSearch("");
     setStatus(`确认${isPrime ? "巅峰球员" : "新秀"}设置后开始生成`);
-    setMobilePane("settings");
   };
 
   const copyResult = async () => {
@@ -1454,35 +1440,10 @@ function RookieBuilder({
 
   return (
     <section className="flex min-h-0 flex-col gap-2.5">
-      <nav aria-label="生成步骤" className="builder-wizard-nav" role="tablist">
-        {wizardSteps.map((step, index) => {
-          const active = mobilePane === step.key;
-          const reached = step.key === "settings" || settingsLocked && step.key !== "result" || isComplete;
-          return (
-            <button
-              aria-controls={`builder-pane-${step.key}`}
-              aria-selected={active}
-              className="builder-wizard-step"
-              data-active={active}
-              data-reached={reached}
-              disabled={!step.enabled}
-              id={`builder-step-${step.key}`}
-              key={step.key}
-              onClick={() => setMobilePane(step.key)}
-              role="tab"
-              type="button"
-            >
-              <span className="builder-wizard-index">{String(index + 1).padStart(2, "0")}</span>
-              <span>{step.label}</span>
-            </button>
-          );
-        })}
-      </nav>
-
       <div
         aria-labelledby="builder-step-settings"
         className="builder-setup panel-surface overflow-hidden"
-        data-mobile-active={mobilePane === "settings"}
+        data-mobile-active={!settingsLocked}
         id="builder-pane-settings"
         role="tabpanel"
       >
@@ -1608,13 +1569,31 @@ function RookieBuilder({
         <aside
           aria-label="属性槽"
           className="builder-pane builder-attributes-pane panel-surface min-w-0 overflow-hidden"
-          data-mobile-active={mobilePane === "attributes"}
+          data-mobile-active={settingsLocked && !isComplete}
           id="builder-pane-attributes"
           role="tabpanel"
         >
           <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">
             <span className="section-label">属性槽</span>
             <span className="max-w-[130px] truncate text-[9px] font-medium text-ink-500">{selectedPlayer ? getPlayerNameCN(selectedPlayer.name) : "尚未选择球员"}</span>
+          </div>
+          <div className="builder-mobile-summary mb-2 flex items-center gap-3 rounded-[5px] border border-ink-200 bg-ink-50/70 px-2.5 py-2 lg:hidden">
+            <div className="flex shrink-0 flex-col items-center">
+              <span className="text-[22px] font-bold leading-none tabular-nums text-ink-300">--</span>
+              <span className="mt-1 text-[8px] font-medium text-ink-400">总评</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="mb-1.5 flex items-center justify-between gap-2 text-[9px] font-semibold text-ink-500">
+                <span className="truncate">{position}/{secondaryPosition} · {effectiveAge}岁</span>
+                <span className="shrink-0 tabular-nums text-ink-700">{completed}/{bundles.length}</span>
+              </div>
+              <div aria-valuemax={bundles.length} aria-valuemin={0} aria-valuenow={completed} className="builder-setup-progress-track" role="progressbar">
+                <div
+                  className="builder-setup-progress-fill"
+                  style={{ transform: `scaleX(${Math.max(0, Math.min(1, completed / bundles.length))})` }}
+                />
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-1.5 p-2.5">
             {bundles.map((bundle) => {
@@ -1685,7 +1664,7 @@ function RookieBuilder({
           aria-label="球队与球员"
           className="builder-pane builder-player-pane panel-surface min-w-0 flex-col overflow-hidden"
           data-complete={isComplete}
-          data-mobile-active={mobilePane === "players"}
+          data-mobile-active={settingsLocked && !isComplete}
           id="builder-pane-players"
           role="tabpanel"
         >
@@ -1799,14 +1778,13 @@ function RookieBuilder({
 
           <div className="flex min-h-11 items-center justify-between gap-2 border-t border-ink-200 bg-ink-50 px-3 py-2">
             <div className="min-w-0 truncate text-[10px] text-ink-500">{selectedPlayer ? `${getPlayerNameCN(selectedPlayer.name)} · 请选择要锁定的属性槽` : displayStatus}</div>
-            {selectedPlayer && <button className="action-button shrink-0 px-2 py-1.5 text-[10px] lg:hidden" onClick={() => setMobilePane("attributes")} type="button">选择属性槽</button>}
           </div>
         </div>
 
         <aside
           aria-label={isPrime ? "巅峰结果" : "新秀结果"}
           className="builder-pane builder-result-pane panel-surface min-w-0 overflow-hidden"
-          data-mobile-active={mobilePane === "result"}
+          data-mobile-active={isComplete}
           id="builder-pane-result"
           role="tabpanel"
         >
@@ -1873,7 +1851,7 @@ function RookieBuilder({
         {isComplete && (
         <section
           className="builder-pane builder-full-preview builder-result-reveal panel-surface overflow-hidden"
-          data-mobile-active={mobilePane === "result"}
+          data-mobile-active={isComplete}
           data-testid="full-attribute-preview"
         >
           <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">

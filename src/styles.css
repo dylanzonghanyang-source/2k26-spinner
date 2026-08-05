@@ -375,57 +375,6 @@ input:focus-visible {
   }
 }
 
-.builder-wizard-nav {
-  position: sticky;
-  top: 8px;
-  z-index: 30;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid #d8d8d1;
-  border-radius: 7px;
-  background: #d8d8d1;
-  box-shadow: 0 4px 14px rgba(32, 32, 29, 0.1);
-}
-
-.builder-wizard-step {
-  display: flex;
-  min-width: 0;
-  min-height: 48px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  background: #ffffff;
-  color: #7a7a73;
-  font-size: 11px;
-  font-weight: 650;
-  line-height: 1.1;
-  transition: background-color 140ms ease, color 140ms ease;
-}
-
-.builder-wizard-step:disabled {
-  cursor: not-allowed;
-  color: #b0b0aa;
-}
-
-.builder-wizard-step[data-reached="true"] {
-  color: #4a4a45;
-}
-
-.builder-wizard-step[data-active="true"] {
-  background: #20201d;
-  color: #ffffff;
-}
-
-.builder-wizard-index {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 9px;
-  font-variant-numeric: tabular-nums;
-  opacity: 0.7;
-}
-
 .builder-setup,
 .builder-pane {
   display: none;
@@ -448,6 +397,41 @@ input:focus-visible {
   gap: 10px;
 }
 
+/* Mobile/tablet (<1024px): two-column workspace — attribute slots left,
+   team & player selection right (layout reference: activity-style builder). */
+@media (max-width: 1023.98px) {
+  .builder-workspace {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    align-items: start;
+  }
+
+  .builder-attributes-pane {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .builder-player-pane {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+  }
+
+  .builder-result-pane[data-mobile-active="true"],
+  .builder-full-preview[data-mobile-active="true"] {
+    grid-column: 1 / -1;
+  }
+
+  /* Narrow columns: attribute slots become a single stacked list */
+  .builder-attributes-pane > .grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Narrow columns: player cards become a single stacked list */
+  .builder-player-pane .grid.grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
 .attribute-preview-grid {
   display: grid;
   gap: 1px;
@@ -458,10 +442,6 @@ input:focus-visible {
 }
 
 @media (min-width: 1024px) {
-  .builder-wizard-nav {
-    display: none;
-  }
-
   .builder-setup {
     display: block;
   }
@@ -871,8 +851,7 @@ input:focus-visible {
 .dialog-close-button,
 .mode-nav-button,
 .theme-toggle,
-.version-option,
-.builder-wizard-step {
+.version-option {
   transition: transform var(--motion-fast) var(--motion-ease-out), background-color var(--motion-fast) ease, border-color var(--motion-fast) ease, color var(--motion-fast) ease, box-shadow var(--motion-fast) ease, opacity var(--motion-fast) ease;
 }
 
@@ -883,7 +862,6 @@ input:focus-visible {
 .mode-nav-button:not(:disabled):active,
 .theme-toggle:not(:disabled):active,
 .version-option:not(:disabled):active,
-.builder-wizard-step:not(:disabled):active,
 .marquee-draw-footer button:not(:disabled):active {
   transform: scale(0.97);
 }
@@ -1005,7 +983,6 @@ input:focus-visible {
   .mode-nav-button,
   .theme-toggle,
   .version-option,
-  .builder-wizard-step,
   .marquee-draw-item,
   .marquee-draw-pointer,
   .builder-setup-progress-fill,
@@ -1235,26 +1212,6 @@ html[data-theme="dark"] .mode-nav-button[data-active="true"] {
   background: #2a332e;
   color: #f1f5f1;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.36);
-}
-
-html[data-theme="dark"] .builder-wizard-nav {
-  border-color: #39443e;
-  background: #39443e;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
-}
-
-html[data-theme="dark"] .builder-wizard-step {
-  background: #202622;
-  color: #aab6ae;
-}
-
-html[data-theme="dark"] .builder-wizard-step[data-reached="true"] {
-  color: #dce5df;
-}
-
-html[data-theme="dark"] .builder-wizard-step[data-active="true"] {
-  background: #111512;
-  color: #ffffff;
 }
 
 html[data-theme="dark"] .section-label,
