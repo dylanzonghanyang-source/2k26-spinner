@@ -430,6 +430,14 @@ input:focus-visible {
   .builder-player-pane .grid.grid-cols-2 {
     grid-template-columns: 1fr;
   }
+
+  /* Team-draw animation: sit right under the toolbar, never centered or
+     stretched — must stay visible in the first viewport without scrolling. */
+  .team-draw-stage {
+    flex: none;
+    align-items: flex-start;
+    min-height: 0;
+  }
 }
 
 .attribute-preview-grid {

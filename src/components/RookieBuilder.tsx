@@ -1746,7 +1746,7 @@ function RookieBuilder({
               })}
               {filteredManualPlayerGroups.length === 0 && <div className="col-span-2 flex min-h-[180px] items-center justify-center text-[11px] text-ink-400">没有找到匹配的球员</div>}
             </div>
-          </> : isTeamDrawing ? <div className="flex min-h-[300px] flex-1 items-center px-2.5 py-3 sm:px-4">
+          </> : isTeamDrawing ? <div className="team-draw-stage flex min-h-[300px] flex-1 items-center px-2.5 py-3 sm:px-4">
             <MarqueeDraw
               currentLabel={drawingTeamLabel}
               dataKind="team"
