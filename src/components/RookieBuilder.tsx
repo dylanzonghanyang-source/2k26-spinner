@@ -1593,7 +1593,7 @@ function RookieBuilder({
             <div className="builder-setup-actions flex shrink-0 items-center justify-end gap-1.5" aria-label="设置操作">
               {!settingsLocked && (
                 <button className="action-button primary-action justify-center px-3 py-1.5 text-[11px] font-semibold" onClick={confirmSettings} type="button">
-                  <Check className="h-3.5 w-3.5" />确认并抽取
+                  <Check className="h-3.5 w-3.5" />{isManualSelection ? "确认设置" : "确认并抽取"}
                 </button>
               )}
               <button className="action-button justify-center px-3 py-1.5 text-[11px]" onClick={reset} type="button">
@@ -1795,7 +1795,7 @@ function RookieBuilder({
                 </button>
               );
             })}
-          </div> : <div className="builder-empty-state flex min-h-[300px] flex-1 flex-col items-center justify-center px-5 text-center"><span className="builder-empty-icon"><Shuffle className="h-4 w-4" /></span><div className="mt-3 text-[15px] font-semibold text-ink-700">先从一支球队开始</div><div className="mt-1 max-w-[310px] text-[10px] leading-5 text-ink-400">确认球员设置后抽取球队，再从候选球员中锁定 16 个属性槽。</div><div className="builder-empty-steps" aria-hidden="true"><span data-current="true">设置</span><ChevronRight /><span>抽取球队</span><ChevronRight /><span>锁定属性</span></div></div>}
+          </div> : <div className="builder-empty-state flex min-h-[300px] flex-1 flex-col items-center justify-center px-5 text-center"><span className="builder-empty-icon"><Shuffle className="h-4 w-4" /></span><div className="mt-3 text-[15px] font-semibold text-ink-700">{isManualSelection ? "先选择来源球员" : "先从一支球队开始"}</div><div className="mt-1 max-w-[310px] text-[10px] leading-5 text-ink-400">{isManualSelection ? "确认设置后搜索并选择来源球员，再为 16 个属性槽锁定属性。" : "确认球员设置后抽取球队，再从候选球员中锁定 16 个属性槽。"}</div><div className="builder-empty-steps" aria-hidden="true"><span data-current="true">设置</span><ChevronRight /><span>{isManualSelection ? "选来源" : "抽取球队"}</span><ChevronRight /><span>锁定属性</span></div></div>}
 
           <div className="flex min-h-11 items-center justify-between gap-2 border-t border-ink-200 bg-ink-50 px-3 py-2">
             <div className="min-w-0 truncate text-[10px] text-ink-500">{selectedPlayer ? `${getPlayerNameCN(selectedPlayer.name)} · 请选择要锁定的属性槽` : displayStatus}</div>

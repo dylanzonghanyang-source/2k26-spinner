@@ -350,7 +350,7 @@ input:focus-visible {
   .builder-setup-grid {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
     grid-template-areas:
-      "identity growth"
+      "identity body"
       "identity body"
       "footer footer";
   }
@@ -1159,6 +1159,7 @@ html[data-theme="dark"] .app-header {
 }
 
 html[data-theme="dark"] .workspace-toolbar,
+html[data-theme="dark"] .builder-setup-grid,
 html[data-theme="dark"] .builder-setup-footer,
 html[data-theme="dark"] .meta-chip {
   border-color: #39443e;
