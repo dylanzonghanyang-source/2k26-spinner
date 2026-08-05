@@ -401,12 +401,16 @@ function evaluateCustom(bundle: Bundle, customValues: Record<string, number>, bo
   };
 }
 
+/** Attribute / OVR rating color.
+ * Light mode uses darker semantic tokens so 80+ green and 90+ amber stay readable
+ * on white / warm-gray panels. Dark mode recolors these classes in styles.css.
+ */
 function valueColor(value: number) {
-  if (value >= 90) return "text-warning-600";
-  if (value >= 80) return "text-court-600";
-  if (value >= 70) return "text-ink-800";
-  if (value >= 60) return "text-ink-600";
-  return "text-ink-600";
+  if (value >= 90) return "text-warning-800 value-rating value-rating-elite";
+  if (value >= 80) return "text-court-800 value-rating value-rating-good";
+  if (value >= 70) return "text-ink-900 value-rating value-rating-solid";
+  if (value >= 60) return "text-ink-700 value-rating value-rating-fair";
+  return "text-ink-600 value-rating value-rating-low";
 }
 
 function createRound(teams: RookieBuilderTeam[], seed: number, previousTeamId = ""): TeamRound {

@@ -21,10 +21,47 @@ function contrastRatio(foreground: string, background: string) {
 
 const colors = config.theme.extend.colors as Record<string, Record<number, string>>;
 const white = "#ffffff";
+const page = "#f5f5f2";
+const darkBody = "#141816";
+const darkPanel = "#1c211f";
 
-assert(colors.warning, "the UI palette needs a semantic warning scale distinct from destructive rose");
-assert(contrastRatio(colors.court[500], white) >= 4.5, "court-500 must remain readable when used as text or an icon on white");
-assert(contrastRatio(colors.warning[500], white) >= 4.5, "warning-500 must remain readable on white");
+// Light mode rating colors — must pass AA (≥4.5) on white
+const lightRatings: [string, string, string][] = [
+  ["90+ warning-800 (elite)", colors.warning[800], white],
+  ["80+ court-800 (good)", colors.court[800], white],
+  ["70+ ink-900 (solid)", colors.ink[900], white],
+  ["60+ ink-700 (fair)", colors.ink[700], white],
+  ["<60 ink-600 (low)", colors.ink[600], white],
+];
+for (const [label, fg, bg] of lightRatings) {
+  const ratio = contrastRatio(fg, bg);
+  assert(ratio >= 4.5, `${label} contrast ${ratio.toFixed(2)}:1 on white (need ≥4.5)`);
+}
+
+// Dark mode rating colors — must pass AA (≥4.5) on dark panel
+const darkRatingColors: Record<string, string> = {
+  elite: "#ffd36a",
+  good: "#6fdbab",
+  solid: "#f3f7f4",
+  fair: "#d2ddd6",
+  low: "#a7b5ac",
+};
+const darkRatings: [string, string, string][] = [
+  ["90+ dark-elite", darkRatingColors.elite, darkPanel],
+  ["80+ dark-good", darkRatingColors.good, darkPanel],
+  ["70+ dark-solid", darkRatingColors.solid, darkPanel],
+  ["60+ dark-fair", darkRatingColors.fair, darkPanel],
+  ["<60 dark-low", darkRatingColors.low, darkPanel],
+];
+for (const [label, fg, bg] of darkRatings) {
+  const ratio = contrastRatio(fg, bg);
+  assert(ratio >= 4.5, `${label} contrast ${ratio.toFixed(2)}:1 on dark panel (need ≥4.5)`);
+}
+
+// Core semantic palette
+assert(colors.warning, "the UI palette needs a semantic warning scale");
+assert(contrastRatio(colors.court[500], white) >= 5.0, "court-500 on white should be strong AA");
+assert(contrastRatio(colors.warning[500], white) >= 5.0, "warning-500 on white should be strong AA");
 assert(contrastRatio(colors.ink[500], white) >= 4.5, "ink-500 must remain readable on white");
 
 console.log(JSON.stringify({
@@ -32,4 +69,18 @@ console.log(JSON.stringify({
   court500Contrast: Number(contrastRatio(colors.court[500], white).toFixed(2)),
   warning500Contrast: Number(contrastRatio(colors.warning[500], white).toFixed(2)),
   ink500Contrast: Number(contrastRatio(colors.ink[500], white).toFixed(2)),
+  ratingLight: {
+    elite: Number(contrastRatio(colors.warning[800], white).toFixed(2)),
+    good: Number(contrastRatio(colors.court[800], white).toFixed(2)),
+    solid: Number(contrastRatio(colors.ink[900], white).toFixed(2)),
+    fair: Number(contrastRatio(colors.ink[700], white).toFixed(2)),
+    low: Number(contrastRatio(colors.ink[600], white).toFixed(2)),
+  },
+  ratingDark: {
+    elite: Number(contrastRatio(darkRatingColors.elite, darkPanel).toFixed(2)),
+    good: Number(contrastRatio(darkRatingColors.good, darkPanel).toFixed(2)),
+    solid: Number(contrastRatio(darkRatingColors.solid, darkPanel).toFixed(2)),
+    fair: Number(contrastRatio(darkRatingColors.fair, darkPanel).toFixed(2)),
+    low: Number(contrastRatio(darkRatingColors.low, darkPanel).toFixed(2)),
+  },
 }, null, 2));
