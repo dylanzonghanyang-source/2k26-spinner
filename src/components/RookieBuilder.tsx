@@ -345,7 +345,7 @@ function localizedTeamName(team: string) {
 }
 
 function playerVariantLabel(player: PlayerSource) {
-  const rawTeam = player.rosterTeam ?? player.team ?? "未知球队版本";
+  const rawTeam = player.rosterTeam ?? player.team ?? "未记录球队";
   const category = player.rosterCategory ? rosterCategoryCN[player.rosterCategory] : "球员版本";
   const allTimeTeam = rawTeam.replace(/^All-Time\s+/, "");
   const classicMatch = rawTeam.match(/^(\d{4}-\d{2})\s+(.+)$/);
@@ -723,52 +723,52 @@ function createExportText(
 ) {
   const isPrime = mode === "prime";
   const tendencyLines = tendencyLoadState === "loading"
-    ? ["倾向数据加载中"]
+    ? ["正在加载倾向数据"]
     : tendencyLoadState === "error"
       ? ["倾向数据加载失败，请刷新后重试"]
       : tendencyLoadState === "unavailable"
-        ? ["当前版本暂无独立倾向数据（未复用其他版本）"]
+        ? ["当前版本暂无独立倾向数据"]
         : Object.keys(result.tendencies).length
         ? Object.entries(result.tendencies)
           .sort(([left], [right]) => getTendencyNameCN(left).localeCompare(getTendencyNameCN(right), "zh"))
           .map(([field, value]) => `${getTendencyNameCN(field)}: ${value}`)
-        : ["无倾向数据（来源球员无倾向档案）"];
+        : ["暂无倾向数据（来源球员没有对应档案）"];
   return [
-    `${dataVersionLabel} ${isPrime ? "巅峰球员" : "新秀"}创建清单`, "", "[资料]",
+    `${dataVersionLabel} ${isPrime ? "巅峰球员" : "新秀"}生成清单`, "", "[基本信息]",
     `姓名: ${rookieName}`, `年龄: ${result.age}`, `位置: ${result.position}`, `次要位置: ${result.secondary}`,
     `惯用手: ${result.hand}`, `扣篮惯用手: ${result.dunkHand}`,
     `巅峰开始年龄: ${result.peakStart}`, `巅峰结束年龄: ${result.peakEnd}`,
     `数据版本: ${dataVersionLabel}`,
-    ...(!isPrime ? [`预计进步速度: 每年 +${result.progressSpeed} 综评`] : []),
-    `潜力来源值: ${result.potential}`,
-    `成长百分比: ${result.boom}%`, `平均百分比: ${result.normal}%`, `衰退百分比: ${result.bust}%`,
-    "", "[身体]", `身高: ${result.height} cm`, `体重: ${result.weight} kg`, `臂展: ${result.wingspan}`,
+    ...(!isPrime ? [`预计成长速度: 每年 +${result.progressSpeed} OVR`] : []),
+    `潜力: ${result.potential}`,
+    `成长概率: ${result.boom}%`, `平均概率: ${result.normal}%`, `衰退概率: ${result.bust}%`,
+    "", "[身体设定]", `身高: ${result.height} cm`, `体重: ${result.weight} kg`, `臂展: ${result.wingspan}`,
     `肩宽: ${result.shoulder}`, `颈部长度: ${result.neck}`, `躯干长度: ${result.torso}`,
-    "", `[完整${isPrime ? "巅峰" : "初始"}属性]`,
+    "", `[完整${isPrime ? "巅峰" : "初始"}属性预览]`,
     ...fullAttributeGroups.flatMap((group) => [
       `-- ${group.label} --`,
       ...group.attrs.map((attr) => `${attrNameCN[attr] ?? attr}: ${result.initialAttrs[attr] ?? "--"}`),
     ]),
-    "", "[杂项]", `预估游戏综评: ${result.baseOverall}`, `无形属性: ${result.intangibles}`,
-    `${isPrime ? "巅峰综评" : "预计初始综评"}: ${result.initialStrength}`, `潜力: ${result.potential}`,
+    "", "[杂项]", `游戏 OVR 估算: ${result.baseOverall}`, `无形属性: ${result.intangibles}`,
+    `${isPrime ? "巅峰 OVR" : "预计初始 OVR"}: ${result.initialStrength}`, `潜力: ${result.potential}`,
     ...(!isPrime ? [
-      `新秀初始综评目标: ${result.initialOverallTarget}`,
-      ...(result.initialOverallConstraintReachable ? [] : ["警告: 自定义锁定值使初始综评目标不可完全达到"]),
+      `新秀初始 OVR 目标: ${result.initialOverallTarget}`,
+      ...(result.initialOverallConstraintReachable ? [] : ["警告：手动锁定的数值使初始 OVR 无法完全达到目标"]),
     ] : []),
     "", "[热区]", ...Object.entries(result.hotZones).map(([name, state]) => `${name}: ${state}`),
     ...(isPrime ? [
       "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
     ] : [
-      "", `[当前徽章（${result.rookieTier} 档降级）]`, ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
+      "", `[当前徽章（按${result.rookieTier}档调整）]`, ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
       "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.peakBadges.length ? result.peakBadges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
     ]),
-    "", "[倾向（按属性来源继承，未降档）]",
+    "", "[倾向（继承属性来源，未按等级调整）]",
     ...tendencyLines,
     "", "[属性来源]", ...bundles.map((bundle) => {
       const lock = locks[bundle.id];
       if (lock?.kind === "custom") {
         const values = bundle.attrs.map((attr) => `${attrNameCN[attr] ?? attr} ${lock.values[attr]}`).join("，");
-        return `${bundle.label}: 用户自定义（${values}）`;
+        return `${bundle.label}: 手动设置（${values}）`;
       }
       const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
       const evaluation = evaluations[bundle.id];
@@ -777,13 +777,13 @@ function createExportText(
         .map(([attr, cap]) => `${attrNameCN[attr] ?? attr}上限 ${cap}`)
         .join(" / ");
       const adjustments = [
-        bodyAdjustment ? `体型修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "",
+        bodyAdjustment ? `身体修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "",
         capLabel,
-        player?.isEstimated ? "估算属性" : "",
+        player?.isEstimated ? "估算值" : "",
       ].filter(Boolean).join("，");
       const weightLabel = bundle.id === "potential"
         ? "独立潜力来源"
-        : `权重 ${displayedPositionWeight(result.position, result.secondary, bundle.id)}%`;
+        : `位置权重 ${displayedPositionWeight(result.position, result.secondary, bundle.id)}%`;
       return `${bundle.label}（${weightLabel}）: ${player ? getPlayerNameCN(player.name) : "--"}${adjustments ? `（${adjustments}）` : ""}`;
     }),
   ].join("\n");
@@ -983,7 +983,7 @@ function RookieBuilder({
   const [customizingBundleId, setCustomizingBundleId] = useState<string | null>(null);
   const [customDraft, setCustomDraft] = useState<Record<string, string>>({});
   const [playerSearch, setPlayerSearch] = useState("");
-  const [status, setStatus] = useState(`确认${isPrime ? "巅峰球员" : "新秀"}设定后开始`);
+  const [status, setStatus] = useState(`确认${isPrime ? "巅峰球员" : "新秀"}设置后开始生成`);
   const [mobilePane, setMobilePane] = useState<MobilePane>("settings");
   const pendingTeamDrawRef = useRef<{ round: TeamRound; completionStatus: string } | null>(null);
   const customDialogRef = useRef<HTMLElement | null>(null);
@@ -1187,21 +1187,21 @@ function RookieBuilder({
           : "idle";
   const tendencyCount = Object.keys(result.tendencies).length;
   const tendencyStatusLabel = tendencyLoadState === "ready"
-    ? `${tendencyCount} 项 · 未降档`
+    ? `${tendencyCount} 项 · 未调整`
     : tendencyLoadState === "unavailable"
-      ? "当前版本暂无"
+      ? "当前版本暂无数据"
       : tendencyLoadState === "error"
         ? "加载失败"
         : tendencyLoadState === "loading"
-          ? "加载中…"
-          : "未加载";
+          ? "正在加载…"
+          : "尚未加载";
   const tendencyEmptyText = tendencyLoadState === "error"
     ? "倾向数据加载失败，请刷新后重试"
     : tendencyLoadState === "loading"
-      ? "倾向数据加载中…"
+      ? "正在加载倾向数据…"
       : tendencyLoadState === "unavailable"
-        ? "当前版本暂无独立倾向数据（未复用其他版本）"
-        : "无倾向数据";
+        ? "当前版本暂无独立倾向数据"
+        : "暂无倾向数据";
   const completed = Object.keys(locks).length;
   const isComplete = completed === bundles.length;
   const exportReady = isComplete && tendencyLoadState !== "loading";
@@ -1224,8 +1224,8 @@ function RookieBuilder({
     return Number.isFinite(value) && value >= 25 && value <= 99;
   }));
   const wizardSteps: Array<{ key: MobilePane; label: string; enabled: boolean }> = [
-    { key: "settings", label: "基础设定", enabled: true },
-    { key: "players", label: "球队球员", enabled: settingsLocked },
+    { key: "settings", label: "基础设置", enabled: true },
+    { key: "players", label: "球队与球员", enabled: settingsLocked },
     { key: "attributes", label: "锁定属性", enabled: settingsLocked },
     { key: "result", label: isPrime ? "巅峰结果" : "新秀结果", enabled: isComplete },
   ];
@@ -1286,7 +1286,7 @@ function RookieBuilder({
     setSelectedPlayerId(null);
     setPlayerVersionGroupKey(null);
     setCustomizingBundleId(null);
-    setStatus("正在随机抽取球队...");
+    setStatus("正在抽取球队…");
     setMobilePane("players");
     pendingTeamDrawRef.current = { round: nextRound, completionStatus };
 
@@ -1309,15 +1309,15 @@ function RookieBuilder({
     setRookieName((current) => current.trim().replace(/\s+/g, " ") || generateRookieName());
     setSettingsLocked(true);
     if (isManualSelection) {
-      setStatus("请选择每个属性槽的来源球员");
+      setStatus("请为每个属性槽选择来源球员");
       setMobilePane("players");
     } else {
-      startTeamDraw(undefined, "第 1 轮球队已抽取");
+      startTeamDraw(undefined, "第 1 轮球队已确定");
     }
   };
 
   const drawNextTeam = () => {
-    startTeamDraw(round.teamId, "下一轮球队已抽取");
+    startTeamDraw(round.teamId, "下一轮球队已确定");
   };
 
   const switchPlayers = () => {
@@ -1329,7 +1329,7 @@ function RookieBuilder({
     }));
     setSwitchesLeft((current) => current - 1);
     setSelectedPlayerId(null);
-    setStatus(`已在${team ? teamNamesCN[team.name] ?? team.name : "当前球队"}内切换一批球员`);
+    setStatus(`已换一批${team ? teamNamesCN[team.name] ?? team.name : "当前球队"}球员`);
   };
 
   const choosePlayer = (player: PlayerSource) => {
@@ -1337,7 +1337,7 @@ function RookieBuilder({
     if (!settingsLocked || isTeamDrawing || (!isManualSelection && usedBy.has(playerIdentity(player)))) return;
     setSelectedPlayerId(id);
     setPlayerVersionGroupKey(null);
-    setStatus(`${getPlayerNameCN(player.name)} 已选择`);
+    setStatus(`已选择${getPlayerNameCN(player.name)}`);
     setMobilePane("attributes");
   };
 
@@ -1353,10 +1353,10 @@ function RookieBuilder({
     setPlayerVersionGroupKey(null);
     setCustomizingBundleId(null);
     if (Object.keys(nextLocks).length === bundles.length) {
-      setStatus(`${isPrime ? "巅峰球员" : "新秀"}已揭晓`);
+      setStatus(`${isPrime ? "巅峰球员" : "新秀"}已生成`);
       setMobilePane("result");
     } else if (isManualSelection) {
-      setStatus("已锁定，请继续选择下一个属性槽的来源球员");
+      setStatus("已锁定。请继续为下一个属性槽选择来源球员");
       setMobilePane("players");
     } else {
       drawNextTeam();
@@ -1403,14 +1403,14 @@ function RookieBuilder({
     setCustomizingBundleId(null);
     setCustomDraft({});
     setPlayerSearch("");
-    setStatus(`确认${isPrime ? "巅峰球员" : "新秀"}设定后开始`);
+    setStatus(`确认${isPrime ? "巅峰球员" : "新秀"}设置后开始生成`);
     setMobilePane("settings");
   };
 
   const copyResult = async () => {
     try {
       await copyText(createExportText(rookieName, result, locks, evaluations, playersById, mode, tendencyLoadState, dataVersionLabel));
-      setStatus("清单已复制");
+      setStatus("已复制生成报告");
     } catch {
       setStatus("复制失败，请手动复制");
     }
@@ -1431,7 +1431,7 @@ function RookieBuilder({
         const writable = await handle.createWritable();
         await writable.write(blob);
         await writable.close();
-        setStatus("文件已导出");
+        setStatus("已导出生成数据");
         return;
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
@@ -1451,7 +1451,7 @@ function RookieBuilder({
     anchor.click();
     anchor.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setStatus("文件已导出");
+    setStatus("已导出生成数据");
   };
 
   return (
@@ -1490,7 +1490,7 @@ function RookieBuilder({
       >
         <div className="builder-setup-grid">
           <section aria-labelledby="player-identity-label" className="builder-setup-identity bg-white px-3 py-3">
-            <div className="section-label mb-2" id="player-identity-label">球员身份</div>
+            <div className="section-label mb-2" id="player-identity-label">球员信息</div>
             <div className="grid gap-2 sm:grid-cols-2">
               <div className="min-w-0 sm:col-span-2">
                 <div className="section-label mb-1">{isPrime ? "球员姓名" : "新秀姓名"}</div>
@@ -1505,7 +1505,7 @@ function RookieBuilder({
                     type="text"
                     value={rookieName}
                   />
-                  <button aria-label="随机生成英文姓名" className="icon-button flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeName} title="随机生成英文姓名" type="button"><RefreshCw className="h-3.5 w-3.5" /></button>
+                  <button aria-label="随机生成英文名" className="icon-button flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeName} title="随机生成英文名" type="button"><RefreshCw className="h-3.5 w-3.5" /></button>
                 </div>
               </div>
               <div className="min-w-0">
@@ -1551,7 +1551,7 @@ function RookieBuilder({
                           ? "bg-white text-ink-600 hover:bg-court-50 hover:text-court-800"
                           : "bg-warning-50/70 text-warning-600 hover:bg-warning-100 hover:text-warning-800";
                     return (
-                      <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`segmented-button h-full min-w-0 flex-1 px-1 text-[11px] font-semibold disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked || isPrimary} onClick={() => changeSecondaryPosition(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规次要位置" : "非常规次要位置：仍按来源属性与目标体型计算"} type="button">{option}</button>
+                      <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`segmented-button h-full min-w-0 flex-1 px-1 text-[11px] font-semibold disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked || isPrimary} onClick={() => changeSecondaryPosition(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规搭配" : "非常规搭配：仍会结合来源属性和体型计算"} type="button">{option}</button>
                     );
                   })}
                 </div>
@@ -1563,7 +1563,7 @@ function RookieBuilder({
           <section aria-labelledby="body-settings-label" className="builder-setup-body bg-ink-50/60 px-3 py-3">
             <div className="mb-2 flex items-center justify-between gap-2">
               <div className="section-label" id="body-settings-label">身体设定</div>
-              <button aria-label="随机身体" className="action-button h-7 w-7 justify-center" disabled={settingsLocked} onClick={randomizeBody} title="随机身体" type="button"><Shuffle className="h-3.5 w-3.5" /></button>
+              <button aria-label="随机生成身体设定" className="action-button h-7 w-7 justify-center" disabled={settingsLocked} onClick={randomizeBody} title="随机生成身体设定" type="button"><Shuffle className="h-3.5 w-3.5" /></button>
             </div>
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-3 xl:grid-cols-6">
               <BodyNumberInput disabled={settingsLocked} label="身高" max={300} min={150} onChange={(value) => updateBody("height", value)} unit="cm" value={body.height} />
@@ -1592,7 +1592,7 @@ function RookieBuilder({
                 />
               </div>
             </div>
-            <div className="builder-setup-actions flex shrink-0 items-center justify-end gap-1.5" aria-label="设定操作">
+            <div className="builder-setup-actions flex shrink-0 items-center justify-end gap-1.5" aria-label="设置操作">
               {!settingsLocked && (
                 <button className="action-button primary-action justify-center px-3 py-1.5 text-[11px] font-semibold" onClick={confirmSettings} type="button">
                   <Check className="h-3.5 w-3.5" />确认并抽取
@@ -1616,7 +1616,7 @@ function RookieBuilder({
         >
           <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">
             <span className="section-label">属性槽</span>
-            <span className="max-w-[130px] truncate text-[9px] font-medium text-ink-500">{selectedPlayer ? getPlayerNameCN(selectedPlayer.name) : "未选球员"}</span>
+            <span className="max-w-[130px] truncate text-[9px] font-medium text-ink-500">{selectedPlayer ? getPlayerNameCN(selectedPlayer.name) : "尚未选择球员"}</span>
           </div>
           <div className="grid grid-cols-2 gap-1.5 p-2.5">
             {bundles.map((bundle) => {
@@ -1627,11 +1627,11 @@ function RookieBuilder({
               const value = lockedEvaluation?.adjusted ?? preview?.adjusted;
               const activeEvaluation = lockedEvaluation ?? preview;
               const bodyAdjustment = lockedEvaluation?.bodyAdjustment ?? preview?.bodyAdjustment ?? 0;
-              const sourceLabel = lock?.kind === "custom" ? "用户自定义" : lockedPlayer ? getPlayerNameCN(lockedPlayer.name) : (selectedPlayer ? "可锁定" : "待选择");
+              const sourceLabel = lock?.kind === "custom" ? "手动设置" : lockedPlayer ? getPlayerNameCN(lockedPlayer.name) : (selectedPlayer ? "可锁定" : "等待选择");
               const weightLabel = bundle.id === "potential"
-                ? "独立潜力来源，不参与位置 OVR 权重"
-                : `主次位置综合权重 ${displayedPositionWeight(position, secondaryPosition, bundle.id)}%`;
-              const bodyAdjustmentLabel = bodyAdjustment ? `体型 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "";
+                ? "潜力独立取值，不计入位置权重"
+                : `位置综合权重：${displayedPositionWeight(position, secondaryPosition, bundle.id)}%`;
+              const bodyAdjustmentLabel = bodyAdjustment ? `身体修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "";
               const capLabels = Object.entries(activeEvaluation?.bodyCaps ?? {})
                 .map(([attr, cap]) => `${attrNameCN[attr] ?? attr}上限 ${cap}`);
               const hasBodyConstraint = bodyAdjustment !== 0 || capLabels.length > 0;
@@ -1650,7 +1650,7 @@ function RookieBuilder({
                     className={`flex h-full w-full min-w-0 items-center gap-1.5 px-2 pr-7 text-left transition ${lock ? "cursor-not-allowed" : selectedPlayer ? "hover:bg-ink-50" : "cursor-not-allowed"}`}
                     disabled={Boolean(lock) || !settingsLocked || !selectedPlayer}
                     onClick={() => clickBundle(bundle)}
-                    title={lock ? `${weightLabel} · 已锁定，重新开始后才能修改` : typeof value === "number" ? `${weightLabel} · ${sourceLabel}：${lockedEvaluation?.raw ?? preview?.raw} → ${value}${adjustmentLabel ? `（${adjustmentLabel}）` : ""}` : `${bundle.label} · ${weightLabel}`}
+                    title={lock ? `${weightLabel} · 已锁定；如需修改，请重新开始` : typeof value === "number" ? `${weightLabel} · ${sourceLabel}：${lockedEvaluation?.raw ?? preview?.raw} → ${value}${adjustmentLabel ? `（${adjustmentLabel}）` : ""}` : `${bundle.label} · ${weightLabel}`}
                     type="button"
                   >
                     <span className="min-w-0 flex-1">
@@ -1659,18 +1659,18 @@ function RookieBuilder({
                     </span>
                     {typeof value === "number" ? (
                       <span className="flex shrink-0 items-center gap-1" title={hasBodyConstraint ? adjustmentLabel : undefined}>
-                        {hasBodyConstraint && <span className="text-[8px] font-semibold text-court-600">体型</span>}
+                        {hasBodyConstraint && <span className="text-[8px] font-semibold text-court-600">身体</span>}
                         <span className={`text-[13px] font-bold tabular-nums ${valueColor(value)}`}>{value}</span>
                       </span>
                     ) : <span className="text-ink-300">--</span>}
                   </button>
                   {!lock && bundle.id !== "potential" && (
                     <button
-                      aria-label={`自定义${bundle.label}`}
+                      aria-label={`手动设置${bundle.label}`}
                       className="absolute right-1 top-1/2 z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-[4px] text-ink-400 transition hover:bg-ink-200 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-200"
                       disabled={!settingsLocked || isTeamDrawing}
                       onClick={() => openCustomEditor(bundle)}
-                      title={`自定义${bundle.label}最终数值`}
+                      title={`手动设置${bundle.label}的最终数值`}
                       type="button"
                     >
                       <Pencil className="h-3 w-3" />
@@ -1684,7 +1684,7 @@ function RookieBuilder({
         </aside>
 
         <div
-          aria-label="球队球员"
+          aria-label="球队与球员"
           className="builder-pane builder-player-pane panel-surface min-w-0 flex-col overflow-hidden"
           data-complete={isComplete}
           data-mobile-active={mobilePane === "players"}
@@ -1694,19 +1694,19 @@ function RookieBuilder({
           <div className="workspace-toolbar flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
             <div>
               <div className="flex items-center gap-2"><span className="draw-status-icon" data-active={isTeamDrawing}><UsersRound className="h-3.5 w-3.5" /></span><h2 className="text-[14px] font-semibold text-ink-900">{isManualSelection ? "自选来源" : isTeamDrawing ? "随机球队" : team ? teamNamesCN[team.name] ?? team.name : "等待开始"}</h2></div>
-              <div className="mt-0.5 font-mono text-[9px] text-ink-400">{!settingsLocked ? "基础设定待确认" : isManualSelection ? isComplete ? `已完成 / ${completed}/${bundles.length}` : "搜索球员，选择后点击右侧属性槽" : isTeamDrawing ? teamDrawPhase === "landing" ? "落点已确认" : "球队跑马灯抽取中" : isComplete ? `已完成 / ${completed}/${bundles.length}` : `第 ${completed + 1} 轮 / 展示 ${shownPlayers.length}/${team?.players.length ?? 0}`}</div>
+              <div className="mt-0.5 font-mono text-[9px] text-ink-400">{!settingsLocked ? "等待确认基础设置" : isManualSelection ? isComplete ? `已完成 · ${completed}/${bundles.length}` : "搜索球员，选定版本后锁定属性" : isTeamDrawing ? teamDrawPhase === "landing" ? "结果已确定" : "正在抽取球队" : isComplete ? `已完成 · ${completed}/${bundles.length}` : `第 ${completed + 1} 轮 · 已展示 ${shownPlayers.length}/${team?.players.length ?? 0}`}</div>
             </div>
             {settingsLocked && !isComplete && !isManualSelection && (
               <div className="flex items-center gap-1.5">
                 {(() => {
                   const switchDisabled = isTeamDrawing || switchesLeft <= 0 || !hasNextBatch;
                   const switchTitle = isTeamDrawing
-                    ? "球队抽取中，请稍候"
+                    ? "正在抽取球队，请稍候"
                     : !hasNextBatch
-                      ? "当前球队球员已全部展示过，无法再换一批"
+                      ? "本队球员已全部展示，暂时无法更换"
                       : switchesLeft <= 0
-                        ? "本轮换球员次数已用完"
-                        : "仅在当前球队内换下一批球员，不会重新抽取球队";
+                          ? "本轮更换次数已用完"
+                          : "仅更换当前球队的候选球员，不会重新抽取球队";
                   // Disabled buttons often skip hover tooltips; wrap so the hint still appears.
                   return (
                     <span className="inline-flex" title={switchTitle}>
@@ -1717,7 +1717,7 @@ function RookieBuilder({
                         type="button"
                       >
                         <UsersRound className="h-3 w-3" />
-                        换球员 {switchesLeft}
+                        换一批（{switchesLeft}）
                       </button>
                     </span>
                   );
@@ -1732,7 +1732,7 @@ function RookieBuilder({
                 aria-label="搜索来源球员"
                 className="min-w-0 flex-1 bg-transparent text-[12px] text-ink-900 outline-none placeholder:text-ink-400"
                 onChange={(event) => setPlayerSearch(event.target.value)}
-                placeholder="搜索中文名、英文名、位置或球队"
+                placeholder="搜索姓名、位置或球队"
                 type="search"
                 value={playerSearch}
               />
@@ -1767,14 +1767,14 @@ function RookieBuilder({
                   </button>
                 );
               })}
-              {filteredManualPlayerGroups.length === 0 && <div className="col-span-2 flex min-h-[180px] items-center justify-center text-[11px] text-ink-400">没有匹配的球员</div>}
+              {filteredManualPlayerGroups.length === 0 && <div className="col-span-2 flex min-h-[180px] items-center justify-center text-[11px] text-ink-400">没有找到匹配的球员</div>}
             </div>
           </> : isTeamDrawing ? <div className="flex min-h-[300px] flex-1 items-center px-2.5 py-3 sm:px-4">
             <MarqueeDraw
               currentLabel={drawingTeamLabel}
               dataKind="team"
               durationMs={teamDrawDurationMs}
-              emptyText="没有可抽取球队"
+              emptyText="暂无可抽取的球队"
               isDrawing
               items={teamDrawItems}
               onPhaseChange={handleTeamDrawPhaseChange}
@@ -1792,16 +1792,16 @@ function RookieBuilder({
               return (
                 <button key={id} className={`interactive-card flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : unavailable || isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`} disabled={unavailable || isComplete} onClick={() => choosePlayer(player)} type="button">
                   <PlayerHeadshot name={player.name} priority />
-                  <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(player.name)}</span><span className="block text-[9px] text-ink-400">{player.position ?? "--"}{player.isEstimated ? " · 估算" : ""}{unavailable ? " · 已使用" : ""}</span></span>
+                  <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(player.name)}</span><span className="block text-[9px] text-ink-400">{player.position ?? "--"}{player.isEstimated ? " · 估算值" : ""}{unavailable ? " · 已选用" : ""}</span></span>
                   <span className={`shrink-0 text-[14px] font-bold tabular-nums ${typeof player.overall === "number" ? valueColor(player.overall) : "text-ink-400"}`}>{player.overall ?? "--"}</span>
                 </button>
               );
             })}
-          </div> : <div className="builder-empty-state flex min-h-[300px] flex-1 flex-col items-center justify-center px-5 text-center"><span className="builder-empty-icon"><Shuffle className="h-4 w-4" /></span><div className="mt-3 text-[15px] font-semibold text-ink-700">从一支球队开始</div><div className="mt-1 max-w-[310px] text-[10px] leading-5 text-ink-400">确认球员画像后抽取球队，再从候选球员中锁定 16 个属性槽。</div><div className="builder-empty-steps" aria-hidden="true"><span data-current="true">设定</span><ChevronRight /><span>抽球队</span><ChevronRight /><span>锁属性</span></div></div>}
+          </div> : <div className="builder-empty-state flex min-h-[300px] flex-1 flex-col items-center justify-center px-5 text-center"><span className="builder-empty-icon"><Shuffle className="h-4 w-4" /></span><div className="mt-3 text-[15px] font-semibold text-ink-700">先从一支球队开始</div><div className="mt-1 max-w-[310px] text-[10px] leading-5 text-ink-400">确认球员设置后抽取球队，再从候选球员中锁定 16 个属性槽。</div><div className="builder-empty-steps" aria-hidden="true"><span data-current="true">设置</span><ChevronRight /><span>抽取球队</span><ChevronRight /><span>锁定属性</span></div></div>}
 
           <div className="flex min-h-11 items-center justify-between gap-2 border-t border-ink-200 bg-ink-50 px-3 py-2">
-            <div className="min-w-0 truncate text-[10px] text-ink-500">{selectedPlayer ? `${getPlayerNameCN(selectedPlayer.name)} · 请选择要锁定的属性` : displayStatus}</div>
-            {selectedPlayer && <button className="action-button shrink-0 px-2 py-1.5 text-[10px] lg:hidden" onClick={() => setMobilePane("attributes")} type="button">选择属性</button>}
+            <div className="min-w-0 truncate text-[10px] text-ink-500">{selectedPlayer ? `${getPlayerNameCN(selectedPlayer.name)} · 请选择要锁定的属性槽` : displayStatus}</div>
+            {selectedPlayer && <button className="action-button shrink-0 px-2 py-1.5 text-[10px] lg:hidden" onClick={() => setMobilePane("attributes")} type="button">选择属性槽</button>}
           </div>
         </div>
 
@@ -1815,11 +1815,11 @@ function RookieBuilder({
           {isComplete ? (
             <div className="builder-result-reveal">
               <div className="workspace-toolbar px-3 py-2.5">
-                <div className="section-label">{isPrime ? "巅峰球员卡片" : "新秀卡片"}</div>
+                <div className="section-label">{isPrime ? "巅峰球员卡" : "新秀球员卡"}</div>
                 <div className="mt-1 truncate text-[15px] font-semibold text-ink-800" data-testid="rookie-name">{rookieName}</div>
                 <div className="mt-2 flex items-end justify-between">
-                  <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">{isPrime ? "巅峰综评" : "新秀综评"}</div></div>
-                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">游戏 OVR 估算 <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
+                  <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">{isPrime ? "巅峰 OVR" : "新秀 OVR"}</div></div>
+                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">游戏 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-px bg-ink-200 text-[10px]">
@@ -1830,21 +1830,21 @@ function RookieBuilder({
               </div>
               {isPrime ? (
                 <div className="border-b border-ink-200 px-3 py-2.5">
-                  <div className="flex items-center justify-between gap-3 text-[10px]"><span className="font-semibold text-ink-700">巅峰属性</span><span className="text-right text-ink-500">锁定值经体型与位置算法计算后直接生成</span></div>
+                  <div className="flex items-center justify-between gap-3 text-[10px]"><span className="font-semibold text-ink-700">巅峰属性</span><span className="text-right text-ink-500">锁定值已结合体型和位置计算</span></div>
                 </div>
               ) : (
                 <div className="border-b border-ink-200 px-3 py-2.5">
-                  <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold text-ink-700">成长轨迹</span><span className="font-mono text-court-700">潜力来源 {result.potential}</span></div>
+                  <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold text-ink-700">成长轨迹</span><span className="font-mono text-court-700">潜力 {result.potential}</span></div>
                   <div className="mb-2 grid grid-cols-2 gap-x-3 gap-y-1 border-y border-ink-100 py-1.5 text-[9px]">
-                    <div className="flex justify-between gap-2"><span className="text-ink-400">预计初始综评</span><strong className="tabular-nums text-ink-700">{result.initialStrength}</strong></div>
+                    <div className="flex justify-between gap-2"><span className="text-ink-400">预计初始 OVR</span><strong className="tabular-nums text-ink-700">{result.initialStrength}</strong></div>
                     <div className="flex justify-between gap-2"><span className="text-ink-400">巅峰年龄</span><strong className="tabular-nums text-ink-700">{result.peakStart}–{result.peakEnd}</strong></div>
-                    <div className="flex justify-between gap-2"><span className="text-ink-400">进步速度</span><strong className="tabular-nums text-ink-700">+{result.progressSpeed}/年</strong></div>
+                    <div className="flex justify-between gap-2"><span className="text-ink-400">成长速度</span><strong className="tabular-nums text-ink-700">+{result.progressSpeed}/年</strong></div>
                   </div>
                   <div className="grid grid-cols-3 gap-1.5 text-center text-[9px]"><div className="rounded-[5px] border border-court-200 bg-court-50 py-1.5 text-court-700"><strong className="block text-[12px]">{result.boom}%</strong>成长</div><div className="rounded-[5px] border border-ink-200 bg-ink-50 py-1.5 text-ink-700"><strong className="block text-[12px]">{result.normal}%</strong>平均</div><div className="rounded-[5px] border border-rose-200 bg-rose-50 py-1.5 text-rose-700"><strong className="block text-[12px]">{result.bust}%</strong>衰退</div></div>
                 </div>
               )}
               <div className="border-b border-ink-200 px-3 py-2.5">
-                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">{isPrime ? "巅峰徽章" : "当前徽章"}</span><span className="text-ink-400" data-testid="badge-status">{result.badgesEstimated ? "含推算" : "按槽继承"} · {result.badges.length}</span></div>
+                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">{isPrime ? "巅峰徽章" : "当前徽章"}</span><span className="text-ink-400" data-testid="badge-status">{result.badgesEstimated ? "含估算" : "按属性槽继承"} · {result.badges.length}</span></div>
                 <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{result.badges.length ? result.badges.slice(0, 7).map((badge) => <span key={`${badge.name}:${badge.tier}`} className="border border-warning-500/20 bg-warning-50 px-1 py-0.5 text-[8px] text-warning-800">{getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier]}</span>) : <span className="text-[9px] text-ink-400">无</span>}</div>
               </div>
               <div className="border-b border-ink-200 px-3 py-2.5">
@@ -1859,9 +1859,9 @@ function RookieBuilder({
           ) : (
             <div className="flex min-h-[300px] flex-col items-center justify-center px-5 text-center">
               <Unlock className="h-7 w-7 text-ink-300" />
-              <div className="mt-3 text-[15px] font-semibold text-ink-600">待生成</div>
+              <div className="mt-3 text-[15px] font-semibold text-ink-600">尚未生成</div>
               <div className="mt-1 max-w-full truncate text-[12px] font-semibold text-ink-700">{rookieName}</div>
-              <div className="mt-1 text-[10px] leading-5 text-ink-400">已锁定 {completed}/{bundles.length} 项属性</div>
+              <div className="mt-1 text-[10px] leading-5 text-ink-400">已锁定属性：{completed}/{bundles.length}</div>
               <div aria-valuemax={bundles.length} aria-valuemin={0} aria-valuenow={completed} className="builder-result-progress-track" role="progressbar"><div className="builder-result-progress-fill" style={{ transform: `scaleX(${Math.max(0, Math.min(1, completed / bundles.length))})` }} /></div>
               <div className="mt-3 text-[11px] font-medium text-court-700">{position}/{secondaryPosition} · {effectiveAge}岁</div>
               <div className="mt-1 text-[9px] text-ink-400">{body.height} cm · {body.weight} kg · 臂展 {body.wingspan}</div>
@@ -1879,8 +1879,8 @@ function RookieBuilder({
           data-testid="full-attribute-preview"
         >
           <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">
-            <div className="section-label">完整属性预览</div>
-            <div className="text-[10px] text-ink-400">{fullAttributeGroups.reduce((total, group) => total + group.attrs.length, 0)} 项</div>
+            <div className="section-label">属性明细</div>
+            <div className="text-[10px] text-ink-400">{fullAttributeGroups.reduce((total, group) => total + group.attrs.length, 0)} 项属性</div>
           </div>
           <div className="attribute-preview-grid bg-ink-200">
             {fullAttributeGroups.map((group) => (
@@ -1893,8 +1893,8 @@ function RookieBuilder({
                     return (
                       <div key={attr} className="flex min-h-6 items-center justify-between gap-3 border-t border-ink-700/5 py-1 text-[10px]">
                         <span className="min-w-0 text-ink-500">{attrNameCN[attr] ?? attr}</span>
-                        <span className="flex shrink-0 items-center gap-1" title={hasBodyAdjustment ? "该属性包含目标身体带来的修正或物理上限" : undefined}>
-                          {hasBodyAdjustment && <span className="text-[8px] font-semibold text-court-600">体型</span>}
+                        <span className="flex shrink-0 items-center gap-1" title={hasBodyAdjustment ? "该属性包含身体修正或上限" : undefined}>
+                          {hasBodyAdjustment && <span className="text-[8px] font-semibold text-court-600">身体</span>}
                           <span className={`font-semibold tabular-nums ${typeof value === "number" ? valueColor(value) : "text-ink-300"}`}>{value ?? "--"}</span>
                         </span>
                       </div>
@@ -1909,17 +1909,17 @@ function RookieBuilder({
       </div>
       {playerVersionGroup && (
         <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
-          <section aria-label={`选择${getPlayerNameCN(playerVersionGroup.representative.name)}版本`} aria-modal="true" className="dialog-surface w-full max-w-[520px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={customDialogRef} role="dialog">
+          <section aria-label={`选择${getPlayerNameCN(playerVersionGroup.representative.name)}的来源版本`} aria-modal="true" className="dialog-surface w-full max-w-[520px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={customDialogRef} role="dialog">
             <div className="workspace-toolbar flex items-center justify-between gap-3 px-3 py-2.5">
               <div className="flex min-w-0 items-center gap-2">
                 <PlayerHeadshot name={playerVersionGroup.representative.name} priority />
                 <div className="min-w-0">
-                  <div className="section-label">选择球员版本</div>
+                  <div className="section-label">选择来源版本</div>
                   <div className="truncate text-[14px] font-semibold text-ink-800">{getPlayerNameCN(playerVersionGroup.representative.name)}</div>
-                  <div className="truncate text-[9px] text-ink-400">{playerVersionGroup.representative.name} · {playerVersionGroup.variants.length} 个版本</div>
+                  <div className="truncate text-[9px] text-ink-400">{playerVersionGroup.representative.name} · {playerVersionGroup.variants.length} 个版本可选</div>
                 </div>
               </div>
-              <button aria-label="关闭球员版本选择" className="dialog-close-button flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-ink-500 hover:bg-ink-200 hover:text-ink-800" onClick={() => setPlayerVersionGroupKey(null)} type="button"><X className="h-4 w-4" /></button>
+              <button aria-label="关闭版本选择" className="dialog-close-button flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-ink-500 hover:bg-ink-200 hover:text-ink-800" onClick={() => setPlayerVersionGroupKey(null)} type="button"><X className="h-4 w-4" /></button>
             </div>
             <div className="max-h-[58vh] space-y-1.5 overflow-y-auto border-t border-ink-200 p-3">
               {playerVersionGroup.variants.map((variant) => {
@@ -1935,7 +1935,7 @@ function RookieBuilder({
                   >
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[11px] font-semibold text-ink-800">{playerVariantLabel(variant)}</span>
-                      <span className="mt-0.5 block truncate text-[9px] text-ink-400">{variant.position ?? "--"} · {variant.height ?? "身高未知"}{variant.isEstimated ? " · 部分属性为估算" : ""}</span>
+                      <span className="mt-0.5 block truncate text-[9px] text-ink-400">{variant.position ?? "--"} · {variant.height ?? "身高未记录"}{variant.isEstimated ? " · 部分属性为估算值" : ""}</span>
                     </span>
                     <span className="flex shrink-0 items-center gap-2">
                       <span className={`text-[16px] font-bold tabular-nums ${typeof variant.overall === "number" ? valueColor(variant.overall) : "text-ink-400"}`}>{variant.overall ?? "--"}</span>
@@ -1946,24 +1946,24 @@ function RookieBuilder({
               })}
             </div>
             <div className="border-t border-ink-200 bg-ink-50 px-3 py-2.5 text-[10px] text-ink-500">
-              选择版本后会返回属性槽，再点击目标属性完成锁定。
+              选定版本后返回属性槽，再点击目标属性完成锁定。
             </div>
           </section>
         </div>
       )}
       {customizingBundle && (
         <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
-          <section aria-label={`自定义${customizingBundle.label}`} aria-modal="true" className="dialog-surface w-full max-w-[430px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={customDialogRef} role="dialog">
+          <section aria-label={`手动设置${customizingBundle.label}`} aria-modal="true" className="dialog-surface w-full max-w-[430px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={customDialogRef} role="dialog">
             <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">
-              <div className="section-label">自定义{customizingBundle.label}</div>
-              <button aria-label="关闭自定义编辑器" className="dialog-close-button flex h-7 w-7 items-center justify-center rounded-[5px] text-ink-500 hover:bg-ink-200 hover:text-ink-800" onClick={() => setCustomizingBundleId(null)} type="button"><X className="h-4 w-4" /></button>
+              <div className="section-label">手动设置{customizingBundle.label}</div>
+              <button aria-label="关闭设置" className="dialog-close-button flex h-7 w-7 items-center justify-center rounded-[5px] text-ink-500 hover:bg-ink-200 hover:text-ink-800" onClick={() => setCustomizingBundleId(null)} type="button"><X className="h-4 w-4" /></button>
             </div>
             <div className="grid max-h-[55vh] grid-cols-2 gap-2 overflow-y-auto p-3 sm:grid-cols-3">
               {customizingBundle.attrs.map((attr) => (
                 <label key={attr} className="min-w-0">
                   <span className="mb-1 block truncate text-[9px] font-semibold text-ink-500" title={attrNameCN[attr] ?? attr}>{attrNameCN[attr] ?? attr}</span>
                   <input
-                    aria-label={`自定义${attrNameCN[attr] ?? attr}`}
+                    aria-label={`设置${attrNameCN[attr] ?? attr}`}
                     className="h-9 w-full rounded-[5px] border border-ink-200 bg-ink-50 px-2 text-center text-[13px] font-semibold tabular-nums text-ink-800 outline-none focus:border-court-500 focus:bg-white"
                     inputMode="numeric"
                     onChange={(event) => setCustomDraft((current) => ({ ...current, [attr]: event.target.value }))}
@@ -1977,7 +1977,7 @@ function RookieBuilder({
             <div className="flex items-center justify-end gap-3 border-t border-ink-200 bg-ink-50 px-3 py-2.5">
               <div className="flex gap-2">
                 <button className="action-button px-3 py-1.5 text-[10px]" onClick={() => setCustomizingBundleId(null)} type="button">取消</button>
-                <button className="action-button primary-action px-3 py-1.5 text-[10px]" disabled={!customDraftIsValid} onClick={confirmCustomLock} type="button"><Check className="h-3.5 w-3.5" />确认自定义</button>
+                <button className="action-button primary-action px-3 py-1.5 text-[10px]" disabled={!customDraftIsValid} onClick={confirmCustomLock} type="button"><Check className="h-3.5 w-3.5" />保存设置</button>
               </div>
             </div>
           </section>

@@ -127,14 +127,14 @@ type VersionData = {
 
 const versionDataByKey: Record<DataVersion, VersionData> = {
   "2k26": {
-    label: "NBA 2K26 数值 · 最新阵容",
+    label: "NBA 2K26 数据 · 最新阵容",
     rosterCatalog: rosterCatalog2k27 as RosterCatalogData,
     badgeProfiles: badgeProfiles2k26 as BadgeProfileMap,
     detailedPlayers: detailedPlayers2k26 as DetailedPlayerRecord[],
     tendenciesAvailable: true,
   },
   "2k27": {
-    label: "NBA 2K27 数值 · 最新阵容",
+    label: "NBA 2K27 数据 · 最新阵容",
     rosterCatalog: rosterCatalog2k27 as RosterCatalogData,
     badgeProfiles: badgeProfiles2k27 as BadgeProfileMap,
     detailedPlayers: detailedPlayers2k27 as DetailedPlayerRecord[],
@@ -299,23 +299,23 @@ const App = () => {
             <div className="min-w-0">
               <h1 className="truncate text-[14px] font-semibold text-ink-900">2K26 球员生成器</h1>
               <div className="mt-0.5 truncate text-[9px] text-ink-500">
-                {appMode === "rookie" ? "球队抽选 / 新秀构建" : appMode === "prime" ? "球队抽选 / 巅峰构建" : appMode === "custom" ? "自选来源 / 新秀构建" : "能力混合 / 球员转盘"}
+                {appMode === "rookie" ? "球队抽选 · 新秀构建" : appMode === "prime" ? "球队抽选 · 巅峰构建" : appMode === "custom" ? "手动选源 · 新秀构建" : "能力组合 · 球员抽选"}
               </div>
             </div>
           </div>
 
-          <nav className="mode-nav" aria-label="生成模式">
-            <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} disabled={builderFlowActive} onClick={() => setAppMode("rookie")} title={builderFlowActive ? "生成进行中，请点击重新开始后再切换模式" : undefined} type="button">
+          <nav className="mode-nav" aria-label="选择模式">
+            <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} disabled={builderFlowActive} onClick={() => setAppMode("rookie")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : undefined} type="button">
               <UserRoundPlus className="h-3.5 w-3.5" />
               <span className="lg:hidden">新秀</span>
-              <span className="hidden lg:inline">生成我的新秀</span>
+              <span className="hidden lg:inline">随机新秀</span>
             </button>
-            <button aria-pressed={appMode === "prime"} className="mode-nav-button" data-active={appMode === "prime"} disabled={builderFlowActive} onClick={() => setAppMode("prime")} title={builderFlowActive ? "生成进行中，请点击重新开始后再切换模式" : undefined} type="button">
+            <button aria-pressed={appMode === "prime"} className="mode-nav-button" data-active={appMode === "prime"} disabled={builderFlowActive} onClick={() => setAppMode("prime")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : undefined} type="button">
               <Award className="h-3.5 w-3.5" />
               <span className="lg:hidden">巅峰</span>
               <span className="hidden lg:inline">生成巅峰球员</span>
             </button>
-            <button aria-pressed={appMode === "custom"} className="mode-nav-button" data-active={appMode === "custom"} disabled={builderFlowActive} onClick={() => setAppMode("custom")} title={builderFlowActive ? "生成进行中，请点击重新开始后再切换模式" : "逐项选择每个属性槽的来源球员"} type="button">
+            <button aria-pressed={appMode === "custom"} className="mode-nav-button" data-active={appMode === "custom"} disabled={builderFlowActive} onClick={() => setAppMode("custom")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "逐项为属性槽选择来源球员"} type="button">
               <UsersRound className="h-3.5 w-3.5" />
               <span className="lg:hidden">自选</span>
               <span className="hidden lg:inline">自选来源</span>
@@ -323,7 +323,7 @@ const App = () => {
           </nav>
 
           <div className="flex shrink-0 items-center justify-end gap-2">
-            <span className="meta-chip">最新阵容 · {dataVersion === "2k26" ? "2K26 数值" : "2K27 数值"}</span>
+            <span className="meta-chip">最新阵容 · {dataVersion === "2k26" ? "2K26 数据" : "2K27 数据"}</span>
             <span className="meta-chip hidden sm:inline-flex">{appVersion} / {lastUpdated}</span>
             <div className="data-version-toggle" role="radiogroup" aria-label="数据版本">
               <button
@@ -339,12 +339,12 @@ const App = () => {
               </button>
               <button
                 aria-checked={dataVersion === "2k27"}
-                aria-label="2K27 数据（暂未开放）"
+                aria-label="2K27 数据（暂不可用）"
                 className={`version-option ${dataVersion === "2k27" ? "version-active" : ""}`}
                 disabled
                 onClick={() => setDataVersion("2k27")}
                 role="radio"
-                title="2K27 入口暂未开放"
+                title="2K27 数据暂不可用"
                 type="button"
               >
                 2K27
@@ -362,7 +362,7 @@ const App = () => {
             </button>
             <span className="hidden items-center gap-1.5 text-[10px] font-medium text-ink-600 xl:flex">
               <span className="h-1.5 w-1.5 rounded-full bg-court-500" />
-              {appMode === "rookie" ? "新秀构建" : appMode === "prime" ? "巅峰构建" : "自选来源"}
+              {appMode === "rookie" ? "新秀生成" : appMode === "prime" ? "巅峰生成" : "手动选源"}
             </span>
           </div>
         </header>

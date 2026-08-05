@@ -33,7 +33,7 @@ function MarqueeDraw({
   dataKind,
   disabled = false,
   durationMs = 2400,
-  drawLabel = "抽取",
+  drawLabel = "开始抽取",
   emptyText,
   isDrawing,
   items,
@@ -77,17 +77,17 @@ function MarqueeDraw({
       : "settled";
   const canDraw = Boolean(onDraw) && !disabled && !isDrawing && hasItems;
   const statusText = phase === "rolling"
-    ? "正在筛选"
+    ? "正在抽取…"
     : phase === "landing"
       ? `已抽中：${currentLabel ?? emptyText}`
       : phase === "settled"
         ? currentLabel ?? emptyText
-        : "待抽取";
+        : "尚未开始";
   const liveStatus = phase === "rolling"
-    ? `${title}正在筛选`
+    ? title
     : hasSelection
-      ? `${title}结果：${currentLabel ?? selectedId}`
-      : `${title}待抽取`;
+      ? `已抽取：${currentLabel ?? selectedId}`
+      : `${title}，尚未开始`;
 
   useEffect(() => {
     completionRef.current = onSettled;
@@ -220,7 +220,7 @@ function MarqueeDraw({
       </div>
       <div className="marquee-draw-track" ref={trackRef}>
         <div className="marquee-draw-pointer" aria-hidden="true">
-          <span>落点</span>
+          <span>结果</span>
           <ChevronDown />
         </div>
         <div className="marquee-draw-rail" ref={railRef}>
@@ -254,11 +254,11 @@ function MarqueeDraw({
         </div>
       </div>
       <div className="marquee-draw-footer">
-        <span>{hasItems ? `${items.length} 个候选` : emptyText}</span>
+        <span>{hasItems ? dataKind === "team" ? `${items.length} 支候选球队` : `${items.length} 个候选` : emptyText}</span>
         {onDraw && (
           <button disabled={!canDraw} onClick={onDraw} type="button">
             <Shuffle aria-hidden="true" />
-            {isDrawing ? "抽取中" : drawLabel}
+            {isDrawing ? "抽取中…" : drawLabel}
           </button>
         )}
       </div>
