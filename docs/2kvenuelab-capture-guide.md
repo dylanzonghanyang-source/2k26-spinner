@@ -1,7 +1,7 @@
 # 2KVenueLab 采集 2K26 官方历史选秀数据 — 操作文档
 
 > 目的：从 2K26 MyNBA **官方历史选秀届**（不导入自定义名单）批量导出球员属性/徽章/倾向，
-> 生成 CSV/JSON，供 2k26-spinner 转成 `rookieCards` 数据库。
+> 生成 CSV/JSON，供 2kspinner 转成 `rookieCards` 数据库。
 >
 > 适用：Windows PC 本机，已装 NBA 2K26 PC 版。
 > 状态：v2026-08-01，对应 2KVenueLab v2.15。

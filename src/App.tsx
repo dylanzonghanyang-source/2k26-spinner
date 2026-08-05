@@ -1,7 +1,7 @@
 import { Award, Moon, Sun, UserRoundPlus, UsersRound } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import RookieBuilder, { type RookieBuilderTeam } from "./components/RookieBuilder";
-import rookieLogo from "./assets/rookie-26-logo.svg";
+import appLogo from "./assets/2kspinner-logo.png";
 import {
   type PlayerSource,
   type PlayerBadge,
@@ -19,7 +19,8 @@ const lastUpdated = "2026-08-02";
 type AppMode = "rookie" | "prime" | "custom";
 type Theme = "light" | "dark";
 
-const themeStorageKey = "2k26-spinner-theme";
+const themeStorageKey = "2kspinner-theme";
+const legacyThemeStorageKey = "2k26-spinner-theme";
 type DataVersion = "2k26" | "2k27";
 
 function getInitialDataVersion(): DataVersion {
@@ -27,7 +28,8 @@ function getInitialDataVersion(): DataVersion {
 }
 
 function getInitialTheme(): Theme {
-  const savedTheme = window.localStorage.getItem(themeStorageKey);
+  const savedTheme = window.localStorage.getItem(themeStorageKey)
+    ?? window.localStorage.getItem(legacyThemeStorageKey);
   if (savedTheme === "light" || savedTheme === "dark") return savedTheme;
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
@@ -244,6 +246,7 @@ const App = () => {
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     window.localStorage.setItem(themeStorageKey, theme);
+    window.localStorage.removeItem(legacyThemeStorageKey);
   }, [theme]);
   const [dataVersion, setDataVersion] = useState<DataVersion>(getInitialDataVersion);
   const activeVersionData = versionDataByKey[dataVersion];
@@ -294,10 +297,10 @@ const App = () => {
         <header className="app-header">
           <div className="flex min-w-0 shrink-0 items-center gap-2.5">
             <div className="brand-mark" aria-hidden="true">
-              <img alt="" src={rookieLogo} />
+              <img alt="" src={appLogo} />
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-[14px] font-semibold text-ink-900">2K26 球员生成器</h1>
+              <h1 className="truncate text-[14px] font-semibold text-ink-900">2KSpinner</h1>
               <div className="mt-0.5 truncate text-[9px] text-ink-500">
                 {appMode === "rookie" ? "球队抽选 · 新秀构建" : appMode === "prime" ? "球队抽选 · 巅峰构建" : appMode === "custom" ? "手动选源 · 新秀构建" : "能力组合 · 球员抽选"}
               </div>

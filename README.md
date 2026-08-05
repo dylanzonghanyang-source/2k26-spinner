@@ -1,4 +1,4 @@
-# 2K26 Spinner
+# 2KSpinner
 
 A small React/Vite app for generating mixed NBA 2K-style player builds with wheel-based random selection.
 
