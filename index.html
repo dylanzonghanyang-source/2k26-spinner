@@ -11,6 +11,17 @@
     <meta name="application-name" content="2KSpinner" />
     <meta name="apple-mobile-web-app-title" content="2KSpinner" />
     <meta name="theme-color" content="#20201d" />
+    <script>
+      // Set theme before first paint: saved preference wins, otherwise dark by default.
+      (function () {
+        try {
+          var t = localStorage.getItem("2kspinner-theme") || localStorage.getItem("2k26-spinner-theme");
+          document.documentElement.dataset.theme = (t === "light" || t === "dark") ? t : "dark";
+        } catch (e) {
+          document.documentElement.dataset.theme = "dark";
+        }
+      })();
+    </script>
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="shortcut icon" href="/favicon.ico" />

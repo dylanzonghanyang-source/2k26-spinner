@@ -31,7 +31,7 @@ function getInitialTheme(): Theme {
   const savedTheme = window.localStorage.getItem(themeStorageKey)
     ?? window.localStorage.getItem(legacyThemeStorageKey);
   if (savedTheme === "light" || savedTheme === "dark") return savedTheme;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return "dark";
 }
 
 function formatPlayerName(name: string): string {
