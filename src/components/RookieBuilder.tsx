@@ -128,7 +128,7 @@ const positions: Position[] = ["PG", "SG", "SF", "PF", "C"];
 const ages = [18, 19, 20, 21, 22, 23];
 const playersPerRound = 8;
 const playerSwitchLimit = 3;
-const teamDrawDurationMs = 2400;
+const teamDrawDurationMs = 1800;
 const teamDrawSettleHoldMs = 360;
 const secondaryPositionShare = 0.25;
 
