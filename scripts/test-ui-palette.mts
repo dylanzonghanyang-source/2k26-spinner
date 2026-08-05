@@ -21,17 +21,21 @@ function contrastRatio(foreground: string, background: string) {
 
 const colors = config.theme.extend.colors as Record<string, Record<number, string>>;
 const white = "#ffffff";
-const page = "#f5f5f2";
-const darkBody = "#141816";
 const darkPanel = "#1c211f";
 
-// Light mode rating colors — must pass AA (≥4.5) on white
+const lightRatingColors: Record<string, string> = {
+  elite: "#6b3a0f",
+  good: "#145a45",
+  solid: "#1d4f91",
+  fair: "#62438f",
+  low: "#a33d4f",
+};
 const lightRatings: [string, string, string][] = [
-  ["90+ warning-800 (elite)", colors.warning[800], white],
-  ["80+ court-800 (good)", colors.court[800], white],
-  ["70+ ink-900 (solid)", colors.ink[900], white],
-  ["60+ ink-700 (fair)", colors.ink[700], white],
-  ["<60 ink-600 (low)", colors.ink[600], white],
+  ["90+ light-elite", lightRatingColors.elite, white],
+  ["80+ light-good", lightRatingColors.good, white],
+  ["70+ light-solid", lightRatingColors.solid, white],
+  ["60+ light-fair", lightRatingColors.fair, white],
+  ["<60 light-low", lightRatingColors.low, white],
 ];
 for (const [label, fg, bg] of lightRatings) {
   const ratio = contrastRatio(fg, bg);
@@ -42,9 +46,9 @@ for (const [label, fg, bg] of lightRatings) {
 const darkRatingColors: Record<string, string> = {
   elite: "#ffd36a",
   good: "#6fdbab",
-  solid: "#f3f7f4",
-  fair: "#d2ddd6",
-  low: "#a7b5ac",
+  solid: "#8db8ff",
+  fair: "#c3a5f5",
+  low: "#ff9b9f",
 };
 const darkRatings: [string, string, string][] = [
   ["90+ dark-elite", darkRatingColors.elite, darkPanel],
@@ -70,11 +74,11 @@ console.log(JSON.stringify({
   warning500Contrast: Number(contrastRatio(colors.warning[500], white).toFixed(2)),
   ink500Contrast: Number(contrastRatio(colors.ink[500], white).toFixed(2)),
   ratingLight: {
-    elite: Number(contrastRatio(colors.warning[800], white).toFixed(2)),
-    good: Number(contrastRatio(colors.court[800], white).toFixed(2)),
-    solid: Number(contrastRatio(colors.ink[900], white).toFixed(2)),
-    fair: Number(contrastRatio(colors.ink[700], white).toFixed(2)),
-    low: Number(contrastRatio(colors.ink[600], white).toFixed(2)),
+    elite: Number(contrastRatio(lightRatingColors.elite, white).toFixed(2)),
+    good: Number(contrastRatio(lightRatingColors.good, white).toFixed(2)),
+    solid: Number(contrastRatio(lightRatingColors.solid, white).toFixed(2)),
+    fair: Number(contrastRatio(lightRatingColors.fair, white).toFixed(2)),
+    low: Number(contrastRatio(lightRatingColors.low, white).toFixed(2)),
   },
   ratingDark: {
     elite: Number(contrastRatio(darkRatingColors.elite, darkPanel).toFixed(2)),

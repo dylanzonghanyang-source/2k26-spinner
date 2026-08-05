@@ -16,9 +16,9 @@
   /* Rating text: tuned for AA+ on white and warm-gray panels */
   --rating-elite: #6b3a0f;
   --rating-good: #145a45;
-  --rating-solid: #1f1f1c;
-  --rating-fair: #3f3f3a;
-  --rating-low: #5c5c56;
+  --rating-solid: #1d4f91;
+  --rating-fair: #62438f;
+  --rating-low: #a33d4f;
   --motion-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --motion-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --motion-fast: 140ms;
@@ -1120,9 +1120,9 @@ html[data-theme="dark"] {
   --color-warning-soft: #382a18;
   --rating-elite: #ffd36a;
   --rating-good: #6fdbab;
-  --rating-solid: #f3f7f4;
-  --rating-fair: #d2ddd6;
-  --rating-low: #a7b5ac;
+  --rating-solid: #8db8ff;
+  --rating-fair: #c3a5f5;
+  --rating-low: #ff9b9f;
 }
 
 html[data-theme="dark"] body {
@@ -1456,4 +1456,25 @@ html[data-theme="dark"] .marquee-draw-mark img {
   html[data-theme="dark"] .section-label {
     color: #dce5df;
   }
+}
+
+/* Keep rating semantics after the broad legacy text utility overrides above. */
+html[data-theme="dark"] .value-rating-elite {
+  color: var(--rating-elite) !important;
+}
+
+html[data-theme="dark"] .value-rating-good {
+  color: var(--rating-good) !important;
+}
+
+html[data-theme="dark"] .value-rating-solid {
+  color: var(--rating-solid) !important;
+}
+
+html[data-theme="dark"] .value-rating-fair {
+  color: var(--rating-fair) !important;
+}
+
+html[data-theme="dark"] .value-rating-low {
+  color: var(--rating-low) !important;
 }
