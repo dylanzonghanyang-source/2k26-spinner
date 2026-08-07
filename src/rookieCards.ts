@@ -66,6 +66,38 @@ export function corePlayerName(raw: string): string {
     .trim();
 }
 
+// Roster pools use nicknames/shorthands for some players whose rookie card is
+// stored under the full name (DB2K exports use the full in-game name). These
+// aliases map pool name -> card name; verified against the 2018-2025 exports.
+const PLAYER_NAME_ALIASES: Record<string, string> = {
+  "Mo Bamba": "Mohamed Bamba",
+  "Svi Mykhailiuk": "Sviatoslav Mykhailiuk",
+  "Alex Sarr": "Alexandre Sarr",
+  "Rob Dillingham": "Robert Dillingham",
+  "Bub Carrington": "Carlton Carrington",
+  "Bones Hyland": "Nah'Shon Hyland",
+  "Ronald Holland II": "Ron Holland",
+  "VJ Edgecombe": "V.J. Edgecombe",
+  "RJ Barrett": "R.J. Barrett",
+  "AJ Green": "A.J. Green",
+  "KJ Simpson": "K.J. Simpson",
+  "AJ Johnson": "A.J. Johnson",
+  "GG Jackson": "G.G. Jackson",
+  "Yang Hansen": "Hansen Yang",
+};
+
+export function lookupRookieCard(
+  rookieCards: RookieCardLookup | null | undefined,
+  playerName: string,
+): RookieCard | null {
+  if (!rookieCards) return null;
+  const direct = rookieCards.get(corePlayerName(playerName));
+  if (direct) return direct;
+  const alias = PLAYER_NAME_ALIASES[playerName];
+  if (alias) return rookieCards.get(corePlayerName(alias)) ?? null;
+  return null;
+}
+
 export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLookup {
   const lookup: RookieCardLookup = new Map();
   const keys = index.keys ?? [];

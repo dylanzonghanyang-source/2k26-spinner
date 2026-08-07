@@ -31,7 +31,7 @@ import {
   type TendencyDataVersion,
   type TendencyLookup,
 } from "../tendencies";
-import { corePlayerName, loadRookieCards, type RookieCard, type RookieCardLookup } from "../rookieCards";
+import { corePlayerName, loadRookieCards, lookupRookieCard, type RookieCard, type RookieCardLookup } from "../rookieCards";
 import { getTendencyNameCN } from "../tendencyNames";
 import { tendencyBundleMap } from "./tendencyBundleMap";
 import { badgeBundleMap } from "./badgeBundleMap";
@@ -582,7 +582,7 @@ function createResult(
   for (const bundle of bundles) {
     const lock = locks[bundle.id];
     const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
-    const card = useRookieCards && player ? (rookieCards?.get(corePlayerName(player.name)) ?? null) : null;
+    const card = useRookieCards && player ? lookupRookieCard(rookieCards, player.name) : null;
     cardByBundle.set(bundle.id, card);
   }
   const hasRookieCard = [...cardByBundle.values()].some((card) => card !== null);
@@ -602,7 +602,7 @@ function createResult(
       lookup: tendencyLookup,
       cardForPlayer: (playerSlug) => {
         const player = [...players.values()].find((p) => p.slug === playerSlug);
-        return player ? (rookieCards?.get(corePlayerName(player.name)) ?? null) : null;
+        return player ? lookupRookieCard(rookieCards, player.name) : null;
       },
     })
     : {};
@@ -1254,7 +1254,7 @@ function RookieBuilder({
       }
       const player = lock?.kind === "player" ? playersById.get(lock.playerId) : undefined;
       if (player) {
-        const card = !isPrime ? (rookieCards?.get(corePlayerName(player.name)) ?? null) : null;
+        const card = !isPrime ? lookupRookieCard(rookieCards, player.name) : null;
         next[bundle.id] = evaluate(player, bundle, body, card);
       }
     }
@@ -1262,7 +1262,7 @@ function RookieBuilder({
   }, [body, isPrime, locks, playersById, rookieCards]);
   const selectedEvaluations = useMemo(() => Object.fromEntries(
     selectedPlayer ? bundles.map((bundle) => {
-      const card = !isPrime ? (rookieCards?.get(corePlayerName(selectedPlayer.name)) ?? null) : null;
+      const card = !isPrime ? lookupRookieCard(rookieCards, selectedPlayer.name) : null;
       return [bundle.id, evaluate(selectedPlayer, bundle, body, card)];
     }) : [],
   ) as Record<string, Evaluation>, [body, isPrime, rookieCards, selectedPlayer]);
@@ -1839,7 +1839,7 @@ function RookieBuilder({
               {filteredManualPlayerGroups.map((group) => {
                 const selected = selectedPlayer ? playerIdentity(selectedPlayer) === group.key : false;
                 const representative = group.representative;
-                const cardForGroup = !isPrime ? (rookieCards?.get(corePlayerName(representative.name)) ?? null) : null;
+                const cardForGroup = !isPrime ? lookupRookieCard(rookieCards, representative.name) : null;
                 const maxOverall = group.variants.reduce((max, player) => Math.max(max, player.overall ?? 0), 0);
                 const displayedOverall = cardForGroup?.overall ?? maxOverall;
                 const positionSummary = [...new Set(group.variants.map((player) => player.position).filter(Boolean))].join("/");
@@ -1889,7 +1889,7 @@ function RookieBuilder({
               const id = playerId(player);
               const unavailable = usedBy.has(playerIdentity(player));
               const selected = selectedPlayerId === id;
-              const cardForPlayer = !isPrime ? (rookieCards?.get(corePlayerName(player.name)) ?? null) : null;
+              const cardForPlayer = !isPrime ? lookupRookieCard(rookieCards, player.name) : null;
               const displayedPlayerOverall = cardForPlayer?.overall ?? player.overall;
               return (
                 <button key={id} className={`interactive-card flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : unavailable || isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`} disabled={unavailable || isComplete} onClick={() => choosePlayer(player)} type="button">
@@ -2026,7 +2026,7 @@ function RookieBuilder({
               {playerVersionGroup.variants.map((variant) => {
                 const id = playerId(variant);
                 const selected = selectedPlayerId === id;
-                const cardForVariant = !isPrime ? (rookieCards?.get(corePlayerName(variant.name)) ?? null) : null;
+                const cardForVariant = !isPrime ? lookupRookieCard(rookieCards, variant.name) : null;
                 const displayedVariantOverall = cardForVariant?.overall ?? variant.overall;
                 return (
                   <button
