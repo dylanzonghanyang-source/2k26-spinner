@@ -650,7 +650,9 @@ function createResult(
   const mean = average(scores, 71);
   const sourcePeakOverall = calibratedOverall(peakAttrs, position, peakBadges, mean, overallVersion);
   // Potential slot: a real rookie card wins over both the peak evaluation and
-  // the cross-version OVR fallback.
+  // the cross-version OVR fallback. The card also carries the official min/max
+  // potential range; without a card we fall back to a symmetric ±5 band around
+  // the resolved potential.
   const potentialCard = cardByBundle.get("potential") ?? null;
   const potential = clamp(
     potentialCard?.potential?.current
@@ -658,6 +660,8 @@ function createResult(
     40,
     99,
   );
+  const potentialMin = clamp(potentialCard?.potential?.min ?? potential - 5, 40, 99);
+  const potentialMax = clamp(potentialCard?.potential?.max ?? potential + 5, 40, 99);
   const rookieTier = rookieTierForPotential(potential);
 
   // Card attributes are locked (real game data) — the OVR constraint must not
@@ -765,6 +769,7 @@ function createResult(
     potential, growthGap, progressSpeed, boom, normal, bust, peakStart, peakEnd,
     peakOverall: sourcePeakOverall,
     peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges,
+    potentialMin, potentialMax,
     initialOverallTarget: rookieOverallConstraint?.targetOverall ?? initialStrength,
     initialOverallConstraintApplied: rookieOverallConstraint?.changed ?? false,
     initialOverallConstraintReachable: rookieOverallConstraint?.reachable ?? true,
@@ -830,7 +835,7 @@ function createExportText(
     `巅峰开始年龄: ${result.peakStart}`, `巅峰结束年龄: ${result.peakEnd}`,
     `数据版本: ${dataVersionLabel}`,
     ...(!isPrime ? [`预计成长速度: 每年 +${result.progressSpeed} OVR`] : []),
-    `潜力: ${result.potential}`,
+    `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）`,
     `成长概率: ${result.boom}%`, `平均概率: ${result.normal}%`, `衰退概率: ${result.bust}%`,
     "", "[身体设定]", `身高: ${result.height} cm`, `体重: ${result.weight} kg`, `臂展: ${result.wingspan}`,
     `肩宽: ${result.shoulder}`, `颈部长度: ${result.neck}`, `躯干长度: ${result.torso}`,
@@ -840,7 +845,7 @@ function createExportText(
       ...group.attrs.map((attr) => `${attrNameCN[attr] ?? attr}: ${result.initialAttrs[attr] ?? "--"}`),
     ]),
     "", "[杂项]", `游戏 OVR 估算: ${result.baseOverall}`, `无形属性: ${result.intangibles}`,
-    `${isPrime ? "巅峰 OVR" : "预计初始 OVR"}: ${result.initialStrength}`, `潜力: ${result.potential}`,
+    `${isPrime ? "巅峰 OVR" : "预计初始 OVR"}: ${result.initialStrength}`, `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）`,
     ...(!isPrime ? [
       `新秀初始 OVR 目标: ${result.initialOverallTarget}`,
       ...(result.initialOverallConstraintReachable ? [] : ["警告：手动锁定的数值使初始 OVR 无法完全达到目标"]),
@@ -1920,7 +1925,7 @@ function RookieBuilder({
                 <div className="mt-1 truncate text-[15px] font-semibold text-ink-800" data-testid="rookie-name">{rookieName}</div>
                 <div className="mt-2 flex items-end justify-between">
                   <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">{isPrime ? "巅峰 OVR" : "新秀 OVR"}</div></div>
-                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">游戏 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
+                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span> <span className="tabular-nums text-ink-400">({result.potentialMin}-{result.potentialMax})</span></div><div className="text-[8px] text-ink-400">游戏 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-px bg-ink-200 text-[10px]">
@@ -1935,7 +1940,7 @@ function RookieBuilder({
                 </div>
               ) : (
                 <div className="border-b border-ink-200 px-3 py-2.5">
-                  <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold text-ink-700">成长轨迹</span><span className="font-mono text-court-700">潜力 {result.potential}</span></div>
+                  <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold text-ink-700">成长轨迹</span><span className="font-mono text-court-700">潜力 {result.potential}<span className="text-ink-400"> ({result.potentialMin}-{result.potentialMax})</span></span></div>
                   <div className="mb-2 grid grid-cols-2 gap-x-3 gap-y-1 border-y border-ink-100 py-1.5 text-[9px]">
                     <div className="flex justify-between gap-2"><span className="text-ink-400">预计初始 OVR</span><strong className="tabular-nums text-ink-700">{result.initialStrength}</strong></div>
                     <div className="flex justify-between gap-2"><span className="text-ink-400">巅峰年龄</span><strong className="tabular-nums text-ink-700">{result.peakStart}–{result.peakEnd}</strong></div>
