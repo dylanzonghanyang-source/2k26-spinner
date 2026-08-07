@@ -1,0 +1,17 @@
+{
+  "source": "DB2K Editor Draft Class snapshot",
+  "inputFile": "/Users/yangzonghan/Downloads/2003_draft_class.json",
+  "targetExecutable": "NBA2K26.exe",
+  "mode": "Draft Class 2003 (relocated read-only)",
+  "recordCount": 150,
+  "converted": 10,
+  "year": 2003,
+  "capturedAt": "2026-08-07T19:47:14.191Z",
+  "badgeTierMap": {
+    "1": "Bronze",
+    "2": "Silver",
+    "3": "Gold",
+    "4": "HOF"
+  },
+  "whitelistUsed": true
+}

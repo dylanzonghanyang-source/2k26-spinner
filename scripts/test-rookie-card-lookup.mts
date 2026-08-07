@@ -59,6 +59,17 @@ assert.ok(bronny, "Bronny matches via core name");
 assert.equal(bronny.slug, "bronny-james-jr");
 console.log("Bronny card OK (suffix-stripped match)");
 
+// 2003 draft class (collected 2026-08-08 from 2003_draft_class.json)
+const lebron = lookup.get(corePlayerName("LeBron James"));
+assert.ok(lebron, "LeBron card exists after 2003 collection");
+assert.equal(lebron.year, 2003);
+assert.equal(lebron.overall, 84); // user UI-confirmed
+assert.equal(lebron.vitals?.draftPick, 1);
+assert.equal(lebron.vitals?.jerseyNumber, 23);
+assert.equal(lebron.vitals?.birthYear, 1984);
+assert.equal(lebron.durability?.overall, 99);
+console.log("LeBron 2003 card OK: pick=1, jersey=23, overall=84");
+
 const brunson = lookup.get(corePlayerName("Jalen Brunson"));
 assert.ok(brunson);
 assert.equal(brunson.badges.length, 0, "Brunson has zero badges (user-confirmed)");
@@ -76,7 +87,9 @@ for (const name of rosterNames) {
   if (card) matched += 1;
   else console.log(`  NO CARD for roster player: ${name}`);
 }
-assert.equal(matched, rosterNames.length - 2, "Curry/LeBron (pre-2018 draft) expected missing");
-console.log(`roster matching: ${matched}/${rosterNames.length} (Curry/LeBron pre-2018, expected no card)`);
+// 2003 draft class was collected later, so LeBron now has a card; Curry (2009)
+// is the only expected missing one.
+assert.equal(matched, rosterNames.length - 1, "only Stephen Curry (2009) expected missing");
+console.log(`roster matching: ${matched}/${rosterNames.length} (Curry 2009 expected no card)`);
 
 console.log("\nALL ROOKIE CARD LOOKUP CHECKS PASSED");
