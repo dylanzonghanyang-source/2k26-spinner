@@ -39,21 +39,40 @@ export type TendencyBundleSource = {
   playerSlug?: string;
 };
 
+export type TendencyCardResolver = (playerSlug: string) => {
+  tendencies: Record<string, number>;
+} | null | undefined;
+
 export function collectTendenciesByBundle({
   sources,
   fieldToBundle,
   lookup,
+  cardForPlayer,
 }: {
   sources: TendencyBundleSource[];
   fieldToBundle: Record<string, string>;
-  lookup: TendencyLookup;
+  lookup?: TendencyLookup | null;
+  cardForPlayer?: TendencyCardResolver;
 }): Record<string, number> {
   const sourceByBundle = new Map(sources.map((source) => [source.bundleId, source.playerSlug]));
+  // Cache the card per player slug so multi-slot lookups reuse one object.
+  const cardCache = new Map<string, ReturnType<TendencyCardResolver>>();
+  const resolveCard = (playerSlug: string | undefined) => {
+    if (!playerSlug) return undefined;
+    if (!cardCache.has(playerSlug)) cardCache.set(playerSlug, cardForPlayer?.(playerSlug));
+    return cardCache.get(playerSlug);
+  };
   const tendencies: Record<string, number> = {};
 
   for (const [field, bundleId] of Object.entries(fieldToBundle)) {
     const playerSlug = sourceByBundle.get(bundleId);
     if (!playerSlug) continue;
+    const card = resolveCard(playerSlug);
+    if (card?.tendencies && typeof card.tendencies[field] === "number") {
+      tendencies[field] = card.tendencies[field];
+      continue;
+    }
+    if (!lookup) continue;
     const value = lookup.get(playerSlug, field);
     if (typeof value === "number") tendencies[field] = value;
   }

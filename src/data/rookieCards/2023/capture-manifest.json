@@ -1,0 +1,17 @@
+{
+  "source": "DB2K Editor Draft Class snapshot",
+  "inputFile": "/Users/yangzonghan/Downloads/2023player_roster_snapshot.json",
+  "targetExecutable": "NBA2K26.exe",
+  "mode": "Draft Class",
+  "recordCount": 150,
+  "converted": 58,
+  "year": 2023,
+  "capturedAt": "2026-08-07T15:33:16.043Z",
+  "badgeTierMap": {
+    "1": "Bronze",
+    "2": "Silver",
+    "3": "Gold",
+    "4": "HOF"
+  },
+  "whitelistUsed": true
+}

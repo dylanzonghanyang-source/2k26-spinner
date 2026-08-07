@@ -1,0 +1,222 @@
+{
+  "slug": "lamelo-ball",
+  "name": "LaMelo Ball",
+  "draftYear": 2020,
+  "source": "db2k-draft-class",
+  "gameVersion": "NBA2K26.exe",
+  "capturedAt": "2026-08-07",
+  "overall": null,
+  "position": "PG",
+  "secondaryPosition": "N/A",
+  "height": 79,
+  "weight": 180,
+  "wingspan": 208.28,
+  "faceId": 7953,
+  "potential": {
+    "current": 88,
+    "min": 84,
+    "max": 92
+  },
+  "detailed": {
+    "Agility": 76,
+    "Ball Handle": 86,
+    "Block": 40,
+    "Close Shot": 77,
+    "Defensive Consistency": 50,
+    "Defensive Rebound": 60,
+    "Draw Foul": 50,
+    "Driving Dunk": 65,
+    "Free Throw": 72,
+    "Hands": 98,
+    "Help Defense IQ": 64,
+    "Hustle": 75,
+    "Intangibles": 60,
+    "Interior Defense": 45,
+    "Shot IQ": 95,
+    "Mid-Range Shot": 72,
+    "Offensive Consistency": 85,
+    "Offensive Rebound": 58,
+    "Pass Accuracy": 80,
+    "Pass IQ": 86,
+    "Pass Perception": 66,
+    "Pass Vision": 83,
+    "Perimeter Defense": 69,
+    "Post Control": 52,
+    "Post Fade": 58,
+    "Post Hook": 52,
+    "Speed": 84,
+    "Speed with Ball": 84,
+    "Stamina": 88,
+    "Standing Dunk": 45,
+    "Steal": 60,
+    "Strength": 50,
+    "Vertical": 79,
+    "Layup": 82,
+    "Three-Point Shot": 74
+  },
+  "badges": [
+    {
+      "name": "Bail Out",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Break Starter",
+      "tier": "Silver"
+    },
+    {
+      "name": "Float Game",
+      "tier": "Silver"
+    },
+    {
+      "name": "Glove",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Interceptor",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Lightning Launch",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Limitless Range",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Mini Marksman",
+      "tier": "Silver"
+    },
+    {
+      "name": "Physical Finisher",
+      "tier": "Silver"
+    },
+    {
+      "name": "Rebound Chaser",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "tier": "Silver"
+    },
+    {
+      "name": "Shifty Shooter",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handle",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Unpluckable",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "tier": "Silver"
+    }
+  ],
+  "tendencies": {
+    "Alley-Oop": 50,
+    "Alley-Oop Pass": 80,
+    "Attack Strong on Drive": 40,
+    "Block Shot": 35,
+    "Contested Jumper Mid-Range": 20,
+    "Contested Jumper Three": 50,
+    "Crash": 65,
+    "Dish to Open Man": 50,
+    "Drive": 45,
+    "Drive Pull-Up Mid-Range": 40,
+    "Drive Pull-Up Three": 30,
+    "Drive Right": 75,
+    "Driving Behind the Back": 15,
+    "Driving Crossover": 45,
+    "Driving Double Crossover": 0,
+    "Driving Dribble Hesitation": 30,
+    "Driving Dunk": 60,
+    "Driving Half Spin": 15,
+    "Driving In & Out": 15,
+    "Driving Layup": 75,
+    "Driving Spin": 30,
+    "Driving Stepback": 45,
+    "Euro Step Layup": 45,
+    "Flashy Dunk": 10,
+    "Flashy Pass": 70,
+    "Floater": 75,
+    "Foul": 60,
+    "Hard Foul": 30,
+    "Hop Step Layup": 65,
+    "Iso vs Average Defender": 10,
+    "Iso vs Elite Defender": 3,
+    "Iso vs Good Defender": 5,
+    "No Driving Dribble Move": 90,
+    "No Setup Dribble": 25,
+    "Off-Screen Drive": 35,
+    "Off-Screen Shot Mid-Range": 45,
+    "Off-Screen Shot Three": 40,
+    "On-Ball Steal": 60,
+    "Pass Interception": 60,
+    "Play Discipline": 10,
+    "Post Aggressive Backdown": 0,
+    "Post Back Down": 0,
+    "Post Drive": 0,
+    "Post Drop Step": 0,
+    "Post Face Up": 0,
+    "Post Fade Left": 0,
+    "Post Fade Right": 0,
+    "Post Hook Left": 0,
+    "Post Hook Right": 0,
+    "Post Hop Step": 20,
+    "Post Shimmy Shot": 0,
+    "Post Spin": 0,
+    "Post Stepback Shot": 0,
+    "Post Up": 5,
+    "Post Up & Under": 0,
+    "Putback": 5,
+    "Roll vs Pop": 0,
+    "Setup With Hesitation": 25,
+    "Setup With Sizeup": 25,
+    "Shoot From Post": 10,
+    "Shot": 85,
+    "Shot Close": 10,
+    "Shot Close Left": 28,
+    "Shot Close Middle": 57,
+    "Shot Close Right": 15,
+    "Shot Mid Center": 28,
+    "Shot Mid Left": 24,
+    "Shot Mid Left-Center": 16,
+    "Shot Mid Right": 8,
+    "Shot Mid Right-Center": 24,
+    "Shot Mid-Range": 14,
+    "Shot Three": 77,
+    "Shot Three Center": 13,
+    "Shot Three Left": 0,
+    "Shot Three Left-Center": 19,
+    "Shot Three Right": 22,
+    "Shot Three Right-Center": 15,
+    "Shot Under Basket": 29,
+    "Spin Jumper": 15,
+    "Spin Layup": 60,
+    "Spot Up Drive": 25,
+    "Spot Up Shot Mid-Range": 45,
+    "Spot Up Shot Three": 60,
+    "Standing Dunk": 0,
+    "Step Through Shot": 0,
+    "Stepback Jumper Mid-Range": 5,
+    "Stepback Three Point Shot": 10,
+    "Take Charge": 0,
+    "Touches": 60,
+    "Transition Pull-Up Three Point Shot": 25,
+    "Transition Spot Up vs Cut to the Basket": 50,
+    "Triple Threat Idle": 50,
+    "Triple Threat Jab Step": 5,
+    "Triple Threat Pump Fake": 5,
+    "Triple Threat Shoot": 5,
+    "Use Glass": 15
+  },
+  "personalityBadges": []
+}

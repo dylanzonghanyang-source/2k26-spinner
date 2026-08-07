@@ -1,0 +1,227 @@
+{
+  "slug": "ja-morant",
+  "name": "Ja Morant",
+  "draftYear": 2019,
+  "source": "db2k-draft-class",
+  "gameVersion": "NBA2K26.exe",
+  "capturedAt": "2026-08-07",
+  "overall": null,
+  "position": "PG",
+  "secondaryPosition": "N/A",
+  "height": 74,
+  "weight": 174,
+  "wingspan": 200.66,
+  "faceId": 7821,
+  "potential": {
+    "current": 92,
+    "min": 88,
+    "max": 96
+  },
+  "detailed": {
+    "Agility": 84,
+    "Ball Handle": 89,
+    "Block": 45,
+    "Close Shot": 72,
+    "Defensive Consistency": 50,
+    "Defensive Rebound": 50,
+    "Draw Foul": 69,
+    "Driving Dunk": 85,
+    "Free Throw": 80,
+    "Hands": 85,
+    "Help Defense IQ": 70,
+    "Hustle": 80,
+    "Intangibles": 50,
+    "Interior Defense": 39,
+    "Shot IQ": 75,
+    "Mid-Range Shot": 77,
+    "Offensive Consistency": 95,
+    "Offensive Rebound": 36,
+    "Pass Accuracy": 76,
+    "Pass IQ": 78,
+    "Pass Perception": 68,
+    "Pass Vision": 70,
+    "Perimeter Defense": 73,
+    "Post Control": 37,
+    "Post Fade": 37,
+    "Post Hook": 34,
+    "Speed": 92,
+    "Speed with Ball": 92,
+    "Stamina": 95,
+    "Standing Dunk": 25,
+    "Steal": 46,
+    "Strength": 42,
+    "Vertical": 88,
+    "Layup": 87,
+    "Three-Point Shot": 80
+  },
+  "badges": [
+    {
+      "name": "Aerial Wizard",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Ankle Assassin",
+      "tier": "Silver"
+    },
+    {
+      "name": "Bail Out",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Dimer",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Float Game",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Handles For Days",
+      "tier": "Silver"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "tier": "Silver"
+    },
+    {
+      "name": "Lightning Launch",
+      "tier": "Silver"
+    },
+    {
+      "name": "Mini Marksman",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Posterizer",
+      "tier": "Silver"
+    },
+    {
+      "name": "Shifty Shooter",
+      "tier": "Gold"
+    },
+    {
+      "name": "Strong Handle",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Unpluckable",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Versatile Visionary",
+      "tier": "Bronze"
+    }
+  ],
+  "tendencies": {
+    "Alley-Oop": 25,
+    "Alley-Oop Pass": 40,
+    "Attack Strong on Drive": 45,
+    "Block Shot": 15,
+    "Contested Jumper Mid-Range": 30,
+    "Contested Jumper Three": 20,
+    "Crash": 60,
+    "Dish to Open Man": 55,
+    "Drive": 65,
+    "Drive Pull-Up Mid-Range": 12,
+    "Drive Pull-Up Three": 0,
+    "Drive Right": 75,
+    "Driving Behind the Back": 15,
+    "Driving Crossover": 60,
+    "Driving Double Crossover": 15,
+    "Driving Dribble Hesitation": 35,
+    "Driving Dunk": 40,
+    "Driving Half Spin": 10,
+    "Driving In & Out": 5,
+    "Driving Layup": 60,
+    "Driving Spin": 25,
+    "Driving Stepback": 40,
+    "Euro Step Layup": 40,
+    "Flashy Dunk": 0,
+    "Flashy Pass": 45,
+    "Floater": 55,
+    "Foul": 36,
+    "Hard Foul": 40,
+    "Hop Step Layup": 55,
+    "Iso vs Average Defender": 15,
+    "Iso vs Elite Defender": 5,
+    "Iso vs Good Defender": 5,
+    "No Driving Dribble Move": 45,
+    "No Setup Dribble": 25,
+    "Off-Screen Drive": 75,
+    "Off-Screen Shot Mid-Range": 45,
+    "Off-Screen Shot Three": 30,
+    "On-Ball Steal": 45,
+    "Pass Interception": 55,
+    "Play Discipline": 60,
+    "Post Aggressive Backdown": 0,
+    "Post Back Down": 0,
+    "Post Drive": 0,
+    "Post Drop Step": 0,
+    "Post Face Up": 0,
+    "Post Fade Left": 20,
+    "Post Fade Right": 25,
+    "Post Hook Left": 0,
+    "Post Hook Right": 5,
+    "Post Hop Step": 20,
+    "Post Shimmy Shot": 0,
+    "Post Spin": 0,
+    "Post Stepback Shot": 0,
+    "Post Up": 0,
+    "Post Up & Under": 0,
+    "Putback": 5,
+    "Roll vs Pop": 0,
+    "Setup With Hesitation": 15,
+    "Setup With Sizeup": 0,
+    "Shoot From Post": 10,
+    "Shot": 75,
+    "Shot Close": 43,
+    "Shot Close Left": 43,
+    "Shot Close Middle": 42,
+    "Shot Close Right": 15,
+    "Shot Mid Center": 32,
+    "Shot Mid Left": 20,
+    "Shot Mid Left-Center": 10,
+    "Shot Mid Right": 18,
+    "Shot Mid Right-Center": 20,
+    "Shot Mid-Range": 14,
+    "Shot Three": 28,
+    "Shot Three Center": 34,
+    "Shot Three Left": 0,
+    "Shot Three Left-Center": 13,
+    "Shot Three Right": 14,
+    "Shot Three Right-Center": 29,
+    "Shot Under Basket": 77,
+    "Spin Jumper": 5,
+    "Spin Layup": 55,
+    "Spot Up Drive": 75,
+    "Spot Up Shot Mid-Range": 50,
+    "Spot Up Shot Three": 75,
+    "Standing Dunk": 0,
+    "Step Through Shot": 0,
+    "Stepback Jumper Mid-Range": 35,
+    "Stepback Three Point Shot": 20,
+    "Take Charge": 20,
+    "Touches": 75,
+    "Transition Pull-Up Three Point Shot": 0,
+    "Transition Spot Up vs Cut to the Basket": 5,
+    "Triple Threat Idle": 0,
+    "Triple Threat Jab Step": 5,
+    "Triple Threat Pump Fake": 5,
+    "Triple Threat Shoot": 0,
+    "Use Glass": 1
+  },
+  "personalityBadges": [
+    {
+      "name": "alphadog",
+      "tier": "Bronze"
+    },
+    {
+      "name": "expressive",
+      "tier": "Bronze"
+    }
+  ]
+}

@@ -70,7 +70,7 @@ export type BadgeBundleSource = {
 
 export type BadgeBundleMap = Record<string, string | string[]>;
 
-function mappedBundleIds(badgeToBundle: BadgeBundleMap, badgeName: string): string[] {
+export function mappedBundleIds(badgeToBundle: BadgeBundleMap, badgeName: string): string[] {
   const mapping = badgeToBundle[badgeName];
   if (!mapping) return [];
   return Array.isArray(mapping) ? mapping : [mapping];
@@ -157,7 +157,7 @@ export function downgradeBadgesForRookie(
     }));
 }
 
-function uniqueBadges(badges: PlayerBadgeLike[]): PlayerBadgeLike[] {
+export function uniqueBadges(badges: PlayerBadgeLike[]): PlayerBadgeLike[] {
   const unique = new Map<string, PlayerBadgeLike>();
   for (const badge of badges) {
     const existing = unique.get(badge.name);

@@ -17,9 +17,12 @@ import {
   buildBadgesByBundle,
   downgradeBadgesForRookie,
   getBadgeNameCN,
+  mappedBundleIds,
+  uniqueBadges,
   type PlayerBadgeLike,
   type RookieBadgeTier,
 } from "../badges";
+import { badgeTierRank } from "../badgeTiers";
 import MarqueeDraw, { type MarqueeDrawItem } from "./MarqueeDraw";
 import { attrNameCN, type BadgeTier, type PlayerSource } from "../domain";
 import {
@@ -28,6 +31,7 @@ import {
   type TendencyDataVersion,
   type TendencyLookup,
 } from "../tendencies";
+import { corePlayerName, loadRookieCards, type RookieCard, type RookieCardLookup } from "../rookieCards";
 import { getTendencyNameCN } from "../tendencyNames";
 import { tendencyBundleMap } from "./tendencyBundleMap";
 import { badgeBundleMap } from "./badgeBundleMap";
@@ -370,8 +374,16 @@ function getAttr(player: PlayerSource, attr: string) {
   return clamp(fallback(player, attr));
 }
 
-function evaluate(player: PlayerSource, bundle: Bundle, body: BodySettings): Evaluation {
-  const rawValues = Object.fromEntries(bundle.attrs.map((attr) => [attr, getAttr(player, attr)]));
+function evaluate(player: PlayerSource, bundle: Bundle, body: BodySettings, card?: RookieCard | null): Evaluation {
+  // In rookie mode a locked player with a real rookie card shows that card's
+  // values directly (e.g. Luka mid-range shows 79, not his current 97). The
+  // card is the display source; body constraints still apply on top.
+  const rawValues = Object.fromEntries(bundle.attrs.map((attr) => [
+    attr,
+    attr === "Potential"
+      ? (card?.potential?.current != null ? clamp(card.potential.current) : getAttr(player, attr))
+      : (card?.detailed?.[attr] != null ? clamp(card.detailed[attr]) : getAttr(player, attr)),
+  ]));
   const constrained = applyBodyConstraints(rawValues, body, parsePlayerBody(player));
   const raw = Math.round(average(Object.values(rawValues)));
   const adjusted = Math.round(average(Object.values(constrained.values)));
@@ -537,21 +549,49 @@ function createResult(
   players: Map<string, PlayerSource>,
   tendencyLookup: TendencyLookup | null,
   overallVersion: OverallDataVersion,
+  rookieCards: RookieCardLookup | null,
 ) {
   const isPrime = mode === "prime";
+  // Peak attributes must reflect the source player's real (non-card) values:
+  // the displayed slot evaluations may already be rookie-card values in rookie
+  // mode, so rebuild the peak evaluation here without any card override.
   let peakAttrs: Record<string, number> = {};
   let initialAttrs: Record<string, number> = {};
   const scores: number[] = [];
   for (const bundle of bundles) {
-    const evaluation = evaluations[bundle.id];
+    const lock = locks[bundle.id];
+    let evaluation: Evaluation | undefined;
+    if (lock?.kind === "custom") {
+      evaluation = evaluateCustom(bundle, lock.values, body);
+    } else if (lock?.kind === "player") {
+      const player = players.get(lock.playerId);
+      if (player) evaluation = evaluate(player, bundle, body);
+    }
     if (!evaluation) continue;
     Object.assign(peakAttrs, evaluation.values);
     if (bundle.id !== "potential") scores.push(evaluation.adjusted);
   }
 
+  // Rookie card sources: a slot whose locked player has a real rookie card
+  // inherits that card's attributes/badges/tendencies verbatim (no age-curve
+  // downgrade, no badge downgrade). Only in rookie mode — prime mode keeps the
+  // existing peak inheritance path untouched. Slots without a card also keep
+  // the existing path.
+  const useRookieCards = !isPrime;
+  const cardByBundle = new Map<string, RookieCard | null>();
+  for (const bundle of bundles) {
+    const lock = locks[bundle.id];
+    const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
+    const card = useRookieCards && player ? (rookieCards?.get(corePlayerName(player.name)) ?? null) : null;
+    cardByBundle.set(bundle.id, card);
+  }
+  const hasRookieCard = [...cardByBundle.values()].some((card) => card !== null);
+
   // Tendency inheritance: each slot reads only its mapped fields from the
   // compact lookup. Values are inherited verbatim, without rookie down-scaling.
-  const tendencies = tendencyLookup
+  // Slots with a real rookie card prefer the card's game-exported tendencies;
+  // other slots fall back to the ATD lookup.
+  const tendencies = tendencyLookup || hasRookieCard
     ? collectTendenciesByBundle({
       sources: bundles.filter((bundle) => bundle.id !== "potential").map((bundle) => {
         const lock = locks[bundle.id];
@@ -560,6 +600,10 @@ function createResult(
       }),
       fieldToBundle: tendencyBundleMap,
       lookup: tendencyLookup,
+      cardForPlayer: (playerSlug) => {
+        const player = [...players.values()].find((p) => p.slug === playerSlug);
+        return player ? (rookieCards?.get(corePlayerName(player.name)) ?? null) : null;
+      },
     })
     : {};
 
@@ -569,13 +613,26 @@ function createResult(
   const customFinalAttrs = applyBodyConstraints(rawCustomFinalAttrs, body, null).values;
   Object.assign(peakAttrs, customFinalAttrs);
   peakAttrs = applyBodyConstraints(peakAttrs, body, null).values;
-  const badgeSources = bundles.filter((bundle) => bundle.id !== "potential").map((bundle) => {
+  const badgeSources = bundles.filter((bundle) => bundle.id !== "potential" && !cardByBundle.get(bundle.id)).map((bundle) => {
     const lock = locks[bundle.id];
     return {
       bundleId: bundle.id,
       playerId: lock?.kind === "player" ? lock.playerId : undefined,
     };
   });
+  // Real rookie-card badges for slots whose locked player has a card. These are
+  // inherited verbatim (the card already carries rookie-tier levels) and never
+  // pass through downgradeBadgesForRookie.
+  const cardBadges: PlayerBadgeLike[] = [];
+  for (const [bundleId, card] of cardByBundle) {
+    if (!card) continue;
+    for (const badge of card.badges) {
+      const mapped = mappedBundleIds(badgeBundleMap, badge.name);
+      if (mapped.includes(bundleId) && badgeTierRank[badge.tier as BadgeTier] !== undefined) {
+        cardBadges.push({ name: badge.name, tier: badge.tier as BadgeTier });
+      }
+    }
+  }
   const resolvePeakBadges = (attrs: Record<string, number>) => buildBadgesByBundle({
     sources: badgeSources,
     badgeToBundle: badgeBundleMap,
@@ -592,18 +649,44 @@ function createResult(
   const random = makeRandom(hash(`${signature}|${age}|${position}|${secondary}`));
   const mean = average(scores, 71);
   const sourcePeakOverall = calibratedOverall(peakAttrs, position, peakBadges, mean, overallVersion);
+  // Potential slot: a real rookie card wins over both the peak evaluation and
+  // the cross-version OVR fallback.
+  const potentialCard = cardByBundle.get("potential") ?? null;
   const potential = clamp(
-    typeof peakAttrs.Potential === "number" ? peakAttrs.Potential : Math.round(sourcePeakOverall),
+    potentialCard?.potential?.current
+      ?? (typeof peakAttrs.Potential === "number" ? peakAttrs.Potential : Math.round(sourcePeakOverall)),
     40,
     99,
   );
   const rookieTier = rookieTierForPotential(potential);
 
+  // Card attributes are locked (real game data) — the OVR constraint must not
+  // lower them, only the non-card slots remain adjustable.
+  const cardLockedValues: Record<string, number> = {};
+  if (!isPrime) {
+    for (const [bundleId, card] of cardByBundle) {
+      if (!card) continue;
+      const bundle = bundles.find((candidate) => candidate.id === bundleId);
+      if (!bundle) continue;
+      for (const attr of bundle.attrs) {
+        const value = card.detailed[attr];
+        if (typeof value === "number") cardLockedValues[attr] = value;
+      }
+    }
+  }
+
   if (!isPrime) {
     peakBadgeResolution = resolvePeakBadges(peakAttrs);
     peakBadges = peakBadgeResolution.badges;
     for (const bundle of bundles) {
+      const card = cardByBundle.get(bundle.id);
       for (const attr of bundle.attrs) {
+        const cardValue = card?.detailed[attr];
+        if (typeof cardValue === "number") {
+          // Real rookie-card value: verbatim, no age-curve downgrade.
+          initialAttrs[attr] = clamp(cardValue, 25, 99);
+          continue;
+        }
         const value = peakAttrs[attr];
         if (typeof value === "number") initialAttrs[attr] = rookieValue(value, age, bundle.category);
       }
@@ -614,7 +697,10 @@ function createResult(
     initialAttrs = { ...peakAttrs };
   }
 
-  const badges = isPrime ? peakBadges : downgradeBadgesForRookie(peakBadges, rookieTier);
+  // Merge: card badges verbatim + downgraded non-card badges.
+  const badges = isPrime
+    ? uniqueBadges([...peakBadges, ...cardBadges])
+    : uniqueBadges([...downgradeBadgesForRookie(peakBadges, rookieTier), ...cardBadges]);
   Object.assign(initialAttrs, customFinalAttrs);
   initialAttrs = applyBodyConstraints(initialAttrs, body, null).values;
   const sourceDurability = peakAttrs["Overall Durability"] ?? 80;
@@ -636,7 +722,7 @@ function createResult(
       adjustableAttributes: bundles
         .filter((bundle) => bundle.id !== "potential")
         .flatMap((bundle) => bundle.attrs),
-      lockedValues: customFinalAttrs,
+      lockedValues: { ...customFinalAttrs, ...cardLockedValues },
       badges,
       estimateOverall: (values, candidateBadges) => calibratedOverall(
         values,
@@ -647,7 +733,14 @@ function createResult(
       ),
     });
   if (rookieOverallConstraint) Object.assign(initialAttrs, rookieOverallConstraint.values);
-  const baseOverall = calibratedOverall(initialAttrs, position, badges, mean, overallVersion);
+  // OVR: when all non-potential slots come from one card and the card carries a
+  // UI-confirmed overall, use it instead of the model estimate.
+  const cardSlugs = new Set([...cardByBundle.values()].filter((card): card is RookieCard => card !== null).map((card) => card.slug));
+  const singleCard = cardSlugs.size === 1
+    ? [...cardByBundle.values()].find((card): card is RookieCard => card !== null) ?? null
+    : null;
+  const cardOverall = !isPrime && singleCard?.overall != null ? singleCard.overall : null;
+  const baseOverall = cardOverall ?? calibratedOverall(initialAttrs, position, badges, mean, overallVersion);
   const initialStrength = baseOverall;
   const intangibles = 50;
   const boom = isPrime ? 0 : clamp(28 + potential - 84 - (age - 18) * 2 + (random() - 0.5) * 8, 10, 55);
@@ -969,6 +1062,8 @@ function RookieBuilder({
   const [settingsLocked, setSettingsLocked] = useState(false);
   const [tendencyLookup, setTendencyLookup] = useState<TendencyLookup | null>(null);
   const [tendencyLoadError, setTendencyLoadError] = useState(false);
+  const [rookieCards, setRookieCards] = useState<RookieCardLookup | null>(null);
+  const [rookieCardLoadError, setRookieCardLoadError] = useState(false);
   const [locks, setLocks] = useState<LockState>({});
   const [round, setRound] = useState<TeamRound>(() => createRound(teams, Date.now()));
   const [isTeamDrawing, setIsTeamDrawing] = useState(false);
@@ -1010,6 +1105,24 @@ function RookieBuilder({
       active = false;
     };
   }, [settingsLocked, tendencyLoadError, tendencyLookup, tendencyVersion]);
+
+  // Real rookie cards (DB2K exports 2018–2025) are lazy-loaded in rookie mode
+  // as soon as the builder mounts — before settings are confirmed — so the
+  // first generation already has card data. Prime mode never loads them.
+  useEffect(() => {
+    if (isPrime || rookieCards || rookieCardLoadError) return;
+    let active = true;
+    loadRookieCards()
+      .then((cards) => {
+        if (active) setRookieCards(cards);
+      })
+      .catch(() => {
+        if (active) setRookieCardLoadError(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [isPrime, rookieCardLoadError, rookieCards]);
 
   useEffect(() => {
     if (!customizingBundleId && !playerVersionGroupKey) return;
@@ -1140,13 +1253,19 @@ function RookieBuilder({
         continue;
       }
       const player = lock?.kind === "player" ? playersById.get(lock.playerId) : undefined;
-      if (player) next[bundle.id] = evaluate(player, bundle, body);
+      if (player) {
+        const card = !isPrime ? (rookieCards?.get(corePlayerName(player.name)) ?? null) : null;
+        next[bundle.id] = evaluate(player, bundle, body, card);
+      }
     }
     return next;
-  }, [body, locks, playersById]);
+  }, [body, isPrime, locks, playersById, rookieCards]);
   const selectedEvaluations = useMemo(() => Object.fromEntries(
-    selectedPlayer ? bundles.map((bundle) => [bundle.id, evaluate(selectedPlayer, bundle, body)]) : [],
-  ) as Record<string, Evaluation>, [body, selectedPlayer]);
+    selectedPlayer ? bundles.map((bundle) => {
+      const card = !isPrime ? (rookieCards?.get(corePlayerName(selectedPlayer.name)) ?? null) : null;
+      return [bundle.id, evaluate(selectedPlayer, bundle, body, card)];
+    }) : [],
+  ) as Record<string, Evaluation>, [body, isPrime, rookieCards, selectedPlayer]);
   const bodyAdjustedAttributes = useMemo(() => new Set(
     bundles.flatMap((bundle) => {
       const evaluation = evaluations[bundle.id];
@@ -1170,8 +1289,9 @@ function RookieBuilder({
       playersById,
       tendencyLookup,
       overallVersion,
+      rookieCards,
     ),
-    [body, effectiveAge, evaluations, locks, mode, overallVersion, playersById, position, secondaryPosition, tendencyLookup],
+    [body, effectiveAge, evaluations, locks, mode, overallVersion, playersById, position, secondaryPosition, rookieCards, tendencyLookup],
   );
   const tendencyLoadState: TendencyLoadState = tendencyLookup?.available === false
     ? "unavailable"
@@ -1719,7 +1839,9 @@ function RookieBuilder({
               {filteredManualPlayerGroups.map((group) => {
                 const selected = selectedPlayer ? playerIdentity(selectedPlayer) === group.key : false;
                 const representative = group.representative;
+                const cardForGroup = !isPrime ? (rookieCards?.get(corePlayerName(representative.name)) ?? null) : null;
                 const maxOverall = group.variants.reduce((max, player) => Math.max(max, player.overall ?? 0), 0);
+                const displayedOverall = cardForGroup?.overall ?? maxOverall;
                 const positionSummary = [...new Set(group.variants.map((player) => player.position).filter(Boolean))].join("/");
                 return (
                   <button
@@ -1738,7 +1860,8 @@ function RookieBuilder({
                       <span className="block truncate text-[9px] text-ink-400">{representative.name} · {group.variants.length} 个版本{positionSummary ? ` · ${positionSummary}` : ""}</span>
                     </span>
                     <span className="flex shrink-0 items-center gap-1">
-                      <span className={`text-[14px] font-bold tabular-nums ${maxOverall ? valueColor(maxOverall) : "text-ink-400"}`}>{maxOverall || "--"}</span>
+                      <span className={`text-[14px] font-bold tabular-nums ${displayedOverall ? valueColor(displayedOverall) : "text-ink-400"}`}>{displayedOverall || "--"}</span>
+                      {cardForGroup?.overall != null && <span className="rounded-[3px] bg-court-500/10 px-1 py-0.5 text-[8px] font-semibold text-court-700">新秀</span>}
                       <ChevronRight aria-hidden="true" className="h-3.5 w-3.5 text-ink-300" />
                     </span>
                   </button>
@@ -1766,11 +1889,13 @@ function RookieBuilder({
               const id = playerId(player);
               const unavailable = usedBy.has(playerIdentity(player));
               const selected = selectedPlayerId === id;
+              const cardForPlayer = !isPrime ? (rookieCards?.get(corePlayerName(player.name)) ?? null) : null;
+              const displayedPlayerOverall = cardForPlayer?.overall ?? player.overall;
               return (
                 <button key={id} className={`interactive-card flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : unavailable || isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`} disabled={unavailable || isComplete} onClick={() => choosePlayer(player)} type="button">
                   <PlayerHeadshot name={player.name} priority />
-                  <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(player.name)}</span><span className="block text-[9px] text-ink-400">{player.position ?? "--"}{player.isEstimated ? " · 估算值" : ""}{unavailable ? " · 已选用" : ""}</span></span>
-                  <span className={`shrink-0 text-[14px] font-bold tabular-nums ${typeof player.overall === "number" ? valueColor(player.overall) : "text-ink-400"}`}>{player.overall ?? "--"}</span>
+                  <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(player.name)}</span><span className="block text-[9px] text-ink-400">{player.position ?? "--"}{player.isEstimated ? " · 估算值" : ""}{unavailable ? " · 已选用" : ""}{cardForPlayer?.overall != null ? " · 新秀卡" : ""}</span></span>
+                  <span className="flex shrink-0 items-center gap-1"><span className={`shrink-0 text-[14px] font-bold tabular-nums ${typeof displayedPlayerOverall === "number" ? valueColor(displayedPlayerOverall) : "text-ink-400"}`}>{displayedPlayerOverall ?? "--"}</span>{cardForPlayer?.overall != null && <span className="rounded-[3px] bg-court-500/10 px-1 py-0.5 text-[8px] font-semibold text-court-700">新秀</span>}</span>
                 </button>
               );
             })}
@@ -1901,6 +2026,8 @@ function RookieBuilder({
               {playerVersionGroup.variants.map((variant) => {
                 const id = playerId(variant);
                 const selected = selectedPlayerId === id;
+                const cardForVariant = !isPrime ? (rookieCards?.get(corePlayerName(variant.name)) ?? null) : null;
+                const displayedVariantOverall = cardForVariant?.overall ?? variant.overall;
                 return (
                   <button
                     aria-pressed={selected}
@@ -1914,7 +2041,8 @@ function RookieBuilder({
                       <span className="mt-0.5 block truncate text-[9px] text-ink-400">{variant.position ?? "--"} · {variant.height ?? "身高未记录"}{variant.isEstimated ? " · 部分属性为估算值" : ""}</span>
                     </span>
                     <span className="flex shrink-0 items-center gap-2">
-                      <span className={`text-[16px] font-bold tabular-nums ${typeof variant.overall === "number" ? valueColor(variant.overall) : "text-ink-400"}`}>{variant.overall ?? "--"}</span>
+                      <span className={`text-[16px] font-bold tabular-nums ${typeof displayedVariantOverall === "number" ? valueColor(displayedVariantOverall) : "text-ink-400"}`}>{displayedVariantOverall ?? "--"}</span>
+                      {cardForVariant?.overall != null && <span className="rounded-[3px] bg-court-500/10 px-1 py-0.5 text-[8px] font-semibold text-court-700">新秀</span>}
                       {selected ? <Check aria-hidden="true" className="h-3.5 w-3.5 text-court-600" /> : <ChevronRight aria-hidden="true" className="h-3.5 w-3.5 text-ink-300" />}
                     </span>
                   </button>
