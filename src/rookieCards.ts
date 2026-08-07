@@ -23,7 +23,11 @@ export type RookieCard = {
   detailed: Record<string, number>;
   tendencies: Record<string, number>;
   badges: { name: string; tier: string }[];
+  personalityBadges: { name: string; tier: string }[];
   potential: { current: number | null; min: number | null; max: number | null } | null;
+  vitals: Record<string, string | number | boolean | null>;
+  durability: Record<string, number>;
+  hotZones: Record<string, string>;
 };
 
 type RookieCardIndex = {
@@ -35,7 +39,11 @@ type RookieCardIndex = {
   attrs: { fields: string[]; rows: (number | null)[][] };
   tendencies: { fields: string[]; rows: (number | null)[][] };
   badges: [string, string][][];
+  personalityBadges: [string, string][][];
   potentials: ({ current: number | null; min: number | null; max: number | null } | null)[];
+  vitals: { fields: string[]; rows: unknown[][] };
+  durability: { fields: string[]; rows: unknown[][] };
+  hotZones: { fields: string[]; rows: unknown[][] };
 };
 
 // JSON imports type rows as number[][]; values may be null in practice. The
@@ -49,7 +57,11 @@ type RawRookieCardIndex = {
   attrs?: { fields?: string[]; rows?: unknown[][] };
   tendencies?: { fields?: string[]; rows?: unknown[][] };
   badges?: unknown[][];
+  personalityBadges?: unknown[][];
   potentials?: ({ current: number | null; min: number | null; max: number | null } | null)[];
+  vitals?: { fields?: string[]; rows?: unknown[][] };
+  durability?: { fields?: string[]; rows?: unknown[][] };
+  hotZones?: { fields?: string[]; rows?: unknown[][] };
 };
 
 type RookieCardIndexModule = { default: RookieCardIndex };
@@ -125,6 +137,36 @@ export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLoo
         badges.push({ name: entry[0], tier: entry[1] });
       }
     }
+    const rawPersonality = (index.personalityBadges?.[i] ?? []) as unknown[];
+    const personalityBadges: { name: string; tier: string }[] = [];
+    for (const entry of rawPersonality) {
+      if (Array.isArray(entry) && typeof entry[0] === "string" && typeof entry[1] === "string") {
+        personalityBadges.push({ name: entry[0], tier: entry[1] });
+      }
+    }
+    const vitals: Record<string, string | number | boolean | null> = {};
+    const vitalsFields = index.vitals?.fields ?? [];
+    const vitalsRow = index.vitals?.rows?.[i] ?? [];
+    for (let f = 0; f < vitalsFields.length; f += 1) {
+      const value = vitalsRow[f];
+      if (value !== null && value !== undefined && value !== "") {
+        vitals[vitalsFields[f]] = value as string | number | boolean;
+      }
+    }
+    const durability: Record<string, number> = {};
+    const durFields = index.durability?.fields ?? [];
+    const durRow = index.durability?.rows?.[i] ?? [];
+    for (let f = 0; f < durFields.length; f += 1) {
+      const value = durRow[f];
+      if (typeof value === "number") durability[durFields[f]] = value;
+    }
+    const hotZones: Record<string, string> = {};
+    const hotFields = index.hotZones?.fields ?? [];
+    const hotRow = index.hotZones?.rows?.[i] ?? [];
+    for (let f = 0; f < hotFields.length; f += 1) {
+      const value = hotRow[f];
+      if (typeof value === "string") hotZones[hotFields[f]] = value;
+    }
     lookup.set(keys[i], {
       slug: index.slugs?.[i] ?? "",
       year: index.years?.[i] ?? 0,
@@ -133,7 +175,11 @@ export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLoo
       detailed,
       tendencies,
       badges,
+      personalityBadges,
       potential: index.potentials?.[i] ?? null,
+      vitals,
+      durability,
+      hotZones,
     });
   }
   return lookup;

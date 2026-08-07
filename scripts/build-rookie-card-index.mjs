@@ -85,6 +85,9 @@ for (const card of cards) {
 // Attribute field universe (union, but normally all 35 from the converter).
 const attrFields = [...new Set(unique.flatMap((card) => Object.keys(card.detailed ?? {})))].sort();
 const tendFields = [...new Set(unique.flatMap((card) => Object.keys(card.tendencies ?? {})))].sort();
+const vitalsFields = [...new Set(unique.flatMap((card) => Object.keys(card.vitals ?? {})))].sort();
+const durabilityFields = [...new Set(unique.flatMap((card) => Object.keys(card.durability ?? {})))].sort();
+const hotZoneFields = [...new Set(unique.flatMap((card) => Object.keys(card.hotZones ?? {})))].sort();
 
 const index = {
   keys: unique.map((card) => coreName(card.name)),
@@ -101,7 +104,20 @@ const index = {
     rows: unique.map((card) => tendFields.map((field) => card.tendencies?.[field] ?? null)),
   },
   badges: unique.map((card) => (card.badges ?? []).map((badge) => [badge.name, badge.tier])),
+  personalityBadges: unique.map((card) => (card.personalityBadges ?? []).map((badge) => [badge.name, badge.tier])),
   potentials: unique.map((card) => card.potential ?? null),
+  vitals: {
+    fields: vitalsFields,
+    rows: unique.map((card) => vitalsFields.map((field) => card.vitals?.[field] ?? null)),
+  },
+  durability: {
+    fields: durabilityFields,
+    rows: unique.map((card) => durabilityFields.map((field) => card.durability?.[field] ?? null)),
+  },
+  hotZones: {
+    fields: hotZoneFields,
+    rows: unique.map((card) => hotZoneFields.map((field) => card.hotZones?.[field] ?? null)),
+  },
 };
 
 fs.writeFileSync(OUT, JSON.stringify(index), "utf8");

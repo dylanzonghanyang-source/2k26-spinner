@@ -770,6 +770,7 @@ function createResult(
     peakOverall: sourcePeakOverall,
     peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges,
     potentialMin, potentialMax,
+    card: singleCard,
     initialOverallTarget: rookieOverallConstraint?.targetOverall ?? initialStrength,
     initialOverallConstraintApplied: rookieOverallConstraint?.changed ?? false,
     initialOverallConstraintReachable: rookieOverallConstraint?.reachable ?? true,
@@ -817,6 +818,81 @@ function createExportText(
   dataVersionLabel: string,
 ) {
   const isPrime = mode === "prime";
+  const card = result.card ?? null;
+  const v = (key: string) => card?.vitals?.[key];
+  const vs = (key: string) => {
+    const value = v(key);
+    return value == null || value === "" ? "--" : String(value);
+  };
+  const vn = (key: string) => {
+    const value = v(key);
+    return typeof value === "number" && Number.isFinite(value) ? String(value) : "--";
+  };
+  const handCN = (hand: string | number | boolean | null | undefined) =>
+    hand === "Right" ? "右手" : hand === "Left" ? "左手" : hand == null ? "--" : String(hand);
+  // Full record sections come from the locked rookie card (single-card build);
+  // without a card the export keeps the classic reduced fields.
+  const vitalLines = card ? [
+    `名字: ${vs("firstName")}`, `姓氏: ${vs("lastName")}`, `昵称: ${vs("nickname")}`,
+    `位置: ${result.position}`, `次要位置: ${result.secondary}`,
+    `出生: ${vn("birthYear")}年${vn("birthMonth")}月${vn("birthDay")}日`, `年龄: ${result.age}`,
+    `球衣号码: ${vn("jerseyNumber")}`, `惯用手: ${handCN(v("dominantHand"))}`,
+    `扣篮惯用手: ${handCN(v("dominantDunkHand"))}`, `职业年限: ${vn("yearsPro")}`,
+    `巅峰开始年龄: ${vn("peakStartAge")}`, `巅峰结束年龄: ${vn("peakEndAge")}`,
+    `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）`,
+    `衰退百分比: ${vn("bustPercent")}%`, `平均百分比: ${vn("averagePercent")}%`,
+    `成长百分比: ${vn("boomPercent")}%`,
+    `胜利重要性: ${vn("playForWinner")}`, `经济重要性: ${vn("financialSecurity")}`,
+    `忠诚度: ${vn("loyalty")}`, `强制不先发: ${vs("forceNonStarter")}`,
+    `比赛主控者: ${v("playInitiator") == null ? "--" : v("playInitiator") ? "是" : "否"}`,
+    `进攻方式 1: ${vs("playType1")}`, `进攻方式 2: ${vs("playType2")}`,
+    `进攻方式 3: ${vs("playType3")}`, `进攻方式 4: ${vs("playType4")}`,
+    `数据版本: ${dataVersionLabel}`,
+    ...(!isPrime ? [`预计成长速度: 每年 +${result.progressSpeed} OVR`] : []),
+    `成长概率: ${result.boom}%`, `平均概率: ${result.normal}%`, `衰退概率: ${result.bust}%`,
+  ] : [
+    `姓名: ${rookieName}`, `年龄: ${result.age}`, `位置: ${result.position}`, `次要位置: ${result.secondary}`,
+    `惯用手: ${result.hand}`, `扣篮惯用手: ${result.dunkHand}`,
+    `巅峰开始年龄: ${result.peakStart}`, `巅峰结束年龄: ${result.peakEnd}`,
+    `数据版本: ${dataVersionLabel}`,
+    ...(!isPrime ? [`预计成长速度: 每年 +${result.progressSpeed} OVR`] : []),
+    `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）`,
+    `成长概率: ${result.boom}%`, `平均概率: ${result.normal}%`, `衰退概率: ${result.bust}%`,
+  ];
+  const bodyLines = card ? [
+    `身高: ${typeof v("heightInches") === "number" ? `${v("heightInches")} in` : `${result.height} cm`}（${result.height} cm）`,
+    `体重: ${typeof v("weightLb") === "number" ? `${v("weightLb")} lb` : `${result.weight} kg`}（${result.weight} kg）`,
+    `臂展: ${result.wingspan} cm（臂展评分 ${vs("armScale")}）`,
+    `肩宽（1-100）: ${vs("shoulderLength")}`, `颈部长度（1-100）: ${vs("neckLength")}`,
+    `躯干长度（1-100）: ${vs("trunkLength")}`,
+  ] : [
+    `身高: ${result.height} cm`, `体重: ${result.weight} kg`, `臂展: ${result.wingspan}`,
+    `肩宽: ${result.shoulder}`, `颈部长度: ${result.neck}`, `躯干长度: ${result.torso}`,
+  ];
+  const durabilityLines = card && Object.keys(card.durability).length ? [
+    `头部耐久: ${card.durability.head ?? "--"}`, `颈部耐久: ${card.durability.neck ?? "--"}`,
+    `背部耐久: ${card.durability.back ?? "--"}`,
+    `左肩耐久: ${card.durability.leftShoulder ?? "--"}`, `右肩耐久: ${card.durability.rightShoulder ?? "--"}`,
+    `左肘耐久: ${card.durability.leftElbow ?? "--"}`, `右肘耐久: ${card.durability.rightElbow ?? "--"}`,
+    `左髋关节耐久: ${card.durability.leftHip ?? "--"}`, `右髋关节耐久: ${card.durability.rightHip ?? "--"}`,
+    `左膝耐久: ${card.durability.leftKnee ?? "--"}`, `右膝耐久: ${card.durability.rightKnee ?? "--"}`,
+    `左踝关节耐久: ${card.durability.leftAnkle ?? "--"}`, `右踝关节耐久: ${card.durability.rightAnkle ?? "--"}`,
+    `左脚耐久: ${card.durability.leftFoot ?? "--"}`, `右脚耐久: ${card.durability.rightFoot ?? "--"}`,
+    `综合耐久: ${card.durability.overall ?? "--"}`,
+  ] : [];
+  const hotZoneCN: Record<string, string> = {
+    underBasket: "篮下", closeLeft: "近距离左侧", closeMiddle: "近距离正面", closeRight: "近距离右侧",
+    midLeft: "左侧底角中距离", midLeftCenter: "左侧 45 度中距离", midCenter: "弧顶中距离",
+    midRightCenter: "右侧 45 度中距离", midRight: "右侧底角中距离",
+    threeLeft: "左侧底角三分", threeLeftCenter: "左侧 45 度三分", threeCenter: "弧顶三分",
+    threeRightCenter: "右侧 45 度三分", threeRight: "右侧底角三分",
+  };
+  const hotZoneLines = card && Object.keys(card.hotZones).length
+    ? Object.entries(card.hotZones).map(([key, state]) => `${hotZoneCN[key] ?? key}: ${state === "Hot" ? "热区" : state === "Cold" ? "冷区" : "正常"}`)
+    : Object.entries(result.hotZones).map(([name, state]) => `${name}: ${state}`);
+  const personalityLines = card?.personalityBadges?.length
+    ? card.personalityBadges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}`)
+    : [];
   const tendencyLines = tendencyLoadState === "loading"
     ? ["正在加载倾向数据"]
     : tendencyLoadState === "error"
@@ -829,16 +905,11 @@ function createExportText(
           .map(([field, value]) => `${getTendencyNameCN(field)}: ${value}`)
         : ["暂无倾向数据（来源球员没有对应档案）"];
   return [
-    `${dataVersionLabel} ${isPrime ? "巅峰球员" : "新秀"}生成清单`, "", "[基本信息]",
-    `姓名: ${rookieName}`, `年龄: ${result.age}`, `位置: ${result.position}`, `次要位置: ${result.secondary}`,
-    `惯用手: ${result.hand}`, `扣篮惯用手: ${result.dunkHand}`,
-    `巅峰开始年龄: ${result.peakStart}`, `巅峰结束年龄: ${result.peakEnd}`,
-    `数据版本: ${dataVersionLabel}`,
-    ...(!isPrime ? [`预计成长速度: 每年 +${result.progressSpeed} OVR`] : []),
-    `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）`,
-    `成长概率: ${result.boom}%`, `平均概率: ${result.normal}%`, `衰退概率: ${result.bust}%`,
-    "", "[身体设定]", `身高: ${result.height} cm`, `体重: ${result.weight} kg`, `臂展: ${result.wingspan}`,
-    `肩宽: ${result.shoulder}`, `颈部长度: ${result.neck}`, `躯干长度: ${result.torso}`,
+    `${dataVersionLabel} ${isPrime ? "巅峰球员" : "新秀"}生成清单`, "",
+    `[资料${card ? `（${card.name} ${card.year} 届新秀卡）` : ""}]`,
+    ...vitalLines,
+    "", "[身体设定]", ...bodyLines,
+    ...(durabilityLines.length ? ["", "[耐久]", ...durabilityLines] : []),
     "", `[完整${isPrime ? "巅峰" : "初始"}属性预览]`,
     ...fullAttributeGroups.flatMap((group) => [
       `-- ${group.label} --`,
@@ -850,13 +921,14 @@ function createExportText(
       `新秀初始 OVR 目标: ${result.initialOverallTarget}`,
       ...(result.initialOverallConstraintReachable ? [] : ["警告：手动锁定的数值使初始 OVR 无法完全达到目标"]),
     ] : []),
-    "", "[热区]", ...Object.entries(result.hotZones).map(([name, state]) => `${name}: ${state}`),
+    "", "[热区]", ...hotZoneLines,
     ...(isPrime ? [
       "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
     ] : [
       "", `[当前徽章（按${result.rookieTier}档调整）]`, ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
       "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.peakBadges.length ? result.peakBadges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
     ]),
+    ...(personalityLines.length ? ["", "[个性徽章]", ...personalityLines] : []),
     "", "[倾向（继承属性来源，未按等级调整）]",
     ...tendencyLines,
     "", "[属性来源]", ...bundles.map((bundle) => {

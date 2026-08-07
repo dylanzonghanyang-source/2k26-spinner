@@ -48,7 +48,25 @@ export const badgeNameCN: Record<string, string> = {
 
   "Brick Wall": "铜墙铁壁",
   "Pogo Stick": "弹跳大师",
-  "Slippery Off-Ball": "无球跑位",
+  "Slippery Off-Ball": "无球跑位杀手",
+
+  // Personality badges (DB2K Badges/ section, stored lowercase in cards)
+  "expressive": "善于表达",
+  "extremelyconfident": "自信满满",
+  "financesavvy": "金融头脑",
+  "friendly": "友善",
+  "keepitreal": "直言不讳",
+  "laidback": "淡定",
+  "marketability": "市场价值",
+  "mediaringmaster": "媒体负责人",
+  "patmyback": "拍拍我的背",
+  "reserved": "沉默寡言",
+  "teamplayer": "团队精神",
+  "unpredictable": "飘忽不定",
+  "warmweatherfan": "温暖好天气",
+  "workethic": "职业道德",
+  "alphadog": "大当家",
+  "enforcer": "暴力执法",
 };
 
 export function getBadgeNameCN(name: string): string {

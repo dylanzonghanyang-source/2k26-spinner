@@ -26,6 +26,23 @@ assert.equal(luka.overall, 81); // user UI-confirmed 2026-08-08 (overrides file)
 assert.equal(luka.detailed["Mid-Range Shot"], 79);
 assert.equal(luka.detailed["Three-Point Shot"], 84);
 assert.equal(luka.potential?.current, 98);
+// Full-record vitals (from the 2k26 球员全部字段 sheet mapping)
+assert.equal(luka.vitals?.firstName, "Luka");
+assert.equal(luka.vitals?.lastName, "Doncic");
+assert.equal(luka.vitals?.jerseyNumber, 77);
+assert.equal(luka.vitals?.birthMonth, 2);
+assert.equal(luka.vitals?.birthDay, 28);
+assert.equal(luka.vitals?.birthYear, 1999);
+assert.equal(luka.vitals?.dominantHand, "Right");
+assert.equal(luka.vitals?.playType1, "P&R Wing");
+assert.equal(luka.vitals?.playForWinner, 100);
+assert.equal(luka.vitals?.loyalty, 10);
+assert.equal(luka.vitals?.financialSecurity, 11);
+assert.equal(luka.durability?.head, 84);
+assert.equal(luka.durability?.overall, 87);
+assert.equal(luka.hotZones?.threeLeft, "Hot");
+assert.equal(luka.hotZones?.midLeft, "Cold");
+assert.ok(luka.personalityBadges?.length >= 1, "Luka has personality badges");
 assert.ok(luka.tendencies["Shot Mid-Range"] !== undefined);
 assert.ok(luka.badges.some((b) => b.name === "Float Game" && b.tier === "Silver"));
 console.log("Luka card OK: mid=79, three=84, potential=98, overall=82");

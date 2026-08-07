@@ -370,12 +370,108 @@ for (const rec of records) {
     wingspan: wingspanCm,
     faceId,
     potential: { current: potential, min: potentialMin, max: potentialMax },
+    vitals: extractVitals(get),
+    durability: extractDurability(get),
+    hotZones: extractHotZones(get),
     detailed,
     badges,
     tendencies,
     personalityBadges,
   };
   out.push(card);
+}
+
+// --- full player record fields (mirrors the "2k26 球员全部字段" sheet) ---
+// Vitals section: identity, body, growth, personality, play types.
+function extractVitals(get) {
+  const pick = (name) => {
+    const v = get("Vitals", name);
+    return v == null || v === "" ? null : v;
+  };
+  const boolYes = (name) => {
+    const v = pick(name);
+    if (v == null) return null;
+    return String(v).toLowerCase() === "yes";
+  };
+  return {
+    firstName: pick("FIRSTNAME"),
+    lastName: pick("LASTNAME"),
+    nickname: pick("NICKNAME") || null,
+    jerseyNickname: pick("JERSEYNICKNAME") || null,
+    birthMonth: num(pick("BIRTHMONTH")),
+    birthDay: num(pick("BIRTHDAY")),
+    birthYear: num(pick("BIRTHYEAR")),
+    ageAtSetYear: num(pick("CUSTOMAGEATSETYEAR")),
+    jerseyNumber: num(pick("NUMBER")),
+    yearsPro: num(pick("YEARSPRO")),
+    dominantHand: pick("DOMINANTHAND"),
+    dominantDunkHand: pick("DOMINANTDUNKHAND"),
+    peakStartAge: num(pick("PEAKSTARTAGE")),
+    peakEndAge: num(pick("PEAKENDAGE")),
+    boomPercent: num(pick("BOOMPERCENTAGE")),
+    averagePercent: num(pick("AVERAGEPERCENT")),
+    bustPercent: num(pick("BUSTPERCENTAGE")),
+    playForWinner: num(pick("PLAYFORWINNER")),
+    financialSecurity: num(pick("FINANCIALSECURITY")),
+    loyalty: num(pick("LOYALTY")),
+    forceNonStarter: pick("FORCENONSTARTER"),
+    playInitiator: boolYes("PLAYINITIATOR"),
+    playType1: pick("PLAYTYPE1"),
+    playType2: pick("PLAYTYPE2"),
+    playType3: pick("PLAYTYPE3"),
+    playType4: pick("PLAYTYPE4"),
+    currentTeam: num(pick("CURRENTTEAM")),
+    hometownTeam1: num(pick("HOMETOWNTEAM1")),
+    hometownTeam2: num(pick("HOMETOWNTEAM2")),
+    draftYear: num(pick("DRAFTEDYEAR")),
+    draftPick: num(pick("DRAFTPICKNUMBER")),
+    // body proportions (1-100 scale in-game ratings)
+    heightInches: num(pick("HEIGHT")),
+    weightLb: num(pick("WEIGHT")),
+    wingspanCm: num(pick("WINGSPANCM")),
+    armScale: num(pick("ARMSCALE")),
+    shoulderLength: num(pick("SHOULDERLENGTH")),
+    neckLength: num(pick("NECKLENGTH")),
+    trunkLength: num(pick("TRUNKLENGTH")),
+  };
+}
+
+// Attributes durability section (16 body-part durabilities).
+function extractDurability(get) {
+  const map = {
+    head: "HEADDURABILITY", neck: "NECKDURABILITY", back: "BACKDURABILITY",
+    leftShoulder: "LEFTSHOULDERDURABILITY", rightShoulder: "RIGHTSHOULDERDURABILITY",
+    leftElbow: "LEFTELBOWDURABILITY", rightElbow: "RIGHTELBOWDURABILITY",
+    leftHip: "LEFTHIPDURABILITY", rightHip: "RIGHTHIPDURABILITY",
+    leftKnee: "LEFTKNEEDURABILITY", rightKnee: "RIGHTKNEEDURABILITY",
+    leftAnkle: "LEFTANKLEDURABILITY", rightAnkle: "RIGHTANKLEDURABILITY",
+    leftFoot: "LEFTFOOTDURABILITY", rightFoot: "RIGHTFOOTDURABILITY",
+    overall: "MISCDURABILITY",
+  };
+  const durability = {};
+  for (const [key, attr] of Object.entries(map)) {
+    const v = num(get("Attributes", attr));
+    if (v != null) durability[key] = v;
+  }
+  return durability;
+}
+
+// Hot zones live in the tendencies section (Hot / Neutral / Cold values).
+function extractHotZones(get) {
+  const map = {
+    underBasket: "UNDERBASKET",
+    closeLeft: "CLOSELEFT", closeMiddle: "CLOSEMIDDLE", closeRight: "CLOSERIGHT",
+    midLeft: "MIDRANGELEFT", midLeftCenter: "MIDRANGELEFTCENTER", midCenter: "MIDRANGECENTER",
+    midRightCenter: "MIDRANGERIGHTCENTER", midRight: "MIDRANGERIGHT",
+    threeLeft: "3LEFT", threeLeftCenter: "3LEFTCENTER", threeCenter: "3CENTER",
+    threeRightCenter: "3RIGHTCENTER", threeRight: "3RIGHT",
+  };
+  const hotZones = {};
+  for (const [key, tend] of Object.entries(map)) {
+    const v = get("Tendencies", tend);
+    if (v != null) hotZones[key] = String(v);
+  }
+  return hotZones;
 }
 
 // ============================================================
