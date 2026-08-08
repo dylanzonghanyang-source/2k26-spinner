@@ -25,7 +25,8 @@ import { badgeBundleMap } from "./components/badgeBundleMap.ts";
 import { estimateGameOverall, type OverallDataVersion } from "./rookieOverall.ts";
 import { generateDurabilityAttributes, generateRookieDurability } from "./rookieDurability.ts";
 import { constrainRookieInitialAttributes } from "./rookieInitialOverall.ts";
-import { applyBodyConstraints, parsePlayerBody, type BuilderBody } from "./rookieBodyConstraints.ts";
+import { applyBodyConstraints, parsePlayerBody, effectivePositionDistance, parsePositionRoles, type BuilderBody, type SourceBody } from "./rookieBodyConstraints.ts";
+import { attrToSlot, bodyTransferProfiles, profileFor } from "./rookieBodyProfiles.ts";
 
 export type Position = "PG" | "SG" | "SF" | "PF" | "C";
 export type BundleCategory = "technical" | "physical" | "mental";
@@ -46,7 +47,16 @@ export type Evaluation = {
   bodyAdjustment: number;
   bodyAdjustments: Record<string, number>;
   bodyCaps: Partial<Record<string, number>>;
+  supportAdjustments?: Record<string, number>;
+  /** 来源无身体数据（仅应用目标 cap，未执行来源体型比较/位置交叉） */
+  bodyIncomplete?: boolean;
+  /** 支持依赖缺失真实值（未执行支持修正） */
+  supportIncomplete?: { attr: string; missing: string[] };
   values: Record<string, number>;
+  /** 主/次位置到来源的有效距离（null = 来源位置不可解析） */
+  positionDistance?: number | null;
+  /** 命中位置宽容区（原值继承） */
+  usedGraceZone?: boolean;
 };
 
 export const positions: Position[] = ["PG", "SG", "SF", "PF", "C"];
@@ -132,7 +142,43 @@ function getAttr(player: PlayerSource, attr: string) {
   return clamp(fallback(player, attr));
 }
 
-export function evaluate(player: PlayerSource, bundle: Bundle, body: BuilderBody, card?: RookieCard | null): Evaluation {
+/** 严格 accessor：只返回真实观测值，不做 category fallback（支持依赖专用）。 */
+function getObservedAttr(player: PlayerSource, attr: string): number | undefined {
+  if (attr === "Potential") return player.potential ?? undefined;
+  for (const name of attrAliases[attr] ?? [attr]) {
+    const value = player.detailed?.[name];
+    if (typeof value === "number") return value;
+  }
+  return undefined;
+}
+
+/** 从 rookie card vitals 构造来源身体（英寸/磅/cm），无数据时返回 null。 */
+export function cardSourceBody(card: RookieCard | null | undefined): SourceBody | null {
+  const heightInches = card?.vitals?.heightInches;
+  const weightLb = card?.vitals?.weightLb;
+  if (typeof heightInches !== "number" || typeof weightLb !== "number") return null;
+  const height = heightInches * 2.54;
+  const wingspanCm = typeof card?.vitals?.wingspanCm === "number" ? card.vitals.wingspanCm : null;
+  return {
+    height,
+    weight: weightLb * 0.453592,
+    wingspan: wingspanCm ?? height + 10,
+  };
+}
+
+export type EvaluateOptions = {
+  targetPosition?: Position | null;
+  secondaryPosition?: Position | null;
+};
+
+export function evaluate(
+  player: PlayerSource,
+  bundle: Bundle,
+  body: BuilderBody,
+  card?: RookieCard | null,
+  options?: EvaluateOptions,
+  cardBody?: SourceBody | null,
+): Evaluation {
   // In rookie mode a locked player with a real rookie card shows that card's
   // values directly (e.g. Luka mid-range shows 79, not his current 97). The
   // card is the display source; body constraints still apply on top.
@@ -142,7 +188,20 @@ export function evaluate(player: PlayerSource, bundle: Bundle, body: BuilderBody
       ? (card?.potential?.current != null ? clamp(card.potential.current) : getAttr(player, attr))
       : (card?.detailed?.[attr] != null ? clamp(card.detailed[attr]) : getAttr(player, attr)),
   ]));
-  const constrained = applyBodyConstraints(rawValues, body, parsePlayerBody(player));
+  // 来源身体优先取 rookie card 自带数据（新秀时体型），其次当前球员。
+  const sourceBody = cardBody ?? parsePlayerBody(player);
+  const constrained = applyBodyConstraints(rawValues, body, sourceBody, {
+    targetPosition: options?.targetPosition ?? null,
+    secondaryPosition: options?.secondaryPosition ?? null,
+    sourcePosition: player.position,
+  });
+  const positionDistance = options?.targetPosition != null
+    ? effectivePositionDistance(
+      options.targetPosition,
+      options.secondaryPosition ?? null,
+      parsePositionRoles(player.position),
+    )
+    : null;
   const raw = Math.round(average(Object.values(rawValues)));
   const adjusted = Math.round(average(Object.values(constrained.values)));
   return {
@@ -152,6 +211,9 @@ export function evaluate(player: PlayerSource, bundle: Bundle, body: BuilderBody
     bodyAdjustments: constrained.adjustments,
     bodyCaps: constrained.caps,
     values: constrained.values,
+    positionDistance,
+    usedGraceZone: constrained.usedGraceZone,
+    bodyIncomplete: sourceBody === null,
   };
 }
 
@@ -168,6 +230,142 @@ export function evaluateCustom(bundle: Bundle, customValues: Record<string, numb
     bodyCaps: constrained.caps,
     values: constrained.values,
   };
+}
+
+// --- 两阶段批量评估（槽位身体修正 + 跨槽位支持依赖） ---
+
+const SUPPORT_MAX_CUT = 8;
+const SUPPORT_MIN_KEEP = 0.65;
+/** 支持属性每 20 点差值折算 1 单位支持缺口 */
+const SUPPORT_GAP_REFERENCE = 20;
+
+export type SlotInput = {
+  bundle: Bundle;
+  player: PlayerSource | null;
+  card?: RookieCard | null;
+  customValues?: Record<string, number>;
+};
+
+function supportDeficitFor(
+  player: PlayerSource,
+  card: RookieCard | null | undefined,
+  attr: string,
+  bundleId: string,
+  targetSupport: Record<string, number>,
+): { deficit: number; missing: string[] } {
+  const slotProfile = bodyTransferProfiles[bundleId];
+  if (!slotProfile) return { deficit: 0, missing: [] };
+  const attrProfile = profileFor(slotProfile, attr);
+  const support = attrProfile.support ?? slotProfile.support;
+  if (!support?.length) return { deficit: 0, missing: [] };
+  let deficit = 0;
+  const missing: string[] = [];
+  for (const dep of support) {
+    // 支持属性与槽位 raw 值使用同一来源：优先 rookie card，其次当前球员。
+    // 只认真实观测值；缺失时跳过该依赖（不猜聚合值），并上报 missing。
+    const sourceValue = card?.detailed?.[dep.attr] ?? getObservedAttr(player, dep.attr);
+    const targetValue = targetSupport[dep.attr];
+    if (typeof sourceValue !== "number" || typeof targetValue !== "number") {
+      if (typeof sourceValue !== "number") missing.push(dep.attr);
+      continue;
+    }
+    deficit += dep.weight * Math.max(0, sourceValue - targetValue) / SUPPORT_GAP_REFERENCE;
+  }
+  return { deficit, missing };
+}
+
+/**
+ * 两阶段评估：
+ * 1. 每个锁定槽位独立身体评估（有符号差值 + 位置交叉 + 目标 cap）；
+ * 2. 读取目标已调整的根属性（athletic/strength），对依赖槽位应用软支持修正。
+ * 预览与最终 createResult 共用此函数，保证结果一致。
+ */
+export function evaluateAll(
+  inputs: SlotInput[],
+  body: BuilderBody,
+  options?: EvaluateOptions,
+): Record<string, Evaluation> {
+  const evaluations: Record<string, Evaluation> = {};
+  for (const input of inputs) {
+    if (input.customValues) {
+      evaluations[input.bundle.id] = evaluateCustom(input.bundle, input.customValues, body);
+      continue;
+    }
+    if (!input.player) continue;
+    evaluations[input.bundle.id] = evaluate(
+      input.player,
+      input.bundle,
+      body,
+      input.card,
+      options,
+      cardSourceBody(input.card),
+    );
+  }
+
+  // 目标支持值：第一阶段后 athletic/strength 槽位的最终值
+  const targetSupport: Record<string, number> = {};
+  for (const [attr, slot] of Object.entries(attrToSlot)) {
+    const evaluation = evaluations[slot];
+    if (evaluation && typeof evaluation.values[attr] === "number") {
+      targetSupport[attr] = evaluation.values[attr];
+    }
+  }
+
+  // 第二阶段：支持依赖软修正
+  for (const input of inputs) {
+    if (!input.player) continue;
+    const evaluation = evaluations[input.bundle.id];
+    if (!evaluation) continue;
+    const deltas: Record<string, number> = {};
+    const incompleteAttrs: string[] = [];
+    for (const attr of input.bundle.attrs) {
+      const { deficit, missing } = supportDeficitFor(input.player, input.card, attr, input.bundle.id, targetSupport);
+      if (missing.length) incompleteAttrs.push(attr);
+      if (deficit <= 0) continue;
+      const cut = Math.min(deficit, SUPPORT_MAX_CUT);
+      const current = evaluation.values[attr] ?? 0;
+      const floor = Math.round(current * SUPPORT_MIN_KEEP);
+      const next = Math.max(current - cut, floor);
+      if (next !== current) deltas[attr] = next - current;
+    }
+    if (incompleteAttrs.length) {
+      const player = input.player;
+      const missing = incompleteAttrs.flatMap((attr) =>
+        supportDeficitFor(player, input.card, attr, input.bundle.id, targetSupport).missing);
+      evaluation.supportIncomplete = { attr: incompleteAttrs.join(","), missing: [...new Set(missing)] };
+    }
+    if (Object.keys(deltas).length === 0) continue;
+    const nextValues = { ...evaluation.values };
+    for (const [attr, delta] of Object.entries(deltas)) {
+      // clamp 内部四舍五入：supportAdjustments 记录取整后的实际差值，
+      // 保证诊断值与最终 values 完全一致。
+      nextValues[attr] = clamp((nextValues[attr] ?? 0) + delta);
+    }
+    evaluation.supportAdjustments = Object.fromEntries(
+      Object.entries(deltas).map(([attr]) => [attr, nextValues[attr] - (evaluation.values[attr] ?? 0)]),
+    );
+    evaluation.values = nextValues;
+    evaluation.adjusted = Math.round(average(input.bundle.attrs.map((attr) => nextValues[attr])));
+  }
+
+  return evaluations;
+}
+
+/**
+ * 候选预览：在"当前已锁定槽位 + 候选球员替换一个未锁定槽位"的假设下
+ * 评估该槽位，与最终锁定结果走完全相同的两阶段路径。
+ */
+export function evaluateAllPreview(
+  currentInputs: SlotInput[],
+  candidate: SlotInput,
+  body: BuilderBody,
+  options?: EvaluateOptions,
+): Evaluation | undefined {
+  const inputs = [
+    ...currentInputs.filter((input) => input.bundle.id !== candidate.bundle.id),
+    candidate,
+  ];
+  return evaluateAll(inputs, body, options)[candidate.bundle.id];
 }
 
 function rookieValue(value: number, age: number, category: BundleCategory) {
@@ -301,15 +499,23 @@ export function createResult(
   let peakAttrs: Record<string, number> = {};
   let initialAttrs: Record<string, number> = {};
   const scores: number[] = [];
+  // 两阶段批量评估：先各槽位身体修正（真实非卡值），再统一支持依赖修正。
+  const slotInputs: SlotInput[] = [];
   for (const bundle of bundles) {
     const lock = locks[bundle.id];
-    let evaluation: Evaluation | undefined;
     if (lock?.kind === "custom") {
-      evaluation = evaluateCustom(bundle, lock.values, body);
+      slotInputs.push({ bundle, player: null, customValues: lock.values });
     } else if (lock?.kind === "player") {
       const player = players.get(lock.playerId);
-      if (player) evaluation = evaluate(player, bundle, body);
+      if (player) slotInputs.push({ bundle, player, card: null });
     }
+  }
+  const evaluations = evaluateAll(slotInputs, body, {
+    targetPosition: position,
+    secondaryPosition: secondary,
+  });
+  for (const bundle of bundles) {
+    const evaluation = evaluations[bundle.id];
     if (!evaluation) continue;
     Object.assign(peakAttrs, evaluation.values);
     if (bundle.id !== "potential") scores.push(evaluation.adjusted);
@@ -412,35 +618,52 @@ export function createResult(
   const potentialMax = clamp(potentialCard?.potential?.max ?? potential + 5, 40, 99);
   const rookieTier = rookieTierForPotential(potential);
 
-  // Card attributes are locked (real game data) — the OVR constraint must not
-  // lower them, only the non-card slots remain adjustable.
+  // Rookie-mode initial attributes: card slots go through the same two-phase
+  // body-constraint path as the UI preview (card-aware), so the final card
+  // values match what the user saw when locking. Non-card slots keep the peak
+  // evaluation with the rookie age-curve downgrade.
+  const cardConstrainedValues: Record<string, number> = {};
   const cardLockedValues: Record<string, number> = {};
   if (!isPrime) {
-    for (const [bundleId, card] of cardByBundle) {
-      if (!card) continue;
-      const bundle = bundles.find((candidate) => candidate.id === bundleId);
-      if (!bundle) continue;
-      for (const attr of bundle.attrs) {
-        const value = card.detailed[attr];
-        if (typeof value === "number") cardLockedValues[attr] = value;
+    const cardInputs: SlotInput[] = [];
+    for (const bundle of bundles) {
+      const lock = locks[bundle.id];
+      if (lock?.kind === "custom") {
+        cardInputs.push({ bundle, player: null, customValues: lock.values });
+        continue;
       }
+      const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
+      if (player) cardInputs.push({ bundle, player, card: cardByBundle.get(bundle.id) ?? null });
     }
-  }
-
-  if (!isPrime) {
+    const cardEvaluations = evaluateAll(cardInputs, body, { targetPosition: position, secondaryPosition: secondary });
     peakBadgeResolution = resolvePeakBadges(peakAttrs);
     peakBadges = peakBadgeResolution.badges;
     for (const bundle of bundles) {
       const card = cardByBundle.get(bundle.id);
+      const evaluation = cardEvaluations[bundle.id];
       for (const attr of bundle.attrs) {
         const cardValue = card?.detailed[attr];
         if (typeof cardValue === "number") {
-          // Real rookie-card value: verbatim, no age-curve downgrade.
-          initialAttrs[attr] = clamp(cardValue, 25, 99);
+          // Card raw value with the full body constraint path (same as preview).
+          const constrained = evaluation?.values[attr];
+          initialAttrs[attr] = clamp(constrained ?? cardValue, 25, 99);
+          cardConstrainedValues[attr] = initialAttrs[attr];
           continue;
         }
         const value = peakAttrs[attr];
         if (typeof value === "number") initialAttrs[attr] = rookieValue(value, age, bundle.category);
+      }
+    }
+    // Card attributes are locked (real game data) — the OVR constraint must not
+    // lower them, only the non-card slots remain adjustable. The lock values are
+    // the body-constrained card values (what the user actually sees).
+    for (const bundle of bundles) {
+      const card = cardByBundle.get(bundle.id);
+      if (!card) continue;
+      for (const attr of bundle.attrs) {
+        const constrained = cardConstrainedValues[attr];
+        if (constrained != null) cardLockedValues[attr] = constrained;
+        else if (typeof card.detailed[attr] === "number") cardLockedValues[attr] = card.detailed[attr];
       }
     }
   } else {
@@ -455,6 +678,11 @@ export function createResult(
     : uniqueBadges([...downgradeBadgesForRookie(peakBadges, rookieTier), ...cardBadges]);
   Object.assign(initialAttrs, customFinalAttrs);
   initialAttrs = applyBodyConstraints(initialAttrs, body, null).values;
+  // 恢复卡槽位的完整身体约束结果（含来源容量豁免），避免被上面 source=null
+  // 的目标 cap 二次压低；非卡槽位保持目标 cap 校验。
+  for (const [attr, value] of Object.entries(cardConstrainedValues)) {
+    initialAttrs[attr] = value;
+  }
   const sourceDurability = peakAttrs["Overall Durability"] ?? 80;
   const bodyBase = bodyBases[position];
   const bodyStress = Math.max(0, (body.weight - bodyBase.weight) / 15) + Math.max(0, (body.height - bodyBase.height) / 12);

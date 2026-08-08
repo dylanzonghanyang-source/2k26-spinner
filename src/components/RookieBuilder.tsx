@@ -21,16 +21,16 @@ import {
   bundles,
   clamp,
   createResult,
-  evaluate,
-  evaluateCustom,
+  evaluateAll,
+  evaluateAllPreview,
   makeRandom,
   positions,
   secondaryPositionShare,
   type Bundle,
   type Evaluation,
-  type HotZoneState,
   type LockState,
   type Position,
+  type SlotInput,
 } from "../createResult";
 import {
   loadTendencyLookup,
@@ -42,9 +42,8 @@ import { getTendencyNameCN } from "../tendencyNames";
 import { getPlayerHeadshotSources, prefetchPlayerHeadshots } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
 import { type OverallDataVersion } from "../rookieOverall";
-import { generateRookieName } from "../rookieNames";
+import { generateRookieFirstName, generateRookieLastName } from "../rookieNames";
 import { type BuilderBody as BodySettings } from "../rookieBodyConstraints";
-import { DURABILITY_ATTRIBUTES } from "../rookieDurability";
 import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../fieldCategories";
 
 export type RookieBuilderTeam = {
@@ -532,11 +531,27 @@ function createExportText(
       const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
       const evaluation = evaluations[bundle.id];
       const bodyAdjustment = evaluation?.bodyAdjustment ?? 0;
+      const supportLabel = Object.entries(evaluation?.supportAdjustments ?? {})
+        .map(([attr, delta]) => `${attrNameCN[attr] ?? attr}支持 ${delta > 0 ? "+" : ""}${delta}`)
+        .join(" / ");
       const capLabel = Object.entries(evaluation?.bodyCaps ?? {})
         .map(([attr, cap]) => `${attrNameCN[attr] ?? attr}上限 ${cap}`)
         .join(" / ");
+      const graceLabel = evaluation?.usedGraceZone ? "身材宽容区，原值继承" : "";
+      const incompleteLabel = evaluation?.bodyIncomplete
+        ? "来源无身体数据，仅应用目标上限"
+        : evaluation?.supportIncomplete
+          ? `支持依赖缺失（${evaluation.supportIncomplete.missing.join(" / ")}），未执行支持修正`
+          : "";
+      const positionLabel = evaluation?.positionDistance != null
+        ? `位置距离 ${Number(evaluation.positionDistance.toFixed(2))}`
+        : "";
       const adjustments = [
         bodyAdjustment ? `身体修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "",
+        supportLabel,
+        positionLabel,
+        graceLabel,
+        incompleteLabel,
         capLabel,
         player?.isEstimated ? "估算值" : "",
       ].filter(Boolean).join("，");
@@ -676,7 +691,9 @@ function RookieBuilder({
 }) {
   const isPrime = mode === "prime";
   const isManualSelection = selectionMode === "manual";
-  const [rookieName, setRookieName] = useState(() => generateRookieName());
+  const [firstName, setFirstName] = useState<string>(() => generateRookieFirstName());
+  const [lastName, setLastName] = useState<string>(() => generateRookieLastName());
+  const rookieName = `${firstName} ${lastName}`.trim();
   const [position, setPosition] = useState<Position>("PG");
   const [secondaryPosition, setSecondaryPosition] = useState<Position>(() => defaultSecondaryPosition("PG"));
   const [age, setAge] = useState(19);
@@ -870,27 +887,56 @@ function RookieBuilder({
     return [[lock.playerId, bundleId] as const];
   })), [locks]);
   const evaluations = useMemo(() => {
-    const next: Record<string, Evaluation> = {};
+    const inputs: SlotInput[] = [];
     for (const bundle of bundles) {
       const lock = locks[bundle.id];
       if (lock?.kind === "custom") {
-        next[bundle.id] = evaluateCustom(bundle, lock.values, body);
+        inputs.push({ bundle, player: null, customValues: lock.values });
         continue;
       }
       const player = lock?.kind === "player" ? playersById.get(lock.playerId) : undefined;
       if (player) {
         const card = !isPrime ? lookupRookieCard(rookieCards, player.name) : null;
-        next[bundle.id] = evaluate(player, bundle, body, card);
+        inputs.push({ bundle, player, card });
       }
     }
-    return next;
-  }, [body, isPrime, locks, playersById, rookieCards]);
-  const selectedEvaluations = useMemo(() => Object.fromEntries(
-    selectedPlayer ? bundles.map((bundle) => {
-      const card = !isPrime ? lookupRookieCard(rookieCards, selectedPlayer.name) : null;
-      return [bundle.id, evaluate(selectedPlayer, bundle, body, card)];
-    }) : [],
-  ) as Record<string, Evaluation>, [body, isPrime, rookieCards, selectedPlayer]);
+    return evaluateAll(inputs, body, {
+      targetPosition: position,
+      secondaryPosition: secondaryPosition,
+    });
+  }, [body, isPrime, locks, playersById, position, rookieCards, secondaryPosition]);
+  const selectedEvaluations = useMemo(() => {
+    if (!selectedPlayer) return {};
+    const currentInputs: SlotInput[] = [];
+    for (const bundle of bundles) {
+      const lock = locks[bundle.id];
+      if (lock?.kind === "custom") {
+        currentInputs.push({ bundle, player: null, customValues: lock.values });
+        continue;
+      }
+      const player = lock?.kind === "player" ? playersById.get(lock.playerId) : undefined;
+      if (player) {
+        const card = !isPrime ? lookupRookieCard(rookieCards, player.name) : null;
+        currentInputs.push({ bundle, player, card });
+      }
+    }
+    const preview: Record<string, Evaluation> = {};
+    for (const bundle of bundles) {
+      if (locks[bundle.id]) continue;
+      const evaluation = evaluateAllPreview(
+        currentInputs,
+        {
+          bundle,
+          player: selectedPlayer,
+          card: !isPrime ? lookupRookieCard(rookieCards, selectedPlayer.name) : null,
+        },
+        body,
+        { targetPosition: position, secondaryPosition },
+      );
+      if (evaluation) preview[bundle.id] = evaluation;
+    }
+    return preview;
+  }, [body, isPrime, locks, playersById, position, rookieCards, secondaryPosition, selectedPlayer]);
   const bodyAdjustedAttributes = useMemo(() => new Set(
     bundles.flatMap((bundle) => {
       const evaluation = evaluations[bundle.id];
@@ -898,6 +944,7 @@ function RookieBuilder({
       return bundle.attrs.filter((attr) => (
         (evaluation.bodyAdjustments[attr] ?? 0) !== 0
         || Object.prototype.hasOwnProperty.call(evaluation.bodyCaps, attr)
+        || Object.prototype.hasOwnProperty.call(evaluation.supportAdjustments ?? {}, attr)
       ));
     }),
   ), [evaluations]);
@@ -927,22 +974,6 @@ function RookieBuilder({
           ? "loading"
           : "idle";
   const tendencyCount = Object.keys(result.tendencies).length;
-  const tendencyStatusLabel = tendencyLoadState === "ready"
-    ? `${tendencyCount} 项 · 未调整`
-    : tendencyLoadState === "unavailable"
-      ? "当前版本暂无数据"
-      : tendencyLoadState === "error"
-        ? "加载失败"
-        : tendencyLoadState === "loading"
-          ? "正在加载…"
-          : "尚未加载";
-  const tendencyEmptyText = tendencyLoadState === "error"
-    ? "倾向数据加载失败，请刷新后重试"
-    : tendencyLoadState === "loading"
-      ? "正在加载倾向数据…"
-      : tendencyLoadState === "unavailable"
-        ? "当前版本暂无独立倾向数据"
-        : "暂无倾向数据";
   const completed = Object.keys(locks).length;
   const isComplete = completed === bundles.length;
   const exportReady = isComplete && tendencyLoadState !== "loading";
@@ -955,10 +986,6 @@ function RookieBuilder({
     [manualPlayerGroups, playerSearch],
   );
   const hasNextBatch = settingsLocked && round.offset + playersPerRound < round.playerOrder.length;
-  const zoneCounts = Object.values(result.hotZones).reduce<Record<HotZoneState, number>>(
-    (counts, state) => ({ ...counts, [state]: counts[state] + 1 }),
-    { 冷区: 0, 中性: 0, 热区: 0 },
-  );
   const customizingBundle = bundles.find((bundle) => bundle.id === customizingBundleId);
   const customDraftIsValid = Boolean(customizingBundle?.attrs.every((attr) => {
     const value = Number(customDraft[attr]);
@@ -987,9 +1014,14 @@ function RookieBuilder({
     setBody(createBodySettings(position, Date.now()));
   };
 
-  const randomizeName = () => {
+  const randomizeFirstName = () => {
     if (settingsLocked) return;
-    setRookieName(generateRookieName());
+    setFirstName(generateRookieFirstName());
+  };
+
+  const randomizeLastName = () => {
+    if (settingsLocked) return;
+    setLastName(generateRookieLastName());
   };
 
   const finishTeamDraw = () => {
@@ -1039,7 +1071,8 @@ function RookieBuilder({
   }, [hasNextBatch, isTeamDrawing, playersById, round.offset, round.playerOrder, settingsLocked]);
 
   const confirmSettings = () => {
-    setRookieName((current) => current.trim().replace(/\s+/g, " ") || generateRookieName());
+    setFirstName((current) => current.trim().replace(/\s+/g, " ") || generateRookieFirstName());
+    setLastName((current) => current.trim().replace(/\s+/g, " ") || generateRookieLastName());
     setSettingsLocked(true);
     if (isManualSelection) {
       setStatus("请为每个属性槽选择来源球员");
@@ -1115,7 +1148,8 @@ function RookieBuilder({
   const reset = () => {
     const seed = Date.now();
     pendingTeamDrawRef.current = null;
-    setRookieName(generateRookieName());
+    setFirstName(generateRookieFirstName());
+    setLastName(generateRookieLastName());
     setPosition("PG");
     setSecondaryPosition(defaultSecondaryPosition("PG"));
     setAge(19);
@@ -1195,20 +1229,38 @@ function RookieBuilder({
           <section aria-labelledby="player-identity-label" className="builder-setup-identity bg-white px-3 py-3">
             <div className="section-label mb-2" id="player-identity-label">球员信息</div>
             <div className="grid gap-2 sm:grid-cols-2">
-              <div className="min-w-0 sm:col-span-2">
-                <div className="section-label mb-1">{isPrime ? "球员姓名" : "新秀姓名"}</div>
+              <div className="min-w-0">
+                <div className="section-label mb-1">{isPrime ? "球员名" : "新秀名"}</div>
                 <div className="flex h-8 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
                   <input
-                    aria-label={`${isPrime ? "巅峰球员" : "新秀"}英文姓名`}
+                    aria-label={`${isPrime ? "巅峰球员" : "新秀"}英文名（First Name）`}
                     className="min-w-0 flex-1 bg-transparent px-2.5 text-[12px] font-semibold text-ink-800 outline-none disabled:cursor-not-allowed disabled:text-ink-400"
                     disabled={settingsLocked}
-                    maxLength={48}
-                    onChange={(event) => setRookieName(event.target.value)}
+                    maxLength={24}
+                    onChange={(event) => setFirstName(event.target.value)}
+                    placeholder="First"
                     spellCheck={false}
                     type="text"
-                    value={rookieName}
+                    value={firstName}
                   />
-                  <button aria-label="随机生成英文名" className="icon-button flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeName} title="随机生成英文名" type="button"><RefreshCw className="h-3.5 w-3.5" /></button>
+                  <button aria-label="随机生成英文名" className="icon-button flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeFirstName} title="随机生成名" type="button"><RefreshCw className="h-3.5 w-3.5" /></button>
+                </div>
+              </div>
+              <div className="min-w-0">
+                <div className="section-label mb-1">{isPrime ? "球员姓" : "新秀姓"}</div>
+                <div className="flex h-8 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
+                  <input
+                    aria-label={`${isPrime ? "巅峰球员" : "新秀"}英文姓（Last Name）`}
+                    className="min-w-0 flex-1 bg-transparent px-2.5 text-[12px] font-semibold text-ink-800 outline-none disabled:cursor-not-allowed disabled:text-ink-400"
+                    disabled={settingsLocked}
+                    maxLength={24}
+                    onChange={(event) => setLastName(event.target.value)}
+                    placeholder="Last"
+                    spellCheck={false}
+                    type="text"
+                    value={lastName}
+                  />
+                  <button aria-label="随机生成英文姓" className="icon-button flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeLastName} title="随机生成姓" type="button"><RefreshCw className="h-3.5 w-3.5" /></button>
                 </div>
               </div>
               <div className="min-w-0">

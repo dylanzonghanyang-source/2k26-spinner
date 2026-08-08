@@ -30,6 +30,14 @@ function pick<T>(values: readonly T[], random: () => number) {
   return values[Math.floor(random() * values.length)];
 }
 
+export function generateRookieFirstName(random: () => number = Math.random) {
+  return pick(firstNames, random);
+}
+
+export function generateRookieLastName(random: () => number = Math.random) {
+  return pick(lastNames, random);
+}
+
 export function generateRookieName(random: () => number = Math.random) {
-  return `${pick(firstNames, random)} ${pick(lastNames, random)}`;
+  return `${generateRookieFirstName(random)} ${generateRookieLastName(random)}`;
 }

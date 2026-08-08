@@ -1,3 +1,9 @@
+import {
+  profileForAttribute,
+  type AxisPreference,
+  type BodyTransferProfile,
+} from "./rookieBodyProfiles.ts";
+
 export type BuilderBody = {
   height: number;
   weight: number;
@@ -17,6 +23,8 @@ export type BodyConstraintResult = {
   values: Record<string, number>;
   adjustments: Record<string, number>;
   caps: Partial<Record<string, number>>;
+  /** 任一属性命中位置宽容区（原值继承） */
+  usedGraceZone: boolean;
 };
 
 type PlayerBodyInput = {
@@ -25,33 +33,37 @@ type PlayerBodyInput = {
   wingspan?: string | number | null;
 };
 
-type BodyAxis = "height" | "weight" | "reach" | "shoulder";
-
 const MIN_RATING = 25;
 const MAX_RATING = 99;
 const DEFAULT_WINGSPAN_ADVANTAGE_CM = 10;
-const WINGSPAN_MORPH_CM_PER_POINT = 0.2;
 const BODY_MISMATCH_PENALTY_SCALE = 2;
+const POSITION_CROSS_SCALE = 0.67;
+const HEIGHT_GAP_REFERENCE_CM = 40;
+const WEIGHT_GAP_REFERENCE_KG = 35;
+const SECONDARY_BODY_DISTANCE_WEIGHT = 0.25;
 
-const adjustmentCoefficients: Partial<Record<string, Partial<Record<BodyAxis, number>>>> = {
-  Strength: { weight: 0.14, shoulder: 0.04 },
-  Speed: { height: -0.14, weight: -0.09 },
-  Agility: { height: -0.16, weight: -0.09 },
-  "Ball Handle": { height: -0.16, weight: -0.08 },
-  "Speed with Ball": { height: -0.18, weight: -0.1 },
-  Block: { height: 0.18, reach: 0.1 },
-  "Interior Defense": { height: 0.1, weight: 0.08, reach: 0.08, shoulder: 0.03 },
-  "Offensive Rebound": { height: 0.13, weight: 0.06, reach: 0.08 },
-  "Defensive Rebound": { height: 0.12, weight: 0.06, reach: 0.08 },
-  "Standing Dunk": { height: 0.15, weight: 0.07, shoulder: 0.03 },
-  "Post Control": { height: 0.06, weight: 0.06, shoulder: 0.02 },
-  "Driving Dunk": { height: 0.03, weight: -0.04 },
-  Layup: { height: -0.02, weight: -0.03 },
-  "Perimeter Defense": { height: -0.06, weight: -0.04, reach: 0.03 },
-  Steal: { reach: 0.04 },
-  "Pass Perception": { reach: 0.03 },
+// 宽容区（同位置 / 相邻位置）的身高、体重阈值
+const GRACE_ZONE_SAME = { height: 12, weight: 18 };
+const GRACE_ZONE_ADJACENT = { height: 10, weight: 15 };
+
+export type PositionCode = "C" | "PF" | "SF" | "SG" | "PG";
+
+export const positionAxis: Record<PositionCode, number> = {
+  C: 0,
+  PF: 1,
+  SF: 2,
+  SG: 3,
+  PG: 4,
 };
 
+export type BodyConstraintOptions = {
+  /** 目标主位置 */
+  targetPosition?: PositionCode | null;
+  /** 目标次要位置 */
+  secondaryPosition?: PositionCode | null;
+  /** 来源球员位置字符串（可含 C/PF 等双位置，null/unknown 时不启用位置交叉） */
+  sourcePosition?: string | null;
+};
 
 function clampRating(value: number, min = MIN_RATING, max = MAX_RATING) {
   return Math.max(min, Math.min(max, Math.round(value)));
@@ -80,15 +92,12 @@ export function parsePlayerBody(player: PlayerBodyInput): SourceBody | null {
   return { height, weight, wingspan };
 }
 
-export function targetReach(body: BuilderBody) {
-  return body.height + DEFAULT_WINGSPAN_ADVANTAGE_CM + (body.wingspan - 50) * WINGSPAN_MORPH_CM_PER_POINT;
-}
-
 export function strengthCapForBody(body: BuilderBody) {
   const shoulderAdjustment = (body.shoulder - 50) * 0.08;
   return clampRating(body.weight * 0.65 + 27 + shoulderAdjustment, 60, MAX_RATING);
 }
 
+/** 目标自身安全上限（1-100 臂展评分只能影响这里，不与来源真实翼展比较） */
 function safetyCapForAttribute(attr: string, body: BuilderBody) {
   const heightDelta = body.height - 185;
   const weightDelta = body.weight - 82;
@@ -102,56 +111,146 @@ function safetyCapForAttribute(attr: string, body: BuilderBody) {
   return MAX_RATING;
 }
 
-function targetCapacityAtLeastSource(attr: string, target: BuilderBody, source: SourceBody | null) {
-  if (!source) return false;
-  const reach = targetReach(target);
-  if (attr === "Block") return target.height >= source.height - 0.5 && reach >= source.wingspan - 1;
-  if (attr === "Interior Defense") {
-    return target.height + target.weight * 0.25 + reach * 0.2
-      >= source.height + source.weight * 0.25 + source.wingspan * 0.2 - 1;
-  }
-  if (attr === "Offensive Rebound" || attr === "Defensive Rebound") {
-    return target.height + target.weight * 0.15 + reach * 0.25
-      >= source.height + source.weight * 0.15 + source.wingspan * 0.25 - 1;
-  }
-  if (attr === "Standing Dunk") {
-    return target.height + target.weight * 0.18 >= source.height + source.weight * 0.18 - 1;
-  }
-  return false;
+// --- 位置解析与距离 ---
+
+export function parsePositionRoles(position: string | null | undefined): PositionCode[] {
+  if (!position) return [];
+  return String(position)
+    .split("/")
+    .map((part) => part.trim().toUpperCase())
+    .filter((part): part is PositionCode => part in positionAxis);
 }
 
-function adjustmentForAttribute(attr: string, target: BuilderBody, source: SourceBody | null) {
-  if (!source) return 0;
-  const coefficients = adjustmentCoefficients[attr];
-  if (!coefficients) return 0;
-  const deltas: Record<BodyAxis, number> = {
-    height: target.height - source.height,
-    weight: target.weight - source.weight,
-    reach: targetReach(target) - source.wingspan,
-    shoulder: target.shoulder - 50,
-  };
-  return Object.entries(coefficients).reduce(
-    (sum, [axis, coefficient]) => sum + deltas[axis as BodyAxis] * (coefficient ?? 0),
-    0,
-  );
+export function distanceToSourceRoles(target: PositionCode, sourceRoles: PositionCode[]): number | null {
+  if (sourceRoles.length === 0) return null;
+  const targetIndex = positionAxis[target];
+  return Math.min(...sourceRoles.map((role) => Math.abs(positionAxis[role] - targetIndex)));
 }
+
+export function effectivePositionDistance(
+  primary: PositionCode,
+  secondary: PositionCode | null | undefined,
+  sourceRoles: PositionCode[],
+): number | null {
+  const primaryDistance = distanceToSourceRoles(primary, sourceRoles);
+  if (primaryDistance === null) return null;
+  if (!secondary) return primaryDistance;
+  const secondaryDistance = distanceToSourceRoles(secondary, sourceRoles);
+  if (secondaryDistance === null) return primaryDistance;
+  return (primaryDistance + SECONDARY_BODY_DISTANCE_WEIGHT * secondaryDistance) / (1 + SECONDARY_BODY_DISTANCE_WEIGHT);
+}
+
+/**
+ * 宽容区位置类别：主位置必须相同或相邻，且有效距离不超过 1。
+ * PG/C 之类仅靠次位置拉近的组合不能进入宽容区。
+ */
+export function graceZonePositionClass(
+  primaryDistance: number | null,
+  effectiveDistance: number | null,
+): "same" | "adjacent" | "none" {
+  if (primaryDistance === null || effectiveDistance === null) return "none";
+  if (primaryDistance === 0 && effectiveDistance <= 1) return "same";
+  if (primaryDistance === 1 && effectiveDistance <= 1) return "adjacent";
+  return "none";
+}
+
+// --- 有符号差值 → 方向性劣势 ---
+
+export function disadvantage(delta: number, preference: AxisPreference): number {
+  if (preference === "higher") return Math.max(0, -delta);
+  if (preference === "lower") return Math.max(0, delta);
+  // mixed/neutral 需要属性级覆盖或明确规则；槽位默认不能决定符号。
+  return 0;
+}
+
+function bodyPressureFor(profile: BodyTransferProfile, target: BuilderBody, source: SourceBody) {
+  const heightDelta = target.height - source.height;
+  const weightDelta = target.weight - source.weight;
+  const heightDisadvantage = disadvantage(heightDelta, profile.height.preference);
+  const weightDisadvantage = disadvantage(weightDelta, profile.weight.preference);
+  const raw = profile.height.weight * heightDisadvantage / HEIGHT_GAP_REFERENCE_CM
+    + profile.weight.weight * weightDisadvantage / WEIGHT_GAP_REFERENCE_KG;
+  return Math.max(0, Math.min(1, raw));
+}
+
+/** 结构调整（属性点）：只对目标处于不利方向的有符号差值扣分。
+ * weight 决定身高/体重占比，sensitivity 整体缩放，scale 是每 10 单位基准强度。 */
+function structuralAdjustmentFor(profile: BodyTransferProfile, target: BuilderBody, source: SourceBody) {
+  const heightDelta = target.height - source.height;
+  const weightDelta = target.weight - source.weight;
+  const heightDisadvantage = disadvantage(heightDelta, profile.height.preference);
+  const weightDisadvantage = disadvantage(weightDelta, profile.weight.preference);
+  const raw = profile.sensitivity * (
+    profile.height.weight * heightDisadvantage / 10 * profile.height.scale
+    + profile.weight.weight * weightDisadvantage / 10 * profile.weight.scale
+  );
+  return -raw;
+}
+
+// --- 主入口 ---
 
 export function applyBodyConstraints(
   sourceValues: Record<string, number>,
   target: BuilderBody,
   source: SourceBody | null,
+  options?: BodyConstraintOptions,
 ): BodyConstraintResult {
   const values: Record<string, number> = {};
   const adjustments: Record<string, number> = {};
   const caps: Partial<Record<string, number>> = {};
+  let usedGraceZone = false;
+
+  const sourceRoles = options?.sourcePosition != null
+    ? parsePositionRoles(options.sourcePosition)
+    : [];
+  const primaryDistance = options?.targetPosition != null
+    ? distanceToSourceRoles(options.targetPosition, sourceRoles)
+    : null;
+  const effectiveDistance = options?.targetPosition != null
+    ? effectivePositionDistance(options.targetPosition, options.secondaryPosition ?? null, sourceRoles)
+    : null;
+  const positionClass = graceZonePositionClass(primaryDistance, effectiveDistance);
 
   for (const [attr, rawValue] of Object.entries(sourceValues)) {
-    const rawAdjustment = adjustmentForAttribute(attr, target, source);
-    const adjustment = rawAdjustment < 0 ? rawAdjustment * BODY_MISMATCH_PENALTY_SCALE : rawAdjustment;
+    if (!source) {
+      // 无来源身体：只套目标自身安全上限
+      const cap = safetyCapForAttribute(attr, target);
+      const nextValue = clampRating(Math.min(rawValue, cap));
+      values[attr] = nextValue;
+      adjustments[attr] = nextValue - rawValue;
+      if (cap < MAX_RATING) caps[attr] = cap;
+      continue;
+    }
+
+    const profile = profileForAttribute(attr);
+
+    // 宽容区：主位置相同/相邻且体型接近 → 非力量属性原值继承
+    const inGraceZone = attr !== "Strength"
+      && graceZoneWithin(positionClass, target, source);
+    if (inGraceZone) {
+      usedGraceZone = true;
+      const nextValue = clampRating(rawValue);
+      values[attr] = nextValue;
+      adjustments[attr] = 0;
+      continue;
+    }
+
+    const structural = structuralAdjustmentFor(profile, target, source);
+    let adjustment = structural;
+    if (structural < 0) {
+      const bodyPressure = bodyPressureFor(profile, target, source);
+      const positionMultiplier = effectiveDistance !== null
+        ? 1 + effectiveDistance * POSITION_CROSS_SCALE * bodyPressure * profile.sensitivity
+        : 1;
+      adjustment = structural * BODY_MISMATCH_PENALTY_SCALE * positionMultiplier;
+    }
+
     let cap = safetyCapForAttribute(attr, target);
-    // A real source proves that a non-Strength outlier is feasible when the
-    // target has equal or better physical capacity. Strength always obeys weight.
-    if (attr !== "Strength" && targetCapacityAtLeastSource(attr, target, source)) {
+    // 来源容量豁免：目标身体不低于来源时，来源在自身体型下证明过的
+    // outlier 值不应被目标侧 cap 压低（力量仍服从体重硬上限）。
+    if (attr !== "Strength"
+      && target.height >= source.height - 1
+      && target.weight >= source.weight - 2) {
       cap = Math.max(cap, rawValue);
     }
     const nextValue = clampRating(Math.min(rawValue + adjustment, cap));
@@ -160,5 +259,13 @@ export function applyBodyConstraints(
     if (cap < MAX_RATING) caps[attr] = cap;
   }
 
-  return { values, adjustments, caps };
+  return { values, adjustments, caps, usedGraceZone };
+}
+
+function graceZoneWithin(positionClass: "same" | "adjacent" | "none", target: BuilderBody, source: SourceBody) {
+  if (positionClass === "none") return false;
+  const hGap = Math.abs(target.height - source.height);
+  const wGap = Math.abs(target.weight - source.weight);
+  const thresholds = positionClass === "same" ? GRACE_ZONE_SAME : GRACE_ZONE_ADJACENT;
+  return hGap <= thresholds.height && wGap <= thresholds.weight;
 }
