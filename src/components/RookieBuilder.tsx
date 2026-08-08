@@ -12,7 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { badgeTierCN, getBadgeNameCN } from "../badges";
+import { badgeTierCN, getBadgeNameCN, normalizeBadgeName } from "../badges";
 import MarqueeDraw, { type MarqueeDrawItem } from "./MarqueeDraw";
 import { attrNameCN, type PlayerSource } from "../domain";
 import {
@@ -45,6 +45,7 @@ import { type OverallDataVersion } from "../rookieOverall";
 import { generateRookieName } from "../rookieNames";
 import { type BuilderBody as BodySettings } from "../rookieBodyConstraints";
 import { DURABILITY_ATTRIBUTES } from "../rookieDurability";
+import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../fieldCategories";
 
 export type RookieBuilderTeam = {
   id: string;
@@ -137,17 +138,68 @@ function displayedPositionWeight(position: Position, secondary: Position, bundle
   return Math.round(blendedPositionWeight(position, secondary, bundleId));
 }
 
-const durabilityAttrs = [...DURABILITY_ATTRIBUTES];
+const fullAttributeGroups = attributeGroups;
 
-const fullAttributeGroups = [
-  { key: "offense", label: "进攻", attrs: ["Layup", "Post Fade", "Post Hook", "Post Control", "Draw Foul", "Close Shot", "Mid-Range Shot", "Three-Point Shot", "Free Throw", "Ball Handle", "Pass IQ", "Pass Accuracy", "Offensive Rebound", "Standing Dunk", "Driving Dunk", "Shot IQ", "Pass Vision", "Hands"] },
-  { key: "defense", label: "防守", attrs: ["Defensive Rebound", "Interior Defense", "Perimeter Defense", "Block", "Steal"] },
-  { key: "athletic", label: "运动", attrs: ["Speed", "Speed with Ball", "Vertical", "Stamina", "Hustle", "Agility"] },
-  { key: "strength", label: "力量", attrs: ["Strength"] },
-  { key: "durability", label: "耐久", attrs: durabilityAttrs },
-  { key: "mental", label: "精神", attrs: ["Pass Perception", "Defensive Consistency", "Help Defense IQ", "Offensive Consistency"] },
-  { key: "misc", label: "杂项", attrs: ["Intangibles"] },
-] as const;
+/** 热区字段 → 中文名（表格「热区」列命名，DB2K 卡英文 key） */
+const hotZoneLabelCN: Record<string, string> = {
+  underBasket: "篮下", closeLeft: "近距离左侧", closeMiddle: "近距离正面", closeRight: "近距离右侧",
+  midLeft: "左侧底角中距离", midLeftCenter: "左侧 45 度中距离", midCenter: "弧顶中距离",
+  midRightCenter: "右侧 45 度中距离", midRight: "右侧底角中距离",
+  threeLeft: "左侧底角三分", threeLeftCenter: "左侧 45 度三分", threeCenter: "弧顶三分",
+  threeRightCenter: "右侧 45 度三分", threeRight: "右侧底角三分",
+};
+
+/**
+ * 生成热区的中文 key 分组（createResult 的 hotZones 用中文 key，与 DB2K 卡的英文 key 不同）。
+ * 篮下 / 中距离 / 三分 三组，匹配中文 key 前缀。
+ */
+const hotZoneCNGroups: { key: string; label: string; keys: string[] }[] = [
+  { key: "inside", label: "篮下", keys: ["篮下", "近距离左侧", "近距离中央", "近距离右侧"] },
+  { key: "mid", label: "中距离", keys: ["中距离左侧底角", "中距离左侧45度", "中距离弧顶", "中距离右侧45度", "中距离右侧底角"] },
+  { key: "three", label: "三分", keys: ["三分左侧底角", "三分左侧45度", "三分弧顶", "三分右侧45度", "三分右侧底角"] },
+];
+
+/** 按徽章分类分组渲染（表格「徽章」列分类），无法归类的徽章放入「其他」。 */
+function renderBadgeGroups(badges: { name: string; tier: string }[]) {
+  if (!badges.length) return <div className="text-[9px] text-ink-400">无</div>;
+  const rows: React.ReactNode[] = [];
+  for (const group of badgeGroups) {
+    const members = badges.filter((badge) =>
+      group.badges.some((candidate) => normalizeBadgeName(candidate) === normalizeBadgeName(badge.name)),
+    );
+    if (!members.length) continue;
+    rows.push(
+      <div key={group.key} className="mb-2">
+        <div className="mb-1 text-[9px] font-semibold text-court-700">{group.label}</div>
+        <div className="flex flex-wrap gap-1">
+          {members.map((badge) => (
+            <span key={`${group.key}:${badge.name}:${badge.tier}`} className="border border-warning-500/20 bg-warning-50 px-1 py-0.5 text-[8px] text-warning-800">
+              {getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}
+            </span>
+          ))}
+        </div>
+      </div>,
+    );
+  }
+  const ungrouped = badges.filter((badge) =>
+    !badgeGroups.some((group) => group.badges.some((candidate) => normalizeBadgeName(candidate) === normalizeBadgeName(badge.name))),
+  );
+  if (ungrouped.length) {
+    rows.push(
+      <div key="other">
+        <div className="mb-1 text-[9px] font-semibold text-ink-400">其他</div>
+        <div className="flex flex-wrap gap-1">
+          {ungrouped.map((badge) => (
+            <span key={`other:${badge.name}:${badge.tier}`} className="border border-ink-200 bg-ink-50 px-1 py-0.5 text-[8px] text-ink-600">
+              {getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}
+            </span>
+          ))}
+        </div>
+      </div>,
+    );
+  }
+  return <>{rows}</>;
+}
 
 // PG-SF and PF weights are adapted from the supplied mobile-game tables.
 // Strength is kept separate from athleticism so body weight can constrain it independently.
@@ -400,11 +452,36 @@ function createExportText(
     threeRightCenter: "右侧 45 度三分", threeRight: "右侧底角三分",
   };
   const hotZoneLines = card && Object.keys(card.hotZones).length
-    ? Object.entries(card.hotZones).map(([key, state]) => `${hotZoneCN[key] ?? key}: ${state === "Hot" ? "热区" : state === "Cold" ? "冷区" : "正常"}`)
-    : Object.entries(result.hotZones).map(([name, state]) => `${name}: ${state}`);
+    ? hotZoneGroups.flatMap((group) => [
+      `-- ${group.label} --`,
+      ...group.zones.map((key) => {
+        const state = card.hotZones[key];
+        return `${hotZoneCN[key] ?? key}: ${state === "Hot" ? "热区" : state === "Cold" ? "冷区" : "正常"}`;
+      }),
+    ])
+    : hotZoneCNGroups.flatMap((group) => {
+      const entries = group.keys.filter((key) => result.hotZones[key] !== undefined);
+      return entries.length ? [`-- ${group.label} --`, ...entries.map((name) => `${name}: ${result.hotZones[name]}`)] : [];
+    });
   const personalityLines = card?.personalityBadges?.length
     ? card.personalityBadges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}`)
     : [];
+  // 徽章按分类分组输出（内线得分/外线得分/组织/防守/运动能力/篮板/个性）。
+  const groupBadgeLines = (badges: { name: string; tier: string }[]): string[] => {
+    const grouped = badgeGroups.flatMap((group) => {
+      const members = badges.filter((badge) =>
+        group.badges.some((candidate) => normalizeBadgeName(candidate) === normalizeBadgeName(badge.name)),
+      );
+      return members.length ? [`-- ${group.label} --`, ...members.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}`)] : [];
+    });
+    const ungrouped = badges.filter((badge) =>
+      !badgeGroups.some((group) => group.badges.some((candidate) => normalizeBadgeName(candidate) === normalizeBadgeName(badge.name))),
+    );
+    return [
+      ...grouped,
+      ...(ungrouped.length ? ["-- 其他 --", ...ungrouped.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}`)] : []),
+    ];
+  };
   const tendencyLines = tendencyLoadState === "loading"
     ? ["正在加载倾向数据"]
     : tendencyLoadState === "error"
@@ -412,9 +489,10 @@ function createExportText(
       : tendencyLoadState === "unavailable"
         ? ["当前版本暂无独立倾向数据"]
         : Object.keys(result.tendencies).length
-        ? Object.entries(result.tendencies)
-          .sort(([left], [right]) => getTendencyNameCN(left).localeCompare(getTendencyNameCN(right), "zh"))
-          .map(([field, value]) => `${getTendencyNameCN(field)}: ${value}`)
+        ? tendencyGroups.flatMap((group) => {
+          const members = group.fields.filter((field) => result.tendencies[field] !== undefined);
+          return members.length ? [`-- ${group.label} --`, ...members.map((field) => `${getTendencyNameCN(field)}: ${result.tendencies[field]}`)] : [];
+        })
         : ["暂无倾向数据（来源球员没有对应档案）"];
   return [
     `${dataVersionLabel} ${isPrime ? "巅峰球员" : "新秀"}生成清单`, "",
@@ -435,10 +513,10 @@ function createExportText(
     ] : []),
     "", "[热区]", ...hotZoneLines,
     ...(isPrime ? [
-      "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
+      "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.badges.length ? groupBadgeLines(result.badges) : ["无"]),
     ] : [
-      "", `[当前徽章（按${result.rookieTier}档调整）]`, ...(result.badges.length ? result.badges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
-      "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.peakBadges.length ? result.peakBadges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier]}`) : ["无"]),
+      "", `[当前徽章（按${result.rookieTier}档调整）]`, ...(result.badges.length ? groupBadgeLines(result.badges) : ["无"]),
+      "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.peakBadges.length ? groupBadgeLines(result.peakBadges) : ["无"]),
     ]),
     ...(personalityLines.length ? ["", "[个性徽章]", ...personalityLines] : []),
     "", "[倾向（继承属性来源，未按等级调整）]",
@@ -1549,6 +1627,73 @@ function RookieBuilder({
               </div>
             ))}
           </div>
+          {/* 倾向明细：按表格分类分组 */}
+          {tendencyCount ? (
+            <div className="border-t border-ink-200 px-3 py-2.5">
+              <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold">倾向明细</span><span className="text-ink-400">{tendencyCount} 项</span></div>
+              <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+                {tendencyGroups.map((group) => {
+                  const members = group.fields.filter((field) => result.tendencies[field] !== undefined);
+                  if (!members.length) return null;
+                  return (
+                    <div key={group.key}>
+                      <div className="mb-1 text-[9px] font-semibold text-court-700">{group.label}</div>
+                      {members.map((field) => (
+                        <div key={field} className="flex min-h-5 items-center justify-between gap-3 border-t border-ink-700/5 py-0.5 text-[10px]">
+                          <span className="min-w-0 text-ink-500">{getTendencyNameCN(field)}</span>
+                          <span className={`shrink-0 font-semibold tabular-nums ${typeof result.tendencies[field] === "number" ? valueColor(result.tendencies[field]) : "text-ink-300"}`}>{result.tendencies[field] ?? "--"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+          {/* 热区明细：按表格分类分组 */}
+          <div className="border-t border-ink-200 px-3 py-2.5">
+            <div className="mb-2 text-[10px] font-semibold">热区明细</div>
+            <div className="grid gap-x-6 gap-y-3 sm:grid-cols-3">
+              {hotZoneCNGroups.map((group) => {
+                // 兼容两种来源：生成器中文 key（result.hotZones）与 DB2K 卡英文 key（card.hotZones）
+                const entries = group.keys.flatMap((cnKey) => {
+                  const state = result.hotZones[cnKey];
+                  if (state !== undefined) return [[cnKey, state] as const];
+                  const enKey = Object.entries(hotZoneLabelCN).find(([, label]) => label === cnKey)?.[0];
+                  const enState = enKey ? result.hotZones[enKey] : undefined;
+                  return enState !== undefined ? [[cnKey, enState] as const] : [];
+                });
+                if (!entries.length) return null;
+                return (
+                  <div key={group.key}>
+                    <div className="mb-1 text-[9px] font-semibold text-court-700">{group.label}</div>
+                    {entries.map(([cnKey, state]) => (
+                      <div key={cnKey} className="flex min-h-5 items-center justify-between gap-3 border-t border-ink-700/5 py-0.5 text-[10px]">
+                        <span className="min-w-0 text-ink-500">{cnKey}</span>
+                        <span className={`shrink-0 font-semibold ${state === "热区" ? "text-rose-600" : state === "冷区" ? "text-blue-600" : "text-ink-500"}`}>{state}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {/* 徽章明细：按表格分类分组 */}
+          {result.badges.length || result.peakBadges.length ? (
+            <div className="border-t border-ink-200 px-3 py-2.5">
+              <div className="mb-2 text-[10px] font-semibold">徽章明细</div>
+              {!isPrime && result.badges.length ? (
+                <div className="mb-3">
+                  <div className="mb-1 text-[9px] font-semibold text-court-700">当前徽章（按 {result.rookieTier} 档调整）</div>
+                  {renderBadgeGroups(result.badges)}
+                </div>
+              ) : null}
+              <div>
+                <div className="mb-1 text-[9px] font-semibold text-court-700">{isPrime ? "巅峰徽章" : "巅峰徽章（按属性槽继承）"}</div>
+                {renderBadgeGroups(result.peakBadges.length ? result.peakBadges : result.badges)}
+              </div>
+            </div>
+          ) : null}
         </section>
         )}
       </div>

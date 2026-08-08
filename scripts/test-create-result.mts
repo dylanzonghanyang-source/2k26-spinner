@@ -96,8 +96,13 @@ assert.ok(luka.id, "Luka source must carry an id");
 const lukaId: string = luka.id;
 
 // Find a current player WITHOUT a rookie card for the negative cases.
+// Prefer a player with real detailed attributes: an estimated-only player
+// (all-70 fallback) can make the 12×95 + 3×player mixed build land BELOW the
+// potential/age target, which would skip the constraint and fail test 2b.
 const cards = await loadRookieCards();
-const cardless = currentPlayers.find((player) => !lookupRookieCard(cards, player.name));
+const cardless = currentPlayers.find(
+  (player) => !lookupRookieCard(cards, player.name) && detailedBySlug.has(player.id),
+) ?? currentPlayers.find((player) => !lookupRookieCard(cards, player.name));
 assert.ok(cardless, "expected at least one current player without a rookie card");
 const cardlessSource = players.get(`test:${cardless.id}`);
 assert.ok(cardlessSource, "cardless source must exist");
@@ -169,7 +174,7 @@ function customLockFor(bundleId: string, values: Record<string, number>): LockSt
     if (customSlots.has(bundle.id)) {
       locks[bundle.id] = {
         kind: "custom",
-        values: Object.fromEntries(bundle.attrs.map((attr) => [attr, 95])),
+        values: Object.fromEntries(bundle.attrs.map((attr) => [attr, 99])),
       };
       continue;
     }
