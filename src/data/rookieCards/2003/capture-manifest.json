@@ -1,12 +1,11 @@
 {
   "source": "DB2K Editor Draft Class snapshot",
-  "inputFile": "/Users/yangzonghan/Downloads/2003_draft_class.json",
+  "inputFile": "data/raw/db2k/merged-2003-2018-full.json",
   "targetExecutable": "NBA2K26.exe",
-  "mode": "Draft Class 2003 (relocated read-only)",
-  "recordCount": 150,
-  "converted": 10,
+  "recordCount": 534,
+  "converted": 26,
   "year": 2003,
-  "capturedAt": "2026-08-07T19:47:14.191Z",
+  "capturedAt": "2026-08-08T08:12:35.407Z",
   "badgeTierMap": {
     "1": "Bronze",
     "2": "Silver",

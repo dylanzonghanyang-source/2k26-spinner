@@ -32,6 +32,8 @@
 | J.R. Smith | 80 |  |
 | Anderson Varejao | 76 |  |
 
+> Andre Iguodala：2K26 没有该球员的版权/记录，无法从 DB2K 或游戏内采集新秀卡；不计入可采集缺口。
+
 ## 2005（4 人，其中高价值 2 人）
 
 | 球员 | 当前 OVR | 新秀总评 |
@@ -67,7 +69,7 @@
 | Greg Oden | 83 |  |
 | Tiago Splitter | 77 |  |
 
-## 2008（10 人，其中高价值 7 人）
+## 2008（11 人，其中高价值 7 人）
 
 | 球员 | 当前 OVR | 新秀总评 |
 |---|---|---|
@@ -79,6 +81,7 @@
 | DeAndre Jordan★ | 87 |  |
 | Brook Lopez★ | 87 |  |
 | Kevin Love★ | 91 |  |
+| Timofey Mozgov | 75 |  |
 | Derrick Rose★ | 95 |  |
 | Russell Westbrook★ | 95 |  |
 
@@ -96,7 +99,7 @@
 | Patty Mills | 77 |  |
 | Ricky Rubio★ | 85 |  |
 
-## 2010（9 人，其中高价值 4 人）
+## 2010（8 人，其中高价值 4 人）
 
 | 球员 | 当前 OVR | 新秀总评 |
 |---|---|---|
@@ -104,7 +107,6 @@
 | Paul George★ | 93 |  |
 | Gordon Hayward★ | 88 |  |
 | Jeremy Lin | 84 |  |
-| Timofey Mozgov | 75 |  |
 | Quincy Pondexter | 75 |  |
 | Evan Turner | 75 |  |
 | John Wall★ | 89 |  |

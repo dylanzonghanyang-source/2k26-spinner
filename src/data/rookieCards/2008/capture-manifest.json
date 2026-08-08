@@ -1,0 +1,16 @@
+{
+  "source": "DB2K Editor Draft Class snapshot",
+  "inputFile": "data/raw/db2k/merged-2003-2018-full.json",
+  "targetExecutable": "NBA2K26.exe",
+  "recordCount": 534,
+  "converted": 17,
+  "year": 2008,
+  "capturedAt": "2026-08-08T08:12:36.789Z",
+  "badgeTierMap": {
+    "1": "Bronze",
+    "2": "Silver",
+    "3": "Gold",
+    "4": "HOF"
+  },
+  "whitelistUsed": true
+}

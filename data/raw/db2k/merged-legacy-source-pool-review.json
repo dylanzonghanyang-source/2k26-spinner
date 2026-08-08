@@ -1,0 +1,924 @@
+{
+  "input": "/Users/yangzonghan/Downloads/merged_2003_2018_draft_class.json",
+  "sourcePoolCsv": "/Users/yangzonghan/Projects/Personal/2k26-spinner/data/raw/db2k/ovr-collection-legacy-2003-2017.csv",
+  "sourcePoolCount": 154,
+  "classificationCorrections": [
+    {
+      "player": "Timofey Mozgov",
+      "fromYear": 2010,
+      "toYear": 2008,
+      "reason": "2K26 historical template places him in 2008"
+    },
+    {
+      "player": "Andre Iguodala",
+      "year": 2004,
+      "reason": "unavailable under 2K26 player rights"
+    }
+  ],
+  "years": {
+    "2003": {
+      "sourceCount": 10,
+      "matchedCount": 10,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Carmelo Anthony",
+          "snapshotName": "Carmelo Anthony",
+          "recordIndex": 4
+        },
+        {
+          "sourceName": "Chris Bosh",
+          "snapshotName": "Chris Bosh",
+          "recordIndex": 5
+        },
+        {
+          "sourceName": "Kirk Hinrich",
+          "snapshotName": "Kirk Hinrich",
+          "recordIndex": 8
+        },
+        {
+          "sourceName": "LeBron James",
+          "snapshotName": "LeBron James",
+          "recordIndex": 2
+        },
+        {
+          "sourceName": "Chris Kaman",
+          "snapshotName": "Chris Kaman",
+          "recordIndex": 7
+        },
+        {
+          "sourceName": "Kyle Korver",
+          "snapshotName": "Kyle Korver",
+          "recordIndex": 29
+        },
+        {
+          "sourceName": "Darko Milicic",
+          "snapshotName": "Darko Milicic",
+          "recordIndex": 3
+        },
+        {
+          "sourceName": "Zaza Pachulia",
+          "snapshotName": "Zaza Pachulia",
+          "recordIndex": 24
+        },
+        {
+          "sourceName": "Dwyane Wade",
+          "snapshotName": "Dwyane Wade",
+          "recordIndex": 6
+        },
+        {
+          "sourceName": "David West",
+          "snapshotName": "David West",
+          "recordIndex": 15
+        }
+      ]
+    },
+    "2004": {
+      "sourceCount": 9,
+      "matchedCount": 8,
+      "unavailable": [
+        {
+          "sourceName": "Andre Iguodala",
+          "reason": "2K26 has no licensed player/copyright record; cannot collect from DB2K"
+        }
+      ],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Tony Allen",
+          "snapshotName": "Tony Allen",
+          "recordIndex": 50
+        },
+        {
+          "sourceName": "Luol Deng",
+          "snapshotName": "Luol Deng",
+          "recordIndex": 43
+        },
+        {
+          "sourceName": "Dwight Howard",
+          "snapshotName": "Dwight Howard",
+          "recordIndex": 37
+        },
+        {
+          "sourceName": "Kevin Martin",
+          "snapshotName": "Kevin Martin",
+          "recordIndex": 51
+        },
+        {
+          "sourceName": "Jameer Nelson",
+          "snapshotName": "Jameer Nelson",
+          "recordIndex": 48
+        },
+        {
+          "sourceName": "Josh Smith",
+          "snapshotName": "Josh Smith",
+          "recordIndex": 45
+        },
+        {
+          "sourceName": "J.R. Smith",
+          "snapshotName": "J.R. Smith",
+          "recordIndex": 46
+        },
+        {
+          "sourceName": "Anderson Varejao",
+          "snapshotName": "Anderson Varejao",
+          "recordIndex": 54
+        }
+      ]
+    },
+    "2005": {
+      "sourceCount": 4,
+      "matchedCount": 4,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Andrew Bogut",
+          "snapshotName": "Andrew Bogut",
+          "recordIndex": 65
+        },
+        {
+          "sourceName": "Channing Frye",
+          "snapshotName": "Channing Frye",
+          "recordIndex": 70
+        },
+        {
+          "sourceName": "Chris Paul",
+          "snapshotName": "Chris Paul",
+          "recordIndex": 67
+        },
+        {
+          "sourceName": "Deron Williams",
+          "snapshotName": "Deron Williams",
+          "recordIndex": 66
+        }
+      ]
+    },
+    "2006": {
+      "sourceCount": 8,
+      "matchedCount": 8,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "LaMarcus Aldridge",
+          "snapshotName": "LaMarcus Aldridge",
+          "recordIndex": 108
+        },
+        {
+          "sourceName": "Andrea Bargnani",
+          "snapshotName": "Andrea Bargnani",
+          "recordIndex": 107
+        },
+        {
+          "sourceName": "Shannon Brown",
+          "snapshotName": "Shannon Brown",
+          "recordIndex": 123
+        },
+        {
+          "sourceName": "Rudy Gay",
+          "snapshotName": "Rudy Gay",
+          "recordIndex": 113
+        },
+        {
+          "sourceName": "Daniel Gibson",
+          "snapshotName": "Daniel Gibson",
+          "recordIndex": 130
+        },
+        {
+          "sourceName": "Kyle Lowry",
+          "snapshotName": "Kyle Lowry",
+          "recordIndex": 122
+        },
+        {
+          "sourceName": "JJ Redick",
+          "snapshotName": "JJ Redick",
+          "recordIndex": 115
+        },
+        {
+          "sourceName": "Rajon Rondo",
+          "snapshotName": "Rajon Rondo",
+          "recordIndex": 121
+        }
+      ]
+    },
+    "2007": {
+      "sourceCount": 8,
+      "matchedCount": 8,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Corey Brewer",
+          "snapshotName": "Corey Brewer",
+          "recordIndex": 148
+        },
+        {
+          "sourceName": "Mike Conley",
+          "snapshotName": "Mike Conley",
+          "recordIndex": 145
+        },
+        {
+          "sourceName": "Kevin Durant",
+          "snapshotName": "Kevin Durant",
+          "recordIndex": 143
+        },
+        {
+          "sourceName": "Marc Gasol",
+          "snapshotName": "Marc Gasol",
+          "recordIndex": 165
+        },
+        {
+          "sourceName": "Al Horford",
+          "snapshotName": "Al Horford",
+          "recordIndex": 144
+        },
+        {
+          "sourceName": "Joakim Noah",
+          "snapshotName": "Joakim Noah",
+          "recordIndex": 149
+        },
+        {
+          "sourceName": "Greg Oden",
+          "snapshotName": "Greg Oden",
+          "recordIndex": 142
+        },
+        {
+          "sourceName": "Tiago Splitter",
+          "snapshotName": "Tiago Splitter",
+          "recordIndex": 161
+        }
+      ]
+    },
+    "2008": {
+      "sourceCount": 11,
+      "matchedCount": 11,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Nicolas Batum",
+          "snapshotName": "Nicolas Batum",
+          "recordIndex": 190
+        },
+        {
+          "sourceName": "Goran Dragic",
+          "snapshotName": "Goran Dragic",
+          "recordIndex": 196
+        },
+        {
+          "sourceName": "Eric Gordon",
+          "snapshotName": "Eric Gordon",
+          "recordIndex": 181
+        },
+        {
+          "sourceName": "George Hill",
+          "snapshotName": "George Hill",
+          "recordIndex": 191
+        },
+        {
+          "sourceName": "Serge Ibaka",
+          "snapshotName": "Serge Ibaka",
+          "recordIndex": 189
+        },
+        {
+          "sourceName": "DeAndre Jordan",
+          "snapshotName": "DeAndre Jordan",
+          "recordIndex": 194
+        },
+        {
+          "sourceName": "Brook Lopez",
+          "snapshotName": "Brook Lopez",
+          "recordIndex": 183
+        },
+        {
+          "sourceName": "Kevin Love",
+          "snapshotName": "Kevin Love",
+          "recordIndex": 180
+        },
+        {
+          "sourceName": "Timofey Mozgov",
+          "snapshotName": "Timofey Mozgov",
+          "recordIndex": 207
+        },
+        {
+          "sourceName": "Derrick Rose",
+          "snapshotName": "Derrick Rose",
+          "recordIndex": 176
+        },
+        {
+          "sourceName": "Russell Westbrook",
+          "snapshotName": "Russell Westbrook",
+          "recordIndex": 179
+        }
+      ]
+    },
+    "2009": {
+      "sourceCount": 9,
+      "matchedCount": 9,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Stephen Curry",
+          "snapshotName": "Stephen Curry",
+          "recordIndex": 212
+        },
+        {
+          "sourceName": "DeMar DeRozan",
+          "snapshotName": "DeMar DeRozan",
+          "recordIndex": 214
+        },
+        {
+          "sourceName": "Taj Gibson",
+          "snapshotName": "Taj Gibson",
+          "recordIndex": 224
+        },
+        {
+          "sourceName": "Danny Green",
+          "snapshotName": "Danny Green",
+          "recordIndex": 231
+        },
+        {
+          "sourceName": "Blake Griffin",
+          "snapshotName": "Blake Griffin",
+          "recordIndex": 209
+        },
+        {
+          "sourceName": "James Harden",
+          "snapshotName": "James Harden",
+          "recordIndex": 210
+        },
+        {
+          "sourceName": "Jrue Holiday",
+          "snapshotName": "Jrue Holiday",
+          "recordIndex": 218
+        },
+        {
+          "sourceName": "Patty Mills",
+          "snapshotName": "Patrick Mills",
+          "recordIndex": 233,
+          "alias": "Patrick Mills"
+        },
+        {
+          "sourceName": "Ricky Rubio",
+          "snapshotName": "Ricky Rubio",
+          "recordIndex": 249
+        }
+      ]
+    },
+    "2010": {
+      "sourceCount": 8,
+      "matchedCount": 8,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "John Wall",
+          "snapshotName": "John Wall",
+          "recordIndex": 0,
+          "input": "2010_draft_class_filtered.json"
+        },
+        {
+          "sourceName": "DeMarcus Cousins",
+          "snapshotName": "DeMarcus Cousins",
+          "recordIndex": 252
+        },
+        {
+          "sourceName": "Paul George",
+          "snapshotName": "Paul George",
+          "recordIndex": 255
+        },
+        {
+          "sourceName": "Gordon Hayward",
+          "snapshotName": "Gordon Hayward",
+          "recordIndex": 254
+        },
+        {
+          "sourceName": "Jeremy Lin",
+          "snapshotName": "Jeremy Lin",
+          "recordIndex": 266
+        },
+        {
+          "sourceName": "Quincy Pondexter",
+          "snapshotName": "Quincy Pondexter",
+          "recordIndex": 273
+        },
+        {
+          "sourceName": "Evan Turner",
+          "snapshotName": "Evan Turner",
+          "recordIndex": 250
+        },
+        {
+          "sourceName": "Hassan Whiteside",
+          "snapshotName": "Hassan Whiteside",
+          "recordIndex": 261
+        }
+      ]
+    },
+    "2011": {
+      "sourceCount": 11,
+      "matchedCount": 11,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Jimmy Butler",
+          "snapshotName": "Jimmy Butler",
+          "recordIndex": 295
+        },
+        {
+          "sourceName": "Tobias Harris",
+          "snapshotName": "Tobias Harris",
+          "recordIndex": 291
+        },
+        {
+          "sourceName": "Kyrie Irving",
+          "snapshotName": "Kyrie Irving",
+          "recordIndex": 281
+        },
+        {
+          "sourceName": "Reggie Jackson",
+          "snapshotName": "Reggie Jackson",
+          "recordIndex": 293
+        },
+        {
+          "sourceName": "Cory Joseph",
+          "snapshotName": "Cory Joseph",
+          "recordIndex": 294
+        },
+        {
+          "sourceName": "Kawhi Leonard",
+          "snapshotName": "Kawhi Leonard",
+          "recordIndex": 289
+        },
+        {
+          "sourceName": "Klay Thompson",
+          "snapshotName": "Klay Thompson",
+          "recordIndex": 286
+        },
+        {
+          "sourceName": "Tristan Thompson",
+          "snapshotName": "Tristan Thompson",
+          "recordIndex": 282
+        },
+        {
+          "sourceName": "Jonas Valanciunas",
+          "snapshotName": "Jonas Valanciunas",
+          "recordIndex": 283
+        },
+        {
+          "sourceName": "Nikola Vucevic",
+          "snapshotName": "Nikola Vucevic",
+          "recordIndex": 290
+        },
+        {
+          "sourceName": "Kemba Walker",
+          "snapshotName": "Kemba Walker",
+          "recordIndex": 285
+        }
+      ]
+    },
+    "2012": {
+      "sourceCount": 7,
+      "matchedCount": 7,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Harrison Barnes",
+          "snapshotName": "Harrison Barnes",
+          "recordIndex": 311
+        },
+        {
+          "sourceName": "Bradley Beal",
+          "snapshotName": "Bradley Beal",
+          "recordIndex": 308
+        },
+        {
+          "sourceName": "Anthony Davis",
+          "snapshotName": "Anthony Davis",
+          "recordIndex": 307
+        },
+        {
+          "sourceName": "Andre Drummond",
+          "snapshotName": "Andre Drummond",
+          "recordIndex": 313
+        },
+        {
+          "sourceName": "Draymond Green",
+          "snapshotName": "Draymond Green",
+          "recordIndex": 321
+        },
+        {
+          "sourceName": "Damian Lillard",
+          "snapshotName": "Damian Lillard",
+          "recordIndex": 310
+        },
+        {
+          "sourceName": "Khris Middleton",
+          "snapshotName": "Khris Middleton",
+          "recordIndex": 322
+        }
+      ]
+    },
+    "2013": {
+      "sourceCount": 9,
+      "matchedCount": 9,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Steven Adams",
+          "snapshotName": "Steven Adams",
+          "recordIndex": 333
+        },
+        {
+          "sourceName": "Giannis Antetokounmpo",
+          "snapshotName": "Giannis Antetokounmpo",
+          "recordIndex": 335
+        },
+        {
+          "sourceName": "Reggie Bullock",
+          "snapshotName": "Reggie Bullock",
+          "recordIndex": 354
+        },
+        {
+          "sourceName": "Kentavious Caldwell-Pope",
+          "snapshotName": "Kentavious Caldwell-Pope",
+          "recordIndex": 330
+        },
+        {
+          "sourceName": "Matthew Dellavedova",
+          "snapshotName": "Matthew Dellavedova",
+          "recordIndex": 356
+        },
+        {
+          "sourceName": "Rudy Gobert",
+          "snapshotName": "Rudy Gobert",
+          "recordIndex": 341
+        },
+        {
+          "sourceName": "Tim Hardaway Jr.",
+          "snapshotName": "Tim Hardaway Jr.",
+          "recordIndex": 339
+        },
+        {
+          "sourceName": "C.J. McCollum",
+          "snapshotName": "C.J. McCollum",
+          "recordIndex": 331
+        },
+        {
+          "sourceName": "Dennis Schroder",
+          "snapshotName": "Dennis Schroder",
+          "recordIndex": 336
+        }
+      ]
+    },
+    "2014": {
+      "sourceCount": 13,
+      "matchedCount": 13,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Kyle Anderson",
+          "snapshotName": "Kyle Anderson",
+          "recordIndex": 372
+        },
+        {
+          "sourceName": "Bogdan Bogdanovic",
+          "snapshotName": "Bogdan Bogdanovic",
+          "recordIndex": 371
+        },
+        {
+          "sourceName": "Clint Capela",
+          "snapshotName": "Clint Capela",
+          "recordIndex": 370
+        },
+        {
+          "sourceName": "Jordan Clarkson",
+          "snapshotName": "Jordan Clarkson",
+          "recordIndex": 379
+        },
+        {
+          "sourceName": "Joel Embiid",
+          "snapshotName": "Joel Embiid",
+          "recordIndex": 360
+        },
+        {
+          "sourceName": "Aaron Gordon",
+          "snapshotName": "Aaron Gordon",
+          "recordIndex": 361
+        },
+        {
+          "sourceName": "Gary Harris",
+          "snapshotName": "Gary Harris",
+          "recordIndex": 369
+        },
+        {
+          "sourceName": "Nikola Jokic",
+          "snapshotName": "Nikola Jokic",
+          "recordIndex": 377
+        },
+        {
+          "sourceName": "Zach LaVine",
+          "snapshotName": "Zach LaVine",
+          "recordIndex": 367
+        },
+        {
+          "sourceName": "Jusuf Nurkic",
+          "snapshotName": "Jusuf Nurkic",
+          "recordIndex": 368
+        },
+        {
+          "sourceName": "Julius Randle",
+          "snapshotName": "Julius Randle",
+          "recordIndex": 364
+        },
+        {
+          "sourceName": "Marcus Smart",
+          "snapshotName": "Marcus Smart",
+          "recordIndex": 363
+        },
+        {
+          "sourceName": "Andrew Wiggins",
+          "snapshotName": "Andrew Wiggins",
+          "recordIndex": 359
+        }
+      ]
+    },
+    "2015": {
+      "sourceCount": 16,
+      "matchedCount": 16,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Devin Booker",
+          "snapshotName": "Devin Booker",
+          "recordIndex": 404
+        },
+        {
+          "sourceName": "Pat Connaughton",
+          "snapshotName": "Pat Connaughton",
+          "recordIndex": 416
+        },
+        {
+          "sourceName": "Javonte Green",
+          "snapshotName": "Javonte Green",
+          "recordIndex": 418
+        },
+        {
+          "sourceName": "Mario Hezonja",
+          "snapshotName": "Mario Hezonja",
+          "recordIndex": 429
+        },
+        {
+          "sourceName": "Tyus Jones",
+          "snapshotName": "Tyus Jones",
+          "recordIndex": 410
+        },
+        {
+          "sourceName": "Kevon Looney",
+          "snapshotName": "Kevon Looney",
+          "recordIndex": 412
+        },
+        {
+          "sourceName": "Trey Lyles",
+          "snapshotName": "Trey Lyles",
+          "recordIndex": 403
+        },
+        {
+          "sourceName": "T.J. McConnell",
+          "snapshotName": "T.J. McConnell",
+          "recordIndex": 419
+        },
+        {
+          "sourceName": "Larry Nance Jr.",
+          "snapshotName": "Larry Nance Jr.",
+          "recordIndex": 411
+        },
+        {
+          "sourceName": "Kelly Oubre Jr.",
+          "snapshotName": "Kelly Oubre Jr.",
+          "recordIndex": 406
+        },
+        {
+          "sourceName": "Bobby Portis",
+          "snapshotName": "Bobby Portis Jr.",
+          "recordIndex": 409,
+          "alias": "Bobby Portis Jr."
+        },
+        {
+          "sourceName": "Kristaps Porzingis",
+          "snapshotName": "Kristaps Porzingis",
+          "recordIndex": 399
+        },
+        {
+          "sourceName": "Norman Powell",
+          "snapshotName": "Norman Powell",
+          "recordIndex": 417
+        },
+        {
+          "sourceName": "D’Angelo Russell",
+          "snapshotName": "D'Angelo Russell",
+          "recordIndex": 397
+        },
+        {
+          "sourceName": "Karl-Anthony Towns",
+          "snapshotName": "Karl-Anthony Towns",
+          "recordIndex": 396
+        },
+        {
+          "sourceName": "Myles Turner",
+          "snapshotName": "Myles Turner",
+          "recordIndex": 402
+        }
+      ]
+    },
+    "2016": {
+      "sourceCount": 13,
+      "matchedCount": 13,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Jaylen Brown",
+          "snapshotName": "Jaylen Brown",
+          "recordIndex": 432
+        },
+        {
+          "sourceName": "Alex Caruso",
+          "snapshotName": "Alex Caruso",
+          "recordIndex": 453
+        },
+        {
+          "sourceName": "Kris Dunn",
+          "snapshotName": "Kris Dunn",
+          "recordIndex": 434
+        },
+        {
+          "sourceName": "Buddy Hield",
+          "snapshotName": "Buddy Hield",
+          "recordIndex": 435
+        },
+        {
+          "sourceName": "Brandon Ingram",
+          "snapshotName": "Brandon Ingram",
+          "recordIndex": 431
+        },
+        {
+          "sourceName": "Caris LeVert",
+          "snapshotName": "Caris LeVert",
+          "recordIndex": 443
+        },
+        {
+          "sourceName": "Dejounte Murray",
+          "snapshotName": "Dejounte Murray",
+          "recordIndex": 447
+        },
+        {
+          "sourceName": "Jamal Murray",
+          "snapshotName": "Jamal Murray",
+          "recordIndex": 436
+        },
+        {
+          "sourceName": "Taurean Prince",
+          "snapshotName": "Taurean Prince",
+          "recordIndex": 439
+        },
+        {
+          "sourceName": "Domantas Sabonis",
+          "snapshotName": "Domantas Sabonis",
+          "recordIndex": 438
+        },
+        {
+          "sourceName": "Pascal Siakam",
+          "snapshotName": "Pascal Siakam",
+          "recordIndex": 445
+        },
+        {
+          "sourceName": "Ben Simmons",
+          "snapshotName": "Ben Simmons",
+          "recordIndex": 430
+        },
+        {
+          "sourceName": "Fred VanVleet",
+          "snapshotName": "Fred VanVleet",
+          "recordIndex": 459
+        }
+      ]
+    },
+    "2017": {
+      "sourceCount": 18,
+      "matchedCount": 18,
+      "unavailable": [],
+      "missing": [],
+      "matched": [
+        {
+          "sourceName": "Bam Adebayo",
+          "snapshotName": "Bam Adebayo",
+          "recordIndex": 477
+        },
+        {
+          "sourceName": "Jarrett Allen",
+          "snapshotName": "Jarrett Allen",
+          "recordIndex": 479
+        },
+        {
+          "sourceName": "OG Anunoby",
+          "snapshotName": "OG Anunoby",
+          "recordIndex": 480
+        },
+        {
+          "sourceName": "Lonzo Ball",
+          "snapshotName": "Lonzo Ball",
+          "recordIndex": 468
+        },
+        {
+          "sourceName": "Dillon Brooks",
+          "snapshotName": "Dillon Brooks",
+          "recordIndex": 487
+        },
+        {
+          "sourceName": "Thomas Bryant",
+          "snapshotName": "Thomas Bryant",
+          "recordIndex": 485
+        },
+        {
+          "sourceName": "John Collins",
+          "snapshotName": "John Collins",
+          "recordIndex": 478
+        },
+        {
+          "sourceName": "Zach Collins",
+          "snapshotName": "Zach Collins",
+          "recordIndex": 473
+        },
+        {
+          "sourceName": "De’Aaron Fox",
+          "snapshotName": "De'Aaron Fox",
+          "recordIndex": 470
+        },
+        {
+          "sourceName": "Josh Hart",
+          "snapshotName": "Josh Hart",
+          "recordIndex": 484
+        },
+        {
+          "sourceName": "Jonathan Isaac",
+          "snapshotName": "Jonathan Isaac",
+          "recordIndex": 471
+        },
+        {
+          "sourceName": "Luke Kennard",
+          "snapshotName": "Luke Kennard",
+          "recordIndex": 475
+        },
+        {
+          "sourceName": "Kyle Kuzma",
+          "snapshotName": "Kyle Kuzma",
+          "recordIndex": 481
+        },
+        {
+          "sourceName": "Lauri Markkanen",
+          "snapshotName": "Lauri Markkanen",
+          "recordIndex": 472
+        },
+        {
+          "sourceName": "Donovan Mitchell",
+          "snapshotName": "Donovan Mitchell",
+          "recordIndex": 476
+        },
+        {
+          "sourceName": "Malik Monk",
+          "snapshotName": "Malik Monk",
+          "recordIndex": 474
+        },
+        {
+          "sourceName": "Jayson Tatum",
+          "snapshotName": "Jayson Tatum",
+          "recordIndex": 469
+        },
+        {
+          "sourceName": "Derrick White",
+          "snapshotName": "Derrick White",
+          "recordIndex": 483
+        }
+      ]
+    }
+  },
+  "totalMatched": 153,
+  "totalUnavailable": 1,
+  "totalMissing": 0,
+  "supplementalInputs": [
+    {
+      "path": "/Users/yangzonghan/Downloads/2010_draft_class_filtered.json",
+      "year": 2010,
+      "reason": "adds John Wall omitted from the original merged 2003–2018 file",
+      "recordCount": 29
+    }
+  ]
+}
