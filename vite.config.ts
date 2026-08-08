@@ -79,7 +79,8 @@ function headshotProxyPlugin(): Plugin {
 }
 
 export default defineConfig({
-  base: process.env.GITHUB_ACTIONS ? "/2k26-spinner/" : "/",
+  base:
+    process.env.VITE_BASE ?? (process.env.GITHUB_ACTIONS ? "/2k26-spinner/" : "/"),
   plugins: [headshotProxyPlugin(), react()],
   build: {
     rollupOptions: {
