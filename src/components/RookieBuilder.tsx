@@ -413,7 +413,6 @@ function createExportText(
     `进攻方式 3: ${vs("playType3")}`, `进攻方式 4: ${vs("playType4")}`,
     `数据版本: ${dataVersionLabel}`,
     ...(!isPrime ? [`预计成长速度: 每年 +${result.progressSpeed} OVR`] : []),
-    `成长概率: ${result.boom}%`, `平均概率: ${result.normal}%`, `衰退概率: ${result.bust}%`,
   ] : [
     `姓名: ${rookieName}`, `年龄: ${result.age}`, `位置: ${result.position}`, `次要位置: ${result.secondary}`,
     `惯用手: ${result.hand}`, `扣篮惯用手: ${result.dunkHand}`,

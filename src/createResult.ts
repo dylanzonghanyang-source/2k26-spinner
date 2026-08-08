@@ -507,19 +507,47 @@ export function createResult(
   const baseOverall = cardOverall ?? calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
   const initialStrength = baseOverall;
   const intangibles = singleCard?.detailed?.["Intangibles"] ?? 50;
-  const boom = isPrime ? 0 : clamp(28 + potential - 84 - (age - 18) * 2 + (random() - 0.5) * 8, 10, 55);
-  const bust = isPrime ? 0 : clamp(18 - (age - 18) + (random() - 0.5) * 8, 8, 40);
-  const normal = 100 - boom - bust;
   const hand: "左手" | "右手" = random() < 0.11 ? "左手" : "右手";
   const dunkHand: "左手" | "右手" = random() < 0.8 ? hand : hand === "左手" ? "右手" : "左手";
   const growthGap = Math.max(0, potential - initialStrength);
+  // Career/peak fields: inherit the potential slot's rookie-card vitals when
+  // available (real game data: 巅峰开始/结束年龄, 成长/平均/衰退百分比).
+  // Without a card (or when the card carries no value) fall back to the
+  // deterministic formulas. 成长速度 is not a sheet field, so it is derived
+  // from the inherited peak start so the trajectory stays consistent.
+  const vitalNumber = (key: string): number | null => {
+    const value = potentialCard?.vitals?.[key];
+    const parsed = typeof value === "number" ? value : Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  };
+  const vitalPeakStart = vitalNumber("peakStartAge");
+  const vitalPeakEnd = vitalNumber("peakEndAge");
+  const vitalBoom = vitalNumber("boomPercent");
+  const vitalBust = vitalNumber("bustPercent");
+  const vitalAverage = vitalNumber("averagePercent");
+  const hasVitalProbabilities = vitalBoom !== null && vitalBust !== null && vitalAverage !== null;
   const progressSpeed = isPrime
     ? 0
     : Math.round(Math.max(2.2, Math.min(5.4, 2.4 + Math.max(0, (potential - 87) / 10) + (random() - 0.5) * 0.6)) * 10) / 10;
   const yearsToPeak = isPrime || progressSpeed === 0 ? 0 : Math.ceil(growthGap / progressSpeed);
-  const peakStart = isPrime ? 28 : clamp(Math.max(24, age + yearsToPeak), age, 30);
+  const peakStart = vitalPeakStart !== null && vitalPeakStart >= age
+    ? vitalPeakStart
+    : isPrime
+      ? 28
+      : clamp(Math.max(24, age + yearsToPeak), age, 30);
   const peakDuration = isPrime ? 7 : Math.max(5, Math.min(11, 7 + (durability - 70) / 15 + random() * 1.5));
-  const peakEnd = clamp(peakStart + peakDuration, peakStart, 40);
+  const peakEnd = vitalPeakEnd !== null && vitalPeakEnd >= peakStart
+    ? vitalPeakEnd
+    : clamp(peakStart + peakDuration, peakStart, 40);
+  const boom = isPrime ? 0 : hasVitalProbabilities
+    ? vitalBoom
+    : clamp(28 + potential - 84 - (age - 18) * 2 + (random() - 0.5) * 8, 10, 55);
+  const bust = isPrime ? 0 : hasVitalProbabilities
+    ? vitalBust
+    : clamp(18 - (age - 18) + (random() - 0.5) * 8, 8, 40);
+  const normal = hasVitalProbabilities
+    ? vitalAverage
+    : 100 - boom - bust;
   initialAttrs.Intangibles = intangibles;
   initialAttrs.Potential = potential;
   const hotZones = createHotZones(initialAttrs, position, secondary, hand, random);
