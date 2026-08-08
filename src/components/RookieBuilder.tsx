@@ -423,14 +423,18 @@ function createExportText(
     `成长概率: ${result.boom}%`, `平均概率: ${result.normal}%`, `衰退概率: ${result.bust}%`,
   ];
   const bodyLines = card ? [
-    `身高: ${typeof v("heightInches") === "number" ? `${v("heightInches")} in` : `${result.height} cm`}（${result.height} cm）`,
-    `体重: ${typeof v("weightLb") === "number" ? `${v("weightLb")} lb` : `${result.weight} kg`}（${result.weight} kg）`,
-    `臂展: ${result.wingspan} cm（臂展评分 ${vs("armScale")}）`,
-    `肩宽（1-100）: ${vs("shoulderLength")}`, `颈部长度（1-100）: ${vs("neckLength")}`,
-    `躯干长度（1-100）: ${vs("trunkLength")}`,
+    // 身高/体重: 卡真实值（游戏内 in/lb，括号为换算 cm/kg）
+    `身高: ${typeof v("heightInches") === "number" ? `${v("heightInches")} in（${Math.round((v("heightInches") as number) * 2.54)} cm）` : `${result.height} cm`}`,
+    `体重: ${typeof v("weightLb") === "number" ? `${v("weightLb")} lb（${Math.round((v("weightLb") as number) * 0.4536)} kg）` : `${result.weight} kg`}`,
+    // 臂展/肩宽/颈长/躯干: 游戏内为 1-100 评分，非真实尺寸
+    `臂展（1-100）: ${vs("armScale") === "--" ? result.wingspan : vs("armScale")}`,
+    `肩宽（1-100）: ${vs("shoulderLength") === "--" ? result.shoulder : vs("shoulderLength")}`,
+    `颈部长度（1-100）: ${vs("neckLength") === "--" ? result.neck : vs("neckLength")}`,
+    `躯干长度（1-100）: ${vs("trunkLength") === "--" ? result.torso : vs("trunkLength")}`,
   ] : [
-    `身高: ${result.height} cm`, `体重: ${result.weight} kg`, `臂展: ${result.wingspan}`,
-    `肩宽: ${result.shoulder}`, `颈部长度: ${result.neck}`, `躯干长度: ${result.torso}`,
+    `身高: ${result.height} cm`, `体重: ${result.weight} kg`,
+    `臂展（1-100）: ${result.wingspan}`, `肩宽（1-100）: ${result.shoulder}`,
+    `颈部长度（1-100）: ${result.neck}`, `躯干长度（1-100）: ${result.torso}`,
   ];
   const durabilityLines = card && Object.keys(card.durability).length ? [
     `头部耐久: ${card.durability.head ?? "--"}`, `颈部耐久: ${card.durability.neck ?? "--"}`,

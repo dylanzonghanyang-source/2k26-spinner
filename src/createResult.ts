@@ -510,8 +510,16 @@ export function createResult(
   const intangibles = potentialCard?.detailed?.["Intangibles"]
     ?? singleCard?.detailed?.["Intangibles"]
     ?? 50;
-  const hand: "左手" | "右手" = random() < 0.11 ? "左手" : "右手";
-  const dunkHand: "左手" | "右手" = random() < 0.8 ? hand : hand === "左手" ? "右手" : "左手";
+  // 惯用手: 继承运动槽来源卡的真实值；扣篮惯用手: 继承扣篮槽来源卡的真实值。
+  // vitals 存 "Left"/"Right"，无卡或值无效时回退原有随机逻辑。
+  const handFromVital = cardByBundle.get("athletic")?.vitals?.dominantHand;
+  const dunkHandFromVital = cardByBundle.get("dunk")?.vitals?.dominantDunkHand;
+  const hand: "左手" | "右手" = handFromVital === "Left" || handFromVital === "Right"
+    ? handFromVital === "Left" ? "左手" : "右手"
+    : random() < 0.11 ? "左手" : "右手";
+  const dunkHand: "左手" | "右手" = dunkHandFromVital === "Left" || dunkHandFromVital === "Right"
+    ? dunkHandFromVital === "Left" ? "左手" : "右手"
+    : random() < 0.8 ? hand : hand === "左手" ? "右手" : "左手";
   const growthGap = Math.max(0, potential - initialStrength);
   // Career/peak fields: inherit the potential slot's rookie-card vitals when
   // available (real game data: 巅峰开始/结束年龄, 成长/平均/衰退百分比).
