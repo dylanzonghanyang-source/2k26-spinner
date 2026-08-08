@@ -423,11 +423,11 @@ function createExportText(
     `成长概率: ${result.boom}%`, `平均概率: ${result.normal}%`, `衰退概率: ${result.bust}%`,
   ];
   const bodyLines = card ? [
-    // 身高/体重: 卡真实值（游戏内 in/lb，括号为换算 cm/kg）
+    // 身高/体重/臂展: 卡真实值（游戏内 in/lb/cm，括号为换算 cm/kg）
     `身高: ${typeof v("heightInches") === "number" ? `${v("heightInches")} in（${Math.round((v("heightInches") as number) * 2.54)} cm）` : `${result.height} cm`}`,
     `体重: ${typeof v("weightLb") === "number" ? `${v("weightLb")} lb（${Math.round((v("weightLb") as number) * 0.4536)} kg）` : `${result.weight} kg`}`,
-    // 臂展/肩宽/颈长/躯干: 游戏内为 1-100 评分，非真实尺寸
-    `臂展（1-100）: ${vs("armScale") === "--" ? result.wingspan : vs("armScale")}`,
+    `臂展: ${typeof v("wingspanCm") === "number" ? `${v("wingspanCm")} cm` : result.wingspan}`,
+    // 肩宽/颈长/躯干: 游戏内为 1-100 评分（DB2K 快照当前全为占位 50，无真实值）
     `肩宽（1-100）: ${vs("shoulderLength") === "--" ? result.shoulder : vs("shoulderLength")}`,
     `颈部长度（1-100）: ${vs("neckLength") === "--" ? result.neck : vs("neckLength")}`,
     `躯干长度（1-100）: ${vs("trunkLength") === "--" ? result.torso : vs("trunkLength")}`,
