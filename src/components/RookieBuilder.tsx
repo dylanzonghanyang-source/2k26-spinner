@@ -1553,33 +1553,6 @@ function RookieBuilder({
                 <div className="bg-white px-2.5 py-2"><span className="text-ink-400">臂展</span><strong className="float-right">{result.wingspan}</strong></div>
                 <div className="bg-white px-2.5 py-2"><span className="text-ink-400">肩宽</span><strong className="float-right">{result.shoulder}</strong></div>
               </div>
-              {isPrime ? (
-                <div className="border-b border-ink-200 px-3 py-2.5">
-                  <div className="flex items-center justify-between gap-3 text-[10px]"><span className="font-semibold text-ink-700">巅峰属性</span><span className="text-right text-ink-500">锁定值已结合体型和位置计算</span></div>
-                </div>
-              ) : (
-                <div className="border-b border-ink-200 px-3 py-2.5">
-                  <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold text-ink-700">成长轨迹</span><span className="font-mono text-court-700">潜力 {result.potential}</span></div>
-                  <div className="mb-2 grid grid-cols-2 gap-x-3 gap-y-1 border-y border-ink-100 py-1.5 text-[9px]">
-                    <div className="flex justify-between gap-2"><span className="text-ink-400">预计初始 OVR</span><strong className="tabular-nums text-ink-700">{result.initialStrength}</strong></div>
-                    <div className="flex justify-between gap-2"><span className="text-ink-400">巅峰年龄</span><strong className="tabular-nums text-ink-700">{result.peakStart}–{result.peakEnd}</strong></div>
-                    <div className="flex justify-between gap-2"><span className="text-ink-400">成长速度</span><strong className="tabular-nums text-ink-700">+{result.progressSpeed}/年</strong></div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-1.5 text-center text-[9px]"><div className="rounded-[5px] border border-court-200 bg-court-50 py-1.5 text-court-700"><strong className="block text-[12px]">{result.boom}%</strong>成长</div><div className="rounded-[5px] border border-ink-200 bg-ink-50 py-1.5 text-ink-700"><strong className="block text-[12px]">{result.normal}%</strong>平均</div><div className="rounded-[5px] border border-rose-200 bg-rose-50 py-1.5 text-rose-700"><strong className="block text-[12px]">{result.bust}%</strong>衰退</div></div>
-                </div>
-              )}
-              <div className="border-b border-ink-200 px-3 py-2.5">
-                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">徽章</span><span className="text-ink-400" data-testid="badge-status">共 {result.badges.length} 个</span></div>
-                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{result.badges.length ? result.badges.slice(0, 7).map((badge) => <span key={`${badge.name}:${badge.tier}`} className="border border-warning-500/20 bg-warning-50 px-1 py-0.5 text-[8px] text-warning-800">{getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier]}</span>) : <span className="text-[9px] text-ink-400">无</span>}</div>
-              </div>
-              <div className="border-b border-ink-200 px-3 py-2.5">
-                <div className="mb-1.5 text-[10px] font-semibold">热区</div>
-                <div className="grid grid-cols-3 gap-1 text-center text-[9px]"><div className="bg-blue-50 py-1.5 text-blue-700">冷 <span data-testid="cold-zone-count">{zoneCounts.冷区}</span></div><div className="bg-ink-50 py-1.5 text-ink-600">中 <span data-testid="neutral-zone-count">{zoneCounts.中性}</span></div><div className="bg-rose-50 py-1.5 text-rose-700">热 <span data-testid="hot-zone-count">{zoneCounts.热区}</span></div></div>
-              </div>
-              <div aria-live="polite" className="border-b border-ink-200 px-3 py-2.5" data-tendency-state={tendencyLoadState}>
-                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">倾向</span><span className="text-ink-400" data-testid="tendency-status">{tendencyStatusLabel}</span></div>
-                <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{tendencyCount ? Object.entries(result.tendencies).slice(0, 8).map(([field, value]) => <span key={field} className="border border-court-500/20 bg-court-50 px-1 py-0.5 text-[8px] text-court-800">{getTendencyNameCN(field)} {value}</span>) : <span className="text-[9px] text-ink-400">{tendencyEmptyText}</span>}</div>
-              </div>
             </div>
           ) : (
             <div className="flex min-h-[300px] flex-col items-center justify-center px-5 text-center">
