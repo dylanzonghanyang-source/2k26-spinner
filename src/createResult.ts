@@ -195,6 +195,15 @@ function calibratedOverall(
   return estimateGameOverall(values, position, badges, fallbackValue, version);
 }
 
+/**
+ * OVR model routing: prime/peak estimates use the roster-trained model for the
+ * active data version; rookie-mode initial OVR uses the dedicated model trained
+ * on the 667 official rookie cards (MAE 0.907 vs 2.063 on the same cards).
+ */
+function overallModelFor(isPrime: boolean, version: OverallDataVersion): OverallDataVersion {
+  return isPrime ? version : "rookie";
+}
+
 function tierFor(score: number): BadgeTier {
   if (score >= 96) return "HOF";
   if (score >= 90) return "Gold";
@@ -385,6 +394,9 @@ export function createResult(
   const random = makeRandom(hash(`${signature}|${age}|${position}|${secondary}`));
   const mean = average(scores, 71);
   const sourcePeakOverall = calibratedOverall(peakAttrs, position, peakBadges, mean, overallVersion);
+  // Rookie-mode initial OVR uses the rookie-card-trained model; prime keeps the
+  // roster model of the active data version.
+  const initialOverallVersion = overallModelFor(isPrime, overallVersion);
   // Potential slot: a real rookie card wins over both the peak evaluation and
   // the cross-version OVR fallback. The card also carries the official min/max
   // potential range; without a card we fall back to a symmetric ±5 band around
@@ -474,7 +486,7 @@ export function createResult(
         position,
         candidateBadges,
         mean,
-        overallVersion,
+        initialOverallVersion,
       ),
     });
   if (rookieOverallConstraint) Object.assign(initialAttrs, rookieOverallConstraint.values);
@@ -492,9 +504,9 @@ export function createResult(
     ? firstCard
     : null;
   const cardOverall = !isPrime && singleCard?.overall != null ? singleCard.overall : null;
-  const baseOverall = cardOverall ?? calibratedOverall(initialAttrs, position, badges, mean, overallVersion);
+  const baseOverall = cardOverall ?? calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
   const initialStrength = baseOverall;
-  const intangibles = 50;
+  const intangibles = singleCard?.detailed?.["Intangibles"] ?? 50;
   const boom = isPrime ? 0 : clamp(28 + potential - 84 - (age - 18) * 2 + (random() - 0.5) * 8, 10, 55);
   const bust = isPrime ? 0 : clamp(18 - (age - 18) + (random() - 0.5) * 8, 8, 40);
   const normal = 100 - boom - bust;

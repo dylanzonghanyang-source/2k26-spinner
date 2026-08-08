@@ -29,6 +29,7 @@
     "convert:rookie-cards": "node scripts/convert-db2k-to-rookiecard.mjs",
     "train:overall": "node scripts/train-rookie-overall-model.mjs",
     "train:overall:combined": "node scripts/train-rookie-overall-model.mjs combined src/data/versions/2k26/rookieOverallModel.json && node scripts/train-rookie-overall-model.mjs combined src/data/versions/2k27-play-now/rookieOverallModel.json",
+    "train:overall:rookie": "node --experimental-strip-types scripts/train-rookie-card-ovr.mts",
     "backfill:badges": "node scripts/backfill-badges-from-wayback.mjs",
     "sync:badges": "node scripts/sync-versioned-badges.mjs",
     "analyze:badges": "node scripts/analyze-badge-ovr.mjs",

@@ -1,6 +1,7 @@
 import legacyOverallModel from "./data/rookieOverallModel.json" with { type: "json" };
 import overallModel2k26 from "./data/versions/2k26/rookieOverallModel.json" with { type: "json" };
 import overallModel2k27 from "./data/versions/2k27-play-now/rookieOverallModel.json" with { type: "json" };
+import rookieCardModel from "./data/rookieOverallModel-rookie.json" with { type: "json" };
 
 export type OverallPosition = "PG" | "SG" | "SF" | "PF" | "C";
 
@@ -15,7 +16,7 @@ type PositionModel = {
   badgeCoefficients?: Record<string, number>;
 };
 
-export type OverallDataVersion = "legacy" | "2k26" | "2k27";
+export type OverallDataVersion = "legacy" | "2k26" | "2k27" | "rookie";
 
 type OverallModel = {
   attributes: string[];
@@ -29,6 +30,7 @@ const models: Record<OverallDataVersion, OverallModel> = {
   legacy: legacyOverallModel as OverallModel,
   "2k26": overallModel2k26 as OverallModel,
   "2k27": overallModel2k27 as OverallModel,
+  rookie: rookieCardModel as OverallModel,
 };
 
 const model = models.legacy;
