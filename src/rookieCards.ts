@@ -75,6 +75,7 @@ const PLAYER_NAME_ALIASES: Record<string, string> = {
   "Ronald Holland II": "Ron Holland",
   "VJ Edgecombe": "V.J. Edgecombe",
   "RJ Barrett": "R.J. Barrett",
+  "CJ McCollum": "C.J. McCollum",
   "AJ Green": "A.J. Green",
   "KJ Simpson": "K.J. Simpson",
   "AJ Johnson": "A.J. Johnson",
