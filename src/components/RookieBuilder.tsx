@@ -516,10 +516,9 @@ function createExportText(
     ] : []),
     "", "[热区]", ...hotZoneLines,
     ...(isPrime ? [
-      "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.badges.length ? groupBadgeLines(result.badges) : ["无"]),
+      "", `[巅峰徽章]`, ...(result.badges.length ? groupBadgeLines(result.badges) : ["无"]),
     ] : [
-      "", `[当前徽章（按${result.rookieTier}档调整）]`, ...(result.badges.length ? groupBadgeLines(result.badges) : ["无"]),
-      "", `[巅峰徽章（按属性槽继承${result.badgesEstimated ? "，含推算" : ""}）]`, ...(result.peakBadges.length ? groupBadgeLines(result.peakBadges) : ["无"]),
+      "", "[徽章（直接继承）]", ...(result.badges.length ? groupBadgeLines(result.badges) : ["无"]),
     ]),
     ...(personalityLines.length ? ["", "[个性徽章]", ...personalityLines] : []),
     "", "[倾向（继承属性来源，未按等级调整）]",
@@ -1570,7 +1569,7 @@ function RookieBuilder({
                 </div>
               )}
               <div className="border-b border-ink-200 px-3 py-2.5">
-                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">{isPrime ? "巅峰徽章" : "当前徽章"}</span><span className="text-ink-400" data-testid="badge-status">{result.badgesEstimated ? "含估算" : "按属性槽继承"} · {result.badges.length}</span></div>
+                <div className="mb-1.5 flex justify-between text-[10px]"><span className="font-semibold">徽章</span><span className="text-ink-400" data-testid="badge-status">共 {result.badges.length} 个</span></div>
                 <div className="flex max-h-[58px] flex-wrap gap-1 overflow-hidden">{result.badges.length ? result.badges.slice(0, 7).map((badge) => <span key={`${badge.name}:${badge.tier}`} className="border border-warning-500/20 bg-warning-50 px-1 py-0.5 text-[8px] text-warning-800">{getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier]}</span>) : <span className="text-[9px] text-ink-400">无</span>}</div>
               </div>
               <div className="border-b border-ink-200 px-3 py-2.5">
@@ -1681,19 +1680,13 @@ function RookieBuilder({
               })}
             </div>
           </div>
-          {/* 徽章明细：按表格分类分组 */}
+          {/* 徽章明细：直接继承结果，按表格分类分组 */}
           {result.badges.length || result.peakBadges.length ? (
             <div className="border-t border-ink-200 px-3 py-2.5">
               <div className="mb-2 text-[10px] font-semibold">徽章明细</div>
-              {!isPrime && result.badges.length ? (
-                <div className="mb-3">
-                  <div className="mb-1 text-[9px] font-semibold text-court-700">当前徽章（按 {result.rookieTier} 档调整）</div>
-                  {renderBadgeGroups(result.badges)}
-                </div>
-              ) : null}
               <div>
-                <div className="mb-1 text-[9px] font-semibold text-court-700">{isPrime ? "巅峰徽章" : "巅峰徽章（按属性槽继承）"}</div>
-                {renderBadgeGroups(result.peakBadges.length ? result.peakBadges : result.badges)}
+                <div className="mb-1 text-[9px] font-semibold text-court-700">{isPrime ? "巅峰徽章" : "徽章"}</div>
+                {renderBadgeGroups(result.badges.length ? result.badges : result.peakBadges)}
               </div>
             </div>
           ) : null}
