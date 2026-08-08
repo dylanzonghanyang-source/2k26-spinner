@@ -89,7 +89,14 @@ export function lookupRookieCard(
   if (!rookieCards) return null;
   const direct = rookieCards.get(corePlayerName(playerName));
   if (direct) return direct;
-  const alias = PLAYER_NAME_ALIASES[playerName];
+  // Aliases are matched case-insensitively: the roster pipeline's
+  // formatPlayerName() title-cases segments, so "R.J. Barrett" becomes
+  // "Rj Barrett" (the period is not a splitter) while the alias table uses
+  // the canonical "RJ Barrett". Exact object-key lookup would miss.
+  const aliasKey = Object.keys(PLAYER_NAME_ALIASES).find(
+    (key) => key.toLowerCase() === String(playerName).trim().toLowerCase(),
+  );
+  const alias = aliasKey ? PLAYER_NAME_ALIASES[aliasKey] : undefined;
   if (alias) return rookieCards.get(corePlayerName(alias)) ?? null;
   return null;
 }
@@ -169,10 +176,22 @@ export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLoo
   return lookup;
 }
 
+async function importJsonModule(specifier: string): Promise<{ default: RawRookieCardIndex }> {
+  // Vite dev fails to fetch JSON modules when import attributes are present
+  // (the ?import URL rewrite is incompatible with them), while Node 26's ESM
+  // loader requires attributes for JSON imports. Try attributes first, then
+  // fall back to a bare dynamic import.
+  try {
+    return await import(specifier, { with: { type: "json" } });
+  } catch {
+    return await import(specifier);
+  }
+}
+
 export function loadRookieCards(): Promise<RookieCardLookup> {
   return Promise.all([
-    import("./data/rookieCardIndex-legacy.min.json", { with: { type: "json" } }),
-    import("./data/rookieCardIndex-current.min.json", { with: { type: "json" } }),
+    importJsonModule("./data/rookieCardIndex-legacy.min.json"),
+    importJsonModule("./data/rookieCardIndex-current.min.json"),
   ]).then(([legacyModule, currentModule]) => {
     // Legacy is inserted first so the earliest (true rookie) card wins if a
     // player appears in both partitions.

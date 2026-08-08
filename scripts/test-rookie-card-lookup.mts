@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { corePlayerName, createRookieCardLookup, loadRookieCards } from "../src/rookieCards.ts";
+import { corePlayerName, createRookieCardLookup, loadRookieCards, lookupRookieCard } from "../src/rookieCards.ts";
 import index from "../src/data/rookieCardIndex.min.json" with { type: "json" };
 
 // --- corePlayerName normalization ---
@@ -16,6 +16,16 @@ console.log("corePlayerName OK");
 const lookup = createRookieCardLookup(index);
 assert.equal(lookup.size, index.keys.length);
 console.log(`lookup size: ${lookup.size}`);
+
+// Case-insensitive alias matching: formatPlayerName() title-cases "R.J. Barrett"
+// into "Rj Barrett" (period is not a splitter), which must still hit the alias
+// table key "RJ Barrett".
+const rj = lookupRookieCard(lookup, "Rj Barrett");
+assert.ok(rj, "Rj Barrett (title-cased, lowercase j) matches via case-insensitive alias");
+assert.equal(rj.slug, "r-j-barrett");
+const rjCaps = lookupRookieCard(lookup, "RJ Barrett");
+assert.equal(rjCaps?.slug, "r-j-barrett", "RJ Barrett (canonical alias key) still matches");
+console.log("RJ Barrett case-insensitive alias OK (Rj/RJ/R.J. -> r-j-barrett)");
 
 // --- known cards ---
 const luka = lookup.get(corePlayerName("Luka Doncic"));
