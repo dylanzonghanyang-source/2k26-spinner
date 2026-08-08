@@ -506,7 +506,10 @@ export function createResult(
   const cardOverall = !isPrime && singleCard?.overall != null ? singleCard.overall : null;
   const baseOverall = cardOverall ?? calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
   const initialStrength = baseOverall;
-  const intangibles = singleCard?.detailed?.["Intangibles"] ?? 50;
+  // 综评补偿 (Intangibles): 优先继承潜力来源卡的真实值，其次同卡构建的卡值，最后默认 50。
+  const intangibles = potentialCard?.detailed?.["Intangibles"]
+    ?? singleCard?.detailed?.["Intangibles"]
+    ?? 50;
   const hand: "左手" | "右手" = random() < 0.11 ? "左手" : "右手";
   const dunkHand: "左手" | "右手" = random() < 0.8 ? hand : hand === "左手" ? "右手" : "左手";
   const growthGap = Math.max(0, potential - initialStrength);
