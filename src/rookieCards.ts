@@ -176,22 +176,29 @@ export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLoo
   return lookup;
 }
 
-async function importJsonModule(specifier: string): Promise<{ default: RawRookieCardIndex }> {
-  // Vite dev fails to fetch JSON modules when import attributes are present
-  // (the ?import URL rewrite is incompatible with them), while Node 26's ESM
-  // loader requires attributes for JSON imports. Try attributes first, then
-  // fall back to a bare dynamic import.
+async function importLegacyIndex(): Promise<{ default: RawRookieCardIndex }> {
+  // Literal specifiers so rollup statically analyzes both calls and emits the
+  // JSON chunks. Vite dev rejects the attributes form (?import rewrite), so
+  // fall back to a bare import; Node 26 requires the attributes form.
   try {
-    return await import(specifier, { with: { type: "json" } });
+    return await import("./data/rookieCardIndex-legacy.min.json", { with: { type: "json" } });
   } catch {
-    return await import(specifier);
+    return await import("./data/rookieCardIndex-legacy.min.json");
+  }
+}
+
+async function importCurrentIndex(): Promise<{ default: RawRookieCardIndex }> {
+  try {
+    return await import("./data/rookieCardIndex-current.min.json", { with: { type: "json" } });
+  } catch {
+    return await import("./data/rookieCardIndex-current.min.json");
   }
 }
 
 export function loadRookieCards(): Promise<RookieCardLookup> {
   return Promise.all([
-    importJsonModule("./data/rookieCardIndex-legacy.min.json"),
-    importJsonModule("./data/rookieCardIndex-current.min.json"),
+    importLegacyIndex(),
+    importCurrentIndex(),
   ]).then(([legacyModule, currentModule]) => {
     // Legacy is inserted first so the earliest (true rookie) card wins if a
     // player appears in both partitions.
