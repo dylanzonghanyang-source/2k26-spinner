@@ -1544,7 +1544,7 @@ function RookieBuilder({
                 <div className="mt-1 truncate text-[15px] font-semibold text-ink-800" data-testid="rookie-name">{rookieName}</div>
                 <div className="mt-2 flex items-end justify-between">
                   <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">{isPrime ? "巅峰 OVR" : "新秀 OVR"}</div></div>
-                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span> <span className="tabular-nums text-ink-400">({result.potentialMin}-{result.potentialMax})</span></div><div className="text-[8px] text-ink-400">游戏 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
+                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">游戏 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-px bg-ink-200 text-[10px]">
@@ -1559,7 +1559,7 @@ function RookieBuilder({
                 </div>
               ) : (
                 <div className="border-b border-ink-200 px-3 py-2.5">
-                  <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold text-ink-700">成长轨迹</span><span className="font-mono text-court-700">潜力 {result.potential}<span className="text-ink-400"> ({result.potentialMin}-{result.potentialMax})</span></span></div>
+                  <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold text-ink-700">成长轨迹</span><span className="font-mono text-court-700">潜力 {result.potential}</span></div>
                   <div className="mb-2 grid grid-cols-2 gap-x-3 gap-y-1 border-y border-ink-100 py-1.5 text-[9px]">
                     <div className="flex justify-between gap-2"><span className="text-ink-400">预计初始 OVR</span><strong className="tabular-nums text-ink-700">{result.initialStrength}</strong></div>
                     <div className="flex justify-between gap-2"><span className="text-ink-400">巅峰年龄</span><strong className="tabular-nums text-ink-700">{result.peakStart}–{result.peakEnd}</strong></div>
@@ -1613,11 +1613,16 @@ function RookieBuilder({
                 <div className="mb-2 text-[10px] font-semibold text-court-700">{group.label}</div>
                 <div className={group.key === "durability" ? "grid gap-x-5 sm:grid-cols-2" : ""}>
                   {group.attrs.map((attr) => {
-                    const value = result.initialAttrs[attr];
+                    // 潜力范围不在 initialAttrs 里，从 result 取
+                    const value = attr === "Potential Min"
+                      ? result.potentialMin
+                      : attr === "Potential Max"
+                        ? result.potentialMax
+                        : result.initialAttrs[attr];
                     const hasBodyAdjustment = bodyAdjustedAttributes.has(attr);
                     return (
                       <div key={attr} className="flex min-h-6 items-center justify-between gap-3 border-t border-ink-700/5 py-1 text-[10px]">
-                        <span className="min-w-0 text-ink-500">{attrNameCN[attr] ?? attr}</span>
+                        <span className="min-w-0 text-ink-500">{attr === "Potential Min" ? "最低潜力" : attr === "Potential Max" ? "最高潜力" : attrNameCN[attr] ?? attr}</span>
                         <span className="flex shrink-0 items-center gap-1" title={hasBodyAdjustment ? "该属性包含身体修正或上限" : undefined}>
                           {hasBodyAdjustment && <span className="text-[8px] font-semibold text-court-600">身体</span>}
                           <span className={`font-semibold tabular-nums ${typeof value === "number" ? valueColor(value) : "text-ink-300"}`}>{value ?? "--"}</span>

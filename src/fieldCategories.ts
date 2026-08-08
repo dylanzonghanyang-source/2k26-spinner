@@ -33,7 +33,7 @@ export const attributeGroups: AttributeGroup[] = [
   { key: "strength", label: "力量", attrs: ["Strength"] },
   { key: "durability", label: "耐久", attrs: [...durabilityAttrKeys] },
   { key: "mental", label: "精神", attrs: ["Pass Perception", "Defensive Consistency", "Help Defense IQ", "Offensive Consistency"] },
-  { key: "misc", label: "杂项", attrs: ["Intangibles"] },
+  { key: "misc", label: "杂项", attrs: ["Intangibles", "Potential", "Potential Min", "Potential Max"] },
 ];
 
 /** 倾向子分类（对齐表格：跳投/上篮和扣篮/切入/传球/背身/自由发挥/防守） */
