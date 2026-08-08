@@ -36,8 +36,10 @@ type PlayerBodyInput = {
 const MIN_RATING = 25;
 const MAX_RATING = 99;
 const DEFAULT_WINGSPAN_ADVANTAGE_CM = 10;
-const BODY_MISMATCH_PENALTY_SCALE = 2;
-const POSITION_CROSS_SCALE = 0.67;
+// 身材结构惩罚总系数：原 2 再翻倍（用户需求：身高体重影响 ×2）
+const BODY_MISMATCH_PENALTY_SCALE = 4;
+// 位置交叉放大：原 0.67 × 4（用户需求：位置影响 ×4），且 bodyPressure 不设上限
+const POSITION_CROSS_SCALE = 2.68;
 const HEIGHT_GAP_REFERENCE_CM = 40;
 const WEIGHT_GAP_REFERENCE_KG = 35;
 const SECONDARY_BODY_DISTANCE_WEIGHT = 0.25;
@@ -170,7 +172,8 @@ function bodyPressureFor(profile: BodyTransferProfile, target: BuilderBody, sour
   const weightDisadvantage = disadvantage(weightDelta, profile.weight.preference);
   const raw = profile.height.weight * heightDisadvantage / HEIGHT_GAP_REFERENCE_CM
     + profile.weight.weight * weightDisadvantage / WEIGHT_GAP_REFERENCE_KG;
-  return Math.max(0, Math.min(1, raw));
+  // 不设上限：极端身材差异（差值超过参考 40cm/35kg）继续放大位置影响。
+  return Math.max(0, raw);
 }
 
 /** 结构调整（属性点）：只对目标处于不利方向的有符号差值扣分。
@@ -243,6 +246,14 @@ export function applyBodyConstraints(
         ? 1 + effectiveDistance * POSITION_CROSS_SCALE * bodyPressure * profile.sensitivity
         : 1;
       adjustment = structural * BODY_MISMATCH_PENALTY_SCALE * positionMultiplier;
+    }
+
+    // 位置直接惩罚（传控类）：独立于身材系数，penalty = weight × distance^(squared ? 2 : 1)。
+    // 传球仅此一个影响系数 → 平方放大；控球已有身材系数 → 位置线性叠加。
+    const positionCross = profile.positionCross;
+    if (positionCross && effectiveDistance !== null && effectiveDistance > 0) {
+      const distancePower = positionCross.squared ? effectiveDistance * effectiveDistance : effectiveDistance;
+      adjustment -= positionCross.weight * distancePower;
     }
 
     let cap = safetyCapForAttribute(attr, target);

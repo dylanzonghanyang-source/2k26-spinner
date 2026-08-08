@@ -166,6 +166,53 @@ const source: SourceBody = { height: 198, weight: 98, wingspan: 208 };
   }
 }
 
+// 12. 传控位置直接惩罚：传球唯一系数平方放大，控球双系数线性叠加
+{
+  // 中锋目标 ← 控卫来源：传球大幅衰减（3 × 4² = 48 点）
+  const centerFromGuard = applyBodyConstraints(
+    { "Pass Vision": 99, "Pass Accuracy": 96, "Pass IQ": 95 },
+    target(215, 120),
+    { height: 190, weight: 86, wingspan: 200 },
+    { targetPosition: "C", secondaryPosition: "PF", sourcePosition: "PG" },
+  );
+  assert.equal(centerFromGuard.values["Pass Vision"], 56, "C/PF←PG passing must be squared-decayed (99 − 3×3.8²)");
+  assert.equal(centerFromGuard.values["Pass Accuracy"], 53, "C/PF←PG pass accuracy must decay too (96 − 43)");
+
+  // 同位置：位置距离 0 → 不衰减（且宽容区原值继承）
+  const samePos = applyBodyConstraints(
+    { "Pass Vision": 99 },
+    target(190, 86),
+    { height: 190, weight: 86, wingspan: 200 },
+    { targetPosition: "PG", sourcePosition: "PG" },
+  );
+  assert.equal(samePos.values["Pass Vision"], 99, "same-position passing must stay intact");
+
+  // 相邻位置：3 × 1² = 3 点（体型差超出宽容区阈值，位置惩罚生效）
+  const adjacent = applyBodyConstraints(
+    { "Pass Vision": 99 },
+    target(202, 112),
+    { height: 190, weight: 86, wingspan: 200 },
+    { targetPosition: "SG", sourcePosition: "PG" },
+  );
+  assert.equal(adjacent.values["Pass Vision"], 96, "adjacent-position passing must lose only 3 points");
+
+  // 控球：身材系数 + 位置线性叠加（同体型跨位置：2 × 2 = 4 点）
+  const handleFar = applyBodyConstraints(
+    { "Ball Handle": 95, "Speed with Ball": 95 },
+    target(203, 100),
+    { height: 198, weight: 98, wingspan: 208 },
+    { targetPosition: "SF", sourcePosition: "PG" },
+  );
+  const handleNear = applyBodyConstraints(
+    { "Ball Handle": 95, "Speed with Ball": 95 },
+    target(198, 98),
+    { height: 198, weight: 98, wingspan: 208 },
+    { targetPosition: "SF", sourcePosition: "PG" },
+  );
+  assert.ok(handleFar.values["Ball Handle"] < handleNear.values["Ball Handle"],
+    "far handle must be penalized more than near handle (linear position cross)");
+}
+
 console.log("rookie body constraints OK");
 
 // ============ 新功能：有符号差值 + 槽位方向 + 位置距离 + 宽容区 ============
@@ -191,7 +238,9 @@ console.log("rookie body constraints OK");
 // 注意：Block 还有目标侧安全 cap（200cm → 88），用例必须避开 cap 干扰。
 {
   const shortTarget = target(180, 82);
-  const tallTarget = target(200, 90);
+  // tallTarget 与来源的体型差需超出同位置宽容区（h≤12/w≤18），
+  // 否则 handle lower 的"高目标惩罚"会被宽容区原值继承豁免。
+  const tallTarget = target(205, 100);
   const sourceBody: SourceBody = { height: 190, weight: 86, wingspan: 200 };
   const blockShort = applyBodyConstraints({ Block: 80 }, shortTarget, sourceBody, {
     targetPosition: "PG", sourcePosition: "C",
@@ -202,11 +251,14 @@ console.log("rookie body constraints OK");
   assert.ok(blockShort < 80, "block: shorter target must be penalized (higher preference)");
   assert.equal(blockTall, 80, "block: taller target must not be penalized by body delta (cap is separate)");
 
+  // 方向：Block higher（矮→罚），Handle lower（矮→不罚、高→罚）
+  // 注意：handle 已配置位置直接惩罚（线性），方向验证必须用同位置来源
+  // （distance 0）隔离身材方向；Block 无位置直接惩罚，保留 C 来源验证位置交叉。
   const handleShort = applyBodyConstraints({ "Ball Handle": 90, "Speed with Ball": 90 }, shortTarget, sourceBody, {
-    targetPosition: "PG", sourcePosition: "C",
+    targetPosition: "PG", sourcePosition: "PG",
   }).values["Ball Handle"];
   const handleTall = applyBodyConstraints({ "Ball Handle": 90, "Speed with Ball": 90 }, tallTarget, sourceBody, {
-    targetPosition: "PG", sourcePosition: "C",
+    targetPosition: "PG", sourcePosition: "PG",
   }).values["Ball Handle"];
   assert.equal(handleShort, 90, "handle: shorter target must NOT be penalized (lower preference)");
   assert.ok(handleTall < 90, "handle: taller target must be penalized (lower preference)");
@@ -249,23 +301,25 @@ console.log("rookie body constraints OK");
   assert.ok(samePosBigGap.values.Block < 95, "same position with huge body gap must still be penalized");
 }
 
-// 5. 位置本身不扣分：身高体重完全相同，C → PG
-// Block 用 80 避开 200cm 目标的安全 cap（88），单独验证位置标签无影响。
+// 5. 同身材位置标签：Block 不因位置标签扣分（无位置直接惩罚）；
+// handle 已配置位置直接惩罚 → 位置标签按距离线性衰减（95 − 2×3.8 = 87）
 {
   const sourceBody: SourceBody = { height: 200, weight: 100, wingspan: 210 };
   const sameBody = applyBodyConstraints({ Block: 80, "Ball Handle": 95 }, target(200, 100), sourceBody, {
     targetPosition: "PG", secondaryPosition: "SG", sourcePosition: "C",
   });
   assert.equal(sameBody.values.Block, 80, "identical body must not lose block from position label alone");
-  assert.equal(sameBody.values["Ball Handle"], 95, "identical body must not lose handle from position label alone");
+  assert.equal(sameBody.values["Ball Handle"], 87, "handle must lose the linear position cross (95 − 2×3.8)");
 }
 
-// 6. 42 验收夹具：180/82 PG ← 220/120 C，Block 95 → 42
+// 6. 验收夹具：180/82 PG ← 220/120 C，Block 95
+// 新模型（身材 ×2 + 位置 ×4 无上限）下极端跨位置惩罚远超 42 校准点，
+// 95 直接触底到属性下限 25。
 {
   const result = applyBodyConstraints({ Block: 95 }, target(180, 82), { height: 220, weight: 120, wingspan: 230 }, {
     targetPosition: "PG", sourcePosition: "C",
   });
-  assert.equal(result.values.Block, 42, "calibration fixture must land at 42 (primary-only distance 4)");
+  assert.equal(result.values.Block, 25, "extreme cross-position mismatch must bottom out at 25");
 }
 
 // 7. 位置解析与有效距离
@@ -312,10 +366,10 @@ console.log("rookie body constraints OK");
   assert.ok(dReb.support?.some((dep) => dep.attr === "Strength" && dep.weight >= 0.6), "DReb must weight Strength heavily");
 }
 
-// 10. sensitivity 与 H/W weight 必须真正影响结构惩罚
+// 10. sensitivity 与 H/W weight 必须真正影响结构惩罚（场景选不触底的差值）
 {
-  const targetBody = target(180, 82);
-  const sourceBody: SourceBody = { height: 220, weight: 120, wingspan: 230 };
+  const targetBody = target(190, 88);
+  const sourceBody: SourceBody = { height: 200, weight: 100, wingspan: 210 };
   const opts = { targetPosition: "PG" as const, sourcePosition: "C" as const };
   const blockProfile = bodyTransferProfiles.block;
   const originalSensitivity = blockProfile.sensitivity;
@@ -335,11 +389,11 @@ console.log("rookie body constraints OK");
     blockProfile.height.weight = originalHWeight;
     blockProfile.weight.weight = 1 - originalHWeight;
   }
-  // 恢复后行为不变
+  // 恢复后行为不变（190/88 ← 200/100 基线）
   assert.equal(
     applyBodyConstraints({ Block: 95 }, targetBody, sourceBody, opts).values.Block,
-    42,
-    "restored profile must still land the 42 fixture",
+    67,
+    "restored profile must reproduce the baseline fixture",
   );
 }
 

@@ -40,6 +40,10 @@ export type BodyTransferProfile = {
   weight: BodyAxisRule;
   /** 槽位总敏感度（0-1）：结构惩罚的整体缩放 */
   sensitivity: number;
+  /** 位置直接惩罚：penalty = weight × distance^(squared ? 2 : 1)。
+   * 仅位置一个影响系数时（如传球）squared 平方放大；
+   * 已有身材系数叠加位置时（如控球）保持线性。 */
+  positionCross?: { weight: number; squared?: boolean };
   support?: readonly SupportDependency[];
   attributeOverrides?: Record<string, Partial<BodyTransferProfile>>;
 };
@@ -106,6 +110,8 @@ export const bodyTransferProfiles: Record<string, BodyTransferProfile> = {
     height: rule(0.65, "lower", 3.26),
     weight: rule(0.35, "lower", 3.36),
     sensitivity: 0.85,
+    // 已有身材系数（lower 方向），位置作为叠加项 → 线性不平方。
+    positionCross: { weight: 2, squared: false },
     support: [
       { attr: "Speed", weight: 0.5 },
       { attr: "Agility", weight: 0.5 },
@@ -117,7 +123,14 @@ export const bodyTransferProfiles: Record<string, BodyTransferProfile> = {
       },
     },
   },
-  passing: { height: neutral(), weight: neutral(), sensitivity: 0 },
+  passing: {
+    // 传球无身材方向 → 唯一影响系数是位置：内部平方放大，
+    // 中锋锁控卫传球大幅衰减。
+    height: neutral(),
+    weight: neutral(),
+    sensitivity: 0,
+    positionCross: { weight: 3, squared: true },
+  },
   perimeter: {
     height: rule(0.6, "lower", 1.67),
     weight: rule(0.4, "lower", 1.67),
