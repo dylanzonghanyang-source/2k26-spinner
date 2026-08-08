@@ -88,7 +88,15 @@ await writeJsonAtomic(metadataPath, {
   overallModel: { file: "rookieOverallModel.json" },
 });
 
-await execFileAsync("node", ["scripts/train-rookie-overall-model.mjs", "2k27"], { cwd: root });
+// Retrain BOTH version models with the combined cross-version dataset. The
+// production contract (validate:data) requires identical combined models for
+// 2K26 and 2K27; a single-version retrain would silently break it.
+await execFileAsync("node", ["scripts/train-rookie-overall-model.mjs", "combined", "src/data/versions/2k26/rookieOverallModel.json"], { cwd: root });
+await execFileAsync("node", ["scripts/train-rookie-overall-model.mjs", "combined", "src/data/versions/2k27-play-now/rookieOverallModel.json"], { cwd: root });
+
+// Fail closed if the updated packs no longer satisfy the data contracts;
+// a broken half-synced state must not be silently shipped to production.
+await execFileAsync("node", ["scripts/validate-data.mjs"], { cwd: root });
 await execFileAsync("pnpm", ["run", "build"], { cwd: root, maxBuffer: 10 * 1024 * 1024 });
 
 console.log(JSON.stringify({

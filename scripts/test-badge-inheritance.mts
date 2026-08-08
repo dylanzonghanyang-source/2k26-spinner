@@ -56,6 +56,33 @@ assert.equal(
   "inherited tier must be preserved",
 );
 
+// Aliased export spellings must normalize to canonical names before slot mapping.
+const aliasedBadges: PlayerBadgeLike[] = [
+  { name: "Strong Handles", category: "playmaking", tier: "Gold" },
+  { name: "Off Ball Pest", category: "defense", tier: "Silver" },
+];
+const byAliased = new Map([["alias-player", aliasedBadges]]);
+const aliased = collectBadgesByBundle({
+  sources: [
+    { bundleId: "handle", playerId: "alias-player" },
+    { bundleId: "perimeter", playerId: "alias-player" },
+  ],
+  badgeToBundle: badgeBundleMap,
+  badgesForPlayer: (playerId) => byAliased.get(playerId),
+});
+assert(
+  aliased.some((badge) => badge.name === "Strong Handle"),
+  "Strong Handles must normalize to Strong Handle and reach the handle slot",
+);
+assert(
+  !aliased.some((badge) => badge.name === "Strong Handles"),
+  "aliased spelling must not survive normalization",
+);
+assert(
+  aliased.some((badge) => badge.name === "Off-Ball Pest"),
+  "Off Ball Pest must normalize to Off-Ball Pest and reach the perimeter slot",
+);
+
 const sharedShooting = collectBadgesByBundle({
   sources: [
     { bundleId: "three", playerId: "stephen-curry" },

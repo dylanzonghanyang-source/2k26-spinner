@@ -70,7 +70,86 @@ export const badgeNameCN: Record<string, string> = {
 };
 
 export function getBadgeNameCN(name: string): string {
-  return badgeNameCN[name] ?? "未知徽章";
+  return badgeNameCN[normalizeBadgeName(name)] ?? "未知徽章";
+}
+
+/**
+ * Canonical badge names. Game exports and DB2K snapshots use a few non-canonical
+ * spellings (e.g. "Strong Handles" vs "Strong Handle"); normalizing at the
+ * boundary keeps badgeBundleMap lookups, Chinese names and slot inheritance
+ * working regardless of which spelling the data source used.
+ */
+const BADGE_NAME_ALIASES: Record<string, string> = {
+  "Strong Handles": "Strong Handle",
+  "Off Ball Pest": "Off-Ball Pest",
+  "On Ball Menace": "On-Ball Menace",
+  "High Flying Denier": "High-Flying Denier",
+  "Slippery Off Ball": "Slippery Off-Ball",
+  "Ankle Breaker": "Ankle Assassin",
+  "Post Up Poet": "Post-Up Poet",
+};
+
+export function normalizeBadgeName(name: string): string {
+  const trimmed = String(name ?? "").trim();
+  return BADGE_NAME_ALIASES[trimmed] ?? trimmed;
+}
+
+/**
+ * Authoritative badge category per canonical name (the 6 OVR-model categories:
+ * shooting / playmaking / inside / defense / rebounding / athleticism).
+ * Rookie-card badges carry no category in the DB2K export; without this map
+ * they would be ignored by the joint OVR model.
+ */
+const BADGE_CATEGORY_BY_NAME: Record<string, string> = {
+  "Set Shot Specialist": "shooting",
+  Deadeye: "shooting",
+  "Limitless Range": "shooting",
+  "Mini Marksman": "shooting",
+  "Shifty Shooter": "shooting",
+  "Slippery Off-Ball": "shooting",
+
+  "Ankle Assassin": "playmaking",
+  "Bail Out": "playmaking",
+  "Break Starter": "playmaking",
+  Dimer: "playmaking",
+  "Handles For Days": "playmaking",
+  "Strong Handle": "playmaking",
+  Unpluckable: "playmaking",
+  "Versatile Visionary": "playmaking",
+
+  "Float Game": "inside",
+  "Layup Mixmaster": "inside",
+  "Paint Prodigy": "inside",
+  "Physical Finisher": "inside",
+  "Hook Specialist": "inside",
+  "Post Fade Phenom": "inside",
+  "Post Powerhouse": "inside",
+  "Post-Up Poet": "inside",
+  Posterizer: "inside",
+  "Rise Up": "inside",
+  "Brick Wall": "inside",
+
+  Challenger: "defense",
+  "On-Ball Menace": "defense",
+  "Off-Ball Pest": "defense",
+  "Pick Dodger": "defense",
+  Glove: "defense",
+  Interceptor: "defense",
+  "High-Flying Denier": "defense",
+  "Pogo Stick": "defense",
+  "Paint Patroller": "defense",
+  "Immovable Enforcer": "defense",
+  "Post Lockdown": "defense",
+
+  "Boxout Beast": "rebounding",
+  "Rebound Chaser": "rebounding",
+
+  "Aerial Wizard": "athleticism",
+  "Lightning Launch": "athleticism",
+};
+
+export function getBadgeCategory(name: string): string {
+  return BADGE_CATEGORY_BY_NAME[normalizeBadgeName(name)] ?? "general";
 }
 
 export type PlayerBadgeLike = {
@@ -114,9 +193,10 @@ export function collectBadgesByBundle({
     const playerBadges = badgesForPlayer(source.playerId);
     if (!playerBadges) continue;
     for (const badge of playerBadges) {
-      if (!mappedBundleIds(badgeToBundle, badge.name).includes(source.bundleId)) continue;
+      const name = normalizeBadgeName(badge.name);
+      if (!mappedBundleIds(badgeToBundle, name).includes(source.bundleId)) continue;
       const list = badgeByBundle.get(source.bundleId) ?? [];
-      list.push(badge);
+      list.push({ ...badge, name });
       badgeByBundle.set(source.bundleId, list);
     }
   }

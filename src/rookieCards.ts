@@ -1,9 +1,11 @@
 /**
- * Rookie card lookup — DB2K-exported real rookie cards (2018–2025).
+ * Rookie card lookup — DB2K-exported real rookie cards (2003–2025).
  *
- * Data: src/data/rookieCardIndex.min.json (built by scripts/build-rookie-card-index.mjs).
- * The index is columnar and lazy-loaded only after the user confirms settings,
- * mirroring the tendency profile pattern (keeps it out of the main bundle).
+ * Data: split lazy indexes under src/data/rookieCardIndex-{legacy,current}.min.json
+ * (built by scripts/build-rookie-card-index.mjs). The combined
+ * rookieCardIndex.min.json remains available for offline scripts/tests.
+ * The runtime indexes are lazy-loaded only after the user confirms settings,
+ * mirroring the tendency profile pattern (keeps them out of the main bundle).
  *
  * Matching: players are matched by normalized "core name" (lowercase, no
  * punctuation, no Jr/II/III/IV/V suffix), so roster entries like "Bronny James"
@@ -30,22 +32,6 @@ export type RookieCard = {
   hotZones: Record<string, string>;
 };
 
-type RookieCardIndex = {
-  keys: string[];
-  slugs: string[];
-  years: number[];
-  names: string[];
-  overalls: (number | null)[];
-  attrs: { fields: string[]; rows: (number | null)[][] };
-  tendencies: { fields: string[]; rows: (number | null)[][] };
-  badges: [string, string][][];
-  personalityBadges: [string, string][][];
-  potentials: ({ current: number | null; min: number | null; max: number | null } | null)[];
-  vitals: { fields: string[]; rows: unknown[][] };
-  durability: { fields: string[]; rows: unknown[][] };
-  hotZones: { fields: string[]; rows: unknown[][] };
-};
-
 // JSON imports type rows as number[][]; values may be null in practice. The
 // accessor guards with typeof checks, so treat the imported shape loosely.
 type RawRookieCardIndex = {
@@ -63,8 +49,6 @@ type RawRookieCardIndex = {
   durability?: { fields?: string[]; rows?: unknown[][] };
   hotZones?: { fields?: string[]; rows?: unknown[][] };
 };
-
-type RookieCardIndexModule = { default: RookieCardIndex };
 
 export type RookieCardLookup = Map<string, RookieCard>;
 
@@ -186,7 +170,17 @@ export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLoo
 }
 
 export function loadRookieCards(): Promise<RookieCardLookup> {
-  return import("./data/rookieCardIndex.min.json").then(({ default: index }) =>
-    createRookieCardLookup(index),
-  );
+  return Promise.all([
+    import("./data/rookieCardIndex-legacy.min.json", { with: { type: "json" } }),
+    import("./data/rookieCardIndex-current.min.json", { with: { type: "json" } }),
+  ]).then(([legacyModule, currentModule]) => {
+    // Legacy is inserted first so the earliest (true rookie) card wins if a
+    // player appears in both partitions.
+    const lookup = createRookieCardLookup(legacyModule.default);
+    const currentLookup = createRookieCardLookup(currentModule.default);
+    for (const [key, card] of currentLookup) {
+      if (!lookup.has(key)) lookup.set(key, card);
+    }
+    return lookup;
+  });
 }

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Build src/data/rookieCards/index.min.json — a single compact index of all
- * DB2K-exported rookie cards, keyed by normalized player name for roster
- * matching.
+ * Build rookie card indexes from all DB2K-exported cards.
  *
  * Input:  src/data/rookieCards/{year}/*.json   (converter output)
- * Output: src/data/rookieCardIndex.min.json
+ * Output: rookieCardIndex.min.json (combined compatibility index), plus
+ *         rookieCardIndex-legacy.min.json and rookieCardIndex-current.min.json
+ *         for the runtime's split lazy chunks.
  *
  * Index shape (columnar to keep the lazy-loaded chunk small):
  *   {
@@ -82,45 +82,61 @@ for (const card of cards) {
   unique.push(card);
 }
 
-// Attribute field universe (union, but normally all 35 from the converter).
-const attrFields = [...new Set(unique.flatMap((card) => Object.keys(card.detailed ?? {})))].sort();
-const tendFields = [...new Set(unique.flatMap((card) => Object.keys(card.tendencies ?? {})))].sort();
-const vitalsFields = [...new Set(unique.flatMap((card) => Object.keys(card.vitals ?? {})))].sort();
-const durabilityFields = [...new Set(unique.flatMap((card) => Object.keys(card.durability ?? {})))].sort();
-const hotZoneFields = [...new Set(unique.flatMap((card) => Object.keys(card.hotZones ?? {})))].sort();
+function buildIndex(cardList) {
+  // Attribute field universe (union, but normally all 35 from the converter).
+  const attrFields = [...new Set(cardList.flatMap((card) => Object.keys(card.detailed ?? {})))].sort();
+  const tendFields = [...new Set(cardList.flatMap((card) => Object.keys(card.tendencies ?? {})))].sort();
+  const vitalsFields = [...new Set(cardList.flatMap((card) => Object.keys(card.vitals ?? {})))].sort();
+  const durabilityFields = [...new Set(cardList.flatMap((card) => Object.keys(card.durability ?? {})))].sort();
+  const hotZoneFields = [...new Set(cardList.flatMap((card) => Object.keys(card.hotZones ?? {})))].sort();
 
-const index = {
-  keys: unique.map((card) => coreName(card.name)),
-  slugs: unique.map((card) => card.slug),
-  years: unique.map((card) => card.year),
-  names: unique.map((card) => card.name),
-  overalls: unique.map((card) => card.overall ?? null),
-  attrs: {
-    fields: attrFields,
-    rows: unique.map((card) => attrFields.map((field) => card.detailed?.[field] ?? null)),
-  },
-  tendencies: {
-    fields: tendFields,
-    rows: unique.map((card) => tendFields.map((field) => card.tendencies?.[field] ?? null)),
-  },
-  badges: unique.map((card) => (card.badges ?? []).map((badge) => [badge.name, badge.tier])),
-  personalityBadges: unique.map((card) => (card.personalityBadges ?? []).map((badge) => [badge.name, badge.tier])),
-  potentials: unique.map((card) => card.potential ?? null),
-  vitals: {
-    fields: vitalsFields,
-    rows: unique.map((card) => vitalsFields.map((field) => card.vitals?.[field] ?? null)),
-  },
-  durability: {
-    fields: durabilityFields,
-    rows: unique.map((card) => durabilityFields.map((field) => card.durability?.[field] ?? null)),
-  },
-  hotZones: {
-    fields: hotZoneFields,
-    rows: unique.map((card) => hotZoneFields.map((field) => card.hotZones?.[field] ?? null)),
-  },
-};
+  return {
+    keys: cardList.map((card) => coreName(card.name)),
+    slugs: cardList.map((card) => card.slug),
+    years: cardList.map((card) => card.year),
+    names: cardList.map((card) => card.name),
+    overalls: cardList.map((card) => card.overall ?? null),
+    attrs: {
+      fields: attrFields,
+      rows: cardList.map((card) => attrFields.map((field) => card.detailed?.[field] ?? null)),
+    },
+    tendencies: {
+      fields: tendFields,
+      rows: cardList.map((card) => tendFields.map((field) => card.tendencies?.[field] ?? null)),
+    },
+    badges: cardList.map((card) => (card.badges ?? []).map((badge) => [badge.name, badge.tier])),
+    personalityBadges: cardList.map((card) => (card.personalityBadges ?? []).map((badge) => [badge.name, badge.tier])),
+    potentials: cardList.map((card) => card.potential ?? null),
+    vitals: {
+      fields: vitalsFields,
+      rows: cardList.map((card) => vitalsFields.map((field) => card.vitals?.[field] ?? null)),
+    },
+    durability: {
+      fields: durabilityFields,
+      rows: cardList.map((card) => durabilityFields.map((field) => card.durability?.[field] ?? null)),
+    },
+    hotZones: {
+      fields: hotZoneFields,
+      rows: cardList.map((card) => hotZoneFields.map((field) => card.hotZones?.[field] ?? null)),
+    },
+  };
+}
+
+// Keep the combined index for offline scripts/tests and backwards compatibility.
+// Production loading uses the two split files below so each lazy chunk stays under
+// the repository's 500 kB bundle budget.
+const index = buildIndex(unique);
+const legacy = buildIndex(unique.filter((card) => card.year < 2018));
+const current = buildIndex(unique.filter((card) => card.year >= 2018));
+const OUT_LEGACY = path.join(ROOT, "src", "data", "rookieCardIndex-legacy.min.json");
+const OUT_CURRENT = path.join(ROOT, "src", "data", "rookieCardIndex-current.min.json");
 
 fs.writeFileSync(OUT, JSON.stringify(index), "utf8");
+fs.writeFileSync(OUT_LEGACY, JSON.stringify(legacy), "utf8");
+fs.writeFileSync(OUT_CURRENT, JSON.stringify(current), "utf8");
 const bytes = fs.statSync(OUT).size;
+const legacyBytes = fs.statSync(OUT_LEGACY).size;
+const currentBytes = fs.statSync(OUT_CURRENT).size;
 console.log(`rookieCardIndex.min.json: ${unique.length} unique cards (from ${cards.length} raw across ${years.length} years), ${(bytes / 1024).toFixed(1)} KB`);
-console.log(`attr fields: ${attrFields.length}, tendency fields: ${tendFields.length}`);
+console.log(`split indexes: legacy=${legacy.keys.length} cards / ${(legacyBytes / 1024).toFixed(1)} KB, current=${current.keys.length} cards / ${(currentBytes / 1024).toFixed(1)} KB`);
+console.log(`attr fields: ${index.attrs.fields.length}, tendency fields: ${index.tendencies.fields.length}`);

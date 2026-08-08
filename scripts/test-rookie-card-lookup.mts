@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { corePlayerName, createRookieCardLookup } from "../src/rookieCards.ts";
+import { corePlayerName, createRookieCardLookup, loadRookieCards } from "../src/rookieCards.ts";
 import index from "../src/data/rookieCardIndex.min.json" with { type: "json" };
 
 // --- corePlayerName normalization ---
@@ -87,9 +87,41 @@ for (const name of rosterNames) {
   if (card) matched += 1;
   else console.log(`  NO CARD for roster player: ${name}`);
 }
-// 2003 draft class was collected later, so LeBron now has a card; Curry (2009)
-// is the only expected missing one.
-assert.equal(matched, rosterNames.length - 1, "only Stephen Curry (2009) expected missing");
-console.log(`roster matching: ${matched}/${rosterNames.length} (Curry 2009 expected no card)`);
+// Legacy 2003–2017 source-pool cards were added from the merged read-only export;
+// Curry now has a 2009 card instead of being the expected missing case.
+assert.equal(matched, rosterNames.length, "all sampled roster players should have rookie cards");
+console.log(`roster matching: ${matched}/${rosterNames.length}`);
+
+// Spot-check newly converted legacy cards. Cards whose OVR the user confirmed
+// (2026-08-08 merge) must expose it; cards not yet confirmed stay null.
+const legacyExpectations: [string, number, number | null][] = [
+  ["Stephen Curry", 2009, 82],
+  ["Nikola Jokic", 2014, 80],
+  ["Jayson Tatum", 2017, 78],
+  ["Dwight Howard", 2004, 79],
+  ["Timofey Mozgov", 2008, 70],
+  ["John Wall", 2010, 80],
+  ["Seth Curry", 2013, 74],
+  ["Brandon Roy", 2006, 76],
+  ["Ivica Zubac", 2016, 69],
+  ["Isaiah Hartenstein", 2017, 73],
+];
+for (const [name, year, expectedOverall] of legacyExpectations) {
+  const card = lookup.get(corePlayerName(name));
+  assert.ok(card, `${name} card exists`);
+  assert.equal(card.year, year);
+  assert.equal(card.overall, expectedOverall);
+}
+console.log("legacy spot checks OK: Curry 2009, Jokic 2014, Tatum 2017, Dwight 2004, Mozgov 2008, Wall 2010, Seth Curry 2013, Roy 2006, Zubac 2016, Hartenstein 2017");
+
+// --- runtime split-index loader ---
+const splitLookup = await loadRookieCards();
+assert.equal(splitLookup.size, lookup.size, "split loader preserves combined lookup size");
+for (const key of lookup.keys()) {
+  assert.ok(splitLookup.has(key), `split loader contains ${key}`);
+}
+assert.equal(splitLookup.get(corePlayerName("LeBron James"))?.year, 2003);
+assert.equal(splitLookup.get(corePlayerName("Luka Doncic"))?.year, 2018);
+console.log(`split loader OK: ${splitLookup.size} cards across legacy/current chunks`);
 
 console.log("\nALL ROOKIE CARD LOOKUP CHECKS PASSED");

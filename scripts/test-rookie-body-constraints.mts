@@ -130,8 +130,15 @@ const source: SourceBody = { height: 198, weight: 98, wingspan: 208 };
   assert(!builderSource.includes("非常规次要位置衰减"), "UI/export must not claim a secondary-position penalty");
   assert(!builderSource.includes("enforceBodyStrengthCap"), "peak/rookie paths must not retain the old strength-only cap helper");
   assert(!builderSource.includes("enforceBodyPhysicalCaps"), "peak/rookie paths must not retain the old physical cap helper");
+
+  // The unified body constraint pipeline lives in the domain module
+  // (src/createResult.ts) plus the builder's evaluate()/evaluateCustom()
+  // preview paths; count across both files.
+  const createResultSource = readFileSync(new URL("../src/createResult.ts", import.meta.url), "utf8");
+  const constraintUsages = (builderSource.match(/applyBodyConstraints/g)?.length ?? 0)
+    + (createResultSource.match(/applyBodyConstraints/g)?.length ?? 0);
   assert(
-    builderSource.match(/applyBodyConstraints/g)?.length && (builderSource.match(/applyBodyConstraints/g)?.length ?? 0) >= 6,
+    constraintUsages >= 6,
     "preview, custom, peak and rookie paths must all use the unified body constraint function",
   );
 

@@ -89,6 +89,29 @@ await Promise.all([
   writeJson(path.join(dataDir, "badgeProfiles.meta.json"), metadata),
 ]);
 
+// The runtime consumes the versioned packs (src/data/versions/*/badges.json),
+// not the legacy src/data files. Mirror the updated profiles into both packs,
+// filtered to each version's own roster ids so the 1:1 roster→badge invariant
+// holds (validate:data enforces ≥90% coverage).
+const versionDirs = {
+  "2K26": path.join(dataDir, "versions", "2k26"),
+  "2K27": path.join(dataDir, "versions", "2k27-play-now"),
+};
+for (const [gameVersion, profiles] of [["2K26", profiles2k26], ["2K27", profiles2k27]]) {
+  const packDir = versionDirs[gameVersion];
+  const rosterCatalog = JSON.parse(await fs.readFile(path.join(packDir, "rosterCatalog.json"), "utf8"));
+  const rosterIds = new Set(
+    rosterCatalog.teams
+      .filter((team) => team.category === "current")
+      .flatMap((team) => team.players.map((player) => player.id)),
+  );
+  const packBadges = Object.fromEntries(
+    Object.entries(profiles).filter(([slug]) => rosterIds.has(slug)),
+  );
+  await writeJson(path.join(packDir, "badges.json"), packBadges);
+  console.log(`synced ${gameVersion} pack badges: ${Object.keys(packBadges).length} profiles -> ${path.relative(root, path.join(packDir, "badges.json"))}`);
+}
+
 console.log(JSON.stringify(metadata, null, 2));
 
 function profilesFromRows(rows) {

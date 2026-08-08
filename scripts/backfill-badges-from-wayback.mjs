@@ -82,8 +82,10 @@ const profiles = { ...existingProfiles };
 await mkdir(rawDir, { recursive: true });
 
 // Sync any raw badge rows that never made it into badgeProfiles.2k26.json.
+// Object.hasOwn distinguishes "known zero badges" ([]) from "unknown" (absent);
+// a known-zero profile must never be refetched or replaced by fallback data.
 for (const slug of currentIds) {
-  if (Array.isArray(profiles[slug]) && profiles[slug].length > 0) continue;
+  if (Object.hasOwn(profiles, slug)) continue;
   try {
     const raw = JSON.parse(await readFile(path.join(rawDir, `${slug}.json`), "utf8"));
     if (Array.isArray(raw.badges) && raw.badges.length > 0) {
@@ -130,6 +132,11 @@ await mapPool(targetSlugs, concurrency, async (slug, index) => {
     skipped += 1;
     return;
   }
+  // Known-zero profiles are real data: keep them, never re-fetch or overwrite.
+  if (Object.hasOwn(profiles, slug) && Array.isArray(profiles[slug]) && profiles[slug].length === 0) {
+    skipped += 1;
+    return;
+  }
   // Fast-skip permanent empty/no-snapshot attempts. Transient network failures
   // are never permanent — they stay retryable on the next resume.
   // Use --retry-failed to re-attempt permanent misses too.
@@ -152,7 +159,9 @@ await mapPool(targetSlugs, concurrency, async (slug, index) => {
       profiles[slug] = badges;
       withBadges = Object.values(profiles).filter((entry) => Array.isArray(entry) && entry.length > 0).length;
     } else {
-      delete profiles[slug];
+      // Empty scrape = confirmed zero badges (real data), NOT unknown. Keeping
+      // the [] entry preserves known-zero semantics for the runtime.
+      profiles[slug] = [];
     }
     // Persist incrementally so long runs can be interrupted safely.
     await persistProfiles(profiles, badgeProfilesPath);
@@ -423,9 +432,10 @@ function parseArgs(args) {
 }
 
 async function persistProfiles(profiles, filePath) {
+  // Keep explicit zero-badge profiles ([]) — they are known coverage, not gaps.
   const sorted = Object.fromEntries(
     Object.entries(profiles)
-      .filter(([, badges]) => Array.isArray(badges) && badges.length > 0)
+      .filter(([, badges]) => Array.isArray(badges))
       .sort(([left], [right]) => left.localeCompare(right)),
   );
   await writeFile(filePath, `${JSON.stringify(sorted, null, 2)}\n`, "utf8");
@@ -476,7 +486,8 @@ function deferCovered(slugs, profiles, rawDirectory, allowRetryFailed) {
   const uncovered = [];
   const covered = [];
   for (const slug of slugs) {
-    if (Array.isArray(profiles[slug]) && profiles[slug].length > 0) {
+    // Known coverage includes explicit zero-badge profiles ([]).
+    if (Object.hasOwn(profiles, slug)) {
       covered.push(slug);
       continue;
     }

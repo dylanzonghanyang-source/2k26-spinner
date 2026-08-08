@@ -269,8 +269,15 @@ if (!fs.existsSync(INPUT)) {
   process.exit(1);
 }
 const snapshot = JSON.parse(fs.readFileSync(INPUT, "utf8"));
-if (snapshot.mode !== "Draft Class") {
-  console.warn(`WARN: snapshot mode is "${snapshot.mode}", expected "Draft Class"`);
+const MERGED_MODES = [
+  "Draft Class 2010 (merged full DB2K export, read-only)",
+  "Draft Class 2003 (relocated read-only)",
+  "Draft Class 2005 (VenueLab-region relocated read-only)",
+];
+// Merged full exports (post-patch recovery) omit the "mode" key entirely.
+if (snapshot.mode !== "Draft Class" && snapshot.mode !== undefined && !MERGED_MODES.includes(snapshot.mode)) {
+  console.error(`FATAL: snapshot mode is "${snapshot.mode}", expected "Draft Class". Refusing to convert production cards from an unexpected source.`);
+  process.exit(1);
 }
 const records = snapshot.records ?? [];
 console.log(`snapshot: ${records.length} records, mode=${snapshot.mode}`);
@@ -487,6 +494,18 @@ for (const card of out) {
     "utf8",
   );
   written++;
+}
+
+// Remove stale per-player cards from a previous conversion of the same year so
+// the directory always mirrors exactly this snapshot (idempotent re-runs).
+const writtenSlugs = new Set(out.map((card) => `${card.slug}.json`));
+for (const file of fs.readdirSync(OUT_DIR)) {
+  if (!file.endsWith(".json")) continue;
+  if (file === "review.json" || file === "capture-manifest.json") continue;
+  if (!writtenSlugs.has(file)) {
+    fs.unlinkSync(path.join(OUT_DIR, file));
+    console.log(`removed stale card: ${file}`);
+  }
 }
 fs.writeFileSync(
   path.join(OUT_DIR, "capture-manifest.json"),

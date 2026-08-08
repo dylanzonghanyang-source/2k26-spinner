@@ -29,14 +29,27 @@ const TIER = { 0: null, 1: "Bronze", 2: "Silver", 3: "Gold", 4: "HOF" };
 const EXTRA_CATEGORIES = {
   "Ankle Breaker": "playmaking",
   "High Flying Denier": "athleticism",
-  "Marketability": "general",
   "Off Ball Pest": "defense",
   "On Ball Menace": "defense",
   "Post Up Poet": "inside",
   "Slippery Off Ball": "shooting",
   "Strong Handles": "playmaking",
-  "Work Ethic": "general",
 };
+
+// Non-canonical export spellings -> canonical project names (badgeBundleMap keys).
+// Without this normalization real badges silently fail to map to any slot.
+const ALIAS_TO_CANONICAL = {
+  "Ankle Breaker": "Ankle Assassin",
+  "High Flying Denier": "High-Flying Denier",
+  "Off Ball Pest": "Off-Ball Pest",
+  "On Ball Menace": "On-Ball Menace",
+  "Post Up Poet": "Post-Up Poet",
+  "Slippery Off Ball": "Slippery Off-Ball",
+  "Strong Handles": "Strong Handle",
+};
+
+// Non-gameplay/personality badges that must never enter gameplay profiles.
+const EXCLUDED_BADGES = new Set(["Marketability", "Work Ethic"]);
 
 // Load existing badgeProfiles + category map
 const profiles = JSON.parse(fs.readFileSync(OUT, "utf8"));
@@ -78,7 +91,11 @@ for (const file of files) {
 
   const list = Object.entries(badges)
     .filter(([, level]) => TIER[level])
-    .map(([name, level]) => ({ name, category: categoryFor(name), tier: TIER[level] }))
+    .map(([name, level]) => {
+      const canonical = ALIAS_TO_CANONICAL[name] ?? name;
+      return { name: canonical, category: categoryFor(canonical), tier: TIER[level] };
+    })
+    .filter((badge) => !EXCLUDED_BADGES.has(badge.name))
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const existed = slug in profiles;

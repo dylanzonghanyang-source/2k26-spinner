@@ -86,26 +86,6 @@ input:focus-visible {
   outline-offset: 1px;
 }
 
-/* The colored interval is rendered by RangeSlider's background layer. */
-.range-control {
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-}
-
-.range-control::-webkit-slider-runnable-track {
-  height: 6px;
-  border: 0;
-  background: transparent;
-}
-
-.range-control::-moz-range-track,
-.range-control::-moz-range-progress {
-  height: 6px;
-  border: 0;
-  background: transparent;
-}
-
 ::selection {
   background: rgb(var(--color-accent-rgb) / 0.2);
   color: #153b32;
@@ -264,15 +244,9 @@ input:focus-visible {
 }
 
 .builder-setup-identity,
-.builder-setup-growth,
 .builder-setup-body,
 .builder-setup-footer {
   min-width: 0;
-}
-
-.builder-setup-growth {
-  display: flex;
-  flex-direction: column;
 }
 
 .builder-setup-footer {
@@ -338,14 +312,7 @@ input:focus-visible {
   margin-left: auto;
 }
 
-.growth-metric {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-}
-
-/* Desktop: identity spans both right-column rows so growth no longer
-   leaves a blank strip under the shorter metric cards. */
+/* Desktop: identity spans both right-column rows. */
 @media (min-width: 1024px) {
   .builder-setup-grid {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
@@ -360,10 +327,6 @@ input:focus-visible {
     display: flex;
     flex-direction: column;
     justify-content: center;
-  }
-
-  .builder-setup-growth {
-    grid-area: growth;
   }
 
   .builder-setup-body {
@@ -700,14 +663,6 @@ input:focus-visible {
   padding: 4px;
 }
 
-.marquee-draw[data-kind="wheel"] .marquee-draw-mark {
-  border-radius: 8px;
-}
-
-.marquee-draw[data-kind="wheel"] .marquee-draw-mark img {
-  border-radius: 8px;
-}
-
 .marquee-draw-mark span {
   position: relative;
   z-index: 0;
@@ -876,6 +831,13 @@ input:focus-visible {
 
 .interactive-card:not(:disabled):active {
   transform: scale(0.985);
+}
+
+/* The manual-mode player pool can render 1000+ cards; let the browser skip
+   off-screen layout/paint work (fixed 62px rows make the intrinsic size safe). */
+.builder-player-pane .interactive-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 62px;
 }
 
 .draw-status-icon {
@@ -1196,11 +1158,6 @@ html[data-theme="dark"] .builder-empty-steps span {
 
 html[data-theme="dark"] .dialog-backdrop {
   background: rgba(7, 10, 8, 0.72) !important;
-}
-
-html[data-theme="dark"] .growth-metric {
-  border-color: #39443e;
-  background: #1a201d;
 }
 
 html[data-theme="dark"] .mode-nav {

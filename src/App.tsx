@@ -9,9 +9,7 @@ import {
 import rosterCatalog2k26 from "./data/versions/2k26/rosterCatalog.json";
 import rosterCatalog2k27 from "./data/versions/2k27-play-now/rosterCatalog.json";
 import badgeProfiles2k26 from "./data/versions/2k26/badges.json";
-import badgeProfiles2k27 from "./data/versions/2k27-play-now/badges.json";
 import detailedPlayers2k26 from "./data/versions/2k26/players.json";
-import detailedPlayers2k27 from "./data/versions/2k27-play-now/players.json";
 
 const appVersion = "v0.6.2";
 const lastUpdated = "2026-08-02";
@@ -27,9 +25,24 @@ function getInitialDataVersion(): DataVersion {
   return "2k26";
 }
 
+// Some browsers/contexts (privacy sandbox, restricted iframes, certain
+// enterprise policies) throw SecurityError on any Storage access. Both
+// the initial read and the subsequent write in the effect must survive.
+function safeGetStorageItem(key: string): string | null {
+  try { return window.localStorage.getItem(key); } catch { return null; }
+}
+
+function safeSetStorageItem(key: string, value: string): void {
+  try { window.localStorage.setItem(key, value); } catch { /* storage blocked */ }
+}
+
+function safeRemoveStorageItem(key: string): void {
+  try { window.localStorage.removeItem(key); } catch { /* storage blocked */ }
+}
+
 function getInitialTheme(): Theme {
-  const savedTheme = window.localStorage.getItem(themeStorageKey)
-    ?? window.localStorage.getItem(legacyThemeStorageKey);
+  const savedTheme = safeGetStorageItem(themeStorageKey)
+    ?? safeGetStorageItem(legacyThemeStorageKey);
   if (savedTheme === "light" || savedTheme === "dark") return savedTheme;
   return "dark";
 }
@@ -82,6 +95,9 @@ type BadgeProfileMap = Record<string, PlayerBadge[]>;
 type DetailedPlayerRecord = {
   slug: string;
   potential?: number | null;
+  height?: string | null;
+  weight?: number | null;
+  wingspan?: string | null;
   shooting: number | null;
   athleticism: number | null;
   playmaking: number | null;
@@ -127,22 +143,31 @@ type VersionData = {
   tendenciesAvailable: boolean;
 };
 
-const versionDataByKey: Record<DataVersion, VersionData> = {
-  "2k26": {
-    label: "NBA 2K26 数据 · 最新阵容",
-    rosterCatalog: rosterCatalog2k27 as RosterCatalogData,
-    badgeProfiles: badgeProfiles2k26 as BadgeProfileMap,
-    detailedPlayers: detailedPlayers2k26 as DetailedPlayerRecord[],
-    tendenciesAvailable: true,
-  },
-  "2k27": {
+// 2K26 data is always loaded (it's the default/only open version).
+// 2K27 badge/player data is lazy-loaded only when the user switches to 2K27,
+// keeping ~615 KB of chunks out of the initial page load.
+const versionData2k26: VersionData = {
+  label: "NBA 2K26 数据 · 最新阵容",
+  rosterCatalog: rosterCatalog2k27 as RosterCatalogData,
+  badgeProfiles: badgeProfiles2k26 as BadgeProfileMap,
+  detailedPlayers: detailedPlayers2k26 as DetailedPlayerRecord[],
+  tendenciesAvailable: true,
+};
+
+let versionData2k27Promise: Promise<VersionData> | null = null;
+function loadVersionData2k27(): Promise<VersionData> {
+  versionData2k27Promise ??= Promise.all([
+    import("./data/versions/2k27-play-now/badges.json"),
+    import("./data/versions/2k27-play-now/players.json"),
+  ]).then(([badgesModule, playersModule]) => ({
     label: "NBA 2K27 数据 · 最新阵容",
     rosterCatalog: rosterCatalog2k27 as RosterCatalogData,
-    badgeProfiles: badgeProfiles2k27 as BadgeProfileMap,
-    detailedPlayers: detailedPlayers2k27 as DetailedPlayerRecord[],
+    badgeProfiles: badgesModule.default as BadgeProfileMap,
+    detailedPlayers: playersModule.default as DetailedPlayerRecord[],
     tendenciesAvailable: false,
-  },
-};
+  }));
+  return versionData2k27Promise;
+}
 
 
 function clampRating(value: number) {
@@ -186,8 +211,11 @@ function rosterPlayerSource(
     position: player.position,
     archetype: null,
     height: player.height,
-    weight: null,
-    wingspan: null,
+    // Detailed-player body measurements (players.json) feed the source body
+    // used by applyBodyConstraints(). Without weight/wingspan the source body
+    // resolves to null and body-mismatch penalties silently never run.
+    weight: detailedPlayer?.weight ?? null,
+    wingspan: detailedPlayer?.wingspan ?? null,
     shooting: detailedPlayer?.shooting ?? shooting,
     athleticism: detailedPlayer?.athleticism ?? athleticism,
     playmaking: detailedPlayer?.playmaking ?? playmaking,
@@ -245,11 +273,25 @@ const App = () => {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    window.localStorage.setItem(themeStorageKey, theme);
-    window.localStorage.removeItem(legacyThemeStorageKey);
+    safeSetStorageItem(themeStorageKey, theme);
+    safeRemoveStorageItem(legacyThemeStorageKey);
   }, [theme]);
   const [dataVersion, setDataVersion] = useState<DataVersion>(getInitialDataVersion);
-  const activeVersionData = versionDataByKey[dataVersion];
+  const [versionData2k27, setVersionData2k27] = useState<VersionData | null>(null);
+
+  // Pre-fetch 2K27 data in the background once the builder is idle so the
+  // toggle (when it opens) feels instant. Never blocks initial render.
+  useEffect(() => {
+    let active = true;
+    loadVersionData2k27().then((data) => {
+      if (active) setVersionData2k27(data);
+    }).catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  const activeVersionData = dataVersion === "2k26"
+    ? versionData2k26
+    : (versionData2k27 ?? versionData2k26);
   const catalogTeams = activeVersionData.rosterCatalog.teams;
   const rosterDataVersion = activeVersionData.label;
   const sourceBadgeProfiles = activeVersionData.badgeProfiles;
