@@ -34,14 +34,21 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Deploy dist/ to HK server
-        uses: easingthemes/ssh-deploy@v4
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.HK_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.HK_HOST }}
-          REMOTE_USER: ${{ secrets.HK_USER }}
-          REMOTE_PORT: 22
-          SOURCE: "dist/"
-          TARGET: ${{ secrets.HK_DEPLOY_PATH }}
-          ARGS: "-rltgoDzvO --delete"
-          EXCLUDE: ""
+      - name: Deploy dist/ to HK server via rsync
+        env:
+          HK_SSH_KEY: ${{ secrets.HK_SSH_KEY }}
+          HK_KNOWN_HOSTS: ${{ secrets.HK_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          # trailing newline is mandatory for OpenSSH key parsing
+          printf '%s\n' "$HK_SSH_KEY" > ~/.ssh/hk_key
+          chmod 600 ~/.ssh/hk_key
+          printf '%s\n' "$HK_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/hk_key -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes" \
+            dist/ root@191.40.37.238:/var/www/2kspinner/
+          ssh -i ~/.ssh/hk_key -o StrictHostKeyChecking=yes root@191.40.37.238 \
+            "ls /var/www/2kspinner/ | head -5 && du -sh /var/www/2kspinner"
