@@ -84,7 +84,7 @@ function pickOf(card: { vitals?: Record<string, unknown> }) {
     { name: "No Position", position: null },
   ]);
   check("position map lookup", positionForCard(lookup.get("stephen curry")!, map) === "PG");
-  check("position map miss", positionForCard(lookup.get("victor wembanyama")!, map) === null);
+  check("position map miss → card fallback", positionForCard(lookup.get("victor wembanyama")!, map) === "C", `got=${positionForCard(lookup.get("victor wembanyama")!, map)}`);
   const lebron = lookup.get("lebron james")!;
   check("position map aliased name", positionForCard(lebron, map) === "SF/PF");
 }

@@ -198,11 +198,13 @@ function isFiniteNumber(v: unknown): v is number {
   check("effectivePositionDistance C target, PG source w/ secondary", typeof d2 === "number" && d2 !== null && d2 > 2, `d=${d2}`);
 }
 
-// --- 11. corePlayerName normalization ---
+// --- 11. corePlayerName normalization (suffixes kept: Ron Harper != Ron Harper Jr.) ---
 {
-  check("corePlayerName('R.J. Barrett Jr.')", corePlayerName("R.J. Barrett Jr.") === "r j barrett");
-  check("corePlayerName('Bronny James Jr.')", corePlayerName("Bronny James Jr.") === "bronny james");
-  check("corePlayerName('K.J. Simpson III')", corePlayerName("K.J. Simpson III") === "k j simpson");
+  check("corePlayerName('R.J. Barrett Jr.')", corePlayerName("R.J. Barrett Jr.") === "rj barrett jr");
+  check("corePlayerName('Bronny James Jr.')", corePlayerName("Bronny James Jr.") === "bronny james jr");
+  check("corePlayerName('K.J. Simpson III')", corePlayerName("K.J. Simpson III") === "kj simpson iii");
+  check("corePlayerName('Stephen Curry')", corePlayerName("Stephen Curry") === "stephen curry");
+  check("corePlayerName('Bobby Portis')", corePlayerName("Bobby Portis") === "bobby portis");
 }
 
 // --- 12. RookieCardLookup: build from actual index data ---
@@ -216,8 +218,8 @@ function isFiniteNumber(v: unknown): v is number {
     ["LeBron James", "lebron james", true],
     ["Luka Doncic", "luka doncic", true],
     ["Victor Wembanyama", "victor wembanyama", true],
-    ["Bronny James", "bronny james", true],
-    ["R.J. Barrett", "r j barrett", true],
+    ["Bronny James", "bronny james jr", true],
+    ["R.J. Barrett", "rj barrett", true],
     ["Hansen Yang", "hansen yang", true],      // alias test
     ["Yang Hansen", "hansen yang", true],       // alias test (reverse)
     ["不存在的人", "", false],

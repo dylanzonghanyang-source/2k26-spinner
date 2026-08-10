@@ -11,10 +11,10 @@ const legacy = JSON.parse(readFileSync(path.join(root, "src/data/rookieCardIndex
 const current = JSON.parse(readFileSync(path.join(root, "src/data/rookieCardIndex-current.min.json"), "utf8"));
 
 function coreName(raw) {
+  // keep Jr/Sr/II/III suffixes (Ron Harper vs Ron Harper Jr. are distinct)
   return String(raw ?? "")
     .toLowerCase()
     .replace(/[^a-z0-9 ]/g, " ")
-    .replace(/\b(jr|sr|ii|iii|iv|v)\b/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }

@@ -21,6 +21,7 @@ export type RookieCard = {
   slug: string;
   year: number;
   name: string;
+  position: string | null;
   overall: number | null;
   detailed: Record<string, number>;
   tendencies: Record<string, number>;
@@ -39,6 +40,7 @@ type RawRookieCardIndex = {
   slugs?: string[];
   years?: number[];
   names?: string[];
+  positions?: (string | null)[];
   overalls?: (number | null)[];
   attrs?: { fields?: string[]; rows?: unknown[][] };
   tendencies?: { fields?: string[]; rows?: unknown[][] };
@@ -54,10 +56,15 @@ export type RookieCardLookup = Map<string, RookieCard>;
 
 /** Normalized match key: lowercase, strip punctuation & suffix (Jr/II/III...). */
 export function corePlayerName(raw: string): string {
+  // NFKD-decompose accents ("Mickael Piétrus" == "Mickael Pietrus"), delete
+  // dots/apostrophes so "R.J. Barrett" == "RJ Barrett", keep Jr/Sr/II/III
+  // suffixes ("Ron Harper" (1986) != "Ron Harper Jr." (2022))
   return String(raw ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
+    .replace(/[.'’]/g, "")
     .replace(/[^a-z0-9 ]/g, " ")
-    .replace(/\b(jr|sr|ii|iii|iv|v)\b/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -91,8 +98,22 @@ export function lookupRookieCard(
   playerName: string,
 ): RookieCard | null {
   if (!rookieCards) return null;
-  const direct = rookieCards.get(corePlayerName(playerName));
+  const key = corePlayerName(playerName);
+  const direct = rookieCards.get(key);
   if (direct) return direct;
+  // Roster names may drop the suffix for the SAME person (roster "Bobby
+  // Portis" = card "Bobby Portis Jr."). Try suffixed variants only after a
+  // direct miss, so "Ron Harper" (1986) never resolves to Ron Harper Jr.'s
+  // card when both exist, and vice versa.
+  const base = key.replace(/ (jr|sr|ii|iii|iv|v)$/, "");
+  if (base !== key) {
+    const stripped = rookieCards.get(base);
+    if (stripped) return stripped;
+  }
+  for (const suffix of [" jr", " sr", " ii", " iii", " iv", " v"]) {
+    const hit = rookieCards.get(key + suffix);
+    if (hit) return hit;
+  }
   // Aliases are matched case-insensitively: the roster pipeline's
   // formatPlayerName() title-cases segments, so "R.J. Barrett" becomes
   // "Rj Barrett" (the period is not a splitter) while the alias table uses
@@ -166,6 +187,7 @@ export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLoo
       slug: index.slugs?.[i] ?? "",
       year: index.years?.[i] ?? 0,
       name: index.names?.[i] ?? "",
+      position: index.positions?.[i] ?? null,
       overall: index.overalls?.[i] ?? null,
       detailed,
       tendencies,

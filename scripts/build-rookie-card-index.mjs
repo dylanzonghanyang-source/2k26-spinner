@@ -34,10 +34,14 @@ const OUT = path.join(ROOT, "src", "data", "rookieCardIndex.min.json");
 
 /** Normalized match key: lowercase, strip punctuation & suffix (Jr/II/III...). */
 function coreName(raw) {
+  // keep Jr/Sr/II/III so "Ron Harper" (1986) and "Ron Harper Jr." (2022)
+  // are distinct index keys; NFKD accents; delete dots ("R.J." == "RJ")
   const n = String(raw ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
+    .replace(/[.'’]/g, "")
     .replace(/[^a-z0-9 ]/g, " ")
-    .replace(/\b(jr|sr|ii|iii|iv|v)\b/g, " ")
     .replace(/\s+/g, " ")
     .trim();
   return n;
@@ -95,6 +99,7 @@ function buildIndex(cardList) {
     slugs: cardList.map((card) => card.slug),
     years: cardList.map((card) => card.year),
     names: cardList.map((card) => card.name),
+    positions: cardList.map((card) => card.position ?? null),
     overalls: cardList.map((card) => card.overall ?? null),
     attrs: {
       fields: attrFields,

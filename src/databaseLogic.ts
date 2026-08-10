@@ -117,17 +117,41 @@ export function buildPositionMap(roster: RosterPlayer[]): Map<string, string> {
   return map;
 }
 
+const POSITION_SUFFIX_ALIASES: Record<string, string> = {
+  // roster omits the suffix for the SAME person (card keeps it)
+  "bobby portis jr": "bobby portis",
+  "bronny james jr": "bronny james",
+};
+
+// card name -> roster name variants for position lookup
+const POSITION_NAME_ALIASES: Record<string, string> = {
+  "akeem olajuwon": "hakeem olajuwon", // 1984 drafted as Akeem
+  "patrick mills": "patty mills",
+  "wesley matthews": "wes matthews",
+  "eddie a johnson": "eddie johnson",
+};
+
 export function positionForCard(card: RookieCard, positionMap: Map<string, string>): string | null {
-  const direct = positionMap.get(coreName(card.name));
+  const key = coreName(card.name);
+  const direct = positionMap.get(key);
   if (direct) return direct;
-  return null;
+  const alias = POSITION_SUFFIX_ALIASES[key] ?? POSITION_NAME_ALIASES[key];
+  const viaAlias = alias ? positionMap.get(alias) ?? null : null;
+  if (viaAlias) return viaAlias;
+  // fallback: the card's own position (16 allTime players lack roster position)
+  return typeof card.position === "string" && card.position !== "" ? card.position : null;
 }
 
 function coreName(raw: string) {
+  // keep Jr/Sr/II/III so "Ron Harper" (1986) and "Ron Harper Jr." (2022) stay
+  // distinct; position lookup adds explicit suffix aliases below.
+  // NFKD-decompose accents first: "Mickael Piétrus" == "Mickael Pietrus".
   return String(raw ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
+    .replace(/[.'’]/g, "")
     .replace(/[^a-z0-9 ]/g, " ")
-    .replace(/\b(jr|sr|ii|iii|iv|v)\b/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }

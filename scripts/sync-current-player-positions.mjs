@@ -158,8 +158,7 @@ function normalizeName(value) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/gi, "")
-    .toLowerCase()
-    .replace(/(jr|sr|ii|iii|iv)$/i, "");
+    .toLowerCase();
 }
 
 function normalizePosition(value) {

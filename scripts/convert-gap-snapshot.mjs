@@ -135,7 +135,14 @@ const slugify = (name) =>
   String(name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 const num = (v) => (typeof v === "number" && Number.isFinite(v) ? v : null);
 const core = (name) =>
-  String(name ?? "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\b(jr|sr|ii|iii|iv|v)\b/g, " ").replace(/\s+/g, " ").trim();
+  String(name ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[.'’]/g, "")
+    .replace(/[^a-z0-9 ]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
 // canonical names: snapshot label -> gap-list name (keeps roster-consistent naming)
 const NAME_VARIANTS = {

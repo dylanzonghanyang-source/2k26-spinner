@@ -251,7 +251,6 @@ function normalizeName(value) {
   return String(value ?? "")
     .toLowerCase()
     .replace(/[.'’\-]/g, "")
-    .replace(/\b(jr|sr|ii|iii|iv|v)\b/g, "")
     .replace(/\s+/g, "")
     .trim();
 }
