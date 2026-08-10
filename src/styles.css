@@ -394,6 +394,10 @@ input:focus-visible {
   .builder-result-pane[data-mobile-active="true"],
   .builder-full-preview[data-mobile-active="true"] {
     grid-column: 1 / -1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-bottom: 24px;
   }
 
   /* Narrow columns: attribute slots become a single stacked list */

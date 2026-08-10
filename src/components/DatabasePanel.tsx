@@ -156,7 +156,7 @@ function DatabasePanel() {
                     <span className="truncate text-[9px] text-ink-400">{summary.nameCN}</span>
                   </span>
                   <span className="mt-0.5 block truncate text-[9px] text-ink-400">
-                    {summary.year} 届{position ? ` · ${position}` : ""}{summary.draftPick != null ? ` · 第 ${summary.draftPick} 顺位` : ""}{summary.team ? ` · ${summary.team}` : ""}
+                    {summary.year} 届{position ? ` · ${position}` : ""}{summary.draftPick != null ? (summary.draftPick > 0 ? ` · 第 ${summary.draftPick} 顺位` : " · 落选") : ""}{summary.team ? ` · ${summary.team}` : ""}
                   </span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
@@ -185,7 +185,7 @@ function CardDetails({ card, position }: { card: RookieCard; position: string | 
         <span><b className="text-ink-400">身高：</b>{feetInches(summary.heightInches)}（{inchesToCm(summary.heightInches)}）</span>
         <span><b className="text-ink-400">体重：</b>{summary.weightLb != null ? `${Math.round(summary.weightLb * 0.453592)}kg（${summary.weightLb}lb）` : "--"}</span>
         <span><b className="text-ink-400">臂展：</b>{summary.wingspanCm != null ? `${summary.wingspanCm}cm` : "--"}</span>
-        <span><b className="text-ink-400">顺位：</b>{summary.draftPick != null ? `第 ${summary.draftPick} 顺位` : "--"}</span>
+        <span><b className="text-ink-400">顺位：</b>{summary.draftPick != null ? (summary.draftPick > 0 ? `第 ${summary.draftPick} 顺位` : "落选") : "--"}</span>
         <span><b className="text-ink-400">惯用手：</b>{handCN ?? "--"}</span>
         <span><b className="text-ink-400">新秀球队：</b>{summary.team ?? "--"}</span>
       </div>
