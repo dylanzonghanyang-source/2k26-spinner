@@ -244,7 +244,7 @@ function CardDetails({ card, position }: { card: RookieCard; position: string | 
       {/* 热区 */}
       <div className="space-y-1.5">
         <div className="text-[9px] font-semibold text-ink-400">热区</div>
-        <div className="flex flex-wrap gap-x-6 gap-y-1.5">
+        <div className="grid gap-x-6 gap-y-3 sm:grid-cols-3">
           {hotZoneGroups.map((group) => (
             <div key={group.key}>
               <div className="mb-0.5 text-[9px] font-semibold text-court-700">{group.label}</div>
@@ -254,7 +254,7 @@ function CardDetails({ card, position }: { card: RookieCard; position: string | 
                   const stateCN = ZONE_STATE_CN[state] ?? state;
                   const cls = state === "Hot" ? "text-rose-600 font-semibold" : state === "Cold" ? "text-blue-600" : "text-ink-400";
                   return (
-                    <div className="flex items-center justify-between gap-3 text-[9px]" key={zone}>
+                    <div className="flex items-center justify-between gap-3 border-t border-ink-700/5 py-0.5 text-[9px]" key={zone}>
                       <span className="text-ink-500">{ZONE_CN[zone] ?? zone}</span>
                       <span className={`${cls} w-6 text-right`}>{stateCN}</span>
                     </div>
@@ -276,10 +276,11 @@ function CardDetails({ card, position }: { card: RookieCard; position: string | 
           return (
             <div key={group.key}>
               <div className="mb-0.5 text-[9px] font-semibold text-court-700">{group.label}</div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="grid grid-cols-2 gap-1.5 lg:grid-cols-3">
                 {matched.map((badge) => (
-                  <span className="rounded-[3px] bg-ink-100 px-1.5 py-0.5 text-[8px] font-semibold text-ink-600" key={badge.name}>
-                    {getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}
+                  <span className="flex items-center justify-between gap-2 rounded-[3px] bg-ink-100 px-2 py-1 text-[9px] font-semibold text-ink-600" key={badge.name}>
+                    <span className="truncate">{getBadgeNameCN(badge.name)}</span>
+                    <span className="shrink-0 text-ink-400">{badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}</span>
                   </span>
                 ))}
               </div>
