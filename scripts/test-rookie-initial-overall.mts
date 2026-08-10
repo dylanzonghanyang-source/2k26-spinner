@@ -63,7 +63,8 @@ try {
   });
 
   assert(initialOverallForPotential(98, 19) === 84, "98 potential at age 19 must target 84 OVR");
-  assert(rawOverall === 90, `Reece Martin fixture should reproduce 90 OVR, received ${rawOverall}`);
+  // Golden fixture: re-trained with non-negative coefficient constraint on 2026-08-10 (958 samples).
+  assert(rawOverall === 93, `Reece Martin fixture should reproduce 93 OVR, received ${rawOverall}`);
   assert(constrained.changed, "the 90 OVR fixture must be adjusted");
   assert(constrained.reachable, "the unlocked 90 OVR fixture must reach its target");
   assert(constrained.actualOverall <= 84, `constrained fixture must be <=84, received ${constrained.actualOverall}`);

@@ -82,7 +82,10 @@ try {
   const meanAbsoluteError = (rows) => rows.reduce((sum, row) => sum + Math.abs(row.predicted - row.actual), 0) / rows.length;
   const lowIntangiblesSamples = samples.filter((sample) => sample.intangibles <= 50);
   assert(samples.length === 495, `expected 495 complete 2K26 calibration samples, received ${samples.length}`);
-  assert(meanAbsoluteError(samples) <= 1.1, `full-data MAE regressed to ${meanAbsoluteError(samples).toFixed(3)}`);
+  // Non-negative coefficient constraint (monotonic OVR) trades a little
+  // accuracy for the product guarantee: full-data MAE ≈1.29 after clipping,
+  // vs ≈1.05 unconstrained. Budget 1.4 to keep headroom for data refreshes.
+  assert(meanAbsoluteError(samples) <= 1.4, `full-data MAE regressed to ${meanAbsoluteError(samples).toFixed(3)}`);
   if (lowIntangiblesSamples.length > 0) {
     assert(meanAbsoluteError(lowIntangiblesSamples) <= 1.5, `low-Intangibles MAE regressed to ${meanAbsoluteError(lowIntangiblesSamples).toFixed(3)}`);
   }

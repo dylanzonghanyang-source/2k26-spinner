@@ -171,6 +171,7 @@
     }
   ],
   "adou-thiero": [],
+  "aj-dybantsa": [],
   "aj-green": [
     {
       "name": "Bail Out",
@@ -2329,6 +2330,7 @@
       "tier": "Bronze"
     }
   ],
+  "caleb-wilson": [],
   "cam-christie": [],
   "cam-spencer": [
     {
@@ -3734,6 +3736,7 @@
     }
   ],
   "daron-holmes": [],
+  "darryn-peterson": [],
   "david-jones-garcia": [],
   "davion-mitchell": [
     {
@@ -7649,6 +7652,7 @@
       "tier": "Silver"
     }
   ],
+  "jalen-pickett": [],
   "jalen-slawson": [],
   "jalen-smith": [
     {
@@ -8844,7 +8848,6 @@
       "tier": "Bronze"
     }
   ],
-  "jd-davison": [],
   "jerami-grant": [
     {
       "name": "Aerial Wizard",
@@ -8956,6 +8959,48 @@
     {
       "name": "Versatile Visionary",
       "category": "playmaking",
+      "tier": "Bronze"
+    }
+  ],
+  "jeremy-sochan": [
+    {
+      "name": "Physical Finisher",
+      "category": "inside",
+      "tier": "Silver"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "athleticism",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handle",
+      "category": "playmaking",
+      "tier": "Silver"
+    },
+    {
+      "name": "Challenger",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Float Game",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "High-Flying Denier",
+      "category": "defense",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Off-Ball Pest",
+      "category": "defense",
       "tier": "Bronze"
     }
   ],
@@ -13213,6 +13258,7 @@
       "tier": "Bronze"
     }
   ],
+  "mikel-brown-jr": [],
   "miles-bridges": [
     {
       "name": "Aerial Wizard",
@@ -17509,6 +17555,23 @@
   ],
   "trevor-keels": [],
   "trey-alexander": [],
+  "trey-jemison": [
+    {
+      "name": "High-Flying Denier",
+      "category": "defense",
+      "tier": "Silver"
+    },
+    {
+      "name": "Aerial Wizard",
+      "category": "inside",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pogo Stick",
+      "category": "athleticism",
+      "tier": "Bronze"
+    }
+  ],
   "trey-lyles": [
     {
       "name": "Paint Prodigy",

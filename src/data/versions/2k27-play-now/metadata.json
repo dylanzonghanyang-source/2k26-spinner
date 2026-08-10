@@ -3,17 +3,17 @@
   "label": "NBA 2K27 Play Now",
   "roster": {
     "source": "https://api.nba2kapi.com/api/public/players?teamType=curr&limit=100 (paginated)",
-    "generatedAt": "2026-08-01T06:16:48.290Z",
+    "generatedAt": "2026-08-08T04:26:51.427Z",
     "teams": 126,
-    "players": 1686
+    "players": 1692
   },
   "players": {
     "source": "https://api.nba2kapi.com/api/public/players?teamType=curr&limit=100 (paginated)",
-    "profiles": 457
+    "profiles": 463
   },
   "badges": {
     "source": "https://api.nba2kapi.com/api/public/players?teamType=curr&limit=100 (paginated)",
-    "profiles": 457
+    "profiles": 463
   },
   "tendencies": {
     "available": false,

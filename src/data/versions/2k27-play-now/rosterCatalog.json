@@ -1,7 +1,7 @@
 {
   "version": "NBA 2K27 Play Now",
   "source": "https://api.nba2kapi.com/api/public/players?teamType=curr&limit=100 (paginated)",
-  "generatedAt": "2026-08-01T06:16:48.290Z",
+  "generatedAt": "2026-08-08T04:26:51.427Z",
   "teams": [
     {
       "id": "all-time-philadelphia-76ers",
@@ -11843,6 +11843,7 @@
           "id": "aaron-wiggins",
           "name": "Aaron Wiggins",
           "overall": 78,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 79
         },
@@ -11852,6 +11853,7 @@
           "id": "asa-newell",
           "name": "Asa Newell",
           "overall": 75,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 86
         },
@@ -11861,6 +11863,7 @@
           "id": "buddy-hield",
           "name": "Buddy Hield",
           "overall": 75,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 84
         },
@@ -11870,6 +11873,7 @@
           "id": "cj-mccollum",
           "name": "CJ McCollum",
           "overall": 83,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 82
         },
@@ -11879,6 +11883,7 @@
           "id": "corey-kispert",
           "name": "Corey Kispert",
           "overall": 76,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 80
         },
@@ -11888,6 +11893,7 @@
           "id": "devin-carter",
           "name": "Devin Carter",
           "overall": 77,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 73
         },
@@ -11897,6 +11903,7 @@
           "id": "dyson-daniels",
           "name": "Dyson Daniels",
           "overall": 83,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 50
         },
@@ -11906,6 +11913,7 @@
           "id": "jalen-johnson",
           "name": "Jalen Johnson",
           "overall": 89,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 77
         },
@@ -11915,6 +11923,7 @@
           "id": "jalen-wilson",
           "name": "Jalen Wilson",
           "overall": 74,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 79
         },
@@ -11924,6 +11933,7 @@
           "id": "jock-landale",
           "name": "Jock Landale",
           "overall": 78,
+          "potential": null,
           "position": "C",
           "threePoint": 82
         },
@@ -11933,6 +11943,7 @@
           "id": "keshon-gilbert",
           "name": "Keshon Gilbert",
           "overall": 68,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 73
         },
@@ -11942,6 +11953,7 @@
           "id": "luguentz-dort",
           "name": "Luguentz Dort",
           "overall": 80,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 77
         },
@@ -11951,6 +11963,7 @@
           "id": "mouhamed-gueye",
           "name": "Mouhamed Gueye",
           "overall": 74,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 73
         },
@@ -11960,6 +11973,7 @@
           "id": "nickeil-alexander-walker",
           "name": "Nickeil Alexander-Walker",
           "overall": 83,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 86
         },
@@ -11969,6 +11983,7 @@
           "id": "onyeka-okongwu",
           "name": "Onyeka Okongwu",
           "overall": 82,
+          "potential": null,
           "position": "C",
           "threePoint": 81
         },
@@ -11978,6 +11993,7 @@
           "id": "rayj-dennis",
           "name": "RayJ Dennis",
           "overall": 71,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 75
         },
@@ -11987,6 +12003,7 @@
           "id": "ryan-nembhard",
           "name": "Ryan Nembhard",
           "overall": 75,
+          "potential": null,
           "position": "PG",
           "threePoint": 80
         }
@@ -12004,6 +12021,7 @@
           "id": "amari-williams",
           "name": "Amari Williams",
           "overall": 69,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 55
         },
@@ -12013,6 +12031,7 @@
           "id": "baylor-scheierman",
           "name": "Baylor Scheierman",
           "overall": 76,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 82
         },
@@ -12022,6 +12041,7 @@
           "id": "derrick-white",
           "name": "Derrick White",
           "overall": 85,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 75
         },
@@ -12031,6 +12051,7 @@
           "id": "hugo-gonzalez",
           "name": "Hugo Gonzalez",
           "overall": 75,
+          "potential": null,
           "position": "SF/PG",
           "threePoint": 79
         },
@@ -12040,6 +12061,7 @@
           "id": "jayson-tatum",
           "name": "Jayson Tatum",
           "overall": 93,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 85
         },
@@ -12049,6 +12071,7 @@
           "id": "jordan-walsh",
           "name": "Jordan Walsh",
           "overall": 76,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 83
         },
@@ -12058,6 +12081,7 @@
           "id": "luka-garza",
           "name": "Luka Garza",
           "overall": 78,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 87
         },
@@ -12067,6 +12091,7 @@
           "id": "mike-conley",
           "name": "Mike Conley",
           "overall": 77,
+          "potential": null,
           "position": "PG",
           "threePoint": 74
         },
@@ -12076,6 +12101,7 @@
           "id": "mitchell-robinson",
           "name": "Mitchell Robinson",
           "overall": 80,
+          "potential": null,
           "position": "C",
           "threePoint": 32
         },
@@ -12085,6 +12111,7 @@
           "id": "neemias-queta",
           "name": "Neemias Queta",
           "overall": 81,
+          "potential": null,
           "position": "C",
           "threePoint": 50
         },
@@ -12094,6 +12121,7 @@
           "id": "paul-george",
           "name": "Paul George",
           "overall": 83,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 83
         },
@@ -12103,6 +12131,7 @@
           "id": "payton-pritchard",
           "name": "Payton Pritchard",
           "overall": 82,
+          "potential": null,
           "position": "PG",
           "threePoint": 85
         },
@@ -12112,6 +12141,7 @@
           "id": "ron-harper-jr",
           "name": "Ron Harper Jr.",
           "overall": 73,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 78
         },
@@ -12121,6 +12151,7 @@
           "id": "sam-hauser",
           "name": "Sam Hauser",
           "overall": 78,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 86
         }
@@ -12138,6 +12169,7 @@
           "id": "ben-saraf",
           "name": "Ben Saraf",
           "overall": 75,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 67
         },
@@ -12147,6 +12179,7 @@
           "id": "chaney-johnson",
           "name": "Chaney Johnson",
           "overall": 73,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 72
         },
@@ -12156,6 +12189,7 @@
           "id": "danny-wolf",
           "name": "Danny Wolf",
           "overall": 77,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 75
         },
@@ -12165,6 +12199,7 @@
           "id": "dayron-sharpe",
           "name": "Day’Ron Sharpe",
           "overall": 78,
+          "potential": null,
           "position": "C",
           "threePoint": 69
         },
@@ -12174,6 +12209,7 @@
           "id": "drake-powell",
           "name": "Drake Powell",
           "overall": 73,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 72
         },
@@ -12183,6 +12219,7 @@
           "id": "egor-demin",
           "name": "Egor Demin",
           "overall": 78,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 82
         },
@@ -12192,6 +12229,7 @@
           "id": "josh-minott",
           "name": "Josh Minott",
           "overall": 78,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 85
         },
@@ -12201,6 +12239,7 @@
           "id": "julius-randle",
           "name": "Julius Randle",
           "overall": 85,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 73
         },
@@ -12210,6 +12249,7 @@
           "id": "keon-ellis",
           "name": "Keon Ellis",
           "overall": 77,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 80
         },
@@ -12219,8 +12259,19 @@
           "id": "michael-porter-jr",
           "name": "Michael Porter Jr.",
           "overall": 86,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 84
+        },
+        {
+          "drivingDunk": null,
+          "height": "6'5\"",
+          "id": "mikel-brown-jr",
+          "name": "Mikel Brown Jr.",
+          "overall": 74,
+          "potential": null,
+          "position": "PG",
+          "threePoint": null
         },
         {
           "drivingDunk": 65,
@@ -12228,6 +12279,7 @@
           "id": "moritz-wagner",
           "name": "Moritz Wagner",
           "overall": 77,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 75
         },
@@ -12237,6 +12289,7 @@
           "id": "noah-clowney",
           "name": "Noah Clowney",
           "overall": 77,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 76
         },
@@ -12246,6 +12299,7 @@
           "id": "nolan-traore",
           "name": "Nolan Traore",
           "overall": 77,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 74
         },
@@ -12255,6 +12309,7 @@
           "id": "terance-mann",
           "name": "Terance Mann",
           "overall": 76,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 80
         }
@@ -12272,6 +12327,7 @@
           "id": "brandon-miller",
           "name": "Brandon Miller",
           "overall": 87,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 85
         },
@@ -12281,6 +12337,7 @@
           "id": "coby-white",
           "name": "Coby White",
           "overall": 81,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 80
         },
@@ -12290,6 +12347,7 @@
           "id": "dorian-finney-smith",
           "name": "Dorian Finney-Smith",
           "overall": 75,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 73
         },
@@ -12299,6 +12357,7 @@
           "id": "grant-williams",
           "name": "Grant Williams",
           "overall": 76,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 82
         },
@@ -12308,6 +12367,7 @@
           "id": "grayson-allen",
           "name": "Grayson Allen",
           "overall": 81,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 85
         },
@@ -12317,6 +12377,7 @@
           "id": "kon-knueppel",
           "name": "Kon Knueppel",
           "overall": 86,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 94
         },
@@ -12326,6 +12387,7 @@
           "id": "liam-mcneeley",
           "name": "Liam McNeeley",
           "overall": 72,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 82
         },
@@ -12335,6 +12397,7 @@
           "id": "moussa-diabate",
           "name": "Moussa Diabate",
           "overall": 80,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 67
         },
@@ -12344,6 +12407,7 @@
           "id": "naz-reid",
           "name": "Naz Reid",
           "overall": 82,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 81
         },
@@ -12353,6 +12417,7 @@
           "id": "pat-connaughton",
           "name": "Pat Connaughton",
           "overall": 73,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 79
         },
@@ -12362,6 +12427,7 @@
           "id": "pj-hall",
           "name": "PJ Hall",
           "overall": 72,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 74
         },
@@ -12371,6 +12437,7 @@
           "id": "royce-oneale",
           "name": "Royce O’Neale",
           "overall": 77,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 84
         },
@@ -12380,6 +12447,7 @@
           "id": "ryan-kalkbrenner",
           "name": "Ryan Kalkbrenner",
           "overall": 80,
+          "potential": null,
           "position": "C",
           "threePoint": 73
         },
@@ -12389,6 +12457,7 @@
           "id": "sion-james",
           "name": "Sion James",
           "overall": 75,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 80
         },
@@ -12398,6 +12467,7 @@
           "id": "tidjane-salaun",
           "name": "Tidjane Salaun",
           "overall": 75,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 86
         },
@@ -12407,6 +12477,7 @@
           "id": "tre-mann",
           "name": "Tre Mann",
           "overall": 74,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 76
         }
@@ -12419,11 +12490,22 @@
       "category": "current",
       "players": [
         {
+          "drivingDunk": null,
+          "height": "6'10\"",
+          "id": "caleb-wilson",
+          "name": "Caleb Wilson",
+          "overall": 77,
+          "potential": null,
+          "position": "PF/C",
+          "threePoint": null
+        },
+        {
           "drivingDunk": 75,
           "height": "6'4\"",
           "id": "isaac-okoro",
           "name": "Isaac Okoro",
           "overall": 77,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 77
         },
@@ -12433,6 +12515,7 @@
           "id": "jalen-smith",
           "name": "Jalen Smith",
           "overall": 79,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 81
         },
@@ -12442,6 +12525,7 @@
           "id": "josh-giddey",
           "name": "Josh Giddey",
           "overall": 83,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 80
         },
@@ -12451,6 +12535,7 @@
           "id": "leonard-miller",
           "name": "Leonard Miller",
           "overall": 76,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 73
         },
@@ -12460,6 +12545,7 @@
           "id": "matas-buzelis",
           "name": "Matas Buzelis",
           "overall": 82,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 80
         },
@@ -12469,6 +12555,7 @@
           "id": "nicolas-claxton",
           "name": "Nic Claxton",
           "overall": 81,
+          "potential": null,
           "position": "C",
           "threePoint": 64
         },
@@ -12478,6 +12565,7 @@
           "id": "nick-richards",
           "name": "Nick Richards",
           "overall": 75,
+          "potential": null,
           "position": "C",
           "threePoint": 47
         },
@@ -12487,6 +12575,7 @@
           "id": "noa-essengue",
           "name": "Noa Essengue",
           "overall": 72,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 70
         },
@@ -12496,6 +12585,7 @@
           "id": "norman-powell",
           "name": "Norman Powell",
           "overall": 85,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 82
         },
@@ -12505,6 +12595,7 @@
           "id": "patrick-williams",
           "name": "Patrick Williams",
           "overall": 75,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 77
         },
@@ -12514,6 +12605,7 @@
           "id": "rob-dillingham",
           "name": "Rob Dillingham",
           "overall": 73,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 74
         },
@@ -12523,6 +12615,7 @@
           "id": "tre-jones",
           "name": "Tre Jones",
           "overall": 81,
+          "potential": null,
           "position": "PG",
           "threePoint": 75
         },
@@ -12532,6 +12625,7 @@
           "id": "zach-collins",
           "name": "Zach Collins",
           "overall": 77,
+          "potential": null,
           "position": "C",
           "threePoint": 80
         }
@@ -12549,6 +12643,7 @@
           "id": "craig-porter",
           "name": "Craig Porter Jr.",
           "overall": 74,
+          "potential": null,
           "position": "PG",
           "threePoint": 80
         },
@@ -12558,6 +12653,7 @@
           "id": "dennis-schroder",
           "name": "Dennis Schroder",
           "overall": 77,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 76
         },
@@ -12567,6 +12663,7 @@
           "id": "donovan-mitchell",
           "name": "Donovan Mitchell",
           "overall": 93,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 85
         },
@@ -12576,6 +12673,7 @@
           "id": "evan-mobley",
           "name": "Evan Mobley",
           "overall": 87,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 75
         },
@@ -12585,6 +12683,7 @@
           "id": "jarrett-allen",
           "name": "Jarrett Allen",
           "overall": 86,
+          "potential": null,
           "position": "C",
           "threePoint": 63
         },
@@ -12594,6 +12693,7 @@
           "id": "jaylon-tyson",
           "name": "Jaylon Tyson",
           "overall": 77,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 84
         },
@@ -12603,6 +12703,7 @@
           "id": "mario-hezonja",
           "name": "Mario Hezonja",
           "overall": 73,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 76
         },
@@ -12612,8 +12713,9 @@
           "id": "max-strus",
           "name": "Max Strus",
           "overall": 79,
+          "potential": null,
           "position": "SF/SG",
-          "threePoint": 89
+          "threePoint": 91
         },
         {
           "drivingDunk": 80,
@@ -12621,6 +12723,7 @@
           "id": "naeqwan-tomlin",
           "name": "Nae’Qwan Tomlin",
           "overall": 74,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 64
         },
@@ -12630,6 +12733,7 @@
           "id": "riley-minix",
           "name": "Riley Minix",
           "overall": 67,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 76
         },
@@ -12639,8 +12743,9 @@
           "id": "sam-merrill",
           "name": "Sam Merrill",
           "overall": 78,
+          "potential": null,
           "position": "SG/SF",
-          "threePoint": 87
+          "threePoint": 91
         },
         {
           "drivingDunk": 65,
@@ -12648,6 +12753,7 @@
           "id": "thomas-bryant",
           "name": "Thomas Bryant",
           "overall": 76,
+          "potential": null,
           "position": "C",
           "threePoint": 79
         },
@@ -12657,6 +12763,7 @@
           "id": "tristan-enaruna",
           "name": "Tristan Enaruna",
           "overall": 68,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 72
         },
@@ -12666,6 +12773,7 @@
           "id": "tyrese-proctor",
           "name": "Tyrese Proctor",
           "overall": 73,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 79
         }
@@ -12683,6 +12791,7 @@
           "id": "caleb-martin",
           "name": "Caleb Martin",
           "overall": 75,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 78
         },
@@ -12692,6 +12801,7 @@
           "id": "cooper-flagg",
           "name": "Cooper Flagg",
           "overall": 88,
+          "potential": null,
           "position": "SF/PG",
           "threePoint": 71
         },
@@ -12701,6 +12811,7 @@
           "id": "daniel-gafford",
           "name": "Daniel Gafford",
           "overall": 80,
+          "potential": null,
           "position": "C",
           "threePoint": 29
         },
@@ -12710,6 +12821,7 @@
           "id": "dereck-lively-ii",
           "name": "Dereck Lively II",
           "overall": 79,
+          "potential": null,
           "position": "C",
           "threePoint": 52
         },
@@ -12719,6 +12831,7 @@
           "id": "dwight-powell",
           "name": "Dwight Powell",
           "overall": 74,
+          "potential": null,
           "position": "C",
           "threePoint": 78
         },
@@ -12728,6 +12841,7 @@
           "id": "jett-howard",
           "name": "Jett Howard",
           "overall": 74,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 81
         },
@@ -12737,6 +12851,7 @@
           "id": "john-poulakidas",
           "name": "John Poulakidas",
           "overall": 71,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 80
         },
@@ -12746,6 +12861,7 @@
           "id": "klay-thompson",
           "name": "Klay Thompson",
           "overall": 78,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 88
         },
@@ -12755,6 +12871,7 @@
           "id": "kyrie-irving",
           "name": "Kyrie Irving",
           "overall": 90,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 86
         },
@@ -12764,6 +12881,7 @@
           "id": "marcus-sasser",
           "name": "Marcus Sasser",
           "overall": 76,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 87
         },
@@ -12773,6 +12891,7 @@
           "id": "max-christie",
           "name": "Max Christie",
           "overall": 77,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 84
         },
@@ -12782,6 +12901,7 @@
           "id": "moussa-cisse",
           "name": "Moussa Cisse",
           "overall": 73,
+          "potential": null,
           "position": "C",
           "threePoint": 25
         },
@@ -12791,6 +12911,7 @@
           "id": "naji-marshall",
           "name": "Naji Marshall",
           "overall": 81,
+          "potential": null,
           "position": "SF/PG",
           "threePoint": 71
         },
@@ -12800,6 +12921,7 @@
           "id": "pj-washington",
           "name": "P.J. Washington",
           "overall": 80,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 75
         },
@@ -12809,6 +12931,7 @@
           "id": "santi-aldama",
           "name": "Santi Aldama",
           "overall": 81,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 78
         },
@@ -12818,6 +12941,7 @@
           "id": "zaccharie-risacher",
           "name": "Zaccharie Risacher",
           "overall": 77,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 81
         }
@@ -12835,6 +12959,7 @@
           "id": "aaron-gordon",
           "name": "Aaron Gordon",
           "overall": 83,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 81
         },
@@ -12844,6 +12969,7 @@
           "id": "bruce-brown-jr",
           "name": "Bruce Brown",
           "overall": 75,
+          "potential": null,
           "position": "SF/PG",
           "threePoint": 83
         },
@@ -12853,6 +12979,7 @@
           "id": "cameron-johnson",
           "name": "Cameron Johnson",
           "overall": 80,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 89
         },
@@ -12862,6 +12989,7 @@
           "id": "christian-braun",
           "name": "Christian Braun",
           "overall": 80,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 78
         },
@@ -12871,6 +12999,7 @@
           "id": "daron-holmes",
           "name": "DaRon Holmes II",
           "overall": 73,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 78
         },
@@ -12880,6 +13009,7 @@
           "id": "jamal-murray",
           "name": "Jamal Murray",
           "overall": 89,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 88
         },
@@ -12889,6 +13019,7 @@
           "id": "julian-strawther",
           "name": "Julian Strawther",
           "overall": 77,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 81
         },
@@ -12898,6 +13029,7 @@
           "id": "kj-simpson",
           "name": "KJ Simpson",
           "overall": 73,
+          "potential": null,
           "position": "PG",
           "threePoint": 74
         },
@@ -12907,6 +13039,7 @@
           "id": "marvin-bagley-iii",
           "name": "Marvin Bagley III",
           "overall": 79,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 80
         },
@@ -12916,6 +13049,7 @@
           "id": "nikola-jokic",
           "name": "Nikola Jokic",
           "overall": 98,
+          "potential": null,
           "position": "C",
           "threePoint": 84
         },
@@ -12925,6 +13059,7 @@
           "id": "spencer-jones",
           "name": "Spencer Jones",
           "overall": 73,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 83
         },
@@ -12934,6 +13069,7 @@
           "id": "tim-hardaway-jr",
           "name": "Tim Hardaway Jr.",
           "overall": 80,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 86
         },
@@ -12943,6 +13079,7 @@
           "id": "tyus-jones",
           "name": "Tyus Jones",
           "overall": 73,
+          "potential": null,
           "position": "PG",
           "threePoint": 70
         },
@@ -12952,6 +13089,7 @@
           "id": "zeke-nnaji",
           "name": "Zeke Nnaji",
           "overall": 73,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 72
         }
@@ -12969,6 +13107,7 @@
           "id": "ausar-thompson",
           "name": "Ausar Thompson",
           "overall": 86,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 70
         },
@@ -12978,6 +13117,7 @@
           "id": "cade-cunningham",
           "name": "Cade Cunningham",
           "overall": 95,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 86
         },
@@ -12987,6 +13127,7 @@
           "id": "chaz-lanier",
           "name": "Chaz Lanier",
           "overall": 68,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 75
         },
@@ -12996,6 +13137,7 @@
           "id": "daniss-jenkins",
           "name": "Daniss Jenkins",
           "overall": 80,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 83
         },
@@ -13005,8 +13147,9 @@
           "id": "duncan-robinson",
           "name": "Duncan Robinson",
           "overall": 80,
+          "potential": null,
           "position": "SG/SF",
-          "threePoint": 88
+          "threePoint": 93
         },
         {
           "drivingDunk": 50,
@@ -13014,6 +13157,7 @@
           "id": "elijah-harkless",
           "name": "Elijah Harkless",
           "overall": 72,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 75
         },
@@ -13023,6 +13167,7 @@
           "id": "gary-harris",
           "name": "Gary Harris",
           "overall": 73,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 87
         },
@@ -13032,6 +13177,7 @@
           "id": "isaac-jones",
           "name": "Isaac Jones",
           "overall": 71,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 49
         },
@@ -13041,6 +13187,7 @@
           "id": "isaiah-joe",
           "name": "Isaiah Joe",
           "overall": 79,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 85
         },
@@ -13050,6 +13197,7 @@
           "id": "jalen-duren",
           "name": "Jalen Duren",
           "overall": 85,
+          "potential": null,
           "position": "C",
           "threePoint": 35
         },
@@ -13059,6 +13207,7 @@
           "id": "javonte-green",
           "name": "Javonte Green",
           "overall": 78,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 81
         },
@@ -13068,6 +13217,7 @@
           "id": "john-collins",
           "name": "John Collins",
           "overall": 81,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 83
         },
@@ -13077,6 +13227,7 @@
           "id": "kevin-huerter",
           "name": "Kevin Huerter",
           "overall": 77,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 75
         },
@@ -13086,6 +13237,7 @@
           "id": "paul-reed",
           "name": "Paul Reed",
           "overall": 79,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 76
         },
@@ -13095,6 +13247,7 @@
           "id": "ronald-holland",
           "name": "Ronald Holland II",
           "overall": 78,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 70
         },
@@ -13104,6 +13257,7 @@
           "id": "taurean-prince",
           "name": "Taurean Prince",
           "overall": 76,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 84
         },
@@ -13113,6 +13267,7 @@
           "id": "tolu-smith",
           "name": "Tolu Smith",
           "overall": 67,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 37
         }
@@ -13130,6 +13285,7 @@
           "id": "al-horford",
           "name": "Al Horford",
           "overall": 79,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 80
         },
@@ -13139,6 +13295,7 @@
           "id": "brandin-podziemski",
           "name": "Brandin Podziemski",
           "overall": 81,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 81
         },
@@ -13148,6 +13305,7 @@
           "id": "charles-bassey",
           "name": "Charles Bassey",
           "overall": 72,
+          "potential": null,
           "position": "C",
           "threePoint": 62
         },
@@ -13157,6 +13315,7 @@
           "id": "deanthony-melton",
           "name": "De’Anthony Melton",
           "overall": 79,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 70
         },
@@ -13166,6 +13325,7 @@
           "id": "draymond-green",
           "name": "Draymond Green",
           "overall": 79,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 75
         },
@@ -13175,6 +13335,7 @@
           "id": "gary-payton-ii",
           "name": "Gary Payton II",
           "overall": 79,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 72
         },
@@ -13184,6 +13345,7 @@
           "id": "gui-santos",
           "name": "Gui Santos",
           "overall": 80,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 79
         },
@@ -13193,6 +13355,7 @@
           "id": "jimmy-butler",
           "name": "Jimmy Butler",
           "overall": 88,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 81
         },
@@ -13202,6 +13365,7 @@
           "id": "kristaps-porzingis",
           "name": "Kristaps Porzingis",
           "overall": 83,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 80
         },
@@ -13211,6 +13375,7 @@
           "id": "lj-cryer",
           "name": "LJ Cryer",
           "overall": 74,
+          "potential": null,
           "position": "PG",
           "threePoint": 83
         },
@@ -13220,6 +13385,7 @@
           "id": "malevy-leons",
           "name": "Malevy Leons",
           "overall": 70,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 74
         },
@@ -13229,6 +13395,7 @@
           "id": "moses-moody",
           "name": "Moses Moody",
           "overall": 79,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 86
         },
@@ -13238,6 +13405,7 @@
           "id": "stephen-curry",
           "name": "Stephen Curry",
           "overall": 95,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 99
         },
@@ -13247,6 +13415,7 @@
           "id": "will-richard",
           "name": "Will Richard",
           "overall": 75,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 77
         }
@@ -13264,6 +13433,7 @@
           "id": "alperen-sengun",
           "name": "Alperen Sengun",
           "overall": 88,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 74
         },
@@ -13273,6 +13443,7 @@
           "id": "amen-thompson",
           "name": "Amen Thompson",
           "overall": 87,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 56
         },
@@ -13282,6 +13453,7 @@
           "id": "bogdan-bogdanovic",
           "name": "Bogdan Bogdanovic",
           "overall": 74,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 76
         },
@@ -13291,6 +13463,7 @@
           "id": "clint-capela",
           "name": "Clint Capela",
           "overall": 77,
+          "potential": null,
           "position": "C",
           "threePoint": 25
         },
@@ -13300,6 +13473,7 @@
           "id": "fred-vanvleet",
           "name": "Fred VanVleet",
           "overall": 80,
+          "potential": null,
           "position": "PG",
           "threePoint": 78
         },
@@ -13309,6 +13483,7 @@
           "id": "jabari-smith",
           "name": "Jabari Smith Jr.",
           "overall": 82,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 81
         },
@@ -13318,17 +13493,9 @@
           "id": "jaesean-tate",
           "name": "Jae’Sean Tate",
           "overall": 73,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 72
-        },
-        {
-          "drivingDunk": 85,
-          "height": "6'1\"",
-          "id": "jd-davison",
-          "name": "JD Davison",
-          "overall": 69,
-          "position": "PG/SG",
-          "threePoint": 71
         },
         {
           "drivingDunk": 80,
@@ -13336,6 +13503,7 @@
           "id": "julian-phillips",
           "name": "Julian Phillips",
           "overall": 72,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 75
         },
@@ -13345,8 +13513,9 @@
           "id": "kevin-durant",
           "name": "Kevin Durant",
           "overall": 93,
+          "potential": null,
           "position": "SF/SG",
-          "threePoint": 91
+          "threePoint": 92
         },
         {
           "drivingDunk": 50,
@@ -13354,6 +13523,7 @@
           "id": "marcus-smart",
           "name": "Marcus Smart",
           "overall": 80,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 80
         },
@@ -13363,6 +13533,7 @@
           "id": "oscar-tshiebwe",
           "name": "Oscar Tshiebwe",
           "overall": 73,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 37
         },
@@ -13372,6 +13543,7 @@
           "id": "reed-sheppard",
           "name": "Reed Sheppard",
           "overall": 80,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 83
         },
@@ -13381,6 +13553,7 @@
           "id": "steven-adams",
           "name": "Steven Adams",
           "overall": 77,
+          "potential": null,
           "position": "C",
           "threePoint": 26
         },
@@ -13390,6 +13563,7 @@
           "id": "tari-eason",
           "name": "Tari Eason",
           "overall": 79,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 80
         },
@@ -13399,6 +13573,7 @@
           "id": "tristen-newton",
           "name": "Tristen Newton",
           "overall": 68,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 73
         }
@@ -13416,6 +13591,7 @@
           "id": "aaron-nesmith",
           "name": "Aaron Nesmith",
           "overall": 80,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 82
         },
@@ -13425,6 +13601,7 @@
           "id": "andrew-nembhard",
           "name": "Andrew Nembhard",
           "overall": 82,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 80
         },
@@ -13434,6 +13611,7 @@
           "id": "ben-sheppard",
           "name": "Ben Sheppard",
           "overall": 75,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 81
         },
@@ -13443,6 +13621,7 @@
           "id": "ethan-thompson",
           "name": "Ethan Thompson",
           "overall": 73,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 78
         },
@@ -13452,6 +13631,7 @@
           "id": "ivica-zubac",
           "name": "Ivica Zubac",
           "overall": 85,
+          "potential": null,
           "position": "C",
           "threePoint": 26
         },
@@ -13461,6 +13641,7 @@
           "id": "jalen-slawson",
           "name": "Jalen Slawson",
           "overall": 73,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 76
         },
@@ -13470,6 +13651,7 @@
           "id": "jarace-walker",
           "name": "Jarace Walker",
           "overall": 81,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 82
         },
@@ -13479,6 +13661,7 @@
           "id": "jay-huff",
           "name": "Jay Huff",
           "overall": 79,
+          "potential": null,
           "position": "C",
           "threePoint": 74
         },
@@ -13488,6 +13671,7 @@
           "id": "johnny-furphy",
           "name": "Johnny Furphy",
           "overall": 74,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 79
         },
@@ -13497,6 +13681,7 @@
           "id": "kelly-oubre-jr",
           "name": "Kelly Oubre Jr.",
           "overall": 80,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 80
         },
@@ -13506,6 +13691,7 @@
           "id": "kobe-brown",
           "name": "Kobe Brown",
           "overall": 76,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 81
         },
@@ -13515,6 +13701,7 @@
           "id": "larry-nance-jr",
           "name": "Larry Nance Jr.",
           "overall": 73,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 71
         },
@@ -13524,6 +13711,7 @@
           "id": "obi-toppin",
           "name": "Obi Toppin",
           "overall": 80,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 75
         },
@@ -13533,6 +13721,7 @@
           "id": "pascal-siakam",
           "name": "Pascal Siakam",
           "overall": 87,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 80
         },
@@ -13542,6 +13731,7 @@
           "id": "quenton-jackson",
           "name": "Quenton Jackson",
           "overall": 76,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 82
         },
@@ -13551,6 +13741,7 @@
           "id": "tj-mcconnell",
           "name": "T.J. McConnell",
           "overall": 81,
+          "potential": null,
           "position": "PG",
           "threePoint": 75
         },
@@ -13560,6 +13751,7 @@
           "id": "tyrese-haliburton",
           "name": "Tyrese Haliburton",
           "overall": 93,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 84
         }
@@ -13577,6 +13769,7 @@
           "id": "brandon-ingram",
           "name": "Brandon Ingram",
           "overall": 86,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 81
         },
@@ -13586,6 +13779,7 @@
           "id": "brook-lopez",
           "name": "Brook Lopez",
           "overall": 78,
+          "potential": null,
           "position": "C",
           "threePoint": 80
         },
@@ -13595,6 +13789,7 @@
           "id": "cam-christie",
           "name": "Cam Christie",
           "overall": 70,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 70
         },
@@ -13604,6 +13799,7 @@
           "id": "darius-garland",
           "name": "Darius Garland",
           "overall": 85,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 88
         },
@@ -13613,6 +13809,7 @@
           "id": "derrick-jones-jr",
           "name": "Derrick Jones Jr.",
           "overall": 79,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 79
         },
@@ -13622,6 +13819,7 @@
           "id": "gradey-dick",
           "name": "Gradey Dick",
           "overall": 76,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 72
         },
@@ -13631,8 +13829,19 @@
           "id": "isaiah-jackson",
           "name": "Isaiah Jackson",
           "overall": 77,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 59
+        },
+        {
+          "drivingDunk": 60,
+          "height": "6'2\"",
+          "id": "jalen-pickett",
+          "name": "Jalen Pickett",
+          "overall": 73,
+          "potential": null,
+          "position": "PG/SG",
+          "threePoint": 85
         },
         {
           "drivingDunk": 60,
@@ -13640,6 +13849,7 @@
           "id": "johni-broome",
           "name": "Johni Broome",
           "overall": 70,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 69
         },
@@ -13649,6 +13859,7 @@
           "id": "jordan-miller",
           "name": "Jordan Miller",
           "overall": 77,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 75
         },
@@ -13658,6 +13869,7 @@
           "id": "kobe-sanders",
           "name": "Kobe Sanders",
           "overall": 76,
+          "potential": null,
           "position": "PG/SF",
           "threePoint": 84
         },
@@ -13667,6 +13879,7 @@
           "id": "kris-dunn",
           "name": "Kris Dunn",
           "overall": 77,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 81
         },
@@ -13676,6 +13889,7 @@
           "id": "nicolas-batum",
           "name": "Nicolas Batum",
           "overall": 74,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 83
         },
@@ -13685,6 +13899,7 @@
           "id": "rui-hachimura",
           "name": "Rui Hachimura",
           "overall": 81,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 88
         },
@@ -13694,6 +13909,7 @@
           "id": "sean-pedulla",
           "name": "Sean Pedulla",
           "overall": 68,
+          "potential": null,
           "position": "PG",
           "threePoint": 77
         },
@@ -13703,6 +13919,7 @@
           "id": "yanic-konan-niederhauser",
           "name": "Yanic Konan Niederhauser",
           "overall": 75,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 40
         }
@@ -13720,6 +13937,7 @@
           "id": "adou-thiero",
           "name": "Adou Thiero",
           "overall": 70,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 71
         },
@@ -13729,6 +13947,7 @@
           "id": "austin-reaves",
           "name": "Austin Reaves",
           "overall": 87,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 82
         },
@@ -13738,6 +13957,7 @@
           "id": "bronny-james",
           "name": "Bronny James",
           "overall": 71,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 79
         },
@@ -13747,6 +13967,7 @@
           "id": "chris-manon",
           "name": "Chris Manon",
           "overall": 68,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 69
         },
@@ -13756,6 +13977,7 @@
           "id": "collin-sexton",
           "name": "Collin Sexton",
           "overall": 81,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 84
         },
@@ -13765,6 +13987,7 @@
           "id": "dalton-knecht",
           "name": "Dalton Knecht",
           "overall": 74,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 79
         },
@@ -13774,6 +13997,7 @@
           "id": "jaden-hardy",
           "name": "Jaden Hardy",
           "overall": 76,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 84
         },
@@ -13783,6 +14007,7 @@
           "id": "jake-laravia",
           "name": "Jake LaRavia",
           "overall": 76,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 75
         },
@@ -13792,6 +14017,7 @@
           "id": "jarred-vanderbilt",
           "name": "Jarred Vanderbilt",
           "overall": 76,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 72
         },
@@ -13801,6 +14027,7 @@
           "id": "kevon-looney",
           "name": "Kevon Looney",
           "overall": 74,
+          "potential": null,
           "position": "C",
           "threePoint": 69
         },
@@ -13810,8 +14037,9 @@
           "id": "luka-doncic",
           "name": "Luka Doncic",
           "overall": 97,
+          "potential": null,
           "position": "PG/SG",
-          "threePoint": 89
+          "threePoint": 92
         },
         {
           "drivingDunk": 70,
@@ -13819,6 +14047,7 @@
           "id": "matisse-thybulle",
           "name": "Matisse Thybulle",
           "overall": 76,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 83
         },
@@ -13828,6 +14057,7 @@
           "id": "quentin-grimes",
           "name": "Quentin Grimes",
           "overall": 79,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 76
         },
@@ -13837,6 +14067,7 @@
           "id": "sandro-mamukelashvili",
           "name": "Sandro Mamukelashvili",
           "overall": 79,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 82
         },
@@ -13846,6 +14077,7 @@
           "id": "walker-kessler",
           "name": "Walker Kessler",
           "overall": 83,
+          "potential": null,
           "position": "C",
           "threePoint": 70
         },
@@ -13855,6 +14087,7 @@
           "id": "ziaire-williams",
           "name": "Ziaire Williams",
           "overall": 78,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 77
         }
@@ -13872,6 +14105,7 @@
           "id": "aj-johnson",
           "name": "AJ Johnson",
           "overall": 72,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 68
         },
@@ -13881,6 +14115,7 @@
           "id": "cam-spencer",
           "name": "Cam Spencer",
           "overall": 79,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 88
         },
@@ -13890,6 +14125,7 @@
           "id": "cedric-coward",
           "name": "Cedric Coward",
           "overall": 80,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 76
         },
@@ -13899,6 +14135,7 @@
           "id": "dangelo-russell",
           "name": "D’Angelo Russell",
           "overall": 76,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 76
         },
@@ -13908,6 +14145,7 @@
           "id": "gregory-jackson-ii",
           "name": "GG Jackson",
           "overall": 80,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 76
         },
@@ -13917,6 +14155,7 @@
           "id": "isaiah-stewart",
           "name": "Isaiah Stewart",
           "overall": 78,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 77
         },
@@ -13926,6 +14165,7 @@
           "id": "jahmai-mashack",
           "name": "Jahmai Mashack",
           "overall": 73,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 67
         },
@@ -13935,6 +14175,7 @@
           "id": "javon-small",
           "name": "Javon Small",
           "overall": 77,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 87
         },
@@ -13944,6 +14185,7 @@
           "id": "jaylen-wells",
           "name": "Jaylen Wells",
           "overall": 79,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 79
         },
@@ -13953,6 +14195,7 @@
           "id": "jerami-grant",
           "name": "Jerami Grant",
           "overall": 81,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 82
         },
@@ -13962,6 +14205,7 @@
           "id": "kris-murray",
           "name": "Kris Murray",
           "overall": 74,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 66
         },
@@ -13971,6 +14215,7 @@
           "id": "olivier-maxence-prosper",
           "name": "Olivier-Maxence Prosper",
           "overall": 78,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 83
         },
@@ -13980,6 +14225,7 @@
           "id": "quinten-post",
           "name": "Quinten Post",
           "overall": 76,
+          "potential": null,
           "position": "C",
           "threePoint": 76
         },
@@ -13989,6 +14235,7 @@
           "id": "scotty-pippen-jr",
           "name": "Scotty Pippen Jr.",
           "overall": 77,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 75
         },
@@ -13998,6 +14245,7 @@
           "id": "taj-gibson",
           "name": "Taj Gibson",
           "overall": 70,
+          "potential": null,
           "position": "C",
           "threePoint": 50
         },
@@ -14007,6 +14255,7 @@
           "id": "taylor-hendricks",
           "name": "Taylor Hendricks",
           "overall": 75,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 76
         },
@@ -14016,6 +14265,7 @@
           "id": "ty-jerome",
           "name": "Ty Jerome",
           "overall": 83,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 86
         },
@@ -14025,6 +14275,7 @@
           "id": "walter-clayton-jr",
           "name": "Walter Clayton Jr.",
           "overall": 75,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 71
         },
@@ -14034,6 +14285,7 @@
           "id": "zach-edey",
           "name": "Zach Edey",
           "overall": 82,
+          "potential": null,
           "position": "C",
           "threePoint": 76
         }
@@ -14051,6 +14303,7 @@
           "id": "andrew-wiggins",
           "name": "Andrew Wiggins",
           "overall": 81,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 86
         },
@@ -14060,6 +14313,7 @@
           "id": "bam-adebayo",
           "name": "Bam Adebayo",
           "overall": 89,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 74
         },
@@ -14069,6 +14323,7 @@
           "id": "bobby-portis",
           "name": "Bobby Portis",
           "overall": 80,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 89
         },
@@ -14078,6 +14333,7 @@
           "id": "davion-mitchell",
           "name": "Davion Mitchell",
           "overall": 79,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 83
         },
@@ -14087,6 +14343,7 @@
           "id": "dru-smith",
           "name": "Dru Smith",
           "overall": 75,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 71
         },
@@ -14096,6 +14353,7 @@
           "id": "giannis-antetokounmpo",
           "name": "Giannis Antetokounmpo",
           "overall": 97,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 76
         },
@@ -14105,6 +14363,7 @@
           "id": "keshad-johnson",
           "name": "Keshad Johnson",
           "overall": 72,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 71
         },
@@ -14114,6 +14373,7 @@
           "id": "myron-gardner",
           "name": "Myron Gardner",
           "overall": 75,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 83
         },
@@ -14123,6 +14383,7 @@
           "id": "nikola-jovic",
           "name": "Nikola Jovic",
           "overall": 74,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 73
         },
@@ -14132,6 +14393,7 @@
           "id": "pelle-larsson",
           "name": "Pelle Larsson",
           "overall": 80,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 75
         },
@@ -14141,6 +14403,7 @@
           "id": "simone-fontecchio",
           "name": "Simone Fontecchio",
           "overall": 77,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 82
         },
@@ -14150,6 +14413,7 @@
           "id": "trevor-keels",
           "name": "Trevor Keels",
           "overall": 68,
+          "potential": null,
           "position": "SG",
           "threePoint": 71
         },
@@ -14159,6 +14423,7 @@
           "id": "vladislav-goldin",
           "name": "Vladislav Goldin",
           "overall": 68,
+          "potential": null,
           "position": "C",
           "threePoint": 66
         }
@@ -14176,6 +14441,7 @@
           "id": "aj-green",
           "name": "AJ Green",
           "overall": 76,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 85
         },
@@ -14185,6 +14451,7 @@
           "id": "caris-levert",
           "name": "Caris LeVert",
           "overall": 79,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 79
         },
@@ -14194,6 +14461,7 @@
           "id": "cormac-ryan",
           "name": "Cormac Ryan",
           "overall": 72,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 84
         },
@@ -14203,6 +14471,7 @@
           "id": "gary-trent-jr",
           "name": "Gary Trent Jr.",
           "overall": 75,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 82
         },
@@ -14212,6 +14481,7 @@
           "id": "jaime-jaquez-jr",
           "name": "Jaime Jaquez Jr.",
           "overall": 80,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 73
         },
@@ -14221,6 +14491,7 @@
           "id": "jericho-sims",
           "name": "Jericho Sims",
           "overall": 74,
+          "potential": null,
           "position": "C",
           "threePoint": 26
         },
@@ -14230,6 +14501,7 @@
           "id": "kam-jones",
           "name": "Kam Jones",
           "overall": 74,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 73
         },
@@ -14239,6 +14511,7 @@
           "id": "kasparas-jakucionis",
           "name": "Kasparas Jakucionis",
           "overall": 76,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 85
         },
@@ -14248,6 +14521,7 @@
           "id": "kelel-ware",
           "name": "Kel’el Ware",
           "overall": 80,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 82
         },
@@ -14257,6 +14531,7 @@
           "id": "kevin-porter-jr",
           "name": "Kevin Porter Jr.",
           "overall": 82,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 76
         },
@@ -14266,6 +14541,7 @@
           "id": "kyle-kuzma",
           "name": "Kyle Kuzma",
           "overall": 80,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 78
         },
@@ -14275,6 +14551,7 @@
           "id": "myles-turner",
           "name": "Myles Turner",
           "overall": 78,
+          "potential": null,
           "position": "C",
           "threePoint": 82
         },
@@ -14284,6 +14561,7 @@
           "id": "ousmane-dieng",
           "name": "Ousmane Dieng",
           "overall": 77,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 80
         },
@@ -14293,6 +14571,7 @@
           "id": "pete-nance",
           "name": "Pete Nance",
           "overall": 74,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 85
         },
@@ -14302,6 +14581,7 @@
           "id": "ryan-rollins",
           "name": "Ryan Rollins",
           "overall": 82,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 84
         },
@@ -14311,6 +14591,7 @@
           "id": "tyler-herro",
           "name": "Tyler Herro",
           "overall": 87,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 83
         }
@@ -14328,8 +14609,9 @@
           "id": "anthony-edwards",
           "name": "Anthony Edwards",
           "overall": 96,
+          "potential": null,
           "position": "SG/SF",
-          "threePoint": 89
+          "threePoint": 92
         },
         {
           "drivingDunk": 75,
@@ -14337,6 +14619,7 @@
           "id": "ayo-dosunmu",
           "name": "Ayo Dosunmu",
           "overall": 83,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 88
         },
@@ -14346,6 +14629,7 @@
           "id": "bones-hyland",
           "name": "Bones Hyland",
           "overall": 76,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 82
         },
@@ -14355,6 +14639,7 @@
           "id": "donte-divincenzo",
           "name": "Donte DiVincenzo",
           "overall": 80,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 84
         },
@@ -14364,6 +14649,7 @@
           "id": "enrique-freeman",
           "name": "Enrique Freeman",
           "overall": 69,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 66
         },
@@ -14373,6 +14659,7 @@
           "id": "jaden-mcdaniels",
           "name": "Jaden McDaniels",
           "overall": 85,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 85
         },
@@ -14382,6 +14669,7 @@
           "id": "jaylen-clark",
           "name": "Jaylen Clark",
           "overall": 73,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 73
         },
@@ -14391,6 +14679,7 @@
           "id": "joan-beringer",
           "name": "Joan Beringer",
           "overall": 72,
+          "potential": null,
           "position": "C",
           "threePoint": 26
         },
@@ -14400,6 +14689,7 @@
           "id": "josh-green",
           "name": "Josh Green",
           "overall": 75,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 86
         },
@@ -14409,6 +14699,7 @@
           "id": "lamelo-ball",
           "name": "LaMelo Ball",
           "overall": 88,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 84
         },
@@ -14418,6 +14709,7 @@
           "id": "rocco-zikarsky",
           "name": "Rocco Zikarsky",
           "overall": 68,
+          "potential": null,
           "position": "C",
           "threePoint": 39
         },
@@ -14427,6 +14719,7 @@
           "id": "rudy-gobert",
           "name": "Rudy Gobert",
           "overall": 85,
+          "potential": null,
           "position": "C",
           "threePoint": 25
         },
@@ -14436,6 +14729,7 @@
           "id": "terrence-shannon",
           "name": "Terrence Shannon Jr.",
           "overall": 77,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 82
         },
@@ -14445,6 +14739,7 @@
           "id": "trey-lyles",
           "name": "Trey Lyles",
           "overall": 74,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 77
         },
@@ -14454,6 +14749,7 @@
           "id": "zyon-pullin",
           "name": "Zyon Pullin",
           "overall": 67,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 75
         }
@@ -14471,6 +14767,7 @@
           "id": "bryce-mcgowens",
           "name": "Bryce McGowens",
           "overall": 75,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 84
         },
@@ -14480,6 +14777,7 @@
           "id": "christian-koloko",
           "name": "Christian Koloko",
           "overall": 73,
+          "potential": null,
           "position": "C",
           "threePoint": 29
         },
@@ -14489,6 +14787,7 @@
           "id": "deandre-jordan",
           "name": "DeAndre Jordan",
           "overall": 76,
+          "potential": null,
           "position": "C",
           "threePoint": 25
         },
@@ -14498,6 +14797,7 @@
           "id": "dejounte-murray",
           "name": "Dejounte Murray",
           "overall": 84,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 74
         },
@@ -14507,6 +14807,7 @@
           "id": "derik-queen",
           "name": "Derik Queen",
           "overall": 80,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 66
         },
@@ -14516,6 +14817,7 @@
           "id": "herbert-jones",
           "name": "Herbert Jones",
           "overall": 79,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 73
         },
@@ -14525,6 +14827,7 @@
           "id": "hunter-dickinson",
           "name": "Hunter Dickinson",
           "overall": 68,
+          "potential": null,
           "position": "C",
           "threePoint": 69
         },
@@ -14534,6 +14837,7 @@
           "id": "jeremiah-fears",
           "name": "Jeremiah Fears",
           "overall": 80,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 77
         },
@@ -14543,6 +14847,7 @@
           "id": "jordan-hawkins",
           "name": "Jordan Hawkins",
           "overall": 72,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 77
         },
@@ -14552,6 +14857,7 @@
           "id": "jordan-poole",
           "name": "Jordan Poole",
           "overall": 76,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 75
         },
@@ -14561,6 +14867,7 @@
           "id": "karlo-matkovic",
           "name": "Karlo Matkovic",
           "overall": 76,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 84
         },
@@ -14570,6 +14877,7 @@
           "id": "micah-peavy",
           "name": "Micah Peavy",
           "overall": 72,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 69
         },
@@ -14579,6 +14887,7 @@
           "id": "saddiq-bey",
           "name": "Saddiq Bey",
           "overall": 84,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 82
         },
@@ -14588,6 +14897,7 @@
           "id": "trey-murphy",
           "name": "Trey Murphy III",
           "overall": 85,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 81
         },
@@ -14597,6 +14907,7 @@
           "id": "yves-missi",
           "name": "Yves Missi",
           "overall": 78,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 30
         },
@@ -14606,6 +14917,7 @@
           "id": "zion-williamson",
           "name": "Zion Williamson",
           "overall": 86,
+          "potential": null,
           "position": "PF/PG",
           "threePoint": 67
         }
@@ -14623,6 +14935,7 @@
           "id": "andre-drummond",
           "name": "Andre Drummond",
           "overall": 76,
+          "potential": null,
           "position": "C",
           "threePoint": 79
         },
@@ -14632,6 +14945,7 @@
           "id": "dillon-jones",
           "name": "Dillon Jones",
           "overall": 69,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 57
         },
@@ -14641,6 +14955,7 @@
           "id": "jalen-brunson",
           "name": "Jalen Brunson",
           "overall": 96,
+          "potential": null,
           "position": "PG",
           "threePoint": 89
         },
@@ -14650,6 +14965,7 @@
           "id": "jordan-clarkson",
           "name": "Jordan Clarkson",
           "overall": 77,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 76
         },
@@ -14659,6 +14975,7 @@
           "id": "jose-alvarado",
           "name": "Jose Alvarado",
           "overall": 78,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 78
         },
@@ -14668,6 +14985,7 @@
           "id": "josh-hart",
           "name": "Josh Hart",
           "overall": 82,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 84
         },
@@ -14677,6 +14995,7 @@
           "id": "karl-anthony-towns",
           "name": "Karl-Anthony Towns",
           "overall": 91,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 83
         },
@@ -14686,6 +15005,7 @@
           "id": "landry-shamet",
           "name": "Landry Shamet",
           "overall": 77,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 83
         },
@@ -14695,6 +15015,7 @@
           "id": "mikal-bridges",
           "name": "Mikal Bridges",
           "overall": 84,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 82
         },
@@ -14704,6 +15025,7 @@
           "id": "miles-mcbride",
           "name": "Miles McBride",
           "overall": 79,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 86
         },
@@ -14713,6 +15035,7 @@
           "id": "mohamed-diawara",
           "name": "Mohamed Diawara",
           "overall": 74,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 83
         },
@@ -14722,6 +15045,7 @@
           "id": "og-anunoby",
           "name": "OG Anunoby",
           "overall": 88,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 85
         },
@@ -14731,6 +15055,7 @@
           "id": "pacome-dadiet",
           "name": "Pacome Dadiet",
           "overall": 69,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 75
         },
@@ -14740,6 +15065,7 @@
           "id": "tyler-kolek",
           "name": "Tyler Kolek",
           "overall": 74,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 82
         }
@@ -14757,6 +15083,7 @@
           "id": "ajay-mitchell",
           "name": "Ajay Mitchell",
           "overall": 84,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 80
         },
@@ -14766,6 +15093,7 @@
           "id": "alex-caruso",
           "name": "Alex Caruso",
           "overall": 82,
+          "potential": null,
           "position": "SF/PG",
           "threePoint": 82
         },
@@ -14775,6 +15103,7 @@
           "id": "brooks-barnhizer",
           "name": "Brooks Barnhizer",
           "overall": 69,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 72
         },
@@ -14784,6 +15113,7 @@
           "id": "cason-wallace",
           "name": "Cason Wallace",
           "overall": 83,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 83
         },
@@ -14793,6 +15123,7 @@
           "id": "chet-holmgren",
           "name": "Chet Holmgren",
           "overall": 87,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 80
         },
@@ -14802,6 +15133,7 @@
           "id": "isaiah-hartenstein",
           "name": "Isaiah Hartenstein",
           "overall": 84,
+          "potential": null,
           "position": "C",
           "threePoint": 55
         },
@@ -14811,6 +15143,7 @@
           "id": "jalen-williams",
           "name": "Jalen Williams",
           "overall": 87,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 77
         },
@@ -14820,6 +15153,7 @@
           "id": "jared-mccain",
           "name": "Jared McCain",
           "overall": 80,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 86
         },
@@ -14829,6 +15163,7 @@
           "id": "jaylin-williams",
           "name": "Jaylin Williams",
           "overall": 79,
+          "potential": null,
           "position": "C",
           "threePoint": 82
         },
@@ -14838,6 +15173,7 @@
           "id": "kenrich-williams",
           "name": "Kenrich Williams",
           "overall": 78,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 84
         },
@@ -14847,6 +15183,7 @@
           "id": "nikola-topic",
           "name": "Nikola Topic",
           "overall": 73,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 75
         },
@@ -14856,6 +15193,7 @@
           "id": "shai-gilgeous-alexander",
           "name": "Shai Gilgeous-Alexander",
           "overall": 98,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 82
         },
@@ -14865,6 +15203,7 @@
           "id": "thomas-sorber",
           "name": "Thomas Sorber",
           "overall": 71,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 60
         }
@@ -14882,6 +15221,7 @@
           "id": "alex-morales",
           "name": "Alex Morales",
           "overall": 68,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 76
         },
@@ -14891,6 +15231,7 @@
           "id": "anthony-black",
           "name": "Anthony Black",
           "overall": 82,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 77
         },
@@ -14900,6 +15241,7 @@
           "id": "colin-castleton",
           "name": "Colin Castleton",
           "overall": 70,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 69
         },
@@ -14909,6 +15251,7 @@
           "id": "desmond-bane",
           "name": "Desmond Bane",
           "overall": 86,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 86
         },
@@ -14918,6 +15261,7 @@
           "id": "franz-wagner",
           "name": "Franz Wagner",
           "overall": 87,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 80
         },
@@ -14927,6 +15271,7 @@
           "id": "goga-bitadze",
           "name": "Goga Bitadze",
           "overall": 77,
+          "potential": null,
           "position": "C",
           "threePoint": 69
         },
@@ -14936,6 +15281,7 @@
           "id": "jalen-suggs",
           "name": "Jalen Suggs",
           "overall": 81,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 76
         },
@@ -14945,6 +15291,7 @@
           "id": "jamal-cain",
           "name": "Jamal Cain",
           "overall": 74,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 83
         },
@@ -14954,6 +15301,7 @@
           "id": "jase-richardson",
           "name": "Jase Richardson",
           "overall": 73,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 82
         },
@@ -14963,6 +15311,7 @@
           "id": "jevon-carter",
           "name": "Jevon Carter",
           "overall": 75,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 79
         },
@@ -14972,6 +15321,7 @@
           "id": "jonathan-isaac",
           "name": "Jonathan Isaac",
           "overall": 73,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 59
         },
@@ -14981,6 +15331,7 @@
           "id": "nikola-vucevic",
           "name": "Nikola Vucevic",
           "overall": 79,
+          "potential": null,
           "position": "C",
           "threePoint": 79
         },
@@ -14990,6 +15341,7 @@
           "id": "noah-penda",
           "name": "Noah Penda",
           "overall": 75,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 76
         },
@@ -14999,6 +15351,7 @@
           "id": "paolo-banchero",
           "name": "Paolo Banchero",
           "overall": 88,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 78
         },
@@ -15008,6 +15361,7 @@
           "id": "tristan-da-silva",
           "name": "Tristan da Silva",
           "overall": 78,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 80
         },
@@ -15017,6 +15371,7 @@
           "id": "wendell-carter-jr",
           "name": "Wendell Carter Jr.",
           "overall": 80,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 75
         }
@@ -15034,6 +15389,7 @@
           "id": "adem-bona",
           "name": "Adem Bona",
           "overall": 75,
+          "potential": null,
           "position": "C",
           "threePoint": 54
         },
@@ -15043,6 +15399,7 @@
           "id": "anfernee-simons",
           "name": "Anfernee Simons",
           "overall": 80,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 82
         },
@@ -15052,6 +15409,7 @@
           "id": "ariel-hukporti",
           "name": "Ariel Hukporti",
           "overall": 73,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 47
         },
@@ -15061,6 +15419,7 @@
           "id": "caleb-love",
           "name": "Caleb Love",
           "overall": 75,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 76
         },
@@ -15070,6 +15429,7 @@
           "id": "dean-wade",
           "name": "Dean Wade",
           "overall": 78,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 79
         },
@@ -15079,6 +15439,7 @@
           "id": "dominick-barlow",
           "name": "Dominick Barlow",
           "overall": 76,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 70
         },
@@ -15088,6 +15449,7 @@
           "id": "jabari-walker",
           "name": "Jabari Walker",
           "overall": 72,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 76
         },
@@ -15097,6 +15459,7 @@
           "id": "jaylen-brown",
           "name": "Jaylen Brown",
           "overall": 95,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 80
         },
@@ -15106,6 +15469,7 @@
           "id": "joel-embiid",
           "name": "Joel Embiid",
           "overall": 92,
+          "potential": null,
           "position": "C",
           "threePoint": 79
         },
@@ -15115,6 +15479,7 @@
           "id": "justin-edwards",
           "name": "Justin Edwards",
           "overall": 76,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 80
         },
@@ -15124,6 +15489,7 @@
           "id": "kentavious-caldwell-pope",
           "name": "Kentavious Caldwell-Pope",
           "overall": 75,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 80
         },
@@ -15133,6 +15499,7 @@
           "id": "lebron-james",
           "name": "LeBron James",
           "overall": 92,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 76
         },
@@ -15142,6 +15509,7 @@
           "id": "rayan-rupert",
           "name": "Rayan Rupert",
           "overall": 74,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 77
         },
@@ -15151,6 +15519,7 @@
           "id": "tyrese-maxey",
           "name": "Tyrese Maxey",
           "overall": 93,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 86
         },
@@ -15160,6 +15529,7 @@
           "id": "vj-edgecombe",
           "name": "VJ Edgecombe",
           "overall": 83,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 81
         }
@@ -15177,6 +15547,7 @@
           "id": "cj-huntley",
           "name": "CJ Huntley",
           "overall": 68,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 72
         },
@@ -15186,6 +15557,7 @@
           "id": "collin-gillespie",
           "name": "Collin Gillespie",
           "overall": 81,
+          "potential": null,
           "position": "PG",
           "threePoint": 84
         },
@@ -15195,6 +15567,7 @@
           "id": "devin-booker",
           "name": "Devin Booker",
           "overall": 93,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 86
         },
@@ -15204,6 +15577,7 @@
           "id": "dillon-brooks",
           "name": "Dillon Brooks",
           "overall": 84,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 78
         },
@@ -15213,6 +15587,7 @@
           "id": "haywood-highsmith",
           "name": "Haywood Highsmith",
           "overall": 73,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 81
         },
@@ -15222,6 +15597,7 @@
           "id": "jalen-green",
           "name": "Jalen Green",
           "overall": 82,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 79
         },
@@ -15231,6 +15607,7 @@
           "id": "jamaree-bouyea",
           "name": "Jamaree Bouyea",
           "overall": 74,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 72
         },
@@ -15240,6 +15617,7 @@
           "id": "jordan-goodwin",
           "name": "Jordan Goodwin",
           "overall": 77,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 79
         },
@@ -15249,6 +15627,7 @@
           "id": "khaman-maluach",
           "name": "Khaman Maluach",
           "overall": 75,
+          "potential": null,
           "position": "C",
           "threePoint": 50
         },
@@ -15258,6 +15637,7 @@
           "id": "koby-brea",
           "name": "Koby Brea",
           "overall": 68,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 84
         },
@@ -15267,6 +15647,7 @@
           "id": "luke-kennard",
           "name": "Luke Kennard",
           "overall": 78,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 93
         },
@@ -15276,6 +15657,7 @@
           "id": "mark-williams",
           "name": "Mark Williams",
           "overall": 82,
+          "potential": null,
           "position": "C",
           "threePoint": 36
         },
@@ -15285,6 +15667,7 @@
           "id": "miles-bridges",
           "name": "Miles Bridges",
           "overall": 81,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 76
         },
@@ -15294,6 +15677,7 @@
           "id": "oso-ighodaro",
           "name": "Oso Ighodaro",
           "overall": 77,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 35
         },
@@ -15303,6 +15687,7 @@
           "id": "pat-spencer",
           "name": "Pat Spencer",
           "overall": 76,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 80
         },
@@ -15312,6 +15697,7 @@
           "id": "rasheer-fleming",
           "name": "Rasheer Fleming",
           "overall": 76,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 78
         },
@@ -15321,6 +15707,7 @@
           "id": "ryan-dunn",
           "name": "Ryan Dunn",
           "overall": 75,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 76
         }
@@ -15338,6 +15725,7 @@
           "id": "branden-carlson",
           "name": "Branden Carlson",
           "overall": 73,
+          "potential": null,
           "position": "C",
           "threePoint": 78
         },
@@ -15347,6 +15735,7 @@
           "id": "chris-youngblood",
           "name": "Chris Youngblood",
           "overall": 68,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 80
         },
@@ -15356,8 +15745,9 @@
           "id": "damian-lillard",
           "name": "Damian Lillard",
           "overall": 88,
+          "potential": null,
           "position": "PG",
-          "threePoint": 86
+          "threePoint": 93
         },
         {
           "drivingDunk": 75,
@@ -15365,6 +15755,7 @@
           "id": "deni-avdija",
           "name": "Deni Avdija",
           "overall": 88,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 75
         },
@@ -15374,6 +15765,7 @@
           "id": "donovan-clingan",
           "name": "Donovan Clingan",
           "overall": 83,
+          "potential": null,
           "position": "C",
           "threePoint": 75
         },
@@ -15383,6 +15775,7 @@
           "id": "ja-morant",
           "name": "Ja Morant",
           "overall": 87,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 72
         },
@@ -15392,8 +15785,19 @@
           "id": "jayson-kent",
           "name": "Jayson Kent",
           "overall": 68,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 80
+        },
+        {
+          "drivingDunk": 80,
+          "height": "6'8\"",
+          "id": "jeremy-sochan",
+          "name": "Jeremy Sochan",
+          "overall": 74,
+          "potential": null,
+          "position": "PF/C",
+          "threePoint": 70
         },
         {
           "drivingDunk": 70,
@@ -15401,6 +15805,7 @@
           "id": "john-tonje",
           "name": "John Tonje",
           "overall": 69,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 81
         },
@@ -15410,6 +15815,7 @@
           "id": "jrue-holiday",
           "name": "Jrue Holiday",
           "overall": 82,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 84
         },
@@ -15419,6 +15825,7 @@
           "id": "micah-potter",
           "name": "Micah Potter",
           "overall": 76,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 85
         },
@@ -15428,6 +15835,7 @@
           "id": "robert-williams-iii",
           "name": "Robert Williams III",
           "overall": 80,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 74
         },
@@ -15437,6 +15845,7 @@
           "id": "scoot-henderson",
           "name": "Scoot Henderson",
           "overall": 81,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 79
         },
@@ -15446,6 +15855,7 @@
           "id": "shaedon-sharpe",
           "name": "Shaedon Sharpe",
           "overall": 83,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 76
         },
@@ -15455,6 +15865,7 @@
           "id": "sidy-cissoko",
           "name": "Sidy Cissoko",
           "overall": 74,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 72
         },
@@ -15464,6 +15875,7 @@
           "id": "toumani-camara",
           "name": "Toumani Camara",
           "overall": 81,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 81
         },
@@ -15473,6 +15885,7 @@
           "id": "vit-krejci",
           "name": "Vit Krejci",
           "overall": 75,
+          "potential": null,
           "position": "SF/PG",
           "threePoint": 83
         },
@@ -15482,6 +15895,7 @@
           "id": "yang-hansen",
           "name": "Yang Hansen",
           "overall": 70,
+          "potential": null,
           "position": "C",
           "threePoint": 63
         }
@@ -15499,6 +15913,7 @@
           "id": "adam-flagler",
           "name": "Adam Flagler",
           "overall": 67,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 70
         },
@@ -15508,6 +15923,7 @@
           "id": "daeqwon-plowden",
           "name": "Daeqwon Plowden",
           "overall": 73,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 78
         },
@@ -15517,6 +15933,7 @@
           "id": "deandre-hunter",
           "name": "De’Andre Hunter",
           "overall": 79,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 73
         },
@@ -15526,6 +15943,7 @@
           "id": "domantas-sabonis",
           "name": "Domantas Sabonis",
           "overall": 86,
+          "potential": null,
           "position": "C",
           "threePoint": 70
         },
@@ -15535,6 +15953,7 @@
           "id": "dylan-cardwell",
           "name": "Dylan Cardwell",
           "overall": 77,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 37
         },
@@ -15544,6 +15963,7 @@
           "id": "jonathan-mogbo",
           "name": "Jonathan Mogbo",
           "overall": 74,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 70
         },
@@ -15553,6 +15973,7 @@
           "id": "keegan-murray",
           "name": "Keegan Murray",
           "overall": 79,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 76
         },
@@ -15562,6 +15983,7 @@
           "id": "malik-monk",
           "name": "Malik Monk",
           "overall": 80,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 83
         },
@@ -15571,6 +15993,7 @@
           "id": "maxime-raynaud",
           "name": "Maxime Raynaud",
           "overall": 81,
+          "potential": null,
           "position": "C",
           "threePoint": 72
         },
@@ -15580,6 +16003,7 @@
           "id": "nique-clifford",
           "name": "Nique Clifford",
           "overall": 77,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 77
         },
@@ -15589,6 +16013,7 @@
           "id": "precious-achiuwa",
           "name": "Precious Achiuwa",
           "overall": 79,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 73
         },
@@ -15598,6 +16023,7 @@
           "id": "russell-westbrook",
           "name": "Russell Westbrook",
           "overall": 81,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 77
         },
@@ -15607,6 +16033,7 @@
           "id": "zach-lavine",
           "name": "Zach LaVine",
           "overall": 83,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 86
         }
@@ -15624,6 +16051,7 @@
           "id": "carter-bryant",
           "name": "Carter Bryant",
           "overall": 77,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 77
         },
@@ -15633,6 +16061,7 @@
           "id": "david-jones-garcia",
           "name": "David Jones Garcia",
           "overall": 71,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 76
         },
@@ -15642,6 +16071,7 @@
           "id": "deaaron-fox",
           "name": "De’Aaron Fox",
           "overall": 86,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 77
         },
@@ -15651,6 +16081,7 @@
           "id": "devin-vassell",
           "name": "Devin Vassell",
           "overall": 82,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 86
         },
@@ -15660,6 +16091,7 @@
           "id": "dylan-harper",
           "name": "Dylan Harper",
           "overall": 85,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 81
         },
@@ -15669,6 +16101,7 @@
           "id": "harrison-barnes",
           "name": "Harrison Barnes",
           "overall": 77,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 81
         },
@@ -15678,6 +16111,7 @@
           "id": "jordan-mclaughlin",
           "name": "Jordan McLaughlin",
           "overall": 72,
+          "potential": null,
           "position": "PG",
           "threePoint": 86
         },
@@ -15687,6 +16121,7 @@
           "id": "julian-champagnie",
           "name": "Julian Champagnie",
           "overall": 82,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 87
         },
@@ -15696,6 +16131,7 @@
           "id": "keldon-johnson",
           "name": "Keldon Johnson",
           "overall": 81,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 81
         },
@@ -15705,6 +16141,7 @@
           "id": "luke-kornet",
           "name": "Luke Kornet",
           "overall": 78,
+          "potential": null,
           "position": "C",
           "threePoint": 70
         },
@@ -15714,6 +16151,7 @@
           "id": "stephon-castle",
           "name": "Stephon Castle",
           "overall": 88,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 79
         },
@@ -15723,6 +16161,7 @@
           "id": "tobias-harris",
           "name": "Tobias Harris",
           "overall": 83,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 79
         },
@@ -15732,6 +16171,7 @@
           "id": "victor-wembanyama",
           "name": "Victor Wembanyama",
           "overall": 97,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 83
         }
@@ -15749,6 +16189,7 @@
           "id": "alijah-martin",
           "name": "Alijah Martin",
           "overall": 71,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 76
         },
@@ -15758,6 +16199,7 @@
           "id": "chucky-hepburn",
           "name": "Chucky Hepburn",
           "overall": 68,
+          "potential": null,
           "position": "PG",
           "threePoint": 73
         },
@@ -15767,6 +16209,7 @@
           "id": "collin-murray-boyles",
           "name": "Collin Murray-Boyles",
           "overall": 81,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 77
         },
@@ -15776,6 +16219,7 @@
           "id": "immanuel-quickley",
           "name": "Immanuel Quickley",
           "overall": 84,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 81
         },
@@ -15785,6 +16229,7 @@
           "id": "jakobe-walter",
           "name": "Ja’Kobe Walter",
           "overall": 78,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 83
         },
@@ -15794,6 +16239,7 @@
           "id": "jakob-poeltl",
           "name": "Jakob Poeltl",
           "overall": 80,
+          "potential": null,
           "position": "C",
           "threePoint": 45
         },
@@ -15803,6 +16249,7 @@
           "id": "jamal-shead",
           "name": "Jamal Shead",
           "overall": 78,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 74
         },
@@ -15812,6 +16259,7 @@
           "id": "jamison-battle",
           "name": "Jamison Battle",
           "overall": 76,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 88
         },
@@ -15821,6 +16269,7 @@
           "id": "kawhi-leonard",
           "name": "Kawhi Leonard",
           "overall": 95,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 85
         },
@@ -15830,6 +16279,7 @@
           "id": "kyle-anderson",
           "name": "Kyle Anderson",
           "overall": 75,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 79
         },
@@ -15839,6 +16289,7 @@
           "id": "kyle-lowry",
           "name": "Kyle Lowry",
           "overall": 73,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 75
         },
@@ -15848,6 +16299,7 @@
           "id": "rj-barrett",
           "name": "RJ Barrett",
           "overall": 83,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 78
         },
@@ -15857,6 +16309,7 @@
           "id": "scottie-barnes",
           "name": "Scottie Barnes",
           "overall": 89,
+          "potential": null,
           "position": "PF/PG",
           "threePoint": 77
         },
@@ -15866,8 +16319,19 @@
           "id": "trayce-jackson-davis",
           "name": "Trayce Jackson-Davis",
           "overall": 73,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 44
+        },
+        {
+          "drivingDunk": 75,
+          "height": "6'10\"",
+          "id": "trey-jemison",
+          "name": "Trey Jemison III",
+          "overall": 71,
+          "potential": null,
+          "position": "C",
+          "threePoint": 29
         }
       ],
       "missingFromArchive": false
@@ -15883,6 +16347,7 @@
           "id": "ace-bailey",
           "name": "Ace Bailey",
           "overall": 81,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 78
         },
@@ -15892,6 +16357,7 @@
           "id": "blake-hinson",
           "name": "Blake Hinson",
           "overall": 73,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 85
         },
@@ -15901,6 +16367,7 @@
           "id": "brice-sensabaugh",
           "name": "Brice Sensabaugh",
           "overall": 81,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 80
         },
@@ -15910,8 +16377,19 @@
           "id": "cody-williams",
           "name": "Cody Williams",
           "overall": 76,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 70
+        },
+        {
+          "drivingDunk": null,
+          "height": "6'6\"",
+          "id": "darryn-peterson",
+          "name": "Darryn Peterson",
+          "overall": 79,
+          "potential": null,
+          "position": "PG/SG",
+          "threePoint": null
         },
         {
           "drivingDunk": 75,
@@ -15919,6 +16397,7 @@
           "id": "harrison-ingram",
           "name": "Harrison Ingram",
           "overall": 69,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 74
         },
@@ -15928,6 +16407,7 @@
           "id": "isaiah-collier",
           "name": "Isaiah Collier",
           "overall": 82,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 73
         },
@@ -15937,6 +16417,7 @@
           "id": "jaren-jackson-jr",
           "name": "Jaren Jackson Jr.",
           "overall": 86,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 79
         },
@@ -15946,6 +16427,7 @@
           "id": "jaxson-hayes",
           "name": "Jaxson Hayes",
           "overall": 79,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 60
         },
@@ -15955,6 +16437,7 @@
           "id": "john-konchar",
           "name": "John Konchar",
           "overall": 76,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 69
         },
@@ -15964,6 +16447,7 @@
           "id": "josh-okogie",
           "name": "Josh Okogie",
           "overall": 75,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 83
         },
@@ -15973,6 +16457,7 @@
           "id": "jusuf-nurkic",
           "name": "Jusuf Nurkic",
           "overall": 82,
+          "potential": null,
           "position": "C",
           "threePoint": 79
         },
@@ -15982,6 +16467,7 @@
           "id": "keyonte-george",
           "name": "Keyonte George",
           "overall": 87,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 81
         },
@@ -15991,6 +16477,7 @@
           "id": "kyle-filipowski",
           "name": "Kyle Filipowski",
           "overall": 79,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 76
         },
@@ -16000,6 +16487,7 @@
           "id": "lauri-markkanen",
           "name": "Lauri Markkanen",
           "overall": 87,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 82
         },
@@ -16009,6 +16497,7 @@
           "id": "mohamed-bamba",
           "name": "Mo Bamba",
           "overall": 71,
+          "potential": null,
           "position": "C",
           "threePoint": 74
         },
@@ -16018,6 +16507,7 @@
           "id": "sviatoslav-mykhailiuk",
           "name": "Svi Mykhailiuk",
           "overall": 76,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 84
         },
@@ -16027,6 +16517,7 @@
           "id": "tamar-bates",
           "name": "Tamar Bates",
           "overall": 68,
+          "potential": null,
           "position": "SG/SF",
           "threePoint": 82
         },
@@ -16036,6 +16527,7 @@
           "id": "trey-alexander",
           "name": "Trey Alexander",
           "overall": 68,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 70
         }
@@ -16048,11 +16540,22 @@
       "category": "current",
       "players": [
         {
+          "drivingDunk": null,
+          "height": "6'9\"",
+          "id": "aj-dybantsa",
+          "name": "AJ Dybantsa",
+          "overall": 79,
+          "potential": null,
+          "position": "SF",
+          "threePoint": null
+        },
+        {
           "drivingDunk": 85,
           "height": "7'4\"",
           "id": "alexandre-sarr",
           "name": "Alex Sarr",
           "overall": 84,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 76
         },
@@ -16062,6 +16565,7 @@
           "id": "anthony-davis",
           "name": "Anthony Davis",
           "overall": 92,
+          "potential": null,
           "position": "PF/C",
           "threePoint": 71
         },
@@ -16071,6 +16575,7 @@
           "id": "bilal-coulibaly",
           "name": "Bilal Coulibaly",
           "overall": 79,
+          "potential": null,
           "position": "SF/SG",
           "threePoint": 73
         },
@@ -16080,6 +16585,7 @@
           "id": "bub-carrington",
           "name": "Bub Carrington",
           "overall": 78,
+          "potential": null,
           "position": "PG/SG",
           "threePoint": 83
         },
@@ -16089,6 +16595,7 @@
           "id": "cameron-whitmore",
           "name": "Cam Whitmore",
           "overall": 75,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 70
         },
@@ -16098,6 +16605,7 @@
           "id": "deandre-ayton",
           "name": "Deandre Ayton",
           "overall": 79,
+          "potential": null,
           "position": "C",
           "threePoint": 63
         },
@@ -16107,6 +16615,7 @@
           "id": "jamir-watkins",
           "name": "Jamir Watkins",
           "overall": 76,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 71
         },
@@ -16116,6 +16625,7 @@
           "id": "julian-reese",
           "name": "Julian Reese",
           "overall": 76,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 30
         },
@@ -16125,6 +16635,7 @@
           "id": "justin-champagnie",
           "name": "Justin Champagnie",
           "overall": 78,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 75
         },
@@ -16134,6 +16645,7 @@
           "id": "khris-middleton",
           "name": "Khris Middleton",
           "overall": 76,
+          "potential": null,
           "position": "SF/PF",
           "threePoint": 78
         },
@@ -16143,6 +16655,7 @@
           "id": "kyshawn-george",
           "name": "KyShawn George",
           "overall": 82,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 82
         },
@@ -16152,6 +16665,7 @@
           "id": "trae-young",
           "name": "Trae Young",
           "overall": 89,
+          "potential": null,
           "position": "PG",
           "threePoint": 83
         },
@@ -16161,6 +16675,7 @@
           "id": "tre-johnson",
           "name": "Tre Johnson",
           "overall": 78,
+          "potential": null,
           "position": "SG/PG",
           "threePoint": 80
         },
@@ -16170,6 +16685,7 @@
           "id": "tristan-vukcevic",
           "name": "Tristan Vukcevic",
           "overall": 77,
+          "potential": null,
           "position": "C/PF",
           "threePoint": 78
         },
@@ -16179,6 +16695,7 @@
           "id": "will-riley",
           "name": "Will Riley",
           "overall": 81,
+          "potential": null,
           "position": "PF/SF",
           "threePoint": 76
         }

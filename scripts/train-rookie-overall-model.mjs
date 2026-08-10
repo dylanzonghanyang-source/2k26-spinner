@@ -207,17 +207,54 @@ function fitRidge(data, lambda, withBadges = false) {
   }
 
   const coefficients = solveLinearSystem(xtx, xty);
-  if (withBadges) {
-    return {
+  const model = withBadges
+    ? {
       intercept: coefficients[0],
       coefficients: Object.fromEntries(attributes.map((attribute, index) => [attribute, coefficients[index + 1]])),
       badgeCoefficients: Object.fromEntries(badgeCategories.map((category, index) => [category, coefficients[index + 1 + attributes.length]])),
+    }
+    : {
+      intercept: coefficients[0],
+      coefficients: Object.fromEntries(attributes.map((attribute, index) => [attribute, coefficients[index + 1]])),
     };
+  return enforceNonNegative(model, data, withBadges);
+}
+
+/**
+ * 非负约束（产品保证：任一属性提升不得降低 OVR）。
+ * Ridge 封闭解不约束系数符号，样本噪声/共线性会把部分系数拟合为负；
+ * 这里将属性与徽章系数 clip 到 ≥0，并用训练集均值重校准 intercept，
+ * 保持训练集平均预测水平不变（近似非负最小二乘，工程可接受）。
+ */
+function enforceNonNegative(model, data, withBadges) {
+  const clampedCoefficients = Object.fromEntries(
+    Object.entries(model.coefficients).map(([key, value]) => [key, Math.max(0, value)]),
+  );
+  const clampedBadgeCoefficients = withBadges
+    ? Object.fromEntries(
+      Object.entries(model.badgeCoefficients).map(([key, value]) => [key, Math.max(0, value)]),
+    )
+    : undefined;
+  const n = data.length;
+  let intercept = model.intercept;
+  if (n > 0) {
+    const meanOverall = average(data.map((sample) => sample.overall));
+    const meanFeatures = attributes.map((_, index) => average(data.map((sample) => sample.features[index])));
+    const meanAttributeContribution = attributes.reduce(
+      (total, attribute, index) => total + meanFeatures[index] * clampedCoefficients[attribute],
+      0,
+    );
+    const meanBadgeContribution = withBadges
+      ? badgeCategories.reduce(
+        (total, category, index) => total + average(data.map((sample) => sample.badgeFeatures[index])) * clampedBadgeCoefficients[category],
+        0,
+      )
+      : 0;
+    intercept = meanOverall - meanAttributeContribution - meanBadgeContribution;
   }
-  return {
-    intercept: coefficients[0],
-    coefficients: Object.fromEntries(attributes.map((attribute, index) => [attribute, coefficients[index + 1]])),
-  };
+  return withBadges
+    ? { ...model, intercept, coefficients: clampedCoefficients, badgeCoefficients: clampedBadgeCoefficients }
+    : { ...model, intercept, coefficients: clampedCoefficients };
 }
 
 function predict(model, features, nonnegativeBadges = false) {
