@@ -155,6 +155,7 @@ const NAME_VARIANTS = {
   "Slava Medvedenko": "Stanislav Medvedenko",
   "Darrell Griffith": "Darrel Griffith",
   "Cliff Robinson": "Clifford Robinson",
+  "Zhi Zhi Wang": "Wang Zhizhi",
 };
 
 // ============================================================

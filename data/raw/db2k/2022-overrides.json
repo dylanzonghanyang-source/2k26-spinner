@@ -1,246 +1,245 @@
 {
-  "a-j-green": {
-    "overall": 71,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "alondes-williams": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "andrew-nembhard": {
-    "overall": 70,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "bennedict-mathurin": {
-    "overall": 74,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "blake-wesley": {
-    "overall": 65,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "bryce-mcgowens": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "caleb-houstan": {
-    "overall": 70,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "chet-holmgren": {
-    "overall": 77,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "christian-braun": {
-    "overall": 71,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "christian-koloko": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "collin-gillespie": {
-    "overall": 68,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "dalen-terry": {
-    "overall": 73,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "david-roddy": {
-    "overall": 72,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "dyson-daniels": {
-    "overall": 73,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "e-j-liddell": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "gui-santos": {
-    "overall": 71,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "isaiah-mobley": {
-    "overall": 70,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jabari-smith-jr": {
-    "overall": 78,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jabari-walker": {
-    "overall": 71,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jaden-hardy": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jaden-ivey": {
-    "overall": 76,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jake-laravia": {
-    "overall": 71,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jalen-duren": {
-    "overall": 73,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jalen-williams": {
-    "overall": 71,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jamal-cain": {
-    "overall": 71,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jaylin-williams": {
-    "overall": 72,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jd-davison": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "jeremy-sochan": {
-    "overall": 73,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "johnny-davis": {
-    "overall": 73,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "johnny-juzang": {
-    "overall": 67,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "josh-minott": {
-    "overall": 70,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "julian-champagnie": {
-    "overall": 68,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "justin-minaya": {
-    "overall": 67,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "karlo-matkovic": {
-    "overall": 73,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "keegan-murray": {
-    "overall": 76,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "kendall-brown": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "keon-ellis": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "kevon-harris": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "luke-travers": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "malaki-branham": {
-    "overall": 72,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "marjon-beauchamp": {
-    "overall": 71,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "mark-williams": {
-    "overall": 72,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "max-christie": {
-    "overall": 70,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "moussa-diabat": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "nikola-jovic": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "ochai-agbaji": {
-    "overall": 73,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "ousmane-dieng": {
-    "overall": 70,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "paolo-banchero": {
-    "overall": 78,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "patrick-baldwin-jr": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "peyton-watson": {
-    "overall": 67,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "quenton-jackson": {
-    "overall": 67,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "ron-harper-jr": {
-    "overall": 68,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "ryan-rollins": {
-    "overall": 67,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "scotty-pippen-jr": {
-    "overall": 68,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "shaedon-sharpe": {
-    "overall": 72,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "tari-eason": {
-    "overall": 72,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "tyrese-martin": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "tyty-washington-jr": {
-    "overall": 71,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "vince-williams-jr": {
-    "overall": 68,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "walker-kessler": {
-    "overall": 71,
-    "source": "user-ui-confirmed-2026-08-08"
-  },
-  "wendell-moore-jr": {
-    "overall": 69,
-    "source": "user-ui-confirmed-2026-08-08"
-  }
+ "a-j-green": {
+  "overall": 71,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "alondes-williams": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "andrew-nembhard": {
+  "overall": 70,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "bennedict-mathurin": {
+  "overall": 74,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "blake-wesley": {
+  "overall": 65,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "bryce-mcgowens": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "caleb-houstan": {
+  "overall": 70,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "chet-holmgren": {
+  "overall": 77,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "christian-braun": {
+  "overall": 71,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "christian-koloko": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "collin-gillespie": {
+  "overall": 68,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "dalen-terry": {
+  "overall": 73,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "david-roddy": {
+  "overall": 72,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "dyson-daniels": {
+  "overall": 73,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "e-j-liddell": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "gui-santos": {
+  "overall": 71,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "isaiah-mobley": {
+  "overall": 70,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jabari-smith-jr": {
+  "overall": 78,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jabari-walker": {
+  "overall": 71,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jaden-hardy": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jaden-ivey": {
+  "overall": 76,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jake-laravia": {
+  "overall": 71,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jalen-duren": {
+  "overall": 73,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jalen-williams": {
+  "overall": 71,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jamal-cain": {
+  "overall": 71,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jaylin-williams": {
+  "overall": 72,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jd-davison": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "jeremy-sochan": {
+  "overall": 73,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "johnny-davis": {
+  "overall": 73,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "johnny-juzang": {
+  "overall": 67,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "josh-minott": {
+  "overall": 70,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "julian-champagnie": {
+  "overall": 68,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "justin-minaya": {
+  "overall": 67,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "karlo-matkovic": {
+  "overall": 73,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "keegan-murray": {
+  "overall": 76,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "kendall-brown": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "keon-ellis": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "kevon-harris": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "luke-travers": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "malaki-branham": {
+  "overall": 72,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "marjon-beauchamp": {
+  "overall": 71,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "mark-williams": {
+  "overall": 72,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "max-christie": {
+  "overall": 70,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "moussa-diabat": {
+  "overall": 69
+ },
+ "nikola-jovic": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "ochai-agbaji": {
+  "overall": 73,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "ousmane-dieng": {
+  "overall": 70,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "paolo-banchero": {
+  "overall": 78,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "patrick-baldwin-jr": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "peyton-watson": {
+  "overall": 67,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "quenton-jackson": {
+  "overall": 67,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "ron-harper-jr": {
+  "overall": 68,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "ryan-rollins": {
+  "overall": 67,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "scotty-pippen-jr": {
+  "overall": 68,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "shaedon-sharpe": {
+  "overall": 72,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "tari-eason": {
+  "overall": 72,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "tyrese-martin": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "tyty-washington-jr": {
+  "overall": 71,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "vince-williams-jr": {
+  "overall": 68,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "walker-kessler": {
+  "overall": 71,
+  "source": "user-ui-confirmed-2026-08-08"
+ },
+ "wendell-moore-jr": {
+  "overall": 69,
+  "source": "user-ui-confirmed-2026-08-08"
+ }
 }
