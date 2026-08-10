@@ -1,0 +1,329 @@
+{
+  "slug": "joe-dumars",
+  "name": "Joe Dumars",
+  "draftYear": 1985,
+  "source": "db2k-gap-historic",
+  "gameVersion": "NBA2K26.exe",
+  "capturedAt": "2026-08-10",
+  "overall": 98,
+  "overallSource": "model-estimated-gap",
+  "position": "SG",
+  "secondaryPosition": "PG",
+  "height": 75,
+  "weight": 190,
+  "wingspan": 198.43,
+  "faceId": 1213,
+  "potential": {
+    "current": 93,
+    "min": 93,
+    "max": 93
+  },
+  "vitals": {
+    "firstName": "Joe",
+    "lastName": "Dumars",
+    "nickname": null,
+    "jerseyNickname": null,
+    "birthMonth": 5,
+    "birthDay": 24,
+    "birthYear": 1963,
+    "ageAtSetYear": 1988,
+    "jerseyNumber": 4,
+    "yearsPro": 14,
+    "dominantHand": "Right",
+    "dominantDunkHand": "Right",
+    "peakStartAge": 25,
+    "peakEndAge": 31,
+    "boomPercent": 32,
+    "averagePercent": 55,
+    "bustPercent": 13,
+    "playForWinner": 69,
+    "financialSecurity": 40,
+    "loyalty": 100,
+    "forceNonStarter": "Off",
+    "playInitiator": true,
+    "playType1": "Mid Range",
+    "playType2": "P&R Ball Handler",
+    "playType3": "Isolation Point",
+    "playType4": "3 PT",
+    "currentTeam": 9882751792,
+    "hometownTeam1": 0,
+    "hometownTeam2": 0,
+    "draftYear": 1985,
+    "draftPick": 18,
+    "heightInches": 75,
+    "weightLb": 190,
+    "wingspanCm": 198.43,
+    "armScale": 50,
+    "shoulderLength": 50,
+    "neckLength": 50,
+    "trunkLength": 50
+  },
+  "durability": {
+    "head": 80,
+    "neck": 80,
+    "back": 80,
+    "leftShoulder": 80,
+    "rightShoulder": 80,
+    "leftElbow": 80,
+    "rightElbow": 80,
+    "leftHip": 80,
+    "rightHip": 80,
+    "leftKnee": 80,
+    "rightKnee": 80,
+    "leftAnkle": 80,
+    "rightAnkle": 80,
+    "leftFoot": 80,
+    "rightFoot": 80,
+    "overall": 77
+  },
+  "hotZones": {
+    "underBasket": "Hot",
+    "closeLeft": "Neutral",
+    "closeMiddle": "Neutral",
+    "closeRight": "Neutral",
+    "midLeft": "Hot",
+    "midLeftCenter": "Hot",
+    "midCenter": "Neutral",
+    "midRightCenter": "Hot",
+    "midRight": "Hot",
+    "threeLeft": "Neutral",
+    "threeLeftCenter": "Neutral",
+    "threeCenter": "Neutral",
+    "threeRightCenter": "Neutral",
+    "threeRight": "Neutral"
+  },
+  "detailed": {
+    "Agility": 97,
+    "Ball Handle": 84,
+    "Block": 27,
+    "Close Shot": 92,
+    "Defensive Consistency": 98,
+    "Defensive Rebound": 66,
+    "Draw Foul": 88,
+    "Driving Dunk": 51,
+    "Free Throw": 84,
+    "Hands": 98,
+    "Help Defense IQ": 97,
+    "Hustle": 95,
+    "Intangibles": 83,
+    "Interior Defense": 68,
+    "Shot IQ": 98,
+    "Mid-Range Shot": 93,
+    "Offensive Consistency": 95,
+    "Offensive Rebound": 50,
+    "Pass Accuracy": 88,
+    "Pass IQ": 88,
+    "Pass Perception": 96,
+    "Pass Vision": 80,
+    "Perimeter Defense": 98,
+    "Post Control": 33,
+    "Post Fade": 59,
+    "Post Hook": 25,
+    "Speed": 84,
+    "Speed with Ball": 82,
+    "Stamina": 93,
+    "Standing Dunk": 25,
+    "Steal": 77,
+    "Strength": 67,
+    "Vertical": 73,
+    "Layup": 94,
+    "Three-Point Shot": 90
+  },
+  "badges": [
+    {
+      "name": "Ankle Assassin",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Bail Out",
+      "tier": "Silver"
+    },
+    {
+      "name": "Challenger",
+      "tier": "Gold"
+    },
+    {
+      "name": "Deadeye",
+      "tier": "Silver"
+    },
+    {
+      "name": "Dimer",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Glove",
+      "tier": "Gold"
+    },
+    {
+      "name": "Handles For Days",
+      "tier": "Silver"
+    },
+    {
+      "name": "Immovable Enforcer",
+      "tier": "Gold"
+    },
+    {
+      "name": "Interceptor",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Lightning Launch",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Limitless Range",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Mini Marksman",
+      "tier": "Silver"
+    },
+    {
+      "name": "Off-Ball Pest",
+      "tier": "Gold"
+    },
+    {
+      "name": "On-Ball Menace",
+      "tier": "Gold"
+    },
+    {
+      "name": "Physical Finisher",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Pick Dodger",
+      "tier": "Gold"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "tier": "Silver"
+    },
+    {
+      "name": "Shifty Shooter",
+      "tier": "Silver"
+    },
+    {
+      "name": "Slippery Off-Ball",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handle",
+      "tier": "Silver"
+    },
+    {
+      "name": "Unpluckable",
+      "tier": "Silver"
+    },
+    {
+      "name": "Versatile Visionary",
+      "tier": "Gold"
+    }
+  ],
+  "tendencies": {
+    "Alley-Oop": 15,
+    "Alley-Oop Pass": 55,
+    "Attack Strong on Drive": 80,
+    "Block Shot": 5,
+    "Contested Jumper Mid-Range": 55,
+    "Contested Jumper Three": 30,
+    "Crash": 40,
+    "Dish to Open Man": 35,
+    "Drive": 70,
+    "Drive Pull-Up Mid-Range": 35,
+    "Drive Pull-Up Three": 5,
+    "Drive Right": 55,
+    "Driving Behind the Back": 40,
+    "Driving Crossover": 75,
+    "Driving Double Crossover": 30,
+    "Driving Dribble Hesitation": 20,
+    "Driving Dunk": 30,
+    "Driving Half Spin": 15,
+    "Driving In & Out": 50,
+    "Driving Layup": 55,
+    "Driving Spin": 75,
+    "Driving Stepback": 35,
+    "Euro Step Layup": 30,
+    "Flashy Dunk": 10,
+    "Flashy Pass": 45,
+    "Floater": 85,
+    "Foul": 25,
+    "Hard Foul": 45,
+    "Hop Step Layup": 80,
+    "Iso vs Average Defender": 50,
+    "Iso vs Elite Defender": 10,
+    "Iso vs Good Defender": 25,
+    "No Driving Dribble Move": 40,
+    "No Setup Dribble": 10,
+    "Off-Screen Drive": 60,
+    "Off-Screen Shot Mid-Range": 75,
+    "Off-Screen Shot Three": 20,
+    "On-Ball Steal": 60,
+    "Pass Interception": 55,
+    "Play Discipline": 35,
+    "Post Aggressive Backdown": 10,
+    "Post Back Down": 25,
+    "Post Drive": 40,
+    "Post Drop Step": 15,
+    "Post Face Up": 75,
+    "Post Fade Left": 30,
+    "Post Fade Right": 30,
+    "Post Hook Left": 0,
+    "Post Hook Right": 0,
+    "Post Hop Step": 5,
+    "Post Shimmy Shot": 30,
+    "Post Spin": 20,
+    "Post Stepback Shot": 25,
+    "Post Up": 10,
+    "Post Up & Under": 5,
+    "Putback": 15,
+    "Roll vs Pop": 25,
+    "Setup With Hesitation": 45,
+    "Setup With Sizeup": 45,
+    "Shoot From Post": 35,
+    "Shot": 75,
+    "Shot Close": 45,
+    "Shot Close Left": 25,
+    "Shot Close Middle": 50,
+    "Shot Close Right": 25,
+    "Shot Mid Center": 20,
+    "Shot Mid Left": 20,
+    "Shot Mid Left-Center": 25,
+    "Shot Mid Right": 15,
+    "Shot Mid Right-Center": 20,
+    "Shot Mid-Range": 85,
+    "Shot Three": 15,
+    "Shot Three Center": 20,
+    "Shot Three Left": 15,
+    "Shot Three Left-Center": 20,
+    "Shot Three Right": 15,
+    "Shot Three Right-Center": 20,
+    "Shot Under Basket": 30,
+    "Spin Jumper": 10,
+    "Spin Layup": 85,
+    "Spot Up Drive": 60,
+    "Spot Up Shot Mid-Range": 75,
+    "Spot Up Shot Three": 25,
+    "Standing Dunk": 15,
+    "Step Through Shot": 15,
+    "Stepback Jumper Mid-Range": 50,
+    "Stepback Three Point Shot": 10,
+    "Take Charge": 55,
+    "Touches": 85,
+    "Transition Pull-Up Three Point Shot": 5,
+    "Transition Spot Up vs Cut to the Basket": 35,
+    "Triple Threat Idle": 15,
+    "Triple Threat Jab Step": 50,
+    "Triple Threat Pump Fake": 35,
+    "Triple Threat Shoot": 55,
+    "Use Glass": 45
+  },
+  "personalityBadges": []
+}

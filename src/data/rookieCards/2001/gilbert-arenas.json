@@ -1,0 +1,322 @@
+{
+  "slug": "gilbert-arenas",
+  "name": "Gilbert Arenas",
+  "draftYear": 2001,
+  "source": "db2k-gap-historic",
+  "gameVersion": "NBA2K26.exe",
+  "capturedAt": "2026-08-10",
+  "overall": 97,
+  "overallSource": "model-estimated-gap",
+  "position": "PG",
+  "secondaryPosition": "SG",
+  "height": 76,
+  "weight": 191,
+  "wingspan": 207.01,
+  "faceId": 8528,
+  "potential": {
+    "current": 96,
+    "min": 96,
+    "max": 96
+  },
+  "vitals": {
+    "firstName": "Gilbert",
+    "lastName": "Arenas",
+    "nickname": null,
+    "jerseyNickname": null,
+    "birthMonth": 1,
+    "birthDay": 6,
+    "birthYear": 1982,
+    "ageAtSetYear": 2007,
+    "jerseyNumber": 0,
+    "yearsPro": 11,
+    "dominantHand": "Right",
+    "dominantDunkHand": "Right",
+    "peakStartAge": 24,
+    "peakEndAge": 30,
+    "boomPercent": 38,
+    "averagePercent": 51,
+    "bustPercent": 11,
+    "playForWinner": 84,
+    "financialSecurity": 72,
+    "loyalty": 18,
+    "forceNonStarter": "Off",
+    "playInitiator": true,
+    "playType1": "P&R Point",
+    "playType2": "3 PT",
+    "playType3": "Isolation Point",
+    "playType4": "Guard Post Up",
+    "currentTeam": 9882802840,
+    "hometownTeam1": 0,
+    "hometownTeam2": 9882122200,
+    "draftYear": 2001,
+    "draftPick": 32,
+    "heightInches": 76,
+    "weightLb": 191,
+    "wingspanCm": 207.01,
+    "armScale": 50,
+    "shoulderLength": 50,
+    "neckLength": 50,
+    "trunkLength": 50
+  },
+  "durability": {
+    "head": 95,
+    "neck": 95,
+    "back": 95,
+    "leftShoulder": 95,
+    "rightShoulder": 95,
+    "leftElbow": 95,
+    "rightElbow": 95,
+    "leftHip": 95,
+    "rightHip": 95,
+    "leftKnee": 95,
+    "rightKnee": 95,
+    "leftAnkle": 95,
+    "rightAnkle": 95,
+    "leftFoot": 95,
+    "rightFoot": 95,
+    "overall": 95
+  },
+  "hotZones": {
+    "underBasket": "Hot",
+    "closeLeft": "Hot",
+    "closeMiddle": "Hot",
+    "closeRight": "Neutral",
+    "midLeft": "Hot",
+    "midLeftCenter": "Neutral",
+    "midCenter": "Hot",
+    "midRightCenter": "Hot",
+    "midRight": "Hot",
+    "threeLeft": "Neutral",
+    "threeLeftCenter": "Hot",
+    "threeCenter": "Neutral",
+    "threeRightCenter": "Neutral",
+    "threeRight": "Hot"
+  },
+  "detailed": {
+    "Agility": 89,
+    "Ball Handle": 92,
+    "Block": 50,
+    "Close Shot": 88,
+    "Defensive Consistency": 75,
+    "Defensive Rebound": 62,
+    "Draw Foul": 96,
+    "Driving Dunk": 75,
+    "Free Throw": 82,
+    "Hands": 98,
+    "Help Defense IQ": 75,
+    "Hustle": 96,
+    "Intangibles": 65,
+    "Interior Defense": 67,
+    "Shot IQ": 98,
+    "Mid-Range Shot": 92,
+    "Offensive Consistency": 95,
+    "Offensive Rebound": 54,
+    "Pass Accuracy": 90,
+    "Pass IQ": 92,
+    "Pass Perception": 78,
+    "Pass Vision": 75,
+    "Perimeter Defense": 79,
+    "Post Control": 74,
+    "Post Fade": 88,
+    "Post Hook": 60,
+    "Speed": 94,
+    "Speed with Ball": 94,
+    "Stamina": 98,
+    "Standing Dunk": 35,
+    "Steal": 75,
+    "Strength": 78,
+    "Vertical": 95,
+    "Layup": 95,
+    "Three-Point Shot": 89
+  },
+  "badges": [
+    {
+      "name": "Ankle Assassin",
+      "tier": "Gold"
+    },
+    {
+      "name": "Bail Out",
+      "tier": "Gold"
+    },
+    {
+      "name": "Break Starter",
+      "tier": "Silver"
+    },
+    {
+      "name": "Deadeye",
+      "tier": "Gold"
+    },
+    {
+      "name": "Dimer",
+      "tier": "Gold"
+    },
+    {
+      "name": "Float Game",
+      "tier": "Gold"
+    },
+    {
+      "name": "Handles For Days",
+      "tier": "Gold"
+    },
+    {
+      "name": "Layup Mixmaster",
+      "tier": "Gold"
+    },
+    {
+      "name": "Lightning Launch",
+      "tier": "Silver"
+    },
+    {
+      "name": "Limitless Range",
+      "tier": "Bronze"
+    },
+    {
+      "name": "Physical Finisher",
+      "tier": "Silver"
+    },
+    {
+      "name": "Set Shot Specialist",
+      "tier": "Gold"
+    },
+    {
+      "name": "Shifty Shooter",
+      "tier": "Gold"
+    },
+    {
+      "name": "Slippery Off-Ball",
+      "tier": "Silver"
+    },
+    {
+      "name": "Strong Handle",
+      "tier": "Gold"
+    },
+    {
+      "name": "Unpluckable",
+      "tier": "Gold"
+    },
+    {
+      "name": "Versatile Visionary",
+      "tier": "Gold"
+    }
+  ],
+  "tendencies": {
+    "Alley-Oop": 30,
+    "Alley-Oop Pass": 75,
+    "Attack Strong on Drive": 90,
+    "Block Shot": 5,
+    "Contested Jumper Mid-Range": 30,
+    "Contested Jumper Three": 30,
+    "Crash": 35,
+    "Dish to Open Man": 45,
+    "Drive": 85,
+    "Drive Pull-Up Mid-Range": 15,
+    "Drive Pull-Up Three": 15,
+    "Drive Right": 60,
+    "Driving Behind the Back": 25,
+    "Driving Crossover": 65,
+    "Driving Double Crossover": 30,
+    "Driving Dribble Hesitation": 35,
+    "Driving Dunk": 55,
+    "Driving Half Spin": 25,
+    "Driving In & Out": 35,
+    "Driving Layup": 75,
+    "Driving Spin": 45,
+    "Driving Stepback": 55,
+    "Euro Step Layup": 75,
+    "Flashy Dunk": 30,
+    "Flashy Pass": 45,
+    "Floater": 80,
+    "Foul": 50,
+    "Hard Foul": 40,
+    "Hop Step Layup": 80,
+    "Iso vs Average Defender": 65,
+    "Iso vs Elite Defender": 20,
+    "Iso vs Good Defender": 40,
+    "No Driving Dribble Move": 50,
+    "No Setup Dribble": 30,
+    "Off-Screen Drive": 85,
+    "Off-Screen Shot Mid-Range": 55,
+    "Off-Screen Shot Three": 70,
+    "On-Ball Steal": 75,
+    "Pass Interception": 75,
+    "Play Discipline": 25,
+    "Post Aggressive Backdown": 5,
+    "Post Back Down": 20,
+    "Post Drive": 15,
+    "Post Drop Step": 0,
+    "Post Face Up": 80,
+    "Post Fade Left": 25,
+    "Post Fade Right": 25,
+    "Post Hook Left": 0,
+    "Post Hook Right": 0,
+    "Post Hop Step": 0,
+    "Post Shimmy Shot": 5,
+    "Post Spin": 0,
+    "Post Stepback Shot": 25,
+    "Post Up": 5,
+    "Post Up & Under": 0,
+    "Putback": 15,
+    "Roll vs Pop": 25,
+    "Setup With Hesitation": 30,
+    "Setup With Sizeup": 40,
+    "Shoot From Post": 15,
+    "Shot": 95,
+    "Shot Close": 15,
+    "Shot Close Left": 25,
+    "Shot Close Middle": 35,
+    "Shot Close Right": 40,
+    "Shot Mid Center": 15,
+    "Shot Mid Left": 20,
+    "Shot Mid Left-Center": 20,
+    "Shot Mid Right": 20,
+    "Shot Mid Right-Center": 25,
+    "Shot Mid-Range": 55,
+    "Shot Three": 70,
+    "Shot Three Center": 25,
+    "Shot Three Left": 0,
+    "Shot Three Left-Center": 10,
+    "Shot Three Right": 25,
+    "Shot Three Right-Center": 20,
+    "Shot Under Basket": 50,
+    "Spin Jumper": 35,
+    "Spin Layup": 65,
+    "Spot Up Drive": 85,
+    "Spot Up Shot Mid-Range": 50,
+    "Spot Up Shot Three": 75,
+    "Standing Dunk": 20,
+    "Step Through Shot": 10,
+    "Stepback Jumper Mid-Range": 35,
+    "Stepback Three Point Shot": 25,
+    "Take Charge": 35,
+    "Touches": 99,
+    "Transition Pull-Up Three Point Shot": 25,
+    "Transition Spot Up vs Cut to the Basket": 75,
+    "Triple Threat Idle": 35,
+    "Triple Threat Jab Step": 55,
+    "Triple Threat Pump Fake": 10,
+    "Triple Threat Shoot": 45,
+    "Use Glass": 20
+  },
+  "personalityBadges": [
+    {
+      "name": "alphadog",
+      "tier": "Bronze"
+    },
+    {
+      "name": "expressive",
+      "tier": "Bronze"
+    },
+    {
+      "name": "extremelyconfident",
+      "tier": "Bronze"
+    },
+    {
+      "name": "patmyback",
+      "tier": "Bronze"
+    },
+    {
+      "name": "reserved",
+      "tier": "Bronze"
+    }
+  ]
+}

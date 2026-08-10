@@ -23,11 +23,16 @@ const current = JSON.parse(readFileSync(new URL("../src/data/rookieCardIndex-cur
 const lookup = createRookieCardLookup(legacy);
 for (const [key, card] of createRookieCardLookup(current)) if (!lookup.has(key)) lookup.set(key, card);
 
+function pickOf(card: { vitals?: Record<string, unknown> }) {
+  const pick = card.vitals?.draftPick;
+  return typeof pick === "number" && pick > 0 ? pick : null;
+}
+
 // --- years ---
 {
   const years = yearsWithCards(lookup);
-  check("years desc", years[0] === 2025 && years.at(-1) === 2003, `first=${years[0]} last=${years.at(-1)}`);
-  check("years span 23 years", years.length === 23);
+  check("years desc", years[0] === 2025 && years.at(-1) === 1960, `first=${years[0]} last=${years.at(-1)}`);
+  check("years span 1960-2025", years.length >= 60 && years.length <= 66, `count=${years.length}`);
   check("years null", yearsWithCards(null).length === 0);
 }
 
@@ -48,8 +53,10 @@ for (const [key, card] of createRookieCardLookup(current)) if (!lookup.has(key))
   check("all cards", all.length === lookup.size, `${all.length} vs ${lookup.size}`);
   const y2024 = filterCards(lookup, { year: 2024, query: "" });
   check("2024 count matches index", y2024.length > 0 && y2024.every((c) => c.year === 2024));
+  check("2024 sorted by pick asc", y2024.every((c, i) => i === 0 || (pickOf(c) ?? Infinity) >= (pickOf(y2024[i - 1]) ?? Infinity)), `${y2024[0].name}(pick ${pickOf(y2024[0])}) vs ${y2024[1].name}(pick ${pickOf(y2024[1])})`);
+  check("2024 first is pick 1", pickOf(y2024[0]) === 1, `${y2024[0].name} pick=${pickOf(y2024[0])}`);
   const sorted = filterCards(lookup, { year: null, query: "" });
-  check("sorted by OVR desc", sorted[0].overall! >= sorted[1].overall!, `${sorted[0].name}(${sorted[0].overall}) vs ${sorted[1].name}(${sorted[1].overall})`);
+  check("overview sorted by OVR desc", sorted[0].overall! >= sorted[1].overall!, `${sorted[0].name}(${sorted[0].overall}) vs ${sorted[1].name}(${sorted[1].overall})`);
   const q = filterCards(lookup, { year: null, query: "库里" });
   check("search chinese filters", q.length >= 1 && q.every((c) => matchesCard(c, "库里")));
   const none = filterCards(lookup, { year: 2003, query: "wembanyama" });
