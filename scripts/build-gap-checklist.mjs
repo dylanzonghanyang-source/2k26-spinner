@@ -12,10 +12,10 @@ const legacy = JSON.parse(readFileSync(path.join(root, "src/data/rookieCardIndex
 const current = JSON.parse(readFileSync(path.join(root, "src/data/rookieCardIndex-current.min.json"), "utf8"));
 
 function core(raw) {
+  // keep Jr/Sr/II/III suffixes so "Ron Harper" never matches "Ron Harper Jr."
   return String(raw ?? "")
     .toLowerCase()
     .replace(/[^a-z0-9 ]/g, " ")
-    .replace(/\b(jr|sr|ii|iii|iv|v)\b/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -30,6 +30,24 @@ const ALIASES = {
 };
 const aliasKeys = new Map(Object.entries(ALIASES).map(([k, v]) => [core(k), core(v)]));
 
+// Jr/II cards: roster lists "Bobby Portis", card is "Bobby Portis Jr." — resolve
+// by checking the card set for a suffixed variant of the same base name.
+const cardKeySet = new Set();
+for (const n of [...legacy.names, ...current.names]) cardKeySet.add(core(n));
+// Only these roster names omit a Jr/Sr suffix while referring to the SAME person
+// as a card (e.g. roster "Bobby Portis" = card "Bobby Portis Jr."). All other
+// suffix pairs (Ron Harper vs Ron Harper Jr., Gary Payton vs Gary Payton II)
+// are DIFFERENT players and must stay unmatched.
+const SUFFIX_ALIASES = {
+  "bobby portis": "bobby portis jr",
+  "bronny james": "bronny james jr",
+};
+function hasCardOrSuffixed(key, cardKeys) {
+  if (cardKeys.has(key)) return true;
+  const alias = SUFFIX_ALIASES[key];
+  return alias ? cardKeys.has(alias) : false;
+}
+
 const cardKeys = new Set();
 for (const n of [...legacy.names, ...current.names]) cardKeys.add(core(n));
 
@@ -38,7 +56,7 @@ const gapMap = new Map();
 for (const team of catalog.teams) {
   for (const player of team.players) {
     const key = core(player.name);
-    const ok = cardKeys.has(key) || (aliasKeys.has(key) && cardKeys.has(aliasKeys.get(key)));
+    const ok = hasCardOrSuffixed(key, cardKeys) || (aliasKeys.has(key) && hasCardOrSuffixed(aliasKeys.get(key), cardKeys));
     if (ok) continue;
     if (!gapMap.has(key)) {
       gapMap.set(key, { name: player.name, position: player.position ?? "", overall: player.overall ?? 0, teams: [] });
