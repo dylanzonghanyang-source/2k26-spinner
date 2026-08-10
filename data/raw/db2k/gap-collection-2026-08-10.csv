@@ -1,0 +1,547 @@
+球员,位置,OVR,来源队(最多3),类别
+Wilt Chamberlain,C/SF,99,ALL-TIME All-Time Philadelphia 76ers | ALL-TIME All-Time Los Angeles Lakers | ALL-TIME All-Time Golden State Warriors,allTime
+Kareem Abdul-Jabbar,C/PF,99,ALL-TIME All-Time Milwaukee Bucks | ALL-TIME All-Time Los Angeles Lakers | CLASSIC 1970-71 Bucks,allTime
+Michael Jordan,SG/SF,99,ALL-TIME All-Time Chicago Bulls | CLASSIC 1985-86 Bulls | CLASSIC 1992-93 Bulls,allTime
+Larry Bird,SF/PF,99,ALL-TIME All-Time Boston Celtics | CLASSIC 1985-86 Celtics,allTime
+Kobe Bryant,SG/SF,99,ALL-TIME All-Time Los Angeles Lakers | CLASSIC 2003-04 Lakers | CLASSIC 2000-01 Lakers,allTime
+Magic Johnson,PG/SG,99,ALL-TIME All-Time Los Angeles Lakers | CLASSIC 1990-91 Lakers | CLASSIC 1986-87 Lakers,allTime
+Hakeem Olajuwon,C/PF,99,ALL-TIME All-Time Houston Rockets | CLASSIC 1993-94 Rockets,allTime
+Bill Russell,,98,ALL-TIME All-Time Boston Celtics,allTime
+Kevin Garnett,PF/C,98,ALL-TIME All-Time Boston Celtics | ALL-TIME All-Time Minnesota Timberwolves | CLASSIC 2007-08 Celtics,allTime
+Shaquille O’Neal,C,98,ALL-TIME All-Time Miami Heat | ALL-TIME All-Time Los Angeles Lakers | ALL-TIME All-Time Orlando Magic,allTime
+Dirk Nowitzki,PF/C,98,ALL-TIME All-Time Dallas Mavericks | CLASSIC 2002-03 Mavericks | CLASSIC 2010-11 Mavericks,allTime
+Tim Duncan,PF/C,98,ALL-TIME All-Time San Antonio Spurs | CLASSIC 2013-14 Spurs | CLASSIC 1997-98 Spurs,allTime
+Moses Malone,C/PF,97,ALL-TIME All-Time Philadelphia 76ers | ALL-TIME All-Time Houston Rockets | ALL-TIME All-Time Washington Wizards,allTime
+Julius Erving,SF/SG,97,ALL-TIME All-Time Philadelphia 76ers | ALL-TIME All-Time Brooklyn Nets | CLASSIC 1976-77 76ers,allTime
+Oscar Robertson,PG/SG,97,ALL-TIME All-Time Milwaukee Bucks | ALL-TIME All-Time Sacramento Kings | CLASSIC 1970-71 Bucks,allTime
+Scottie Pippen,SF/SG,97,ALL-TIME All-Time Chicago Bulls | CLASSIC 1992-93 Bulls | CLASSIC 1988-89 Bulls,allTime
+John Stockton,PG/SG,97,ALL-TIME All-Time Utah Jazz | CLASSIC 1997-98 Jazz,allTime
+Karl Malone,PF/C,97,ALL-TIME All-Time Utah Jazz | CLASSIC 1997-98 Jazz | CLASSIC 2003-04 Lakers,allTime
+Walt Frazier,PG/SG,97,ALL-TIME All-Time New York Knicks | CLASSIC 1971-72 Knicks,allTime
+Jerry West,PG/SG,97,ALL-TIME All-Time Los Angeles Lakers | CLASSIC 1964-65 Lakers | CLASSIC 1970-71 Lakers,allTime
+Allen Iverson,SG/PG,96,ALL-TIME All-Time Philadelphia 76ers | ALL-TIME All-Time Denver Nuggets | CLASSIC 2000-01 76ers,allTime
+Bob Cousy,PG,96,ALL-TIME All-Time Boston Celtics,allTime
+John Havlicek,SF/SG,96,ALL-TIME All-Time Boston Celtics,allTime
+Elgin Baylor,SF/PF,96,ALL-TIME All-Time Los Angeles Lakers | CLASSIC 1964-65 Lakers | CLASSIC 1970-71 Lakers,allTime
+Steve Nash,PG,96,ALL-TIME All-Time Dallas Mavericks | ALL-TIME All-Time Phoenix Suns | CLASSIC 2002-03 Mavericks,allTime
+Vince Carter,SF/SG,96,ALL-TIME All-Time Brooklyn Nets | ALL-TIME All-Time Toronto Raptors | CLASSIC 1999-00 Raptors,allTime
+Clyde Drexler,SG/SF,96,ALL-TIME All-Time Houston Rockets | ALL-TIME All-Time Portland Trail Blazers | CLASSIC 1990-91 Trail Blazers,allTime
+David Robinson,C/PF,96,ALL-TIME All-Time San Antonio Spurs | CLASSIC 1997-98 Spurs,allTime
+Kevin McHale,PF/C,95,ALL-TIME All-Time Boston Celtics | CLASSIC 1985-86 Celtics,allTime
+Dave Cowens,C/PF,95,ALL-TIME All-Time Boston Celtics,allTime
+Dominique Wilkins,SF/SG,95,ALL-TIME All-Time Atlanta Hawks | CLASSIC 1985-86 Hawks,allTime
+Bob Pettit,PF/C,95,ALL-TIME All-Time Atlanta Hawks,allTime
+Jerry Lucas,PF/C,95,ALL-TIME All-Time Sacramento Kings | CLASSIC 1971-72 Knicks,allTime
+Patrick Ewing,C/PF,95,ALL-TIME All-Time New York Knicks | CLASSIC 1994-95 Knicks | CLASSIC 1998-99 Knicks,allTime
+James Worthy,SF/PF,95,ALL-TIME All-Time Los Angeles Lakers | CLASSIC 1990-91 Lakers | CLASSIC 1986-87 Lakers,allTime
+Tracy McGrady,SG/PG,95,ALL-TIME All-Time Orlando Magic | ALL-TIME All-Time Toronto Raptors | ALL-TIME All-Time Houston Rockets,allTime
+Jason Kidd,PG/SG,95,ALL-TIME All-Time Dallas Mavericks | ALL-TIME All-Time Brooklyn Nets | ALL-TIME All-Time Phoenix Suns,allTime
+David Thompson,SG/SF,95,ALL-TIME All-Time Denver Nuggets,allTime
+Isiah Thomas,PG/SG,95,ALL-TIME All-Time Detroit Pistons | CLASSIC 1988-89 Pistons,allTime
+Tony Parker,PG,95,ALL-TIME All-Time San Antonio Spurs | CLASSIC 2013-14 Spurs | CLASSIC 2004-05 Spurs,allTime
+Bill Walton,C/PF,95,ALL-TIME All-Time Portland Trail Blazers | CLASSIC 1985-86 Celtics,allTime
+Rick Barry,SF/PF,95,ALL-TIME All-Time Golden State Warriors,allTime
+Dolph Schayes,PF/C,94,ALL-TIME All-Time Philadelphia 76ers,allTime
+Sidney Moncrief,SG/PG,94,ALL-TIME All-Time Milwaukee Bucks | CLASSIC 1984-85 Bucks,allTime
+Ray Allen,SG/PF,94,ALL-TIME All-Time Milwaukee Bucks | ALL-TIME All-Time Boston Celtics | ALL-TIME All-Time Oklahoma City Thunder,allTime
+Jo Jo White,PG,94,ALL-TIME All-Time Boston Celtics,allTime
+Paul Pierce,SF/PF,94,ALL-TIME All-Time Boston Celtics | CLASSIC 2007-08 Celtics,allTime
+Bob McAdoo,C/PF,94,ALL-TIME All-Time Los Angeles Clippers,allTime
+Pete Maravich,SG/PG,94,ALL-TIME All-Time Atlanta Hawks | ALL-TIME All-Time Utah Jazz,allTime
+Alonzo Mourning,C/PF,94,ALL-TIME All-Time Miami Heat | ALL-TIME All-Time Charlotte Hornets | CLASSIC 2005-06 Heat,allTime
+Mitch Richmond,SG/SF,94,ALL-TIME All-Time Sacramento Kings | ALL-TIME All-Time Golden State Warriors | CLASSIC 1990-91 Warriors,allTime
+Nate Archibald,PG,94,ALL-TIME All-Time Sacramento Kings,allTime
+Willis Reed,C/PF,94,ALL-TIME All-Time New York Knicks | CLASSIC 1971-72 Knicks,allTime
+George Mikan,C,94,ALL-TIME All-Time Los Angeles Lakers,allTime
+Penny Hardaway,PG/SG,94,ALL-TIME All-Time Orlando Magic | CLASSIC 1994-95 Magic | CLASSIC 2002-03 Suns,allTime
+Elvin Hayes,PF/C,94,ALL-TIME All-Time Houston Rockets | ALL-TIME All-Time Washington Wizards,allTime
+George Gervin,SF/SG,94,ALL-TIME All-Time San Antonio Spurs | CLASSIC 1985-86 Bulls,allTime
+Dennis Johnson,PG/SG,94,ALL-TIME All-Time Phoenix Suns | ALL-TIME All-Time Oklahoma City Thunder | CLASSIC 1985-86 Celtics,allTime
+Chris Mullin,SF/SG,94,ALL-TIME All-Time Golden State Warriors | CLASSIC 1990-91 Warriors,allTime
+Wes Unseld,C/PF,94,ALL-TIME All-Time Washington Wizards,allTime
+Billy Cunningham,SF/PF,93,ALL-TIME All-Time Philadelphia 76ers,allTime
+Artis Gilmore,C,93,ALL-TIME All-Time Chicago Bulls | ALL-TIME All-Time San Antonio Spurs,allTime
+Dennis Rodman,PF/SF,93,ALL-TIME All-Time Chicago Bulls | ALL-TIME All-Time Detroit Pistons | CLASSIC 1995-96 Bulls,allTime
+Mark Price,PG/SG,93,ALL-TIME All-Time Cleveland Cavaliers | CLASSIC 1989-90 Cavaliers,allTime
+Robert Parish,C/PF,93,ALL-TIME All-Time Boston Celtics | CLASSIC 1985-86 Celtics,allTime
+Chris Webber,PF/C,93,ALL-TIME All-Time Sacramento Kings | CLASSIC 2001-02 Kings,allTime
+Grant Hill,SF/SG,93,ALL-TIME All-Time Orlando Magic | ALL-TIME All-Time Detroit Pistons,allTime
+Alex English,SF/PF,93,ALL-TIME All-Time Denver Nuggets,allTime
+Chauncey Billups,PG/SG,93,ALL-TIME All-Time Denver Nuggets | ALL-TIME All-Time Detroit Pistons | CLASSIC 2003-04 Pistons,allTime
+Joe Dumars,SG/PG,93,ALL-TIME All-Time Detroit Pistons | CLASSIC 1988-89 Pistons,allTime
+Bob Lanier,C,93,ALL-TIME All-Time Detroit Pistons,allTime
+Gilbert Arenas,PG/SG,93,ALL-TIME All-Time Washington Wizards | CLASSIC 2006-07 Wizards,allTime
+Marques Johnson,SF/SG,92,ALL-TIME All-Time Milwaukee Bucks,allTime
+Bill Sharman,SG/PG,92,ALL-TIME All-Time Boston Celtics,allTime
+Pau Gasol,C,92,ALL-TIME All-Time Memphis Grizzlies | ALL-TIME All-Time Los Angeles Lakers | CLASSIC 2005-06 Grizzlies,allTime
+Dikembe Mutombo,C/PF,92,ALL-TIME All-Time Atlanta Hawks | ALL-TIME All-Time Denver Nuggets | CLASSIC 2000-01 76ers,allTime
+Baron Davis,PG,92,ALL-TIME All-Time Charlotte Hornets | ALL-TIME All-Time New Orleans Pelicans | ALL-TIME All-Time Golden State Warriors,allTime
+Richie Guerin,SG/PG,92,ALL-TIME All-Time New York Knicks,allTime
+Dave Debusschere,PF/SF,92,ALL-TIME All-Time New York Knicks | ALL-TIME All-Time Detroit Pistons | CLASSIC 1971-72 Knicks,allTime
+Amar’e Stoudemire,PF/C,92,ALL-TIME All-Time New York Knicks | ALL-TIME All-Time Phoenix Suns | CLASSIC 2011-12 Knicks,allTime
+Fat Lever,PG/SG,92,ALL-TIME All-Time Denver Nuggets,allTime
+Dan Issel,PF/C,92,ALL-TIME All-Time Denver Nuggets,allTime
+Mel Daniels,C/PF,92,ALL-TIME All-Time Indiana Pacers,allTime
+Nate Thurmond,C,92,ALL-TIME All-Time Golden State Warriors,allTime
+Cliff Hagan,SF/SG,91,ALL-TIME All-Time Atlanta Hawks,allTime
+Lou Hudson,SF/SG,91,ALL-TIME All-Time Atlanta Hawks,allTime
+Adrian Dantley,SF,91,ALL-TIME All-Time Utah Jazz,allTime
+Jermaine O’Neal,PF/C,91,ALL-TIME All-Time Indiana Pacers | CLASSIC 1999-00 Trail Blazers,allTime
+Yao Ming,C,91,ALL-TIME All-Time Houston Rockets | CLASSIC 2007-08 Rockets,allTime
+Calvin Murphy,PG/SG,91,ALL-TIME All-Time Houston Rockets,allTime
+Shawn Marion,SF/PF,91,ALL-TIME All-Time Phoenix Suns | CLASSIC 2010-11 Mavericks | CLASSIC 2002-03 Suns,allTime
+Paul Arizin,SF/SG,91,ALL-TIME All-Time Golden State Warriors,allTime
+Bobby Jones,SF/PF,90,ALL-TIME All-Time Philadelphia 76ers,allTime
+Brad Daugherty,C/PF,90,ALL-TIME All-Time Cleveland Cavaliers | CLASSIC 1989-90 Cavaliers,allTime
+Elton Brand,PF/C,90,ALL-TIME All-Time Los Angeles Clippers,allTime
+Glen Rice,SF,90,ALL-TIME All-Time Miami Heat | ALL-TIME All-Time Charlotte Hornets,allTime
+Wayne Embry,C/PF,90,ALL-TIME All-Time Sacramento Kings,allTime
+Drazen Petrovic,SG/SF,90,ALL-TIME All-Time Brooklyn Nets,allTime
+Dave Bing,PG/SG,90,ALL-TIME All-Time Detroit Pistons,allTime
+Manu Ginobili,SG,90,ALL-TIME All-Time San Antonio Spurs | CLASSIC 2013-14 Spurs | CLASSIC 2004-05 Spurs,allTime
+Walter Davis,SG/SF,90,ALL-TIME All-Time Phoenix Suns | CLASSIC 1990-91 Trail Blazers,allTime
+Shawn Kemp,PF/C,90,ALL-TIME All-Time Oklahoma City Thunder | CLASSIC 1995-96 Supersonics,allTime
+Maurice Lucas,PF/C,90,ALL-TIME All-Time Portland Trail Blazers,allTime
+George McGinnis,PF/C,89,ALL-TIME All-Time Philadelphia 76ers | ALL-TIME All-Time Indiana Pacers | CLASSIC 1976-77 76ers,allTime
+Bob Love,PF/SF,89,ALL-TIME All-Time Chicago Bulls,allTime
+Jerry Sloan,SG/SF,89,ALL-TIME All-Time Chicago Bulls,allTime
+Tom Heinsohn,PF/C,89,ALL-TIME All-Time Boston Celtics,allTime
+World B. Free,PG/SG,89,ALL-TIME All-Time Los Angeles Clippers | CLASSIC 1976-77 76ers,allTime
+Zach Randolph,PF,89,ALL-TIME All-Time Memphis Grizzlies | CLASSIC 2012-13 Grizzlies,allTime
+Joe Johnson,SF/SG,89,ALL-TIME All-Time Atlanta Hawks | CLASSIC 2002-03 Suns | CLASSIC 2004-05 Suns,allTime
+Eddie Jones,SG/SF,89,ALL-TIME All-Time Miami Heat | ALL-TIME All-Time Charlotte Hornets | CLASSIC 2005-06 Grizzlies,allTime
+Mark Eaton,C,89,ALL-TIME All-Time Utah Jazz,allTime
+Andrei Kirilenko,PF/SF,89,ALL-TIME All-Time Utah Jazz,allTime
+Allan Houston,SG/SF,89,ALL-TIME All-Time New York Knicks | CLASSIC 1998-99 Knicks,allTime
+Bernard King,SF,89,ALL-TIME All-Time New York Knicks | ALL-TIME All-Time Washington Wizards,allTime
+Micheal Ray Richardson,PG/SG,89,ALL-TIME All-Time New York Knicks,allTime
+Earl Monroe,PG/SG,89,ALL-TIME All-Time New York Knicks | ALL-TIME All-Time Washington Wizards | CLASSIC 1971-72 Knicks,allTime
+Gail Goodrich,SG/PG,89,ALL-TIME All-Time Los Angeles Lakers | CLASSIC 1970-71 Lakers,allTime
+Rashard Lewis,PF/SF,89,ALL-TIME All-Time Orlando Magic | ALL-TIME All-Time Oklahoma City Thunder | CLASSIC 2012-13 Heat,allTime
+Derek Harper,PG/SG,89,ALL-TIME All-Time Dallas Mavericks | CLASSIC 1994-95 Knicks,allTime
+Jamal Mashburn,SF,89,ALL-TIME All-Time Dallas Mavericks | ALL-TIME All-Time New Orleans Pelicans | CLASSIC 1996-97 Heat,allTime
+Kiki Vandeweghe,SF/PF,89,ALL-TIME All-Time Denver Nuggets | ALL-TIME All-Time Portland Trail Blazers,allTime
+Mahmoud Abdul-Rauf,PG/SG,89,ALL-TIME All-Time Denver Nuggets | CLASSIC 1993-94 Nuggets,allTime
+Byron Beck,PF/SF,89,ALL-TIME All-Time Denver Nuggets,allTime
+Freddie Lewis,PG/SG,89,ALL-TIME All-Time Indiana Pacers,allTime
+Ben Wallace,C/PF,89,ALL-TIME All-Time Detroit Pistons | CLASSIC 2003-04 Pistons,allTime
+Jerry Stackhouse,SG/SF,89,ALL-TIME All-Time Detroit Pistons,allTime
+Richard Hamilton,SG/SF,89,ALL-TIME All-Time Detroit Pistons | CLASSIC 2003-04 Pistons,allTime
+Ralph Sampson,C/PF,89,ALL-TIME All-Time Houston Rockets,allTime
+Louie Dampier,PG/SG,89,ALL-TIME All-Time San Antonio Spurs,allTime
+Charlie Scott,PG/SG,89,ALL-TIME All-Time Phoenix Suns,allTime
+Tom Chambers,PF/SF,89,ALL-TIME All-Time Phoenix Suns,allTime
+Kevin Johnson,PG,89,ALL-TIME All-Time Phoenix Suns,allTime
+Gus Williams,,89,ALL-TIME All-Time Oklahoma City Thunder,allTime
+Spencer Haywood,PF,89,ALL-TIME All-Time Oklahoma City Thunder,allTime
+Jack Sikma,C,89,ALL-TIME All-Time Oklahoma City Thunder,allTime
+Hal Greer,PG/SG,88,ALL-TIME All-Time Philadelphia 76ers,allTime
+Bob Dandridge,SF/SG,88,ALL-TIME All-Time Milwaukee Bucks | CLASSIC 1970-71 Bucks,allTime
+Michael Redd,SG/SF,88,ALL-TIME All-Time Milwaukee Bucks,allTime
+Terry Cummings,PF/C,88,ALL-TIME All-Time Milwaukee Bucks | CLASSIC 1984-85 Bucks,allTime
+Zydrunas Ilgauskas,C,88,ALL-TIME All-Time Cleveland Cavaliers | CLASSIC 2006-07 Cavaliers,allTime
+Mike Bibby,PG,88,ALL-TIME All-Time Memphis Grizzlies | ALL-TIME All-Time Sacramento Kings | CLASSIC 2001-02 Kings,allTime
+Joe Caldwell,SG/SF,88,ALL-TIME All-Time Atlanta Hawks,allTime
+Larry Johnson,PF/SF,88,ALL-TIME All-Time Charlotte Hornets | CLASSIC 1992-93 Hornets | CLASSIC 1998-99 Knicks,allTime
+Derrick Coleman,PF/C,88,ALL-TIME All-Time Charlotte Hornets | ALL-TIME All-Time Brooklyn Nets,allTime
+Vlade Divac,C/PF,88,ALL-TIME All-Time Charlotte Hornets | ALL-TIME All-Time Sacramento Kings | CLASSIC 2001-02 Kings,allTime
+Carlos Boozer,PF,88,ALL-TIME All-Time Utah Jazz | CLASSIC 2010-11 Bulls,allTime
+Peja Stojakovic,SF,88,ALL-TIME All-Time Sacramento Kings | ALL-TIME All-Time New Orleans Pelicans | CLASSIC 2001-02 Kings,allTime
+John Starks,SG/PG,88,ALL-TIME All-Time New York Knicks | CLASSIC 1994-95 Knicks,allTime
+Rolando Blackman,SG,88,ALL-TIME All-Time Dallas Mavericks,allTime
+Mark Aguirre,SF/PF,88,ALL-TIME All-Time Dallas Mavericks | CLASSIC 1988-89 Pistons,allTime
+Jim Jackson,SG,88,ALL-TIME All-Time Dallas Mavericks | CLASSIC 2004-05 Suns,allTime
+Michael Finley,SF/SG,88,ALL-TIME All-Time Dallas Mavericks | CLASSIC 2002-03 Mavericks,allTime
+Buck Williams,PF/C,88,ALL-TIME All-Time Brooklyn Nets | CLASSIC 1990-91 Trail Blazers,allTime
+Kenny Anderson,PG,88,ALL-TIME All-Time Brooklyn Nets,allTime
+Antonio McDyess,PF/C,88,ALL-TIME All-Time Denver Nuggets,allTime
+Ron Artest,SF,88,ALL-TIME All-Time Indiana Pacers,allTime
+Bob Netolicky,PF/C,88,ALL-TIME All-Time Indiana Pacers,allTime
+Bailey Howell,PF/SF,88,ALL-TIME All-Time Detroit Pistons,allTime
+Rudy Tomjanovich,SF/PF,88,ALL-TIME All-Time Houston Rockets,allTime
+Steve Francis,PG/SG,88,ALL-TIME All-Time Houston Rockets | CLASSIC 2007-08 Rockets,allTime
+Larry Kenon,SF,88,ALL-TIME All-Time San Antonio Spurs,allTime
+Dick Van Arsdale,SG/SF,88,ALL-TIME All-Time Phoenix Suns,allTime
+Paul Westphal,SG/PG,88,ALL-TIME All-Time Phoenix Suns,allTime
+Dan Majerle,SG/SF,88,ALL-TIME All-Time Phoenix Suns | CLASSIC 1996-97 Heat,allTime
+Fred Brown,PG/SG,88,ALL-TIME All-Time Oklahoma City Thunder,allTime
+Dale Ellis,SG/SG,88,ALL-TIME All-Time Oklahoma City Thunder,allTime
+Tom Gugliotta,PF/SF,88,ALL-TIME All-Time Minnesota Timberwolves | CLASSIC 2002-03 Suns,allTime
+Sam Cassell,PG/SG,88,ALL-TIME All-Time Minnesota Timberwolves | CLASSIC 2007-08 Celtics | CLASSIC 1993-94 Rockets,allTime
+Arvydas Sabonis,C/PF,88,ALL-TIME All-Time Portland Trail Blazers | CLASSIC 1999-00 Trail Blazers,allTime
+Sleepy Floyd,PG/SG,88,ALL-TIME All-Time Golden State Warriors,allTime
+Phil Chenier,SG/PG,88,ALL-TIME All-Time Washington Wizards,allTime
+Caron Butler,SF,88,ALL-TIME All-Time Washington Wizards | CLASSIC 2010-11 Mavericks | CLASSIC 2006-07 Wizards,allTime
+Hersey Hawkins,SG/PG,87,ALL-TIME All-Time Philadelphia 76ers | CLASSIC 1995-96 Supersonics,allTime
+Doug Collins,SG/SF,87,ALL-TIME All-Time Philadelphia 76ers | CLASSIC 1976-77 76ers,allTime
+Junior Bridgeman,SF/SG,87,ALL-TIME All-Time Milwaukee Bucks,allTime
+Vin Baker,PF,87,ALL-TIME All-Time Milwaukee Bucks,allTime
+Glenn Robinson,SF,87,ALL-TIME All-Time Milwaukee Bucks | CLASSIC 2004-05 Spurs,allTime
+B.J. Armstrong,PG/SG,87,ALL-TIME All-Time Chicago Bulls | CLASSIC 1992-93 Bulls | CLASSIC 1990-91 Bulls,allTime
+Terrell Brandon,PG,87,ALL-TIME All-Time Cleveland Cavaliers | ALL-TIME All-Time Minnesota Timberwolves,allTime
+Danny Manning,PF,87,ALL-TIME All-Time Los Angeles Clippers,allTime
+Kevin Willis,PF/C,87,ALL-TIME All-Time Atlanta Hawks | CLASSIC 1985-86 Hawks | CLASSIC 1999-00 Raptors,allTime
+Steve Smith,SG/SF,87,ALL-TIME All-Time Atlanta Hawks | ALL-TIME All-Time Miami Heat | CLASSIC 1999-00 Trail Blazers,allTime
+Darrel Griffith,SG/SF,87,ALL-TIME All-Time Utah Jazz,allTime
+Otis Birdsong,SG,87,ALL-TIME All-Time Sacramento Kings | ALL-TIME All-Time Brooklyn Nets,allTime
+Jamaal Wilkes,SF/SG,87,ALL-TIME All-Time Los Angeles Lakers,allTime
+Richard Jefferson,SF/SG,87,ALL-TIME All-Time Brooklyn Nets | CLASSIC 2015-16 Cavaliers | CLASSIC 2001-02 Nets,allTime
+Marcus Camby,C,87,ALL-TIME All-Time Denver Nuggets | CLASSIC 1998-99 Knicks | CLASSIC 2007-08 Nuggets,allTime
+Rik Smits,C,87,ALL-TIME All-Time Indiana Pacers,allTime
+Chuck Person,SF/PF,87,ALL-TIME All-Time Indiana Pacers | CLASSIC 1997-98 Spurs,allTime
+Don Buse,PG/SG,87,ALL-TIME All-Time Indiana Pacers,allTime
+Bill Laimbeer,C/PF,87,ALL-TIME All-Time Detroit Pistons | CLASSIC 1988-89 Pistons,allTime
+Kenny Smith,PG/SG,87,ALL-TIME All-Time Houston Rockets | CLASSIC 1993-94 Rockets,allTime
+Sean Elliott,SF/SG,87,ALL-TIME All-Time San Antonio Spurs | CLASSIC 1997-98 Spurs,allTime
+Xavier McDaniel,SF/PF,87,ALL-TIME All-Time Oklahoma City Thunder,allTime
+Detlef Schrempf,SF/PF,87,ALL-TIME All-Time Oklahoma City Thunder | CLASSIC 1995-96 Supersonics | CLASSIC 1999-00 Trail Blazers,allTime
+Stephon Marbury,PG,87,ALL-TIME All-Time Minnesota Timberwolves | CLASSIC 2002-03 Suns,allTime
+Geoff Petrie,SG/PG,87,ALL-TIME All-Time Portland Trail Blazers,allTime
+Jerome Kersey,SF/PF,87,ALL-TIME All-Time Portland Trail Blazers | CLASSIC 1990-91 Trail Blazers,allTime
+Terry Porter,PG/SG,87,ALL-TIME All-Time Portland Trail Blazers | CLASSIC 1990-91 Trail Blazers,allTime
+Sidney Wicks,PF/SF,87,ALL-TIME All-Time Portland Trail Blazers,allTime
+Jason Richardson,SG/SF,87,ALL-TIME All-Time Golden State Warriors | CLASSIC 2006-07 Warriors,allTime
+Antawn Jamison,PF/SF,87,ALL-TIME All-Time Washington Wizards | CLASSIC 2006-07 Wizards,allTime
+Don Ohl,PG/SG,87,ALL-TIME All-Time Washington Wizards,allTime
+Jeff Ruland,C/PF,87,ALL-TIME All-Time Washington Wizards,allTime
+Maurice Cheeks,PG/SG,86,ALL-TIME All-Time Philadelphia 76ers,allTime
+Brian Winters,SG,86,ALL-TIME All-Time Milwaukee Bucks,allTime
+Reggie Theus,PG/SG,86,ALL-TIME All-Time Chicago Bulls,allTime
+Campy Russell,SF,86,ALL-TIME All-Time Cleveland Cavaliers,allTime
+Austin Carr,SG,86,ALL-TIME All-Time Cleveland Cavaliers,allTime
+Corey Maggette,SF/SG,86,ALL-TIME All-Time Los Angeles Clippers,allTime
+Norm Nixon,PG,86,ALL-TIME All-Time Los Angeles Clippers,allTime
+Shareef Abdur-Rahim,PF/SF,86,ALL-TIME All-Time Memphis Grizzlies,allTime
+Doc Rivers,PG/SG,86,ALL-TIME All-Time Atlanta Hawks | CLASSIC 1985-86 Hawks,allTime
+Rony Seikaly,C,86,ALL-TIME All-Time Miami Heat,allTime
+Thurl Bailey,PF/SF,86,ALL-TIME All-Time Utah Jazz,allTime
+Truck Robinson,PF,86,ALL-TIME All-Time Utah Jazz,allTime
+Eddie Johnson,SG/SF,86,ALL-TIME All-Time Sacramento Kings,allTime
+Charles Oakley,PF/C,86,ALL-TIME All-Time New York Knicks | CLASSIC 1985-86 Bulls | CLASSIC 1994-95 Knicks,allTime
+Michael Cooper,SG/PG,86,ALL-TIME All-Time Los Angeles Lakers | CLASSIC 1986-87 Lakers,allTime
+Hedo Turkoglu,SF/PF,86,ALL-TIME All-Time Orlando Magic | CLASSIC 2013-14 Clippers | CLASSIC 2001-02 Kings,allTime
+Jason Terry,PG/SG,86,ALL-TIME All-Time Dallas Mavericks | CLASSIC 2010-11 Mavericks,allTime
+Keith Van Horn,SF/PF,86,ALL-TIME All-Time Brooklyn Nets | CLASSIC 2001-02 Nets,allTime
+Kelly Tripucka,SG/SF,86,ALL-TIME All-Time Detroit Pistons,allTime
+Damon Stoudamire,PG,86,ALL-TIME All-Time Toronto Raptors | CLASSIC 2005-06 Grizzlies | CLASSIC 1999-00 Trail Blazers,allTime
+Otis Thorpe,PF/C,86,ALL-TIME All-Time Houston Rockets | CLASSIC 1993-94 Rockets,allTime
+James Silas,SG,86,ALL-TIME All-Time San Antonio Spurs,allTime
+Bruce Bowen,SF/SG,86,ALL-TIME All-Time San Antonio Spurs | CLASSIC 1996-97 Heat | CLASSIC 2004-05 Spurs,allTime
+Purvis Short,SF/SG,86,ALL-TIME All-Time Golden State Warriors,allTime
+Jeff Malone,SG/SF,86,ALL-TIME All-Time Washington Wizards,allTime
+Jack Marin,SF/SG,86,ALL-TIME All-Time Washington Wizards,allTime
+Paul Pressey,SG/SF,85,ALL-TIME All-Time Milwaukee Bucks | CLASSIC 1984-85 Bucks,allTime
+Horace Grant,PF/C,85,ALL-TIME All-Time Chicago Bulls | ALL-TIME All-Time Orlando Magic | CLASSIC 1992-93 Bulls,allTime
+Toni Kukoc,SF/PF,85,ALL-TIME All-Time Chicago Bulls | CLASSIC 1995-96 Bulls | CLASSIC 1997-98 Bulls,allTime
+Shane Battier,SF/SG,85,ALL-TIME All-Time Memphis Grizzlies | CLASSIC 2005-06 Grizzlies | CLASSIC 2012-13 Heat,allTime
+Dell Curry,SG/SF,85,ALL-TIME All-Time Charlotte Hornets | CLASSIC 1992-93 Hornets | CLASSIC 1999-00 Raptors,allTime
+Muggsy Bogues,PG/SG,85,ALL-TIME All-Time Charlotte Hornets | CLASSIC 1992-93 Hornets | CLASSIC 1999-00 Raptors,allTime
+Kendall Gill,SG/SF,85,ALL-TIME All-Time Charlotte Hornets | CLASSIC 1992-93 Hornets,allTime
+Nick Anderson,SG/SF,85,ALL-TIME All-Time Orlando Magic | CLASSIC 1994-95 Magic,allTime
+James Donaldson,C,85,ALL-TIME All-Time Dallas Mavericks,allTime
+Antonio Davis,C/PF,85,ALL-TIME All-Time Toronto Raptors | CLASSIC 1999-00 Raptors,allTime
+Morris Peterson,SG/SF,85,ALL-TIME All-Time Toronto Raptors,allTime
+Alvan Adams,C/PF,85,ALL-TIME All-Time Phoenix Suns,allTime
+Doug West,SG/SF,85,ALL-TIME All-Time Minnesota Timberwolves,allTime
+Wally Szczerbiak,SF/SG,85,ALL-TIME All-Time Minnesota Timberwolves | CLASSIC 2003-04 Timberwolves,allTime
+Christian Laettner,PF/C,85,ALL-TIME All-Time Minnesota Timberwolves,allTime
+Jim Paxson,SG/PG,85,ALL-TIME All-Time Portland Trail Blazers,allTime
+Kevin Duckworth,C/PF,85,ALL-TIME All-Time Portland Trail Blazers | CLASSIC 1990-91 Trail Blazers,allTime
+Bingo Smith,SG/SF,84,ALL-TIME All-Time Cleveland Cavaliers,allTime
+Jim Chones,C/PF,84,ALL-TIME All-Time Cleveland Cavaliers,allTime
+Swen Nater,C/PF,84,ALL-TIME All-Time Los Angeles Clippers,allTime
+Bryant Reeves,C,84,ALL-TIME All-Time Memphis Grizzlies,allTime
+Jason Williams,PG,84,ALL-TIME All-Time Memphis Grizzlies | CLASSIC 2005-06 Heat,allTime
+Udonis Haslem,PF/C,84,ALL-TIME All-Time Miami Heat | CLASSIC 2005-06 Heat | CLASSIC 2012-13 Heat,allTime
+Gerald Wallace,SF/PF,84,ALL-TIME All-Time Charlotte Hornets | CLASSIC 2001-02 Kings,allTime
+P.J. Brown,C,84,ALL-TIME All-Time Charlotte Hornets | CLASSIC 2007-08 Celtics | CLASSIC 1996-97 Heat,allTime
+Jeff Hornacek,SG/PG,84,ALL-TIME All-Time Utah Jazz | CLASSIC 1997-98 Jazz,allTime
+Doug Christie,SG/SF,84,ALL-TIME All-Time Sacramento Kings | ALL-TIME All-Time Toronto Raptors | CLASSIC 2001-02 Kings,allTime
+Scott Skiles,PG,84,ALL-TIME All-Time Orlando Magic,allTime
+Dennis Scott,SF/SG,84,ALL-TIME All-Time Orlando Magic | CLASSIC 1994-95 Magic,allTime
+Brad Davis,PG,84,ALL-TIME All-Time Dallas Mavericks,allTime
+Tyson Chandler,C,84,ALL-TIME All-Time Dallas Mavericks | ALL-TIME All-Time New Orleans Pelicans | CLASSIC 2011-12 Knicks,allTime
+David Wesley,SG,84,ALL-TIME All-Time New Orleans Pelicans | CLASSIC 2006-07 Cavaliers,allTime
+Johnny Moore,PG,84,ALL-TIME All-Time San Antonio Spurs,allTime
+Isaiah Rider,SG,84,ALL-TIME All-Time Minnesota Timberwolves | CLASSIC 2000-01 Lakers,allTime
+Latrell Sprewell,SF,84,ALL-TIME All-Time Minnesota Timberwolves | CLASSIC 1998-99 Knicks | CLASSIC 2003-04 Timberwolves,allTime
+Stephen Jackson,SF,83,ALL-TIME All-Time Charlotte Hornets | CLASSIC 2006-07 Warriors,allTime
+Darrell Armstrong,PG,83,ALL-TIME All-Time Orlando Magic | CLASSIC 1994-95 Magic,allTime
+Vernon Maxwell,SG/SF,83,ALL-TIME All-Time Houston Rockets | CLASSIC 1993-94 Rockets,allTime
+Al Harrington,PF/SF,83,CLASSIC 2006-07 Warriors,classic
+Lamar Odom,,82,ALL-TIME All-Time Los Angeles Clippers,allTime
+Mike Miller,SG,82,ALL-TIME All-Time Memphis Grizzlies | CLASSIC 2005-06 Grizzlies | CLASSIC 2012-13 Heat,allTime
+Shawn Bradley,C,82,ALL-TIME All-Time Dallas Mavericks | CLASSIC 2002-03 Mavericks,allTime
+Hot Rod Williams,PF/C,82,CLASSIC 1989-90 Cavaliers,classic
+Byron Scott,SG/PG,82,CLASSIC 1990-91 Lakers | CLASSIC 1986-87 Lakers,classic
+Rudy LaRusso,PF/C,82,CLASSIC 1964-65 Lakers,classic
+Nick Van Exel,PG/SG,82,CLASSIC 1997-98 Lakers | CLASSIC 2002-03 Mavericks,classic
+Andre Miller,PG,82,CLASSIC 2009-10 Trail Blazers,classic
+Andre Iguodala,,82,CLASSIC 2016-17 Warriors | CLASSIC 2015-16 Warriors,classic
+Jamal Crawford,SG/SF,81,CLASSIC 2013-14 Clippers,classic
+A.C. Green,PF/C,81,CLASSIC 1990-91 Lakers | CLASSIC 1986-87 Lakers,classic
+Kerry Kittles,SG/SF,81,CLASSIC 2001-02 Nets,classic
+Vinnie Johnson,SG/PG,81,CLASSIC 1988-89 Pistons,classic
+Henry Bibby,PG/SG,80,CLASSIC 1976-77 76ers,classic
+Larry Hughes,SG/PG,80,CLASSIC 2006-07 Cavaliers,classic
+Antoine Walker,SF/PF,80,CLASSIC 2005-06 Heat,classic
+Bill Bradley,SF/SG,80,CLASSIC 1971-72 Knicks,classic
+Dick Barnett,,80,CLASSIC 1971-72 Knicks | CLASSIC 1964-65 Lakers,classic
+Rick Fox,SF/SF,80,CLASSIC 2003-04 Lakers | CLASSIC 2000-01 Lakers | CLASSIC 1997-98 Lakers,classic
+LaPhonso Ellis,PF/SF,80,CLASSIC 1993-94 Nuggets,classic
+Moussa Diabate,C/PF,80,CURRENT Charlotte Hornets,current(2026新秀)
+Aaron McKie,PG/SG,79,CLASSIC 2000-01 76ers,classic
+Eric Snow,PG,79,CLASSIC 2000-01 76ers | CLASSIC 2006-07 Cavaliers | CLASSIC 1995-96 Supersonics,classic
+Alton Lister,C/PF,79,CLASSIC 1984-85 Bucks | CLASSIC 1990-91 Warriors,classic
+Sidney Green,PF/C,79,CLASSIC 1985-86 Bulls | CLASSIC 1992-93 Hornets,classic
+Craig Ehlo,SG/SF,79,CLASSIC 1989-90 Cavaliers,classic
+Danny Ainge,SG/PG,79,CLASSIC 1985-86 Celtics | CLASSIC 1990-91 Trail Blazers,classic
+Chris Andersen,C,79,CLASSIC 2012-13 Heat,classic
+Johnny Newman,SF/SG,79,CLASSIC 1992-93 Hornets,classic
+Charles Smith,PF/C,79,CLASSIC 1994-95 Knicks,classic
+Mychal Thompson,C/PF,79,CLASSIC 1990-91 Lakers | CLASSIC 1986-87 Lakers,classic
+Raef LaFrentz,C/SF,79,CLASSIC 2002-03 Mavericks,classic
+Avery Johnson,PG/SG,79,CLASSIC 2002-03 Mavericks | CLASSIC 1997-98 Spurs,classic
+Rafer Alston,PG,79,CLASSIC 2007-08 Rockets,classic
+Clifford Robinson,PF/C,79,CLASSIC 1990-91 Trail Blazers,classic
+Sarunas Marciulionis,SG/PG,79,CLASSIC 1990-91 Warriors,classic
+Darryn Peterson,PG/SG,79,CURRENT Utah Jazz,current(2026新秀)
+AJ Dybantsa,SF,79,CURRENT Washington Wizards,current(2026新秀)
+Steve Mix,PF/SF,78,CLASSIC 1976-77 76ers,classic
+John Paxson,PG/SG,78,CLASSIC 1985-86 Bulls | CLASSIC 1992-93 Bulls | CLASSIC 1988-89 Bulls,classic
+Steve Kerr,PG/SG,78,CLASSIC 1995-96 Bulls | CLASSIC 1997-98 Bulls | CLASSIC 1989-90 Cavaliers,classic
+Luc Longley,C/PF,78,CLASSIC 1995-96 Bulls | CLASSIC 1997-98 Bulls,classic
+Isaac Austin,PF/C,78,CLASSIC 1996-97 Heat,classic
+Sam Perkins,PF/C,78,CLASSIC 1990-91 Lakers | CLASSIC 1995-96 Supersonics,classic
+Brendan Haywood,C,78,CLASSIC 2010-11 Mavericks | CLASSIC 2006-07 Wizards,classic
+Nate McMillan,PG/SG,78,CLASSIC 1995-96 Supersonics,classic
+JaVale McGee,,78,CLASSIC 2016-17 Warriors,classic
+Antonio Daniels,SG/PG,78,CLASSIC 2006-07 Wizards,classic
+Etan Thomas,C,78,CLASSIC 2006-07 Wizards,classic
+Caldwell Jones,C,77,CLASSIC 1976-77 76ers,classic
+Lucius Allen,PG/SG,77,CLASSIC 1970-71 Bucks,classic
+Tree Rollins,C/PF,77,CLASSIC 1989-90 Cavaliers | CLASSIC 1985-86 Hawks | CLASSIC 1994-95 Magic,classic
+Donyell Marshall,PF/SF,77,CLASSIC 2006-07 Cavaliers,classic
+Scot Pollard,C,77,CLASSIC 2006-07 Cavaliers | CLASSIC 2007-08 Celtics | CLASSIC 2001-02 Kings,classic
+Bobby Jackson,PG,77,CLASSIC 2005-06 Grizzlies | CLASSIC 2001-02 Kings | CLASSIC 2007-08 Rockets,classic
+Spud Webb,PG/SG,77,CLASSIC 1985-86 Hawks,classic
+Randy Wittman,SG/SF,77,CLASSIC 1985-86 Hawks,classic
+Kenny Gattison,PF/C,77,CLASSIC 1992-93 Hornets,classic
+Hubert Davis,SG/SF,77,CLASSIC 1994-95 Knicks,classic
+Derek Fisher,PG/SG,77,CLASSIC 2003-04 Lakers | CLASSIC 2000-01 Lakers | CLASSIC 1997-98 Lakers,classic
+Robert Horry,PF/SF,77,CLASSIC 2000-01 Lakers | CLASSIC 1997-98 Lakers | CLASSIC 1993-94 Rockets,classic
+DeShawn Stevenson,SG,77,CLASSIC 2010-11 Mavericks | CLASSIC 2006-07 Wizards,classic
+Nene,PF/C,77,CLASSIC 2007-08 Nuggets,classic
+Bryant Stith,SG/SF,77,CLASSIC 1993-94 Nuggets,classic
+Patty Mills,PG,77,CLASSIC 2013-14 Spurs | CLASSIC 2009-10 Trail Blazers,classic
+Brent Barry,SF/SG,77,CLASSIC 2004-05 Spurs,classic
+Nazr Mohammed,C,77,CLASSIC 2004-05 Spurs | CLASSIC 2011-12 Thunder,classic
+Quentin Richardson,SG/SF,77,CLASSIC 2004-05 Suns,classic
+Mickael Pietrus,SF,77,CLASSIC 2006-07 Warriors,classic
+Adonal Foyle,C,77,CLASSIC 2006-07 Warriors,classic
+Caleb Wilson,PF/C,77,CURRENT Chicago Bulls,current(2026新秀)
+Tyrone Hill,PF,76,CLASSIC 2000-01 76ers | CLASSIC 1990-91 Warriors,classic
+Ricky Pierce,SF/SG,76,CLASSIC 1984-85 Bucks,classic
+James Edwards,C/PF,76,CLASSIC 1995-96 Bulls | CLASSIC 1988-89 Pistons,classic
+Cliff Levingston,PF/C,76,CLASSIC 1990-91 Bulls | CLASSIC 1985-86 Hawks,classic
+Drew Gooden,PF/C,76,CLASSIC 2006-07 Cavaliers,classic
+James Posey,SF/PF,76,CLASSIC 2007-08 Celtics | CLASSIC 2005-06 Heat,classic
+Scott Wedman,SF/SG,76,CLASSIC 1985-86 Celtics,classic
+Matt Barnes,SF/PF,76,CLASSIC 2013-14 Clippers | CLASSIC 2016-17 Warriors | CLASSIC 2006-07 Warriors,classic
+Jon Koncak,C/PF,76,CLASSIC 1985-86 Hawks,classic
+Adam Keefe,SF/PF,76,CLASSIC 1997-98 Jazz,classic
+Bryon Russell,SF/SG,76,CLASSIC 1997-98 Jazz | CLASSIC 2003-04 Lakers,classic
+Charlie Ward,PG,76,CLASSIC 1994-95 Knicks | CLASSIC 1998-99 Knicks,classic
+Elden Campbell,C/PF,76,CLASSIC 1990-91 Lakers | CLASSIC 1997-98 Lakers | CLASSIC 2003-04 Pistons,classic
+Luis Scola,PF,76,CLASSIC 2013-14 Pacers | CLASSIC 2007-08 Rockets,classic
+Rick Mahorn,C/PF,76,CLASSIC 1988-89 Pistons,classic
+Corliss Williamson,SF/PF,76,CLASSIC 2003-04 Pistons,classic
+Alvin Williams,PG,76,CLASSIC 1999-00 Raptors,classic
+Malik Rose,PF,76,CLASSIC 1997-98 Spurs,classic
+Stacey Augmon,SG/SF,76,CLASSIC 1999-00 Trail Blazers,classic
+Brian Grant,PF/SF,76,CLASSIC 1999-00 Trail Blazers,classic
+Bonzi Wells,SF/SG,76,CLASSIC 1999-00 Trail Blazers,classic
+Darius Songaila,PF,76,CLASSIC 2006-07 Wizards,classic
+George Lynch,SF/PF,75,CLASSIC 2000-01 76ers,classic
+Craig Hodges,PG/SG,75,CLASSIC 1984-85 Bucks | CLASSIC 1988-89 Bulls | CLASSIC 1990-91 Bulls,classic
+Gene Banks,SF,75,CLASSIC 1985-86 Bulls,classic
+Rodney McCray,SF/PF,75,CLASSIC 1992-93 Bulls,classic
+Bill Cartwright,C/PF,75,CLASSIC 1992-93 Bulls | CLASSIC 1988-89 Bulls | CLASSIC 1990-91 Bulls,classic
+Kurt Thomas,PF,75,CLASSIC 2010-11 Bulls | CLASSIC 1998-99 Knicks,classic
+Winston Bennett,SF,75,CLASSIC 1989-90 Cavaliers,classic
+Jerry Sichting,PG/SG,75,CLASSIC 1985-86 Celtics,classic
+Chucky Atkins,PG,75,CLASSIC 2005-06 Grizzlies | CLASSIC 2007-08 Nuggets,classic
+Lorenzen Wright,C,75,CLASSIC 2005-06 Grizzlies,classic
+Shandon Anderson,SF,75,CLASSIC 2005-06 Heat | CLASSIC 1997-98 Jazz,classic
+Juwan Howard,PF,75,CLASSIC 2012-13 Heat | CLASSIC 2009-10 Trail Blazers,classic
+Howard Eisley,PG/SG,75,CLASSIC 1997-98 Jazz,classic
+Lawrence Funderburke,PF,75,CLASSIC 2001-02 Kings,classic
+Greg Anthony,PG/SG,75,CLASSIC 1994-95 Knicks | CLASSIC 1999-00 Trail Blazers,classic
+Terry Teagle,SG,75,CLASSIC 1990-91 Lakers,classic
+Devean George,SF,75,CLASSIC 2003-04 Lakers | CLASSIC 2000-01 Lakers,classic
+Fred Hetzel,SF,75,CLASSIC 1970-71 Lakers,classic
+Rick Roberson,C/PF,75,CLASSIC 1970-71 Lakers,classic
+Brian Shaw,SG/PG,75,CLASSIC 2000-01 Lakers | CLASSIC 1994-95 Magic,classic
+Kurt Rambis,,75,CLASSIC 1986-87 Lakers,classic
+Eduardo Najera,SF/SG,75,CLASSIC 2002-03 Mavericks | CLASSIC 2007-08 Nuggets,classic
+Anthony Carter,PG,75,CLASSIC 2007-08 Nuggets,classic
+Robert Pack,PG/SG,75,CLASSIC 1993-94 Nuggets,classic
+Mario Elie,SG/SF,75,CLASSIC 1993-94 Rockets | CLASSIC 1990-91 Warriors,classic
+Vinny Del Negro,SG/PG,75,CLASSIC 1997-98 Spurs,classic
+Rasho Nesterovic,C,75,CLASSIC 2004-05 Spurs,classic
+Bo Outlaw,PF/SF,75,CLASSIC 2002-03 Suns | CLASSIC 2004-05 Suns,classic
+Rod Higgins,SF/PF,75,CLASSIC 1990-91 Warriors,classic
+Speedy Claxton,PG,74,CLASSIC 2000-01 76ers,classic
+Darryl Dawkins,C,74,CLASSIC 1976-77 76ers,classic
+Mike Dunleavy,PG/SG,74,CLASSIC 1976-77 76ers | CLASSIC 1984-85 Bucks,classic
+Jon McGlocklin,SG/PF,74,CLASSIC 1970-71 Bucks,classic
+Greg Smith,PF/SF,74,CLASSIC 1970-71 Bucks,classic
+Randy Brown,PG,74,CLASSIC 1995-96 Bulls | CLASSIC 1997-98 Bulls | CLASSIC 2002-03 Suns,classic
+Brian Scalabrine,PF/SF,74,CLASSIC 2010-11 Bulls | CLASSIC 2007-08 Celtics | CLASSIC 2001-02 Nets,classic
+Scott Burrell,SF,74,CLASSIC 1997-98 Bulls,classic
+Damon Jones,PG/SG,74,CLASSIC 2006-07 Cavaliers,classic
+Eddie House,PG,74,CLASSIC 2007-08 Celtics,classic
+Keith Askins,SF/SG,74,CLASSIC 1996-97 Heat,classic
+Mike Gminski,C,74,CLASSIC 1992-93 Hornets,classic
+Phil Jackson,PF/C,74,CLASSIC 1971-72 Knicks,classic
+Jared Jeffries,PF/SG,74,CLASSIC 2011-12 Knicks,classic
+Keith Erickson,SF/SG,74,CLASSIC 1970-71 Lakers,classic
+Wes Matthews,,74,CLASSIC 1986-87 Lakers,classic
+Donald Royal,SF/SG,74,CLASSIC 1994-95 Magic,classic
+Walt Williams,SF/SG,74,CLASSIC 2002-03 Mavericks,classic
+Rodney Rogers,PF/SF,74,CLASSIC 1993-94 Nuggets,classic
+John Long,SG,74,CLASSIC 1988-89 Pistons,classic
+Micheal Williams,PG,74,CLASSIC 1988-89 Pistons,classic
+Ervin Johnson,C/PF,74,CLASSIC 1995-96 Supersonics | CLASSIC 2003-04 Timberwolves,classic
+Alaa Abdelnaby,PF,74,CLASSIC 1990-91 Trail Blazers,classic
+Mikel Brown Jr.,PG,74,CURRENT Brooklyn Nets,current(2026新秀)
+Kevin Ollie,PG,73,CLASSIC 2000-01 76ers,classic
+Randy Breuer,C/PF,73,CLASSIC 1984-85 Bucks,classic
+Charles Davis,SF/PF,73,CLASSIC 1984-85 Bucks | CLASSIC 1988-89 Bulls,classic
+Kevin Grevey,SF,73,CLASSIC 1984-85 Bucks,classic
+Stacey King,C,73,CLASSIC 1992-93 Bulls | CLASSIC 1990-91 Bulls,classic
+Will Perdue,C/PF,73,CLASSIC 1992-93 Bulls | CLASSIC 1988-89 Bulls | CLASSIC 1990-91 Bulls,classic
+Trent Tucker,SG,73,CLASSIC 1992-93 Bulls,classic
+Scott Williams,PF/C,73,CLASSIC 1992-93 Bulls | CLASSIC 1990-91 Bulls | CLASSIC 2002-03 Suns,classic
+Sam Vincent,PG/SG,73,CLASSIC 1988-89 Bulls | CLASSIC 1985-86 Celtics,classic
+Omer Asik,C,73,CLASSIC 2010-11 Bulls,classic
+Joe Kleine,C,73,CLASSIC 1997-98 Bulls | CLASSIC 1999-00 Trail Blazers,classic
+Willie Anderson,SG,73,CLASSIC 1996-97 Heat,classic
+Mark Madsen,PF/C,73,CLASSIC 2000-01 Lakers | CLASSIC 2003-04 Timberwolves,classic
+Mike Penberthy,PG,73,CLASSIC 2000-01 Lakers,classic
+Tariq Abdul-Wahad,SG,73,CLASSIC 2002-03 Mavericks,classic
+Steven Hunter,C/PF,73,CLASSIC 2007-08 Nuggets | CLASSIC 2004-05 Suns,classic
+Tom Hammonds,PF/C,73,CLASSIC 1993-94 Nuggets,classic
+Mike James,PG,73,CLASSIC 2003-04 Pistons,classic
+Willie Burton,SF,73,CLASSIC 1997-98 Spurs,classic
+Jake Voskuhl,C,73,CLASSIC 2002-03 Suns | CLASSIC 2004-05 Suns,classic
+Fred Hoiberg,SG,73,CLASSIC 2003-04 Timberwolves,classic
+Kyle Macy,PG/SG,72,CLASSIC 1985-86 Bulls,classic
+Dave Corzine,C/PF,72,CLASSIC 1985-86 Bulls | CLASSIC 1988-89 Bulls,classic
+John Salley,PF/C,72,CLASSIC 1995-96 Bulls | CLASSIC 1988-89 Pistons,classic
+Dennis Hopson,SF,72,CLASSIC 1990-91 Bulls,classic
+Brian Cardinal,PF,72,CLASSIC 2005-06 Grizzlies | CLASSIC 2010-11 Mavericks,classic
+Keyon Dooling,PG,72,CLASSIC 2012-13 Grizzlies,classic
+John Battle,SG,72,CLASSIC 1985-86 Hawks,classic
+John Crotty,PG/SG,72,CLASSIC 1996-97 Heat,classic
+Ed Pinckney,PF,72,CLASSIC 1996-97 Heat,classic
+Chris Morris,SF,72,CLASSIC 1997-98 Jazz,classic
+Tony Smith,SG,72,CLASSIC 1990-91 Lakers,classic
+Tyronn Lue,PG/SG,72,CLASSIC 2000-01 Lakers,classic
+Adrian Griffin,SG,72,CLASSIC 2002-03 Mavericks,classic
+Brandon Armstrong,SG,72,CLASSIC 2001-02 Nets,classic
+Aaron Williams,C/PF,72,CLASSIC 2001-02 Nets,classic
+Darvin Ham,SF/SG,72,CLASSIC 2003-04 Pistons,classic
+Dee Brown,PG/SG,72,CLASSIC 1999-00 Raptors,classic
+Carl Herrera,PF,72,CLASSIC 1993-94 Rockets | CLASSIC 1997-98 Spurs,classic
+Michael Olowokandi,C,72,CLASSIC 2003-04 Timberwolves,classic
+Les Jepsen,C,72,CLASSIC 1990-91 Warriors,classic
+Calvin Booth,C,72,CLASSIC 2006-07 Wizards,classic
+Jumaine Jones,SF,71,CLASSIC 2000-01 76ers,classic
+Rodney Buford,SF,71,CLASSIC 2000-01 76ers,classic
+Pepe Sanchez,PG,71,CLASSIC 2000-01 76ers,classic
+Todd MacCulloch,C,71,CLASSIC 2000-01 76ers | CLASSIC 2001-02 Nets,classic
+Joe Bryant,SF/PF,71,CLASSIC 1976-77 76ers,classic
+Harvey Catchings,C/PF,71,CLASSIC 1976-77 76ers,classic
+Dick Cunningham,C/PF,71,CLASSIC 1970-71 Bucks,classic
+Mike Holton,PG,71,CLASSIC 1985-86 Bulls,classic
+Jason Caffey,PF,71,CLASSIC 1995-96 Bulls,classic
+Chucky Brown,SF/PF,71,CLASSIC 1989-90 Cavaliers | CLASSIC 2001-02 Kings,classic
+Michael Doleac,C,71,CLASSIC 2005-06 Heat,classic
+David Wingate,SG/SF,71,CLASSIC 1992-93 Hornets | CLASSIC 1998-99 Knicks | CLASSIC 1995-96 Supersonics,classic
+Rick Brunson,PG,71,CLASSIC 1998-99 Knicks,classic
+Chris Childs,PG,71,CLASSIC 1998-99 Knicks,classic
+Larry Drew,PG/SG,71,CLASSIC 1990-91 Lakers,classic
+Ime Udoka,SF,71,CLASSIC 2003-04 Lakers,classic
+Billy Thompson,,71,CLASSIC 1986-87 Lakers,classic
+Anthony Avent,PF,71,CLASSIC 1994-95 Magic,classic
+Anthony Bowie,SG/SF,71,CLASSIC 1994-95 Magic,classic
+Jeff Turner,SF/PF,71,CLASSIC 1994-95 Magic,classic
+Jason Collins,C,71,CLASSIC 2001-02 Nets,classic
+Jeff Ayres,PF,71,CLASSIC 2013-14 Spurs | CLASSIC 2009-10 Trail Blazers,classic
+Casey Jacobsen,SF/SG,71,CLASSIC 2002-03 Suns,classic
+Vincent Askew,SG/SF,71,CLASSIC 1995-96 Supersonics | CLASSIC 1990-91 Warriors,classic
+Trenton Hassell,SG/SF,71,CLASSIC 2003-04 Timberwolves,classic
+Wayne Cooper,C,71,CLASSIC 1990-91 Trail Blazers,classic
+Jeff Pendegraph,C/PF,71,CLASSIC 2009-10 Trail Blazers,classic
+Michael Ruffin,PF,71,CLASSIC 2006-07 Wizards,classic
+Kenny Fields,SF,70,CLASSIC 1984-85 Bucks,classic
+Brad Sellers,SF/PF,70,CLASSIC 1988-89 Bulls,classic
+Jud Buechler,SF/SG,70,CLASSIC 1995-96 Bulls | CLASSIC 1997-98 Bulls,classic
+Jannero Pargo,PG,70,CLASSIC 2010-11 Bulls,classic
+Rusty LaRue,PG,70,CLASSIC 1997-98 Bulls,classic
+Antoine Carr,PF/C,70,CLASSIC 1985-86 Hawks | CLASSIC 1997-98 Jazz,classic
+Greg Ostertag,C/PF,70,CLASSIC 1997-98 Jazz,classic
+Greg Fillmore,C,70,CLASSIC 1971-72 Knicks,classic
+Anthony Bonner,PF/SF,70,CLASSIC 1994-95 Knicks,classic
+Monty Williams,SF/PF,70,CLASSIC 1994-95 Knicks | CLASSIC 1997-98 Spurs,classic
+Stanislav Medvedenko,PF,70,CLASSIC 2003-04 Lakers | CLASSIC 2000-01 Lakers,classic
+Kareem Rush,SG,70,CLASSIC 2003-04 Lakers,classic
+Corie Blount,PF/C,70,CLASSIC 1997-98 Lakers,classic
+Haywoode Workman,PG,70,CLASSIC 1999-00 Raptors,classic
+Scott Brooks,PG/SG,70,CLASSIC 1993-94 Rockets,classic
+Mike Wilks,PG,70,CLASSIC 2004-05 Spurs,classic
+Oliver Miller,C,70,CLASSIC 2003-04 Timberwolves,classic
+Darrick Martin,PG,70,CLASSIC 2003-04 Timberwolves,classic
+Antonio Harvey,PF,70,CLASSIC 1999-00 Trail Blazers,classic
+Roger Mason,SG,70,CLASSIC 2006-07 Wizards,classic
+Matt Geiger,C,69,CLASSIC 2000-01 76ers,classic
+Roshown McLeod,SF,69,CLASSIC 2000-01 76ers,classic
+Raja Bell,SG,69,CLASSIC 2000-01 76ers | CLASSIC 2002-03 Mavericks,classic
+Dickey Simpkins,PF/C,69,CLASSIC 1995-96 Bulls | CLASSIC 1997-98 Bulls,classic
+Greg Foster,PF/C,69,CLASSIC 1997-98 Jazz | CLASSIC 2000-01 Lakers,classic
+Jacque Vaughn,PG,69,CLASSIC 1997-98 Jazz,classic
+Eddie Mast,PF,69,CLASSIC 1971-72 Knicks,classic
+Chris Dudley,C,69,CLASSIC 1998-99 Knicks,classic
+Irving Thomas,PF,69,CLASSIC 1990-91 Lakers,classic
+Jamal Sampson,C,69,CLASSIC 2003-04 Lakers,classic
+Don Nelson,SF/PF,69,CLASSIC 1964-65 Lakers,classic
+Jon Barry,SG/PG,69,CLASSIC 1997-98 Lakers,classic
+Lindsey Hunter,PG/SG,69,CLASSIC 2003-04 Pistons,classic
+Matt Bullard,PF/C,69,CLASSIC 1993-94 Rockets,classic
+Walter McCarty,PF,69,CLASSIC 2004-05 Suns,classic
+Frank Brickowski,PF/C,69,CLASSIC 1995-96 Supersonics,classic
+Mark Bryant,PF/C,69,CLASSIC 1990-91 Trail Blazers,classic
+Jim Petersen,C,69,CLASSIC 1990-91 Warriors,classic
+Greg Kite,C,68,CLASSIC 1985-86 Celtics,classic
+Scott Hastings,PF/C,68,CLASSIC 1985-86 Hawks,classic
+Gary Grant,PG,68,CLASSIC 1996-97 Heat | CLASSIC 1999-00 Trail Blazers,classic
+Tony Bennett,PG/SG,68,CLASSIC 1992-93 Hornets,classic
+Evan Eschmeyer,C,68,CLASSIC 2002-03 Mavericks,classic
+Popeye Jones,PF,68,CLASSIC 2002-03 Mavericks,classic
+Tremaine Fowlkes,SF,68,CLASSIC 2003-04 Pistons,classic
+Tom Tolbert,PF/C,68,CLASSIC 1990-91 Warriors,classic
+Darrell Walker,PG,67,CLASSIC 1992-93 Bulls,classic
+Bill Wennington,C/PF,67,CLASSIC 1995-96 Bulls | CLASSIC 1997-98 Bulls,classic
+Derek Anderson,SG,67,CLASSIC 2005-06 Heat,classic
+Matt Fish,C,67,CLASSIC 1996-97 Heat,classic
+Luther Rackley,C/PF,67,CLASSIC 1971-72 Knicks,classic
+Herb Williams,C/PF,67,CLASSIC 1994-95 Knicks | CLASSIC 1998-99 Knicks,classic
+Jim King,PG/SG,67,CLASSIC 1964-65 Lakers,classic
+Willie McCarter,SG/PG,67,CLASSIC 1970-71 Lakers,classic
+John Thomas,C,67,CLASSIC 1999-00 Raptors,classic
+Tony Massenburg,PF,67,CLASSIC 2004-05 Spurs,classic
+Paul Mokeski,C/PF,66,CLASSIC 1984-85 Bucks | CLASSIC 1989-90 Cavaliers | CLASSIC 1990-91 Warriors,classic
+Ed Nealy,PF/SF,66,CLASSIC 1992-93 Bulls,classic
+Earl Cureton,PF,66,CLASSIC 1993-94 Rockets,classic
+Kevin Lynch,SG/SF,65,CLASSIC 1992-93 Hornets,classic
