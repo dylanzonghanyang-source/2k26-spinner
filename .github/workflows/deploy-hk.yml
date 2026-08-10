@@ -40,6 +40,8 @@ jobs:
         env:
           HK_SSH_KEY: ${{ secrets.HK_SSH_KEY }}
           HK_KNOWN_HOSTS: ${{ secrets.HK_KNOWN_HOSTS }}
+          HK_HOST: ${{ secrets.HK_HOST }}
+          HK_DEPLOY_PATH: ${{ secrets.HK_DEPLOY_PATH }}
         run: |
           set -euo pipefail
           mkdir -p ~/.ssh
@@ -51,6 +53,6 @@ jobs:
           chmod 644 ~/.ssh/known_hosts
           rsync -az --delete \
             -e "ssh -i ~/.ssh/hk_key -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes" \
-            dist/ root@191.40.37.238:/var/www/2kspinner/
-          ssh -i ~/.ssh/hk_key -o StrictHostKeyChecking=yes root@191.40.37.238 \
-            "ls /var/www/2kspinner/ | head -5 && du -sh /var/www/2kspinner"
+            dist/ root@${HK_HOST}:${HK_DEPLOY_PATH}/
+          ssh -i ~/.ssh/hk_key -o StrictHostKeyChecking=yes root@${HK_HOST} \
+            "ls ${HK_DEPLOY_PATH}/ | head -5 && du -sh ${HK_DEPLOY_PATH}"
