@@ -31,19 +31,32 @@ export type CardFilter = {
   query: string;
 };
 
-/** 按年份 + 关键词过滤，OVR 降序（无 OVR 排最后）。 */
+/** 按年份 + 关键词过滤。选中年份按顺位升序（1 号顺位起，无顺位排最后）；总览按 OVR 降序。 */
 export function filterCards(cards: RookieCardLookup | null | undefined, filter: CardFilter): RookieCard[] {
   if (!cards) return [];
   const yearCards = filter.year != null
     ? [...cards.values()].filter((card) => card.year === filter.year)
     : [...cards.values()];
   const matched = yearCards.filter((card) => matchesCard(card, filter.query));
-  matched.sort((a, b) => {
-    const ao = a.overall ?? -1;
-    const bo = b.overall ?? -1;
-    if (ao !== bo) return bo - ao;
-    return a.name.localeCompare(b.name);
-  });
+  if (filter.year != null) {
+    const pickOf = (card: RookieCard) => {
+      const pick = card.vitals?.draftPick;
+      return typeof pick === "number" && pick > 0 ? pick : Number.POSITIVE_INFINITY;
+    };
+    matched.sort((a, b) => {
+      const ap = pickOf(a);
+      const bp = pickOf(b);
+      if (ap !== bp) return ap - bp;
+      return a.name.localeCompare(b.name);
+    });
+  } else {
+    matched.sort((a, b) => {
+      const ao = a.overall ?? -1;
+      const bo = b.overall ?? -1;
+      if (ao !== bo) return bo - ao;
+      return a.name.localeCompare(b.name);
+    });
+  }
   return matched;
 }
 
