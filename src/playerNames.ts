@@ -1,5 +1,5 @@
-import playerNamesCN from "./data/playerNamesCN.json";
-import playerPresentation from "./data/playerPresentation.json";
+import playerNamesCN from "./data/playerNamesCN.json" with { type: "json" };
+import playerPresentation from "./data/playerPresentation.json" with { type: "json" };
 
 const names = {
   ...(playerPresentation.namesCN as Record<string, string>),

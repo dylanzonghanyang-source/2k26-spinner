@@ -1,6 +1,7 @@
-import { Award, Moon, Sun, UserRoundPlus, UsersRound } from "lucide-react";
+import { Moon, Sun, UserRoundPlus, UsersRound, Disc3 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import RookieBuilder, { type RookieBuilderTeam } from "./components/RookieBuilder";
+import WheelPanel from "./components/WheelPanel";
 import appLogo from "./assets/2kspinner-logo.png";
 import {
   type PlayerSource,
@@ -14,7 +15,7 @@ import detailedPlayers2k26 from "./data/versions/2k26/players.json";
 const appVersion = "v0.6.2";
 const lastUpdated = "2026-08-02";
 
-type AppMode = "rookie" | "prime" | "custom";
+type AppMode = "rookie" | "custom" | "wheel";
 type Theme = "light" | "dark";
 
 const themeStorageKey = "2kspinner-theme";
@@ -25,20 +26,7 @@ function getInitialDataVersion(): DataVersion {
   return "2k26";
 }
 
-// Some browsers/contexts (privacy sandbox, restricted iframes, certain
-// enterprise policies) throw SecurityError on any Storage access. Both
-// the initial read and the subsequent write in the effect must survive.
-function safeGetStorageItem(key: string): string | null {
-  try { return window.localStorage.getItem(key); } catch { return null; }
-}
-
-function safeSetStorageItem(key: string, value: string): void {
-  try { window.localStorage.setItem(key, value); } catch { /* storage blocked */ }
-}
-
-function safeRemoveStorageItem(key: string): void {
-  try { window.localStorage.removeItem(key); } catch { /* storage blocked */ }
-}
+import { safeGetStorageItem, safeRemoveStorageItem, safeSetStorageItem } from "./storage";
 
 function getInitialTheme(): Theme {
   const savedTheme = safeGetStorageItem(themeStorageKey)
@@ -344,7 +332,7 @@ const App = () => {
             <div className="min-w-0">
               <h1 className="truncate text-[14px] font-semibold text-ink-900">2KSpinner</h1>
               <div className="mt-0.5 truncate text-[9px] text-ink-500">
-                {appMode === "rookie" ? "球队抽选 · 新秀构建" : appMode === "prime" ? "球队抽选 · 巅峰构建" : appMode === "custom" ? "手动选源 · 新秀构建" : "能力组合 · 球员抽选"}
+                {appMode === "rookie" ? "球队抽选 · 新秀构建" : appMode === "custom" ? "手动选源 · 新秀构建" : "随机转盘 · 抽选工具"}
               </div>
             </div>
           </div>
@@ -353,17 +341,17 @@ const App = () => {
             <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} disabled={builderFlowActive} onClick={() => setAppMode("rookie")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : undefined} type="button">
               <UserRoundPlus className="h-3.5 w-3.5" />
               <span className="lg:hidden">新秀</span>
-              <span className="hidden lg:inline">随机新秀</span>
-            </button>
-            <button aria-pressed={appMode === "prime"} className="mode-nav-button" data-active={appMode === "prime"} disabled={builderFlowActive} onClick={() => setAppMode("prime")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : undefined} type="button">
-              <Award className="h-3.5 w-3.5" />
-              <span className="lg:hidden">巅峰</span>
-              <span className="hidden lg:inline">生成巅峰球员</span>
+              <span className="hidden lg:inline">新秀生成</span>
             </button>
             <button aria-pressed={appMode === "custom"} className="mode-nav-button" data-active={appMode === "custom"} disabled={builderFlowActive} onClick={() => setAppMode("custom")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "逐项为属性槽选择来源球员"} type="button">
               <UsersRound className="h-3.5 w-3.5" />
               <span className="lg:hidden">自选</span>
-              <span className="hidden lg:inline">自选来源</span>
+              <span className="hidden lg:inline">自选生成</span>
+            </button>
+            <button aria-pressed={appMode === "wheel"} className="mode-nav-button" data-active={appMode === "wheel"} onClick={() => setAppMode("wheel")} title="数字、标签、球员随机转盘" type="button">
+              <Disc3 className="h-3.5 w-3.5" />
+              <span className="lg:hidden">转盘</span>
+              <span className="hidden lg:inline">转盘</span>
             </button>
           </nav>
 
@@ -407,22 +395,25 @@ const App = () => {
             </button>
             <span className="hidden items-center gap-1.5 text-[10px] font-medium text-ink-600 xl:flex">
               <span className="h-1.5 w-1.5 rounded-full bg-court-500" />
-              {appMode === "rookie" ? "新秀生成" : appMode === "prime" ? "巅峰生成" : "手动选源"}
+              {appMode === "rookie" ? "新秀生成" : appMode === "custom" ? "自选生成" : "转盘"}
             </span>
           </div>
         </header>
 
-        <RookieBuilder
-            key={`${appMode}:${dataVersion}`}
-            dataVersionLabel={rosterDataVersion}
-            mode={appMode === "prime" ? "prime" : "rookie"}
-            selectionMode={appMode === "custom" ? "manual" : "random"}
-            availablePlayers={allPlayerPool}
-            onFlowActiveChange={handleBuilderFlowActiveChange}
-            overallVersion={dataVersion}
-            teams={rookieBuilderTeams}
-            tendencyVersion={dataVersion}
+        {appMode === "wheel" ? (
+          <WheelPanel teams={rookieBuilderTeams} />
+        ) : (
+          <RookieBuilder
+              key={`${appMode}:${dataVersion}`}
+              dataVersionLabel={rosterDataVersion}
+              selectionMode={appMode === "custom" ? "manual" : "random"}
+              availablePlayers={allPlayerPool}
+              onFlowActiveChange={handleBuilderFlowActiveChange}
+              overallVersion={dataVersion}
+              teams={rookieBuilderTeams}
+              tendencyVersion={dataVersion}
           />
+        )}
 
       </div>
 

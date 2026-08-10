@@ -169,6 +169,8 @@ export function cardSourceBody(card: RookieCard | null | undefined): SourceBody 
 export type EvaluateOptions = {
   targetPosition?: Position | null;
   secondaryPosition?: Position | null;
+  /** 关闭降级算法：跳过身体约束与位置交叉（自选模式开关） */
+  skipBody?: boolean;
 };
 
 export function evaluate(
@@ -194,6 +196,7 @@ export function evaluate(
     targetPosition: options?.targetPosition ?? null,
     secondaryPosition: options?.secondaryPosition ?? null,
     sourcePosition: player.position,
+    skipBody: options?.skipBody,
   });
   const positionDistance = options?.targetPosition != null
     ? effectivePositionDistance(
@@ -217,9 +220,9 @@ export function evaluate(
   };
 }
 
-export function evaluateCustom(bundle: Bundle, customValues: Record<string, number>, body: BuilderBody): Evaluation {
+export function evaluateCustom(bundle: Bundle, customValues: Record<string, number>, body: BuilderBody, options?: EvaluateOptions): Evaluation {
   const rawValues = Object.fromEntries(bundle.attrs.map((attr) => [attr, clamp(customValues[attr] ?? 75)]));
-  const constrained = applyBodyConstraints(rawValues, body, null);
+  const constrained = applyBodyConstraints(rawValues, body, null, { skipBody: options?.skipBody });
   const raw = Math.round(average(Object.values(rawValues)));
   const adjusted = Math.round(average(Object.values(constrained.values)));
   return {
@@ -288,7 +291,7 @@ export function evaluateAll(
   const evaluations: Record<string, Evaluation> = {};
   for (const input of inputs) {
     if (input.customValues) {
-      evaluations[input.bundle.id] = evaluateCustom(input.bundle, input.customValues, body);
+      evaluations[input.bundle.id] = evaluateCustom(input.bundle, input.customValues, body, options);
       continue;
     }
     if (!input.player) continue;
@@ -393,15 +396,6 @@ function calibratedOverall(
   return estimateGameOverall(values, position, badges, fallbackValue, version);
 }
 
-/**
- * OVR model routing: prime/peak estimates use the roster-trained model for the
- * active data version; rookie-mode initial OVR uses the dedicated model trained
- * on the 667 official rookie cards (MAE 0.907 vs 2.063 on the same cards).
- */
-function overallModelFor(isPrime: boolean, version: OverallDataVersion): OverallDataVersion {
-  return isPrime ? version : "rookie";
-}
-
 function tierFor(score: number): BadgeTier {
   if (score >= 96) return "HOF";
   if (score >= 90) return "Gold";
@@ -486,13 +480,13 @@ export function createResult(
   position: Position,
   secondary: Position,
   body: BuilderBody,
-  mode: "rookie" | "prime",
   players: Map<string, PlayerSource>,
   tendencyLookup: TendencyLookup | null,
   overallVersion: OverallDataVersion,
   rookieCards: RookieCardLookup | null,
+  constraintOptions?: { skipBody?: boolean },
 ) {
-  const isPrime = mode === "prime";
+  const skipBody = constraintOptions?.skipBody === true;
   // Peak attributes must reflect the source player's real (non-card) values:
   // the displayed slot evaluations may already be rookie-card values in rookie
   // mode, so rebuild the peak evaluation here without any card override.
@@ -513,6 +507,7 @@ export function createResult(
   const evaluations = evaluateAll(slotInputs, body, {
     targetPosition: position,
     secondaryPosition: secondary,
+    skipBody,
   });
   for (const bundle of bundles) {
     const evaluation = evaluations[bundle.id];
@@ -523,10 +518,9 @@ export function createResult(
 
   // Rookie card sources: a slot whose locked player has a real rookie card
   // inherits that card's attributes/badges/tendencies verbatim (no age-curve
-  // downgrade, no badge downgrade). Only in rookie mode — prime mode keeps the
-  // existing peak inheritance path untouched. Slots without a card also keep
-  // the existing path.
-  const useRookieCards = !isPrime;
+  // downgrade, no badge downgrade). Slots without a card keep the existing
+  // peak inheritance path.
+  const useRookieCards = true;
   const cardByBundle = new Map<string, RookieCard | null>();
   for (const bundle of bundles) {
     const lock = locks[bundle.id];
@@ -559,9 +553,9 @@ export function createResult(
   const rawCustomFinalAttrs = Object.assign({}, ...Object.values(locks)
     .filter((lock): lock is CustomLock => lock.kind === "custom")
     .map((lock) => lock.values));
-  const customFinalAttrs = applyBodyConstraints(rawCustomFinalAttrs, body, null).values;
+  const customFinalAttrs = applyBodyConstraints(rawCustomFinalAttrs, body, null, { skipBody }).values;
   Object.assign(peakAttrs, customFinalAttrs);
-  peakAttrs = applyBodyConstraints(peakAttrs, body, null).values;
+  peakAttrs = applyBodyConstraints(peakAttrs, body, null, { skipBody }).values;
   const badgeSources = bundles.filter((bundle) => bundle.id !== "potential" && !cardByBundle.get(bundle.id)).map((bundle) => {
     const lock = locks[bundle.id];
     return {
@@ -600,9 +594,8 @@ export function createResult(
   const random = makeRandom(hash(`${signature}|${age}|${position}|${secondary}`));
   const mean = average(scores, 71);
   const sourcePeakOverall = calibratedOverall(peakAttrs, position, peakBadges, mean, overallVersion);
-  // Rookie-mode initial OVR uses the rookie-card-trained model; prime keeps the
-  // roster model of the active data version.
-  const initialOverallVersion = overallModelFor(isPrime, overallVersion);
+  // Rookie-mode initial OVR uses the rookie-card-trained model.
+  const initialOverallVersion: OverallDataVersion = "rookie";
   // Potential slot: a real rookie card wins over both the peak evaluation and
   // the cross-version OVR fallback. The card also carries the official min/max
   // potential range; without a card we fall back to a symmetric ±5 band around
@@ -624,60 +617,52 @@ export function createResult(
   // evaluation with the rookie age-curve downgrade.
   const cardConstrainedValues: Record<string, number> = {};
   const cardLockedValues: Record<string, number> = {};
-  if (!isPrime) {
-    const cardInputs: SlotInput[] = [];
-    for (const bundle of bundles) {
-      const lock = locks[bundle.id];
-      if (lock?.kind === "custom") {
-        cardInputs.push({ bundle, player: null, customValues: lock.values });
+  const cardInputs: SlotInput[] = [];
+  for (const bundle of bundles) {
+    const lock = locks[bundle.id];
+    if (lock?.kind === "custom") {
+      cardInputs.push({ bundle, player: null, customValues: lock.values });
+      continue;
+    }
+    const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
+    if (player) cardInputs.push({ bundle, player, card: cardByBundle.get(bundle.id) ?? null });
+  }
+  const cardEvaluations = evaluateAll(cardInputs, body, { targetPosition: position, secondaryPosition: secondary, skipBody });
+  peakBadgeResolution = resolvePeakBadges(peakAttrs);
+  peakBadges = peakBadgeResolution.badges;
+  for (const bundle of bundles) {
+    const card = cardByBundle.get(bundle.id);
+    const evaluation = cardEvaluations[bundle.id];
+    for (const attr of bundle.attrs) {
+      const cardValue = card?.detailed[attr];
+      if (typeof cardValue === "number") {
+        // Card raw value with the full body constraint path (same as preview).
+        const constrained = evaluation?.values[attr];
+        initialAttrs[attr] = clamp(constrained ?? cardValue, 25, 99);
+        cardConstrainedValues[attr] = initialAttrs[attr];
         continue;
       }
-      const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
-      if (player) cardInputs.push({ bundle, player, card: cardByBundle.get(bundle.id) ?? null });
+      const value = peakAttrs[attr];
+      if (typeof value === "number") initialAttrs[attr] = rookieValue(value, age, bundle.category);
     }
-    const cardEvaluations = evaluateAll(cardInputs, body, { targetPosition: position, secondaryPosition: secondary });
-    peakBadgeResolution = resolvePeakBadges(peakAttrs);
-    peakBadges = peakBadgeResolution.badges;
-    for (const bundle of bundles) {
-      const card = cardByBundle.get(bundle.id);
-      const evaluation = cardEvaluations[bundle.id];
-      for (const attr of bundle.attrs) {
-        const cardValue = card?.detailed[attr];
-        if (typeof cardValue === "number") {
-          // Card raw value with the full body constraint path (same as preview).
-          const constrained = evaluation?.values[attr];
-          initialAttrs[attr] = clamp(constrained ?? cardValue, 25, 99);
-          cardConstrainedValues[attr] = initialAttrs[attr];
-          continue;
-        }
-        const value = peakAttrs[attr];
-        if (typeof value === "number") initialAttrs[attr] = rookieValue(value, age, bundle.category);
-      }
+  }
+  // Card attributes are locked (real game data) — the OVR constraint must not
+  // lower them, only the non-card slots remain adjustable. The lock values are
+  // the body-constrained card values (what the user actually sees).
+  for (const bundle of bundles) {
+    const card = cardByBundle.get(bundle.id);
+    if (!card) continue;
+    for (const attr of bundle.attrs) {
+      const constrained = cardConstrainedValues[attr];
+      if (constrained != null) cardLockedValues[attr] = constrained;
+      else if (typeof card.detailed[attr] === "number") cardLockedValues[attr] = card.detailed[attr];
     }
-    // Card attributes are locked (real game data) — the OVR constraint must not
-    // lower them, only the non-card slots remain adjustable. The lock values are
-    // the body-constrained card values (what the user actually sees).
-    for (const bundle of bundles) {
-      const card = cardByBundle.get(bundle.id);
-      if (!card) continue;
-      for (const attr of bundle.attrs) {
-        const constrained = cardConstrainedValues[attr];
-        if (constrained != null) cardLockedValues[attr] = constrained;
-        else if (typeof card.detailed[attr] === "number") cardLockedValues[attr] = card.detailed[attr];
-      }
-    }
-  } else {
-    // Prime mode exposes the evaluated values directly: no age development curve
-    // and no second overall calibration should alter the attributes the user chose.
-    initialAttrs = { ...peakAttrs };
   }
 
   // Merge: card badges verbatim + downgraded non-card badges.
-  const badges = isPrime
-    ? uniqueBadges([...peakBadges, ...cardBadges])
-    : uniqueBadges([...downgradeBadgesForRookie(peakBadges, rookieTier), ...cardBadges]);
+  const badges = uniqueBadges([...downgradeBadgesForRookie(peakBadges, rookieTier), ...cardBadges]);
   Object.assign(initialAttrs, customFinalAttrs);
-  initialAttrs = applyBodyConstraints(initialAttrs, body, null).values;
+  initialAttrs = applyBodyConstraints(initialAttrs, body, null, { skipBody }).values;
   // 恢复卡槽位的完整身体约束结果（含来源容量豁免），避免被上面 source=null
   // 的目标 cap 二次压低；非卡槽位保持目标 cap 校验。
   for (const [attr, value] of Object.entries(cardConstrainedValues)) {
@@ -693,30 +678,26 @@ export function createResult(
   const manualOverallDurability = customFinalAttrs["Overall Durability"];
   const durabilityValues = manualOverallDurability != null
     ? generateDurabilityAttributes(manualOverallDurability, random)
-    : isPrime
-      ? generateDurabilityAttributes(sourceDurability, random)
-      : generateRookieDurability(sourceDurability, bodyStress, random);
+    : generateRookieDurability(sourceDurability, bodyStress, random);
   Object.assign(initialAttrs, durabilityValues);
   const durability = durabilityValues["Overall Durability"] ?? 82;
-  const rookieOverallConstraint = isPrime
-    ? null
-    : constrainRookieInitialAttributes({
-      values: initialAttrs,
-      potential,
-      age,
-      adjustableAttributes: bundles
-        .filter((bundle) => bundle.id !== "potential")
-        .flatMap((bundle) => bundle.attrs),
-      lockedValues: { ...customFinalAttrs, ...cardLockedValues },
-      badges,
-      estimateOverall: (values, candidateBadges) => calibratedOverall(
-        values,
-        position,
-        candidateBadges,
-        mean,
-        initialOverallVersion,
-      ),
-    });
+  const rookieOverallConstraint = constrainRookieInitialAttributes({
+    values: initialAttrs,
+    potential,
+    age,
+    adjustableAttributes: bundles
+      .filter((bundle) => bundle.id !== "potential")
+      .flatMap((bundle) => bundle.attrs),
+    lockedValues: { ...customFinalAttrs, ...cardLockedValues },
+    badges,
+    estimateOverall: (values, candidateBadges) => calibratedOverall(
+      values,
+      position,
+      candidateBadges,
+      mean,
+      initialOverallVersion,
+    ),
+  });
   if (rookieOverallConstraint) Object.assign(initialAttrs, rookieOverallConstraint.values);
   // OVR: only when EVERY non-potential slot is locked to the same rookie card
   // (and no custom lock is mixed in) does the card's UI-confirmed overall stand
@@ -731,7 +712,7 @@ export function createResult(
   )
     ? firstCard
     : null;
-  const cardOverall = !isPrime && singleCard?.overall != null ? singleCard.overall : null;
+  const cardOverall = singleCard?.overall != null ? singleCard.overall : null;
   const baseOverall = cardOverall ?? calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
   const initialStrength = baseOverall;
   // 综评补偿 (Intangibles): 优先继承潜力来源卡的真实值，其次同卡构建的卡值，最后默认 50。
@@ -765,23 +746,19 @@ export function createResult(
   const vitalBust = vitalNumber("bustPercent");
   const vitalAverage = vitalNumber("averagePercent");
   const hasVitalProbabilities = vitalBoom !== null && vitalBust !== null && vitalAverage !== null;
-  const progressSpeed = isPrime
-    ? 0
-    : Math.round(Math.max(2.2, Math.min(5.4, 2.4 + Math.max(0, (potential - 87) / 10) + (random() - 0.5) * 0.6)) * 10) / 10;
-  const yearsToPeak = isPrime || progressSpeed === 0 ? 0 : Math.ceil(growthGap / progressSpeed);
+  const progressSpeed = Math.round(Math.max(2.2, Math.min(5.4, 2.4 + Math.max(0, (potential - 87) / 10) + (random() - 0.5) * 0.6)) * 10) / 10;
+  const yearsToPeak = progressSpeed === 0 ? 0 : Math.ceil(growthGap / progressSpeed);
   const peakStart = vitalPeakStart !== null && vitalPeakStart >= age
     ? vitalPeakStart
-    : isPrime
-      ? 28
-      : clamp(Math.max(24, age + yearsToPeak), age, 30);
-  const peakDuration = isPrime ? 7 : Math.max(5, Math.min(11, 7 + (durability - 70) / 15 + random() * 1.5));
+    : clamp(Math.max(24, age + yearsToPeak), age, 30);
+  const peakDuration = Math.max(5, Math.min(11, 7 + (durability - 70) / 15 + random() * 1.5));
   const peakEnd = vitalPeakEnd !== null && vitalPeakEnd >= peakStart
     ? vitalPeakEnd
     : clamp(peakStart + peakDuration, peakStart, 40);
-  const boom = isPrime ? 0 : hasVitalProbabilities
+  const boom = hasVitalProbabilities
     ? vitalBoom
     : clamp(28 + potential - 84 - (age - 18) * 2 + (random() - 0.5) * 8, 10, 55);
-  const bust = isPrime ? 0 : hasVitalProbabilities
+  const bust = hasVitalProbabilities
     ? vitalBust
     : clamp(18 - (age - 18) + (random() - 0.5) * 8, 8, 40);
   const normal = hasVitalProbabilities

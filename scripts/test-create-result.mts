@@ -133,7 +133,7 @@ function customLockFor(bundleId: string, values: Record<string, number>): LockSt
 
 // --- 1. singleCard: every non-potential slot on the same card -> card OVR ---
 {
-  const result = createResult(playerLock(lukaId), age, position, secondary, body, "rookie", players, tendencyLookup, "2k26", cards);
+  const result = createResult(playerLock(lukaId), age, position, secondary, body, players, tendencyLookup, "2k26", cards);
   assert.ok(result.card, "all-Luka lock must resolve a single rookie card");
   assert.equal(result.card.slug, "luka-doncic");
   assert.equal(result.card.year, 2018);
@@ -158,7 +158,7 @@ function customLockFor(bundleId: string, values: Record<string, number>): LockSt
       values: Object.fromEntries(bundle.attrs.map((attr) => [attr, 70])),
     };
   }
-  const result = createResult(locks, age, position, secondary, body, "rookie", players, tendencyLookup, "2k26", cards);
+  const result = createResult(locks, age, position, secondary, body, players, tendencyLookup, "2k26", cards);
   assert.equal(result.card, null, "a card used only for potential must not become the build's card");
   assert.notEqual(result.baseOverall, lukaCardOverall, "model estimate must stand in; card OVR must not leak through");
   assert.equal(result.initialStrength, result.baseOverall);
@@ -184,7 +184,7 @@ function customLockFor(bundleId: string, values: Record<string, number>): LockSt
     }
     locks[bundle.id] = { kind: "player", playerId: cardlessId };
   }
-  const result = createResult(locks, age, position, secondary, body, "rookie", players, tendencyLookup, "2k26", cards);
+  const result = createResult(locks, age, position, secondary, body, players, tendencyLookup, "2k26", cards);
   assert.equal(result.card, null);
   assert.ok(result.initialOverallConstraintApplied, "over-target mixed build must be lowered to the potential/age target");
   assert.ok(result.initialStrength <= result.initialOverallTarget, "constrained OVR must not exceed the target");
@@ -202,7 +202,7 @@ function customLockFor(bundleId: string, values: Record<string, number>): LockSt
       ])),
     };
   }
-  const result = createResult(locks, age, position, secondary, body, "rookie", players, tendencyLookup, "2k26", cards);
+  const result = createResult(locks, age, position, secondary, body, players, tendencyLookup, "2k26", cards);
   assert.equal(result.initialAttrs["Overall Durability"], 99, "manual durability lock must survive generation");
 }
 
@@ -228,7 +228,7 @@ function customLockFor(bundleId: string, values: Record<string, number>): LockSt
 
 // --- 5. every locked non-potential player resolves an evaluation (full lock sanity) ---
 {
-  const result = createResult(playerLock(lukaId), age, position, secondary, body, "rookie", players, tendencyLookup, "2k26", cards);
+  const result = createResult(playerLock(lukaId), age, position, secondary, body, players, tendencyLookup, "2k26", cards);
   for (const attr of ["Three-Point Shot", "Mid-Range Shot", "Ball Handle"]) {
     assert(typeof result.initialAttrs[attr] === "number", `${attr} must be a number`);
   }
@@ -236,7 +236,7 @@ function customLockFor(bundleId: string, values: Record<string, number>): LockSt
 
 // --- 6. card badges carry categories so the joint OVR model prices them ---
 {
-  const result = createResult(playerLock(lukaId), age, position, secondary, body, "rookie", players, tendencyLookup, "2k26", cards);
+  const result = createResult(playerLock(lukaId), age, position, secondary, body, players, tendencyLookup, "2k26", cards);
   const modelCategories = new Set(["shooting", "playmaking", "inside", "defense", "rebounding", "athleticism"]);
   assert(result.badges.length > 0, "Luka's rookie card must contribute badges");
   for (const badge of result.badges) {
@@ -273,7 +273,7 @@ console.log("createResult production-path OK: single-card OVR, potential-only ca
   const previewBlock = preview.block?.values.Block;
   assert.equal(typeof previewBlock, "number", "preview block must resolve");
   // 最终生成路径（rookie 模式，全部槽位锁定 Wemby）
-  const result = createResult(playerLock(wembyId), age, position, secondary, pgBody, "rookie", players, tendencyLookup, "2k26", cards);
+  const result = createResult(playerLock(wembyId), age, position, secondary, pgBody, players, tendencyLookup, "2k26", cards);
   assert.equal(
     result.initialAttrs.Block,
     previewBlock,

@@ -12,6 +12,8 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { normalizePlayerSearch, matchesPlayerSearch } from "../playerSearch";
+import { valueColor } from "../valueColor";
 import { badgeTierCN, getBadgeNameCN, normalizeBadgeName } from "../badges";
 import MarqueeDraw, { type MarqueeDrawItem } from "./MarqueeDraw";
 import { attrNameCN, type PlayerSource } from "../domain";
@@ -37,7 +39,8 @@ import {
   type TendencyDataVersion,
   type TendencyLookup,
 } from "../tendencies";
-import { loadRookieCards, lookupRookieCard, type RookieCardLookup } from "../rookieCards";
+import { loadRookieCards, lookupRookieCard, type RookieCard, type RookieCardLookup } from "../rookieCards";
+import SlotPicker from "./SlotPicker";
 import { getTendencyNameCN } from "../tendencyNames";
 import { getPlayerHeadshotSources, prefetchPlayerHeadshots } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
@@ -52,7 +55,6 @@ export type RookieBuilderTeam = {
   players: PlayerSource[];
 };
 
-export type BuilderMode = "rookie" | "prime";
 export type SourceSelectionMode = "random" | "manual";
 
 type TeamRound = {
@@ -267,28 +269,36 @@ function playerId(player: PlayerSource) {
   return player.id ?? `${player.rosterTeam ?? player.team ?? "team"}:${player.slug ?? player.name}`;
 }
 
+/** 新秀卡 → 槽位来源 PlayerSource 适配（manual 模式按槽位选卡）。 */
+function cardToPlayerSource(card: RookieCard): PlayerSource {
+  const id = `card:${card.slug}`;
+  const avg = (keys: string[], fallback = 75) => {
+    const values = keys.map((key) => card.detailed[key]).filter((value): value is number => typeof value === "number");
+    return values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : fallback;
+  };
+  return {
+    id,
+    name: card.name,
+    slug: card.slug,
+    position: typeof card.vitals?.position === "string" ? card.vitals.position : "",
+    overall: card.overall ?? null,
+    shooting: avg(["Three-Point Shot", "Mid-Range Shot", "Free Throw", "Offensive Consistency", "Shot IQ"]),
+    athleticism: avg(["Speed", "Strength", "Agility", "Vertical", "Hustle", "Stamina"]),
+    playmaking: avg(["Ball Handle", "Speed with Ball", "Pass Accuracy", "Pass IQ", "Pass Vision"]),
+    defense: avg(["Block", "Steal", "Pass Perception", "Interior Defense", "Perimeter Defense", "Defensive Consistency", "Help Defense IQ"]),
+    inside: avg(["Layup", "Driving Dunk", "Standing Dunk", "Post Hook", "Post Fade", "Post Control", "Draw Foul", "Hands", "Offensive Rebound", "Defensive Rebound"]),
+    detailed: card.detailed,
+    badges: [],
+    badgesKnown: true,
+  };
+}
+
 function playerIdentity(player: PlayerSource) {
   return player.name
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
-}
-
-function normalizePlayerSearch(value: string) {
-  return value
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/\s+/g, "")
-    .replace(/[.'’\-]/g, "");
-}
-
-function matchesPlayerSearch(player: PlayerSource, query: string) {
-  const normalizedQuery = normalizePlayerSearch(query);
-  if (!normalizedQuery) return true;
-  return [player.name, getPlayerNameCN(player.name), player.rosterTeam ?? "", player.position ?? ""]
-    .some((value) => normalizePlayerSearch(value).includes(normalizedQuery));
 }
 
 function matchesPlayerGroupSearch(group: ManualPlayerGroup, query: string) {
@@ -312,16 +322,6 @@ function playerVariantLabel(player: PlayerSource) {
   if (player.rosterCategory === "allTime") return `${category} · ${localizedTeamName(allTimeTeam)}`;
   if (classicMatch) return `${category} · ${classicMatch[1]} · ${localizedTeamName(classicMatch[2])}`;
   return `${category} · ${localizedTeamName(rawTeam)}`;
-}
-
-/** Classic game rarity scale: gold, red, purple, blue, green, then white/common. */
-function valueColor(value: number) {
-  if (value >= 90) return "text-warning-800 value-rating value-rating-gold";
-  if (value >= 80) return "text-rose-800 value-rating value-rating-red";
-  if (value >= 70) return "text-purple-800 value-rating value-rating-purple";
-  if (value >= 60) return "text-blue-800 value-rating value-rating-blue";
-  if (value >= 50) return "text-court-800 value-rating value-rating-green";
-  return "text-ink-900 value-rating value-rating-common";
 }
 
 function createRound(teams: RookieBuilderTeam[], seed: number, previousTeamId = ""): TeamRound {
@@ -376,11 +376,9 @@ function createExportText(
   locks: LockState,
   evaluations: Record<string, Evaluation>,
   players: Map<string, PlayerSource>,
-  mode: BuilderMode,
   tendencyLoadState: TendencyLoadState,
   dataVersionLabel: string,
 ) {
-  const isPrime = mode === "prime";
   const card = result.card ?? null;
   const v = (key: string) => card?.vitals?.[key];
   const vs = (key: string) => {
@@ -395,94 +393,92 @@ function createExportText(
     hand === "Right" ? "右手" : hand === "Left" ? "左手" : hand == null ? "--" : String(hand);
   // Full record sections come from the locked rookie card (single-card build);
   // without a card the export keeps the classic reduced fields.
+  const sep = " ｜ ";
   const vitalLines = card ? [
-    `名字: ${vs("firstName")}`, `姓氏: ${vs("lastName")}`, `昵称: ${vs("nickname")}`,
-    `位置: ${result.position}`, `次要位置: ${result.secondary}`,
-    `出生: ${vn("birthYear")}年${vn("birthMonth")}月${vn("birthDay")}日`, `年龄: ${result.age}`,
-    `球衣号码: ${vn("jerseyNumber")}`, `惯用手: ${handCN(v("dominantHand"))}`,
-    `扣篮惯用手: ${handCN(v("dominantDunkHand"))}`, `职业年限: ${vn("yearsPro")}`,
-    `巅峰开始年龄: ${vn("peakStartAge")}`, `巅峰结束年龄: ${vn("peakEndAge")}`,
-    `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）`,
-    `衰退百分比: ${vn("bustPercent")}%`, `平均百分比: ${vn("averagePercent")}%`,
-    `成长百分比: ${vn("boomPercent")}%`,
-    `胜利重要性: ${vn("playForWinner")}`, `经济重要性: ${vn("financialSecurity")}`,
-    `忠诚度: ${vn("loyalty")}`, `强制不先发: ${vs("forceNonStarter")}`,
-    `比赛主控者: ${v("playInitiator") == null ? "--" : v("playInitiator") ? "是" : "否"}`,
-    `进攻方式 1: ${vs("playType1")}`, `进攻方式 2: ${vs("playType2")}`,
-    `进攻方式 3: ${vs("playType3")}`, `进攻方式 4: ${vs("playType4")}`,
-    `数据版本: ${dataVersionLabel}`,
-    ...(!isPrime ? [`预计成长速度: 每年 +${result.progressSpeed} OVR`] : []),
+    `名字: ${vs("firstName")}${sep}姓氏: ${vs("lastName")}${sep}昵称: ${vs("nickname")}`,
+    `位置: ${result.position}（次要: ${result.secondary}）${sep}球衣号码: ${vn("jerseyNumber")}`,
+    `出生: ${vn("birthYear")}年${vn("birthMonth")}月${vn("birthDay")}日${sep}年龄: ${result.age}`,
+    `惯用手: ${handCN(v("dominantHand"))}（扣篮: ${handCN(v("dominantDunkHand"))}）${sep}职业年限: ${vn("yearsPro")}`,
+    `巅峰年龄: ${vn("peakStartAge")}-${vn("peakEndAge")}`,
+    `进攻方式: ${[1, 2, 3, 4].map((n) => vs(`playType${n}`)).join(sep)}`,
+    `比赛主控者: ${v("playInitiator") == null ? "--" : v("playInitiator") ? "是" : "否"}${sep}强制不先发: ${vs("forceNonStarter")}`,
+    `胜利重要性: ${vn("playForWinner")}${sep}经济重要性: ${vn("financialSecurity")}${sep}忠诚度: ${vn("loyalty")}`,
+    `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）${sep}成长概率: ${vn("boomPercent")}%${sep}平均: ${vn("averagePercent")}%${sep}衰退: ${vn("bustPercent")}%`,
+    `成长速度: 每年 +${result.progressSpeed} OVR`,
   ] : [
-    `姓名: ${rookieName}`, `年龄: ${result.age}`, `位置: ${result.position}`, `次要位置: ${result.secondary}`,
-    `惯用手: ${result.hand}`, `扣篮惯用手: ${result.dunkHand}`,
-    `巅峰开始年龄: ${result.peakStart}`, `巅峰结束年龄: ${result.peakEnd}`,
-    `数据版本: ${dataVersionLabel}`,
-    ...(!isPrime ? [`预计成长速度: 每年 +${result.progressSpeed} OVR`] : []),
-    `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）`,
-    `成长概率: ${result.boom}%`, `平均概率: ${result.normal}%`, `衰退概率: ${result.bust}%`,
+    `姓名: ${rookieName}`,
+    `年龄: ${result.age}${sep}位置: ${result.position}（次要: ${result.secondary}）`,
+    `惯用手: ${result.hand}（扣篮: ${result.dunkHand}）`,
+    `巅峰年龄: ${result.peakStart}-${result.peakEnd}`,
+    `成长速度: 每年 +${result.progressSpeed} OVR`,
+    `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）${sep}成长概率: ${result.boom}%${sep}平均: ${result.normal}%${sep}衰退: ${result.bust}%`,
   ];
   const bodyLines = card ? [
-    // 身高/体重/臂展: 卡真实值（游戏内 in/lb/cm，括号为换算 cm/kg）
-    `身高: ${typeof v("heightInches") === "number" ? `${v("heightInches")} in（${Math.round((v("heightInches") as number) * 2.54)} cm）` : `${result.height} cm`}`,
-    `体重: ${typeof v("weightLb") === "number" ? `${v("weightLb")} lb（${Math.round((v("weightLb") as number) * 0.4536)} kg）` : `${result.weight} kg`}`,
-    `臂展: ${typeof v("wingspanCm") === "number" ? `${v("wingspanCm")} cm` : result.wingspan}`,
-    // 肩宽/颈长/躯干: 游戏内为 1-100 评分（DB2K 快照当前全为占位 50，无真实值）
-    `肩宽（1-100）: ${vs("shoulderLength") === "--" ? result.shoulder : vs("shoulderLength")}`,
-    `颈部长度（1-100）: ${vs("neckLength") === "--" ? result.neck : vs("neckLength")}`,
-    `躯干长度（1-100）: ${vs("trunkLength") === "--" ? result.torso : vs("trunkLength")}`,
+    `身高: ${typeof v("heightInches") === "number" ? `${Math.round((v("heightInches") as number) * 2.54)} cm` : `${result.height} cm`}${sep}体重: ${typeof v("weightLb") === "number" ? `${Math.round((v("weightLb") as number) * 0.4536)} kg` : `${result.weight} kg`}`,
+    `臂展: ${typeof v("wingspanCm") === "number" ? `${v("wingspanCm")} cm` : result.wingspan}${sep}肩宽: ${vs("shoulderLength") === "--" ? result.shoulder : vs("shoulderLength")}${sep}颈长: ${vs("neckLength") === "--" ? result.neck : vs("neckLength")}${sep}躯干: ${vs("trunkLength") === "--" ? result.torso : vs("trunkLength")}`,
   ] : [
-    `身高: ${result.height} cm`, `体重: ${result.weight} kg`,
-    `臂展（1-100）: ${result.wingspan}`, `肩宽（1-100）: ${result.shoulder}`,
-    `颈部长度（1-100）: ${result.neck}`, `躯干长度（1-100）: ${result.torso}`,
+    `身高: ${result.height} cm${sep}体重: ${result.weight} kg`,
+    `臂展（1-100）: ${result.wingspan}${sep}肩宽: ${result.shoulder}${sep}颈长: ${result.neck}${sep}躯干: ${result.torso}`,
   ];
-  const durabilityLines = card && Object.keys(card.durability).length ? [
-    `头部耐久: ${card.durability.head ?? "--"}`, `颈部耐久: ${card.durability.neck ?? "--"}`,
-    `背部耐久: ${card.durability.back ?? "--"}`,
-    `左肩耐久: ${card.durability.leftShoulder ?? "--"}`, `右肩耐久: ${card.durability.rightShoulder ?? "--"}`,
-    `左肘耐久: ${card.durability.leftElbow ?? "--"}`, `右肘耐久: ${card.durability.rightElbow ?? "--"}`,
-    `左髋关节耐久: ${card.durability.leftHip ?? "--"}`, `右髋关节耐久: ${card.durability.rightHip ?? "--"}`,
-    `左膝耐久: ${card.durability.leftKnee ?? "--"}`, `右膝耐久: ${card.durability.rightKnee ?? "--"}`,
-    `左踝关节耐久: ${card.durability.leftAnkle ?? "--"}`, `右踝关节耐久: ${card.durability.rightAnkle ?? "--"}`,
-    `左脚耐久: ${card.durability.leftFoot ?? "--"}`, `右脚耐久: ${card.durability.rightFoot ?? "--"}`,
-    `综合耐久: ${card.durability.overall ?? "--"}`,
-  ] : [];
-  const hotZoneCN: Record<string, string> = {
-    underBasket: "篮下", closeLeft: "近距离左侧", closeMiddle: "近距离正面", closeRight: "近距离右侧",
-    midLeft: "左侧底角中距离", midLeftCenter: "左侧 45 度中距离", midCenter: "弧顶中距离",
-    midRightCenter: "右侧 45 度中距离", midRight: "右侧底角中距离",
-    threeLeft: "左侧底角三分", threeLeftCenter: "左侧 45 度三分", threeCenter: "弧顶三分",
-    threeRightCenter: "右侧 45 度三分", threeRight: "右侧底角三分",
+  const cardDurabilityKeys = ["head", "neck", "back", "leftShoulder", "rightShoulder", "leftElbow", "rightElbow", "leftHip", "rightHip", "leftKnee", "rightKnee", "leftAnkle", "rightAnkle", "leftFoot", "rightFoot"] as const;
+  const durabilityShort: Record<(typeof cardDurabilityKeys)[number], string> = {
+    head: "头部", neck: "颈部", back: "背部",
+    leftShoulder: "左肩", rightShoulder: "右肩",
+    leftElbow: "左肘", rightElbow: "右肘",
+    leftHip: "左髋", rightHip: "右髋",
+    leftKnee: "左膝", rightKnee: "右膝",
+    leftAnkle: "左踝", rightAnkle: "右踝",
+    leftFoot: "左脚", rightFoot: "右脚",
   };
-  const hotZoneLines = card && Object.keys(card.hotZones).length
-    ? hotZoneGroups.flatMap((group) => [
-      `-- ${group.label} --`,
-      ...group.zones.map((key) => {
-        const state = card.hotZones[key];
-        return `${hotZoneCN[key] ?? key}: ${state === "Hot" ? "热区" : state === "Cold" ? "冷区" : "正常"}`;
-      }),
-    ])
-    : hotZoneCNGroups.flatMap((group) => {
-      const entries = group.keys.filter((key) => result.hotZones[key] !== undefined);
-      return entries.length ? [`-- ${group.label} --`, ...entries.map((name) => `${name}: ${result.hotZones[name]}`)] : [];
+  const durabilityLines = card && Object.keys(card.durability).length ? [
+    `耐久: ${cardDurabilityKeys.map((key) => `${durabilityShort[key]} ${card.durability[key] ?? "--"}`).join(sep)}${sep}综合 ${card.durability.overall ?? "--"}`,
+  ] : [];
+  const zoneSlots: { label: string; slots: { short: string; keys: string[] }[] }[] = [
+    { label: "篮下", slots: [
+      { short: "篮下", keys: ["underBasket", "篮下"] },
+      { short: "近距离左侧", keys: ["closeLeft", "近距离左侧"] },
+      { short: "近距离中央", keys: ["closeMiddle", "近距离中央"] },
+      { short: "近距离右侧", keys: ["closeRight", "近距离右侧"] },
+    ] },
+    { label: "中距离", slots: [
+      { short: "左底角", keys: ["midLeft", "中距离左侧底角"] },
+      { short: "左45", keys: ["midLeftCenter", "中距离左侧45度"] },
+      { short: "弧顶", keys: ["midCenter", "中距离弧顶"] },
+      { short: "右45", keys: ["midRightCenter", "中距离右侧45度"] },
+      { short: "右底角", keys: ["midRight", "中距离右侧底角"] },
+    ] },
+    { label: "三分", slots: [
+      { short: "左底角", keys: ["threeLeft", "三分左侧底角"] },
+      { short: "左45", keys: ["threeLeftCenter", "三分左侧45度"] },
+      { short: "弧顶", keys: ["threeCenter", "三分弧顶"] },
+      { short: "右45", keys: ["threeRightCenter", "三分右侧45度"] },
+      { short: "右底角", keys: ["threeRight", "三分右侧底角"] },
+    ] },
+  ];
+  const hotZoneSource = card && Object.keys(card.hotZones).length ? card.hotZones : result.hotZones;
+  const zoneStateCN = (state: string) => (state === "Hot" || state === "热区") ? "热区" : (state === "Cold" || state === "冷区") ? "冷区" : "中性";
+  const hotZoneLines = zoneSlots.flatMap((group) => {
+    const items = group.slots.flatMap((slot) => {
+      const key = slot.keys.find((k) => hotZoneSource[k] !== undefined);
+      return key != null ? [`${slot.short} ${zoneStateCN(hotZoneSource[key])}`] : [];
     });
+    return items.length ? [`${group.label}: ${items.join(sep)}`] : [];
+  });
+  const badgeLabel = (badge: { name: string; tier: string }) => `${getBadgeNameCN(badge.name)} ${badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}`;
   const personalityLines = card?.personalityBadges?.length
-    ? card.personalityBadges.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}`)
+    ? card.personalityBadges.map(badgeLabel)
     : [];
-  // 徽章按分类分组输出（内线得分/外线得分/组织/防守/运动能力/篮板/个性）。
   const groupBadgeLines = (badges: { name: string; tier: string }[]): string[] => {
     const grouped = badgeGroups.flatMap((group) => {
       const members = badges.filter((badge) =>
         group.badges.some((candidate) => normalizeBadgeName(candidate) === normalizeBadgeName(badge.name)),
       );
-      return members.length ? [`-- ${group.label} --`, ...members.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}`)] : [];
+      return members.length ? [`${group.label}: ${members.map(badgeLabel).join(sep)}`] : [];
     });
     const ungrouped = badges.filter((badge) =>
       !badgeGroups.some((group) => group.badges.some((candidate) => normalizeBadgeName(candidate) === normalizeBadgeName(badge.name))),
     );
-    return [
-      ...grouped,
-      ...(ungrouped.length ? ["-- 其他 --", ...ungrouped.map((badge) => `${getBadgeNameCN(badge.name)}: ${badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}`)] : []),
-    ];
+    return [...grouped, ...(ungrouped.length ? [`其他: ${ungrouped.map(badgeLabel).join(sep)}`] : [])];
   };
   const tendencyLines = tendencyLoadState === "loading"
     ? ["正在加载倾向数据"]
@@ -493,73 +489,53 @@ function createExportText(
         : Object.keys(result.tendencies).length
         ? tendencyGroups.flatMap((group) => {
           const members = group.fields.filter((field) => result.tendencies[field] !== undefined);
-          return members.length ? [`-- ${group.label} --`, ...members.map((field) => `${getTendencyNameCN(field)}: ${result.tendencies[field]}`)] : [];
+          return members.length ? [`${group.label}: ${members.map((field) => `${getTendencyNameCN(field)} ${result.tendencies[field]}`).join(sep)}`] : [];
         })
-        : ["暂无倾向数据（来源球员没有对应档案）"];
+        : ["暂无倾向数据"];
+  const durabilityAttrShort: Record<string, string> = {
+    "Head Durability": "头部", "Neck Durability": "颈部", "Back Durability": "背部",
+    "Left Shoulder Durability": "左肩", "Right Shoulder Durability": "右肩",
+    "Left Elbow Durability": "左肘", "Right Elbow Durability": "右肘",
+    "Left Hip Durability": "左髋", "Right Hip Durability": "右髋",
+    "Left Knee Durability": "左膝", "Right Knee Durability": "右膝",
+    "Left Ankle Durability": "左踝", "Right Ankle Durability": "右踝",
+    "Left Foot Durability": "左脚", "Right Foot Durability": "右脚",
+    "Overall Durability": "综合",
+  };
+  const attributeLines = attributeGroups.flatMap((group) => {
+    const items = group.attrs.flatMap((attr) => {
+      if (attr === "Potential Min" || attr === "Potential Max") return [];
+      const value = result.initialAttrs[attr];
+      return value == null ? [] : [`${durabilityAttrShort[attr] ?? attrNameCN[attr] ?? attr} ${value}`];
+    });
+    return items.length ? [`${group.label}: ${items.join(sep)}`] : [];
+  });
+  const ovrLines = [
+    `预计初始 OVR: ${result.initialStrength}（目标 ${result.initialOverallTarget}）`,
+    `无形属性: ${result.intangibles}`,
+    ...(result.initialOverallConstraintReachable ? [] : ["警告：手动锁定的数值使初始 OVR 无法完全达到目标"]),
+  ];
+  const templateLines = bundles.map((bundle) => {
+    const lock = locks[bundle.id];
+    if (lock?.kind === "custom") {
+      const values = bundle.attrs.map((attr) => `${attrNameCN[attr] ?? attr} ${lock.values[attr]}`).join("，");
+      return `${bundle.label}: 手动设置（${values}）`;
+    }
+    const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
+    return `${bundle.label}: ${player ? getPlayerNameCN(player.name) : "--"}`;
+  });
   return [
-    `${dataVersionLabel} ${isPrime ? "巅峰球员" : "新秀"}生成清单`, "",
-    `[资料${card ? `（${card.name} ${card.year} 届新秀卡）` : ""}]`,
-    ...vitalLines,
-    "", "[身体设定]", ...bodyLines,
+    `${dataVersionLabel} 新秀生成清单`, "",
+    "[资料]", ...vitalLines,
+    "", "[身体]", ...bodyLines,
     ...(durabilityLines.length ? ["", "[耐久]", ...durabilityLines] : []),
-    "", `[完整${isPrime ? "巅峰" : "初始"}属性预览]`,
-    ...fullAttributeGroups.flatMap((group) => [
-      `-- ${group.label} --`,
-      ...group.attrs.map((attr) => `${attrNameCN[attr] ?? attr}: ${result.initialAttrs[attr] ?? "--"}`),
-    ]),
-    "", "[杂项]", `游戏 OVR 估算: ${result.baseOverall}`, `无形属性: ${result.intangibles}`,
-    `${isPrime ? "巅峰 OVR" : "预计初始 OVR"}: ${result.initialStrength}`, `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）`,
-    ...(!isPrime ? [
-      `新秀初始 OVR 目标: ${result.initialOverallTarget}`,
-      ...(result.initialOverallConstraintReachable ? [] : ["警告：手动锁定的数值使初始 OVR 无法完全达到目标"]),
-    ] : []),
+    "", "[属性]", ...attributeLines,
+    "", "[OVR]", ...ovrLines,
     "", "[热区]", ...hotZoneLines,
-    ...(isPrime ? [
-      "", `[巅峰徽章]`, ...(result.badges.length ? groupBadgeLines(result.badges) : ["无"]),
-    ] : [
-      "", "[徽章（直接继承）]", ...(result.badges.length ? groupBadgeLines(result.badges) : ["无"]),
-    ]),
-    ...(personalityLines.length ? ["", "[个性徽章]", ...personalityLines] : []),
-    "", "[倾向（继承属性来源，未按等级调整）]",
-    ...tendencyLines,
-    "", "[属性来源]", ...bundles.map((bundle) => {
-      const lock = locks[bundle.id];
-      if (lock?.kind === "custom") {
-        const values = bundle.attrs.map((attr) => `${attrNameCN[attr] ?? attr} ${lock.values[attr]}`).join("，");
-        return `${bundle.label}: 手动设置（${values}）`;
-      }
-      const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
-      const evaluation = evaluations[bundle.id];
-      const bodyAdjustment = evaluation?.bodyAdjustment ?? 0;
-      const supportLabel = Object.entries(evaluation?.supportAdjustments ?? {})
-        .map(([attr, delta]) => `${attrNameCN[attr] ?? attr}支持 ${delta > 0 ? "+" : ""}${delta}`)
-        .join(" / ");
-      const capLabel = Object.entries(evaluation?.bodyCaps ?? {})
-        .map(([attr, cap]) => `${attrNameCN[attr] ?? attr}上限 ${cap}`)
-        .join(" / ");
-      const graceLabel = evaluation?.usedGraceZone ? "身材宽容区，原值继承" : "";
-      const incompleteLabel = evaluation?.bodyIncomplete
-        ? "来源无身体数据，仅应用目标上限"
-        : evaluation?.supportIncomplete
-          ? `支持依赖缺失（${evaluation.supportIncomplete.missing.join(" / ")}），未执行支持修正`
-          : "";
-      const positionLabel = evaluation?.positionDistance != null
-        ? `位置距离 ${Number(evaluation.positionDistance.toFixed(2))}`
-        : "";
-      const adjustments = [
-        bodyAdjustment ? `身体修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "",
-        supportLabel,
-        positionLabel,
-        graceLabel,
-        incompleteLabel,
-        capLabel,
-        player?.isEstimated ? "估算值" : "",
-      ].filter(Boolean).join("，");
-      const weightLabel = bundle.id === "potential"
-        ? "独立潜力来源"
-        : `位置权重 ${displayedPositionWeight(result.position, result.secondary, bundle.id)}%`;
-      return `${bundle.label}（${weightLabel}）: ${player ? getPlayerNameCN(player.name) : "--"}${adjustments ? `（${adjustments}）` : ""}`;
-    }),
+    "", "[徽章]", ...groupBadgeLines(result.badges),
+    ...(personalityLines.length ? ["", "[个性]", ...personalityLines] : []),
+    "", "[倾向]", ...tendencyLines,
+    "", "[模板]", ...templateLines,
   ].join("\n");
 }
 
@@ -672,7 +648,6 @@ function BodyNumberInput({
 
 function RookieBuilder({
   teams,
-  mode = "rookie",
   tendencyVersion = "2k26",
   overallVersion = "2k26",
   dataVersionLabel = "NBA 2K26",
@@ -681,7 +656,6 @@ function RookieBuilder({
   onFlowActiveChange,
 }: {
   teams: RookieBuilderTeam[];
-  mode?: BuilderMode;
   selectionMode?: SourceSelectionMode;
   availablePlayers?: PlayerSource[];
   tendencyVersion?: TendencyDataVersion;
@@ -689,8 +663,11 @@ function RookieBuilder({
   dataVersionLabel?: string;
   onFlowActiveChange?: (active: boolean) => void;
 }) {
-  const isPrime = mode === "prime";
   const isManualSelection = selectionMode === "manual";
+  const [manualSetupDone, setManualSetupDone] = useState(false);
+  const [skipBodyConstraints, setSkipBodyConstraints] = useState(false);
+  const [pickerBundleId, setPickerBundleId] = useState<string | null>(null);
+  const [cardSources, setCardSources] = useState<Map<string, PlayerSource>>(new Map());
   const [firstName, setFirstName] = useState<string>(() => generateRookieFirstName());
   const [lastName, setLastName] = useState<string>(() => generateRookieLastName());
   const rookieName = `${firstName} ${lastName}`.trim();
@@ -715,7 +692,7 @@ function RookieBuilder({
   const [customizingBundleId, setCustomizingBundleId] = useState<string | null>(null);
   const [customDraft, setCustomDraft] = useState<Record<string, string>>({});
   const [playerSearch, setPlayerSearch] = useState("");
-  const [status, setStatus] = useState(`确认${isPrime ? "巅峰球员" : "新秀"}设置后开始生成`);
+  const [status, setStatus] = useState(`确认${"新秀"}设置后开始生成`);
 
   const pendingTeamDrawRef = useRef<{ round: TeamRound; completionStatus: string } | null>(null);
   const customDialogRef = useRef<HTMLElement | null>(null);
@@ -750,7 +727,7 @@ function RookieBuilder({
   // as soon as the builder mounts — before settings are confirmed — so the
   // first generation already has card data. Prime mode never loads them.
   useEffect(() => {
-    if (isPrime || rookieCards || rookieCardLoadError) return;
+    if (rookieCards || rookieCardLoadError) return;
     let active = true;
     loadRookieCards()
       .then((cards) => {
@@ -762,7 +739,7 @@ function RookieBuilder({
     return () => {
       active = false;
     };
-  }, [isPrime, rookieCardLoadError, rookieCards]);
+  }, [rookieCardLoadError, rookieCards]);
 
   useEffect(() => {
     if (!customizingBundleId && !playerVersionGroupKey) return;
@@ -879,6 +856,12 @@ function RookieBuilder({
     ? `已抽中${drawingTeamLabel ?? "球队"}`
     : status;
   const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : undefined;
+  // Roster pool + manual-mode rookie-card pseudo sources share one id space.
+  const allSourcesById = useMemo(() => {
+    const merged = new Map(playersById);
+    for (const [id, source] of cardSources) merged.set(id, source);
+    return merged;
+  }, [cardSources, playersById]);
   // Keyed by the concrete roster version id, not by normalized identity: the
   // same player's different versions (current / classic / all-time) are
   // intentionally allowed to lock different slots.
@@ -894,17 +877,18 @@ function RookieBuilder({
         inputs.push({ bundle, player: null, customValues: lock.values });
         continue;
       }
-      const player = lock?.kind === "player" ? playersById.get(lock.playerId) : undefined;
+      const player = lock?.kind === "player" ? allSourcesById.get(lock.playerId) : undefined;
       if (player) {
-        const card = !isPrime ? lookupRookieCard(rookieCards, player.name) : null;
+        const card = lookupRookieCard(rookieCards, player.name);
         inputs.push({ bundle, player, card });
       }
     }
     return evaluateAll(inputs, body, {
       targetPosition: position,
       secondaryPosition: secondaryPosition,
+      skipBody: skipBodyConstraints,
     });
-  }, [body, isPrime, locks, playersById, position, rookieCards, secondaryPosition]);
+  }, [allSourcesById, body, locks, position, rookieCards, secondaryPosition, skipBodyConstraints]);
   const selectedEvaluations = useMemo(() => {
     if (!selectedPlayer) return {};
     const currentInputs: SlotInput[] = [];
@@ -914,9 +898,9 @@ function RookieBuilder({
         currentInputs.push({ bundle, player: null, customValues: lock.values });
         continue;
       }
-      const player = lock?.kind === "player" ? playersById.get(lock.playerId) : undefined;
+      const player = lock?.kind === "player" ? allSourcesById.get(lock.playerId) : undefined;
       if (player) {
-        const card = !isPrime ? lookupRookieCard(rookieCards, player.name) : null;
+        const card = lookupRookieCard(rookieCards, player.name);
         currentInputs.push({ bundle, player, card });
       }
     }
@@ -928,15 +912,15 @@ function RookieBuilder({
         {
           bundle,
           player: selectedPlayer,
-          card: !isPrime ? lookupRookieCard(rookieCards, selectedPlayer.name) : null,
+          card: lookupRookieCard(rookieCards, selectedPlayer.name),
         },
         body,
-        { targetPosition: position, secondaryPosition },
+        { targetPosition: position, secondaryPosition, skipBody: skipBodyConstraints },
       );
       if (evaluation) preview[bundle.id] = evaluation;
     }
     return preview;
-  }, [body, isPrime, locks, playersById, position, rookieCards, secondaryPosition, selectedPlayer]);
+  }, [allSourcesById, body, locks, position, rookieCards, secondaryPosition, selectedPlayer, skipBodyConstraints]);
   const bodyAdjustedAttributes = useMemo(() => new Set(
     bundles.flatMap((bundle) => {
       const evaluation = evaluations[bundle.id];
@@ -948,7 +932,7 @@ function RookieBuilder({
       ));
     }),
   ), [evaluations]);
-  const effectiveAge = isPrime ? 28 : age;
+  const effectiveAge = age;
   const result = useMemo(
     () => createResult(
       locks,
@@ -956,13 +940,13 @@ function RookieBuilder({
       position,
       secondaryPosition,
       body,
-      mode,
-      playersById,
+      allSourcesById,
       tendencyLookup,
       overallVersion,
       rookieCards,
+      { skipBody: skipBodyConstraints },
     ),
-    [body, effectiveAge, locks, mode, overallVersion, playersById, position, secondaryPosition, rookieCards, tendencyLookup],
+[allSourcesById, body, effectiveAge, locks, overallVersion, position, secondaryPosition, rookieCards, skipBodyConstraints, tendencyLookup],
   );
   const tendencyLoadState: TendencyLoadState = tendencyLookup?.available === false
     ? "unavailable"
@@ -1117,7 +1101,7 @@ function RookieBuilder({
     setPlayerVersionGroupKey(null);
     setCustomizingBundleId(null);
     if (Object.keys(nextLocks).length === bundles.length) {
-      setStatus(`${isPrime ? "巅峰球员" : "新秀"}已生成`);
+      setStatus(`${"新秀"}已生成`);
     } else if (isManualSelection) {
       setStatus("已锁定。请继续为下一个属性槽选择来源球员");
     } else {
@@ -1129,6 +1113,26 @@ function RookieBuilder({
     const existing = locks[bundle.id];
     if (existing || !settingsLocked || isTeamDrawing || !selectedPlayer || usedBy.has(playerId(selectedPlayer))) return;
     finishLock({ ...locks, [bundle.id]: { kind: "player", playerId: playerId(selectedPlayer) } });
+  };
+
+  const openSlotPicker = (bundle: Bundle) => {
+    if (!settingsLocked || isTeamDrawing || locks[bundle.id]) return;
+    setPickerBundleId(bundle.id);
+  };
+
+  const pickCard = (card: RookieCard) => {
+    if (!pickerBundleId || locks[pickerBundleId]) return;
+    const source = cardToPlayerSource(card);
+    const id = source.id!;
+    setCardSources((current) => new Map(current).set(id, source));
+    finishLock({ ...locks, [pickerBundleId]: { kind: "player", playerId: id } });
+    setPickerBundleId(null);
+  };
+
+  const confirmManualSetup = () => {
+    setManualSetupDone(true);
+    setSettingsLocked(true);
+    setStatus(skipBodyConstraints ? "已关闭降级算法，请点击左侧属性槽选择新秀球员" : "请点击左侧属性槽，为每个槽位选择新秀球员");
   };
 
   const openCustomEditor = (bundle: Bundle) => {
@@ -1166,12 +1170,16 @@ function RookieBuilder({
     setCustomizingBundleId(null);
     setCustomDraft({});
     setPlayerSearch("");
-    setStatus(`确认${isPrime ? "巅峰球员" : "新秀"}设置后开始生成`);
+    setManualSetupDone(false);
+    setSkipBodyConstraints(false);
+    setPickerBundleId(null);
+    setCardSources(new Map());
+    setStatus(`确认${"新秀"}设置后开始生成`);
   };
 
   const copyResult = async () => {
     try {
-      await copyText(createExportText(rookieName, result, locks, evaluations, playersById, mode, tendencyLoadState, dataVersionLabel));
+      await copyText(createExportText(rookieName, result, locks, evaluations, playersById, tendencyLoadState, dataVersionLabel));
       setStatus("已复制生成报告");
     } catch {
       setStatus("复制失败，请手动复制");
@@ -1179,9 +1187,9 @@ function RookieBuilder({
   };
 
   const downloadResult = async () => {
-    const blob = new Blob([createExportText(rookieName, result, locks, evaluations, playersById, mode, tendencyLoadState, dataVersionLabel)], { type: "text/plain;charset=utf-8" });
+    const blob = new Blob([createExportText(rookieName, result, locks, evaluations, playersById, tendencyLoadState, dataVersionLabel)], { type: "text/plain;charset=utf-8" });
     const nameSlug = rookieName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const suggestedName = `2k26-${isPrime ? "prime" : "rookie"}-${nameSlug || position.toLowerCase()}.txt`;
+    const suggestedName = `2k26-rookie-${nameSlug || position.toLowerCase()}.txt`;
     const showSaveFilePicker = (window as Window & { showSaveFilePicker?: SaveFilePicker }).showSaveFilePicker;
 
     if (showSaveFilePicker) {
@@ -1216,8 +1224,46 @@ function RookieBuilder({
     setStatus("已导出生成数据");
   };
 
+  const pickerBundle = bundles.find((bundle) => bundle.id === pickerBundleId);
+
   return (
     <section className="flex min-h-0 flex-col gap-2.5">
+      {isManualSelection && !manualSetupDone && (
+        <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
+          <section aria-label="自选生成设置" aria-modal="true" className="dialog-surface w-full max-w-[460px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" role="dialog">
+            <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">
+              <div className="section-label">自选生成设置</div>
+              <span className="text-[9px] text-ink-400">按槽位选择新秀球员</span>
+            </div>
+            <div className="space-y-3 border-t border-ink-200 p-3">
+              <div>
+                <div className="mb-1.5 text-[10px] font-semibold text-ink-700">身体设定（影响降级算法）</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <BodyNumberInput disabled={skipBodyConstraints} label="身高" max={300} min={150} onChange={(value) => updateBody("height", value)} unit="cm" value={body.height} />
+                  <BodyNumberInput disabled={skipBodyConstraints} label="体重" max={200} min={50} onChange={(value) => updateBody("weight", value)} unit="kg" value={body.weight} />
+                </div>
+                {skipBodyConstraints && <div className="mt-1.5 text-[9px] text-ink-400">已关闭降级算法，身高体重不参与计算</div>}
+              </div>
+              <label className="flex cursor-pointer items-start gap-2 rounded-[5px] border border-ink-200 bg-ink-50 p-2.5">
+                <input
+                  checked={skipBodyConstraints}
+                  className="mt-0.5 h-3.5 w-3.5 accent-court-600"
+                  onChange={(event) => setSkipBodyConstraints(event.target.checked)}
+                  type="checkbox"
+                />
+                <span className="min-w-0">
+                  <span className="block text-[11px] font-semibold text-ink-800">关闭降级算法</span>
+                  <span className="mt-0.5 block text-[9px] leading-4 text-ink-400">不套用身高体重差异与位置交叉惩罚，新秀属性原值继承（关闭后无需填写身高体重）</span>
+                </span>
+              </label>
+            </div>
+            <div className="flex items-center justify-end gap-2 border-t border-ink-200 bg-ink-50 px-3 py-2.5">
+              <span className="mr-auto text-[9px] text-ink-400">进入后点击左侧属性槽选择球员</span>
+              <button className="action-button primary-action px-3 py-1.5 text-[10px]" onClick={confirmManualSetup} type="button"><Check className="h-3.5 w-3.5" />进入自选生成</button>
+            </div>
+          </section>
+        </div>
+      )}
       <div
         aria-labelledby="builder-step-settings"
         className="builder-setup panel-surface overflow-hidden"
@@ -1230,10 +1276,10 @@ function RookieBuilder({
             <div className="section-label mb-2" id="player-identity-label">球员信息</div>
             <div className="grid gap-2 sm:grid-cols-2">
               <div className="min-w-0">
-                <div className="section-label mb-1">{isPrime ? "球员名" : "新秀名"}</div>
+                <div className="section-label mb-1">{"新秀名"}</div>
                 <div className="flex h-8 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
                   <input
-                    aria-label={`${isPrime ? "巅峰球员" : "新秀"}英文名（First Name）`}
+                    aria-label={`${"新秀"}英文名（First Name）`}
                     className="min-w-0 flex-1 bg-transparent px-2.5 text-[12px] font-semibold text-ink-800 outline-none disabled:cursor-not-allowed disabled:text-ink-400"
                     disabled={settingsLocked}
                     maxLength={24}
@@ -1247,10 +1293,10 @@ function RookieBuilder({
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="section-label mb-1">{isPrime ? "球员姓" : "新秀姓"}</div>
+                <div className="section-label mb-1">{"新秀姓"}</div>
                 <div className="flex h-8 overflow-hidden rounded-[5px] border border-ink-200 bg-ink-50 focus-within:border-court-500 focus-within:bg-white">
                   <input
-                    aria-label={`${isPrime ? "巅峰球员" : "新秀"}英文姓（Last Name）`}
+                    aria-label={`${"新秀"}英文姓（Last Name）`}
                     className="min-w-0 flex-1 bg-transparent px-2.5 text-[12px] font-semibold text-ink-800 outline-none disabled:cursor-not-allowed disabled:text-ink-400"
                     disabled={settingsLocked}
                     maxLength={24}
@@ -1266,9 +1312,7 @@ function RookieBuilder({
               <div className="min-w-0">
                 <div className="section-label mb-1">年龄</div>
                 <div className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200">
-                  {isPrime ? (
-                    <button aria-label="巅峰球员年龄固定为 28 岁" className="h-full min-w-14 cursor-not-allowed bg-ink-900 px-3 text-[11px] font-semibold text-white" disabled title="巅峰球员年龄固定为 28 岁" type="button">28</button>
-                  ) : ages.map((option) => (
+                  {ages.map((option) => (
                     <button key={option} className={`segmented-button h-full min-w-0 flex-1 px-1.5 text-[11px] font-semibold disabled:cursor-not-allowed disabled:opacity-55 ${age === option ? "bg-ink-900 text-white" : "bg-white text-ink-500 hover:bg-ink-50 hover:text-ink-800"}`} disabled={settingsLocked} onClick={() => setAge(option)} type="button">{option}</button>
                   ))}
                 </div>
@@ -1348,9 +1392,9 @@ function RookieBuilder({
               </div>
             </div>
             <div className="builder-setup-actions flex shrink-0 items-center justify-end gap-1.5" aria-label="设置操作">
-              {!settingsLocked && (
+              {!settingsLocked && !isManualSelection && (
                 <button className="action-button primary-action justify-center px-3 py-1.5 text-[11px] font-semibold" onClick={confirmSettings} type="button">
-                  <Check className="h-3.5 w-3.5" />{isManualSelection ? "确认设置" : "确认并抽取"}
+                  <Check className="h-3.5 w-3.5" />确认并抽取
                 </button>
               )}
               <button className="action-button justify-center px-3 py-1.5 text-[11px]" onClick={reset} type="button">
@@ -1394,13 +1438,13 @@ function RookieBuilder({
           <div className="grid grid-cols-2 gap-1.5 p-2.5">
             {bundles.map((bundle) => {
               const lock = locks[bundle.id];
-              const lockedPlayer = lock?.kind === "player" ? playersById.get(lock.playerId) : undefined;
+              const lockedPlayer = lock?.kind === "player" ? allSourcesById.get(lock.playerId) : undefined;
               const lockedEvaluation = evaluations[bundle.id];
               const preview = selectedEvaluations[bundle.id];
               const value = lockedEvaluation?.adjusted ?? preview?.adjusted;
               const activeEvaluation = lockedEvaluation ?? preview;
               const bodyAdjustment = lockedEvaluation?.bodyAdjustment ?? preview?.bodyAdjustment ?? 0;
-              const sourceLabel = lock?.kind === "custom" ? "手动设置" : lockedPlayer ? getPlayerNameCN(lockedPlayer.name) : (selectedPlayer ? "可锁定" : "等待选择");
+              const sourceLabel = lock?.kind === "custom" ? "手动设置" : lockedPlayer ? getPlayerNameCN(lockedPlayer.name) : (isManualSelection ? "点击选择" : (selectedPlayer ? "可锁定" : "等待选择"));
               const weightLabel = bundle.id === "potential"
                 ? "潜力独立取值，不计入位置权重"
                 : `位置综合权重：${displayedPositionWeight(position, secondaryPosition, bundle.id)}%`;
@@ -1420,9 +1464,9 @@ function RookieBuilder({
                 >
                   <button
                     aria-label={lock ? `已锁定${bundle.label}` : `锁定${bundle.label}`}
-                    className={`flex h-full w-full min-w-0 items-center gap-1.5 px-2 pr-7 text-left transition ${lock ? "cursor-not-allowed" : selectedPlayer ? "hover:bg-ink-50" : "cursor-not-allowed"}`}
-                    disabled={Boolean(lock) || !settingsLocked || !selectedPlayer}
-                    onClick={() => clickBundle(bundle)}
+                    className={`flex h-full w-full min-w-0 items-center gap-1.5 px-2 pr-7 text-left transition ${lock ? "cursor-not-allowed" : isManualSelection || selectedPlayer ? "hover:bg-ink-50" : "cursor-not-allowed"}`}
+                    disabled={Boolean(lock) || !settingsLocked || isTeamDrawing || (!isManualSelection && !selectedPlayer)}
+                    onClick={isManualSelection ? () => openSlotPicker(bundle) : () => clickBundle(bundle)}
                     title={lock ? `${weightLabel} · 已锁定；如需修改，请重新开始` : typeof value === "number" ? `${weightLabel} · ${sourceLabel}：${lockedEvaluation?.raw ?? preview?.raw} → ${value}${adjustmentLabel ? `（${adjustmentLabel}）` : ""}` : `${bundle.label} · ${weightLabel}`}
                     type="button"
                   >
@@ -1467,7 +1511,7 @@ function RookieBuilder({
           <div className="workspace-toolbar flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
             <div>
               <div className="flex items-center gap-2"><span className="draw-status-icon" data-active={isTeamDrawing}><UsersRound className="h-3.5 w-3.5" /></span><h2 className="text-[14px] font-semibold text-ink-900">{isManualSelection ? "自选来源" : isTeamDrawing ? "随机球队" : team ? teamNamesCN[team.name] ?? team.name : "等待开始"}</h2></div>
-              <div className="mt-0.5 font-mono text-[9px] text-ink-400">{!settingsLocked ? "等待确认基础设置" : isManualSelection ? isComplete ? `已完成 · ${completed}/${bundles.length}` : "搜索球员，选定版本后锁定属性" : isTeamDrawing ? teamDrawPhase === "landing" ? "结果已确定" : "正在抽取球队" : isComplete ? `已完成 · ${completed}/${bundles.length}` : `第 ${completed + 1} 轮 · 已展示 ${shownPlayers.length}/${team?.players.length ?? 0}`}</div>
+              <div className="mt-0.5 font-mono text-[9px] text-ink-400">{!settingsLocked ? "等待确认基础设置" : isManualSelection ? isComplete ? `已完成 · ${completed}/${bundles.length}` : "点击槽位，从新秀卡池选择球员" : isTeamDrawing ? teamDrawPhase === "landing" ? "结果已确定" : "正在抽取球队" : isComplete ? `已完成 · ${completed}/${bundles.length}` : `第 ${completed + 1} 轮 · 已展示 ${shownPlayers.length}/${team?.players.length ?? 0}`}</div>
             </div>
             {settingsLocked && !isComplete && !isManualSelection && (
               <div className="flex items-center gap-1.5">
@@ -1500,52 +1544,19 @@ function RookieBuilder({
           </div>
 
           {settingsLocked ? isManualSelection ? <>
-            <div className="flex items-center gap-2 border-b border-ink-200 px-3 py-2">
-              <input
-                aria-label="搜索来源球员"
-                className="min-w-0 flex-1 bg-transparent text-[12px] text-ink-900 outline-none placeholder:text-ink-400"
-                onChange={(event) => setPlayerSearch(event.target.value)}
-                placeholder="搜索姓名、位置或球队"
-                type="search"
-                value={playerSearch}
-              />
-              <span className="shrink-0 text-[9px] tabular-nums text-ink-400">{filteredManualPlayerGroups.length}/{manualPlayerGroups.length}</span>
+            <div className="flex min-h-[300px] flex-1 flex-col items-center justify-center px-5 text-center">
+              <span className="builder-empty-icon"><UsersRound className="h-4 w-4" /></span>
+              <div className="mt-3 text-[15px] font-semibold text-ink-700">点击左侧属性槽选择球员</div>
+              <div className="mt-1 max-w-[320px] text-[10px] leading-5 text-ink-400">每个属性槽独立选择一名新秀球员：点击槽位 → 选择年份 → 浏览该届新秀与对应槽位属性 → 点击新秀继承其属性。全部 16 个槽位锁定后生成结果。</div>
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5 text-[9px] text-ink-400">
+                <span className="rounded-[3px] bg-court-500/10 px-1.5 py-0.5 font-semibold text-court-700">新秀</span>按年份浏览全部新秀卡
+                <span className="mx-1 text-ink-300">/</span>
+                <span className="rounded-[3px] bg-ink-100 px-1.5 py-0.5 font-semibold text-ink-400">全部球员</span>暂无数据
+                <span className="mx-1 text-ink-300">/</span>
+                <span className="rounded-[3px] bg-ink-100 px-1.5 py-0.5 font-semibold text-ink-400">经典球员</span>暂无数据
+              </div>
             </div>
-            <div className="grid flex-1 auto-rows-[62px] grid-cols-2 gap-2 overflow-y-auto p-2.5">
-              {filteredManualPlayerGroups.map((group) => {
-                const selected = selectedPlayer ? playerIdentity(selectedPlayer) === group.key : false;
-                const representative = group.representative;
-                const cardForGroup = !isPrime ? lookupRookieCard(rookieCards, representative.name) : null;
-                const maxOverall = group.variants.reduce((max, player) => Math.max(max, player.overall ?? 0), 0);
-                const displayedOverall = cardForGroup?.overall ?? maxOverall;
-                const positionSummary = [...new Set(group.variants.map((player) => player.position).filter(Boolean))].join("/");
-                return (
-                  <button
-                    key={group.key}
-                    aria-label={`选择${getPlayerNameCN(representative.name)}，${group.variants.length}个版本`}
-                    aria-pressed={selected}
-                    className={`interactive-card flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`}
-                    disabled={isComplete}
-                    onClick={() => openPlayerVersionPicker(group)}
-                    title={`${getPlayerNameCN(representative.name)} · 点击选择版本`}
-                    type="button"
-                  >
-                    <PlayerHeadshot name={representative.name} priority={false} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(representative.name)}</span>
-                      <span className="block truncate text-[9px] text-ink-400">{representative.name} · {group.variants.length} 个版本{positionSummary ? ` · ${positionSummary}` : ""}</span>
-                    </span>
-                    <span className="flex shrink-0 items-center gap-1">
-                      <span className={`text-[14px] font-bold tabular-nums ${displayedOverall ? valueColor(displayedOverall) : "text-ink-400"}`}>{displayedOverall || "--"}</span>
-                      {cardForGroup?.overall != null && <span className="rounded-[3px] bg-court-500/10 px-1 py-0.5 text-[8px] font-semibold text-court-700">新秀</span>}
-                      <ChevronRight aria-hidden="true" className="h-3.5 w-3.5 text-ink-300" />
-                    </span>
-                  </button>
-                );
-              })}
-              {filteredManualPlayerGroups.length === 0 && <div className="col-span-2 flex min-h-[180px] items-center justify-center text-[11px] text-ink-400">没有找到匹配的球员</div>}
-            </div>
-          </> : isTeamDrawing ? <div className="team-draw-stage flex min-h-[300px] flex-1 items-center px-2.5 py-3 sm:px-4">
+                    </> : isTeamDrawing ? <div className="team-draw-stage flex min-h-[300px] flex-1 items-center px-2.5 py-3 sm:px-4">
             <MarqueeDraw
               currentLabel={drawingTeamLabel}
               dataKind="team"
@@ -1565,7 +1576,7 @@ function RookieBuilder({
               const id = playerId(player);
               const unavailable = usedBy.has(id);
               const selected = selectedPlayerId === id;
-              const cardForPlayer = !isPrime ? lookupRookieCard(rookieCards, player.name) : null;
+              const cardForPlayer = lookupRookieCard(rookieCards, player.name);
               const displayedPlayerOverall = cardForPlayer?.overall ?? player.overall;
               return (
                 <button key={id} className={`interactive-card flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : unavailable || isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`} disabled={unavailable || isComplete} onClick={() => choosePlayer(player)} type="button">
@@ -1583,7 +1594,7 @@ function RookieBuilder({
         </div>
 
         <aside
-          aria-label={isPrime ? "巅峰结果" : "新秀结果"}
+          aria-label={"新秀结果"}
           className="builder-pane builder-result-pane panel-surface min-w-0 overflow-hidden"
           data-mobile-active={isComplete}
           id="builder-pane-result"
@@ -1592,10 +1603,10 @@ function RookieBuilder({
           {isComplete ? (
             <div className="builder-result-reveal">
               <div className="workspace-toolbar px-3 py-2.5">
-                <div className="section-label">{isPrime ? "巅峰球员卡" : "新秀球员卡"}</div>
+                <div className="section-label">{"新秀球员卡"}</div>
                 <div className="mt-1 truncate text-[15px] font-semibold text-ink-800" data-testid="rookie-name">{rookieName}</div>
                 <div className="mt-2 flex items-end justify-between">
-                  <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">{isPrime ? "巅峰 OVR" : "新秀 OVR"}</div></div>
+                  <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">{"新秀 OVR"}</div></div>
                   <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">游戏 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
                 </div>
               </div>
@@ -1715,7 +1726,7 @@ function RookieBuilder({
             <div className="border-t border-ink-200 px-3 py-2.5">
               <div className="mb-2 text-[10px] font-semibold">徽章明细</div>
               <div>
-                <div className="mb-1 text-[9px] font-semibold text-court-700">{isPrime ? "巅峰徽章" : "徽章"}</div>
+                <div className="mb-1 text-[9px] font-semibold text-court-700">{"徽章"}</div>
                 {renderBadgeGroups(result.badges.length ? result.badges : result.peakBadges)}
               </div>
             </div>
@@ -1741,7 +1752,7 @@ function RookieBuilder({
               {playerVersionGroup.variants.map((variant) => {
                 const id = playerId(variant);
                 const selected = selectedPlayerId === id;
-                const cardForVariant = !isPrime ? lookupRookieCard(rookieCards, variant.name) : null;
+                const cardForVariant = lookupRookieCard(rookieCards, variant.name);
                 const displayedVariantOverall = cardForVariant?.overall ?? variant.overall;
                 return (
                   <button
@@ -1769,6 +1780,14 @@ function RookieBuilder({
             </div>
           </section>
         </div>
+      )}
+      {pickerBundle && (
+        <SlotPicker
+          bundle={pickerBundle}
+          onClose={() => setPickerBundleId(null)}
+          onPick={pickCard}
+          rookieCards={rookieCards}
+        />
       )}
       {customizingBundle && (
         <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
