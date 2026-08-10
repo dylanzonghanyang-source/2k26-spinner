@@ -190,6 +190,12 @@
 |------|------|-----|--------|
 | Ray Allen | SG/PF | 94 | ALL-TIME All-Time Milwaukee Bucks | ALL-TIME All-Time Boston Celtics | ALL-TIME All-Time Oklahoma City Thunder |
 
+## 1999（1 人）
+
+| 球员 | 位置 | OVR | 来源队 |
+|------|------|-----|--------|
+| Wang Zhizhi | PF/C | 0 | 1999 Draft Class 达拉斯小牛 |
+
 ## 2000（1 人）
 
 | 球员 | 位置 | OVR | 来源队 |
