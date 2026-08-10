@@ -361,22 +361,34 @@ input:focus-visible {
 }
 
 /* Mobile/tablet (<1024px): two-column workspace — attribute slots left,
-   team & player selection right (layout reference: activity-style builder). */
+   team & player selection right (layout reference: activity-style builder).
+   Each pane scrolls independently (left locked attributes vs right player
+   pool), so the workspace is viewport-height with per-pane overflow. */
 @media (max-width: 1023.98px) {
   .builder-workspace {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
-    align-items: start;
+    align-items: stretch;
+    height: calc(100dvh - 92px); /* app header 54 + page padding 20 + gap 10 + slack */
+    min-height: 0;
   }
 
   .builder-attributes-pane {
     grid-column: 1;
     grid-row: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-bottom: 24px;
   }
 
   .builder-player-pane {
     grid-column: 2;
     grid-row: 1;
     align-self: stretch;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-bottom: 24px;
   }
 
   .builder-result-pane[data-mobile-active="true"],
