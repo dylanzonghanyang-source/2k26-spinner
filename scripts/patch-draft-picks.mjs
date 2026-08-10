@@ -92,7 +92,12 @@ for (const year of yearDirs) {
       source = `merged:round${info.round}`;
     } else {
       const alreadyPatched = log.includes(`${year}:${file}`);
-      const inSecondRound = SECOND_ROUND_BY_YEAR[year]?.some((n) => core(n) === core(name));
+      // list entries may omit a suffix the card keeps ("Xavier Tillman" vs
+      // "Xavier Tillman Sr."); per-year scope makes this unambiguous
+      const inSecondRound = SECOND_ROUND_BY_YEAR[year]?.some((n) => {
+        const k = core(n);
+        return core(name) === k || core(name) === `${k} jr` || core(name) === `${k} sr` || core(name) === `${k} ii` || core(name) === `${k} iii`;
+      });
       if (inSecondRound && !alreadyPatched) {
         target = pick + 30;
         source = "second-round-list";
