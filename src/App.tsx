@@ -1,7 +1,7 @@
-import { Moon, Sun, UserRoundPlus, UsersRound, Disc3 } from "lucide-react";
+import { Database, Moon, Sun, UserRoundPlus, UsersRound } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import RookieBuilder, { type RookieBuilderTeam } from "./components/RookieBuilder";
-import WheelPanel from "./components/WheelPanel";
+import DatabasePanel from "./components/DatabasePanel";
 import appLogo from "./assets/2kspinner-logo.png";
 import {
   type PlayerSource,
@@ -15,7 +15,7 @@ import detailedPlayers2k26 from "./data/versions/2k26/players.json";
 const appVersion = "v0.6.2";
 const lastUpdated = "2026-08-02";
 
-type AppMode = "rookie" | "custom" | "wheel";
+type AppMode = "rookie" | "custom" | "database";
 type Theme = "light" | "dark";
 
 const themeStorageKey = "2kspinner-theme";
@@ -332,7 +332,7 @@ const App = () => {
             <div className="min-w-0">
               <h1 className="truncate text-[14px] font-semibold text-ink-900">2KSpinner</h1>
               <div className="mt-0.5 truncate text-[9px] text-ink-500">
-                {appMode === "rookie" ? "球队抽选 · 新秀构建" : appMode === "custom" ? "手动选源 · 新秀构建" : "随机转盘 · 抽选工具"}
+                {appMode === "rookie" ? "球队抽选 · 新秀构建" : appMode === "custom" ? "手动选源 · 新秀构建" : "新秀卡数据库 · 全部球员"}
               </div>
             </div>
           </div>
@@ -348,10 +348,10 @@ const App = () => {
               <span className="lg:hidden">自选</span>
               <span className="hidden lg:inline">自选生成</span>
             </button>
-            <button aria-pressed={appMode === "wheel"} className="mode-nav-button" data-active={appMode === "wheel"} onClick={() => setAppMode("wheel")} title="数字、标签、球员随机转盘" type="button">
-              <Disc3 className="h-3.5 w-3.5" />
-              <span className="lg:hidden">转盘</span>
-              <span className="hidden lg:inline">转盘</span>
+            <button aria-pressed={appMode === "database"} className="mode-nav-button" data-active={appMode === "database"} onClick={() => setAppMode("database")} title="浏览全部新秀卡数据" type="button">
+              <Database className="h-3.5 w-3.5" />
+              <span className="lg:hidden">数据库</span>
+              <span className="hidden lg:inline">数据库</span>
             </button>
           </nav>
 
@@ -395,13 +395,13 @@ const App = () => {
             </button>
             <span className="hidden items-center gap-1.5 text-[10px] font-medium text-ink-600 xl:flex">
               <span className="h-1.5 w-1.5 rounded-full bg-court-500" />
-              {appMode === "rookie" ? "新秀生成" : appMode === "custom" ? "自选生成" : "转盘"}
+              {appMode === "rookie" ? "新秀生成" : appMode === "custom" ? "自选生成" : "数据库"}
             </span>
           </div>
         </header>
 
-        {appMode === "wheel" ? (
-          <WheelPanel teams={rookieBuilderTeams} />
+        {appMode === "database" ? (
+          <DatabasePanel />
         ) : (
           <RookieBuilder
               key={`${appMode}:${dataVersion}`}
