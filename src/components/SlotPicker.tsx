@@ -47,7 +47,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
       <section
         aria-label={`为${bundle.label}槽位选择球员`}
         aria-modal="true"
-        className="dialog-surface flex w-full max-w-[560px] max-h-[80vh] flex-col overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl"
+        className="dialog-surface flex w-full max-w-[560px] h-[min(82vh,860px)] flex-col overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl"
         role="dialog"
       >
         <div className="workspace-toolbar flex items-center justify-between gap-3 px-3 py-2.5">
@@ -86,7 +86,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
 
         {tab === "rookie" && (
           <>
-            <div className="flex flex-wrap gap-1.5 border-b border-ink-200 px-3 py-2">
+            <div className="flex max-h-[28vh] flex-wrap gap-1.5 overflow-y-auto border-b border-ink-200 px-3 py-2" style={{ WebkitOverflowScrolling: "touch" }}>
               {years.map((option) => (
                 <button
                   aria-pressed={year === option}
@@ -107,7 +107,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
                 value={query}
               />
             </div>
-            <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-3">
+            <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-3" style={{ WebkitOverflowScrolling: "touch" }}>
               {filteredCards.length === 0 && (
                 <div className="py-8 text-center text-[11px] text-ink-400">
                   {year === null ? "暂无新秀卡数据" : `${year} 届没有匹配的新秀`}
