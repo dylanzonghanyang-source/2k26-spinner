@@ -26,9 +26,9 @@
     "birthMonth": 10,
     "birthDay": 22,
     "birthYear": 1979,
-    "ageAtSetYear": 2010,
-    "jerseyNumber": 2,
-    "yearsPro": 7,
+    "ageAtSetYear": 2002,
+    "jerseyNumber": 12,
+    "yearsPro": 0,
     "dominantHand": "Right",
     "dominantDunkHand": "Left",
     "peakStartAge": 24,
@@ -41,11 +41,11 @@
     "loyalty": 100,
     "forceNonStarter": "Off",
     "playInitiator": false,
-    "playType1": "P&R Point",
+    "playType1": "P&R Ball Handler",
     "playType2": "3 PT",
-    "playType3": "Mid Range",
+    "playType3": "Handoff Receiver",
     "playType4": "None",
-    "currentTeam": 9882564616,
+    "currentTeam": 0,
     "hometownTeam1": 0,
     "hometownTeam2": 0,
     "draftYear": 2002,
@@ -93,7 +93,7 @@
     "threeRight": "Cold"
   },
   "detailed": {
-    "Agility": 80,
+    "Agility": 73,
     "Ball Handle": 76,
     "Block": 35,
     "Close Shot": 67,
@@ -129,32 +129,7 @@
     "Layup": 70,
     "Three-Point Shot": 76
   },
-  "badges": [
-    {
-      "name": "Bail Out",
-      "tier": "Bronze"
-    },
-    {
-      "name": "Break Starter",
-      "tier": "Bronze"
-    },
-    {
-      "name": "High-Flying Denier",
-      "tier": "Bronze"
-    },
-    {
-      "name": "Strong Handle",
-      "tier": "Bronze"
-    },
-    {
-      "name": "Unpluckable",
-      "tier": "Bronze"
-    },
-    {
-      "name": "Versatile Visionary",
-      "tier": "Bronze"
-    }
-  ],
+  "badges": [],
   "tendencies": {
     "Alley-Oop": 10,
     "Alley-Oop Pass": 55,
@@ -190,10 +165,10 @@
     "Iso vs Good Defender": 10,
     "No Driving Dribble Move": 60,
     "No Setup Dribble": 50,
-    "Off-Screen Drive": 45,
+    "Off-Screen Drive": 55,
     "Off-Screen Shot Mid-Range": 85,
     "Off-Screen Shot Three": 35,
-    "On-Ball Steal": 65,
+    "On-Ball Steal": 40,
     "Pass Interception": 65,
     "Play Discipline": 50,
     "Post Aggressive Backdown": 5,
@@ -236,17 +211,17 @@
     "Shot Under Basket": 25,
     "Spin Jumper": 20,
     "Spin Layup": 55,
-    "Spot Up Drive": 45,
+    "Spot Up Drive": 55,
     "Spot Up Shot Mid-Range": 80,
     "Spot Up Shot Three": 35,
     "Standing Dunk": 5,
-    "Step Through Shot": 30,
+    "Step Through Shot": 60,
     "Stepback Jumper Mid-Range": 15,
     "Stepback Three Point Shot": 10,
     "Take Charge": 15,
     "Touches": 45,
     "Transition Pull-Up Three Point Shot": 5,
-    "Transition Spot Up vs Cut to the Basket": 45,
+    "Transition Spot Up vs Cut to the Basket": 25,
     "Triple Threat Idle": 50,
     "Triple Threat Jab Step": 30,
     "Triple Threat Pump Fake": 20,

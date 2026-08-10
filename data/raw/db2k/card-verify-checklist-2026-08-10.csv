@@ -1,0 +1,166 @@
+年份,球员,类别,字段,数值,检出原因
+1960,Jerry West,矛盾,Attack Strong on Drive,92,倾向极高(92)但力量只有 53
+1960,Oscar Robertson,属性,Help Defense IQ,88,SG 位置均值 65±9，z=2.4 明显偏高
+1962,John Havlicek,极端,Intangibles,98,接近满值
+1965,Jerry Sloan,矛盾,Putback,19,积极性高达 95 但倾向仅 19
+1965,Keith Erickson,矛盾,Drive,92,倾向极高(92)但控球只有 64
+1965,Rick Barry,极端,Stamina,98,接近满值
+1969,Bingo Smith,矛盾,Pass Interception,99,倾向极高(99)但抢断只有 59
+1969,Eddie Mast,极端,Intangibles,98,接近满值
+1969,Luther Rackley,极端,Intangibles,98,接近满值
+1970,Dave Cowens,矛盾,Alley-Oop,99,倾向极高(99)但切入扣篮只有 58
+1970,Geoff Petrie,矛盾,Alley-Oop,95,倾向极高(95)但切入扣篮只有 60
+1970,Greg Fillmore,矛盾,Crash,10,积极性高达 90 但倾向仅 10
+1972,Paul Westphal,极端,Hands,98,接近满值
+1974,Harvey Catchings,矛盾,Crash,9,积极性高达 91 但倾向仅 9
+1974,Scott Wedman,矛盾,Post Aggressive Backdown,15,力量高达 90 但倾向仅 15
+1974,Bill Walton,极端,Intangibles,98,接近满值
+1976,Moses Malone,矛盾,Crash,10,积极性高达 90 但倾向仅 10
+1976,Adrian Dantley,极端,Stamina,98,接近满值
+1976,Alex English,极端,Stamina,98,接近满值
+1977,Brad Davis,矛盾,Putback,13,积极性高达 97 但倾向仅 13
+1977,Walter Davis,极端,Stamina,98,接近满值
+1977,Otis Birdsong,属性,Perimeter Defense,25,SG 位置均值 68±9，z=-4.9 明显偏低
+1978,Larry Bird,矛盾,Flashy Pass,99,倾向极高(99)但传球视野只有 62
+1978,Reggie Theus,矛盾,Alley-Oop,89,倾向极高(89)但切入扣篮只有 64
+1978,Michael Cooper,属性,Defensive Consistency,89,SG 位置均值 57±14，z=2.2 明显偏高
+1979,James Donaldson,矛盾,Alley-Oop,95,倾向极高(95)但切入扣篮只有 60
+1979,Jerry Sichting,矛盾,Putback,6,积极性高达 91 但倾向仅 6
+1979,Magic Johnson,极端,Stamina,98,接近满值
+1980,Jeff Ruland,矛盾,Crash,15,积极性高达 90 但倾向仅 15
+1980,Kiki Vandeweghe,矛盾,Flashy Pass,99,倾向极高(99)但传球视野只有 53
+1980,Rick Mahorn,矛盾,Post Aggressive Backdown,90,倾向极高(90)但背身控制只有 58
+1981,Frank Brickowski,矛盾,Off-Screen Shot Three,99,倾向极高(99)但三分球只有 48
+1981,Rolando Blackman,矛盾,Block Shot,92,倾向极高(92)但盖帽只有 26
+1981,Alton Lister,属性,Agility,29,PF 位置均值 59±14，z=-2.2 明显偏低
+1982,Fat Lever,矛盾,Post Up,99,倾向极高(99)但背身控制只有 45
+1982,Cliff Levingston,极端,Intangibles,98,接近满值
+1982,Mark Eaton,矛盾,Spot Up Shot Three,90,倾向极高(90)但三分球只有 26
+1983,John Paxson,矛盾,Putback,10,积极性高达 93 但倾向仅 10
+1983,Thurl Bailey,矛盾,Crash,5,积极性高达 90 但倾向仅 5
+1983,Antoine Carr,矛盾,Off-Screen Shot Three,88,倾向极高(88)但三分球只有 37
+1984,Kevin Willis,极端,Intangibles,98,接近满值
+1984,Michael Jordan,矛盾,Attack Strong on Drive,88,倾向极高(88)但力量只有 50
+1984,Otis Thorpe,属性,Pass IQ,30,PF 位置均值 57±12，z=-2.3 明显偏低
+1985,A.C. Green,矛盾,Crash,4,积极性高达 92 但倾向仅 4
+1985,Charles Oakley,极端,Intangibles,98,接近满值
+1985,Jon Koncak,极端,Intangibles,98,接近满值
+1986,Mark Price,极端,Intangibles,98,接近满值
+1986,Dennis Rodman,属性,Ball Handle,29,SF 位置均值 68±9，z=-4.2 明显偏低
+1986,Billy Thompson,属性,Three-Point Shot,37,SF 位置均值 72±11，z=-3.1 明显偏低
+1987,Sarunas Marciulionis,矛盾,Post Aggressive Backdown,0,力量高达 90 但倾向仅 0
+1987,Chris Dudley,极端,Intangibles,98,接近满值
+1987,David Robinson,矛盾,Spot Up Shot Three,89,倾向极高(89)但三分球只有 64
+1988,Danny Manning,矛盾,Putback,15,积极性高达 90 但倾向仅 15
+1988,Gary Grant,矛盾,Driving Dunk,98,倾向极高(98)但切入扣篮只有 25
+1988,Steve Kerr,矛盾,Off-Screen Shot Three,16,三分球高达 92 但倾向仅 16
+1989,B.J. Armstrong,矛盾,Shot Three,20,三分球高达 90 但倾向仅 20
+1989,Chucky Brown,矛盾,Crash,0,积极性高达 92 但倾向仅 0
+1989,Glen Rice,矛盾,Block Shot,95,倾向极高(95)但盖帽只有 34
+1990,Scott Williams,矛盾,Crash,7,积极性高达 90 但倾向仅 7
+1990,Willie Burton,矛盾,Pass Interception,99,倾向极高(99)但抢断只有 59
+1990,Elden Campbell,极端,Intangibles,98,接近满值
+1991,Anthony Avent,矛盾,Dish to Open Man,99,倾向极高(99)但传球准确性只有 54
+1991,Isaac Austin,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 32
+1991,Terrell Brandon,矛盾,Driving Dunk,90,倾向极高(90)但切入扣篮只有 26
+1992,Adam Keefe,矛盾,Crash,5,积极性高达 94 但倾向仅 5
+1992,Jim Jackson,矛盾,Crash,15,积极性高达 90 但倾向仅 15
+1992,Oliver Miller,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 26
+1993,Isaiah Rider,矛盾,Pass Interception,99,倾向极高(99)但抢断只有 59
+1993,Bo Outlaw,极端,Shot IQ,98,接近满值
+1993,Chris Webber,极端,Stamina,98,接近满值
+1994,Brian Grant,矛盾,Putback,15,积极性高达 92 但倾向仅 15
+1994,Lawrence Funderburke,矛盾,Putback,20,原地扣篮高达 90 但倾向仅 20
+1994,Jason Kidd,极端,Stamina,98,接近满值
+1995,Bryant Reeves,矛盾,Post Aggressive Backdown,20,力量高达 93 但倾向仅 20
+1995,Corliss Williamson,矛盾,Putback,10,积极性高达 90 但倾向仅 10
+1995,Jimmy King,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 64
+1996,Allen Iverson,矛盾,Putback,20,积极性高达 95 但倾向仅 20
+1996,Malik Rose,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 61
+1996,Marcus Camby,矛盾,Crash,5,积极性高达 95 但倾向仅 5
+1997,Tariq Abdul-Wahad,矛盾,Pass Interception,99,倾向极高(99)但抢断只有 63
+1997,Tim Duncan,矛盾,Post Back Down,20,背身控制高达 90 但倾向仅 20
+1997,Bobby Jackson,极端,Intangibles,98,接近满值
+1998,Antawn Jamison,矛盾,Crash,0,积极性高达 90 但倾向仅 0
+1998,Bonzi Wells,矛盾,Crash,5,积极性高达 94 但倾向仅 5
+1998,Jason Williams,矛盾,Drive,15,控球高达 98 但倾向仅 15
+1999,Devean George,矛盾,Pass Interception,99,倾向极高(99)但抢断只有 62
+1999,James Posey,矛盾,Dish to Open Man,99,倾向极高(99)但传球准确性只有 60
+1999,Ron Artest,矛盾,Crash,10,积极性高达 95 但倾向仅 10
+2000,Etan Thomas,矛盾,Crash,5,积极性高达 95 但倾向仅 5
+2000,Mark Madsen,矛盾,Drive,95,倾向极高(95)但控球只有 35
+2000,Mike Miller,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 51
+2001,Jason Richardson,矛盾,Alley-Oop,10,切入扣篮高达 94 但倾向仅 10
+2001,Brian Scalabrine,极端,Shot IQ,98,接近满值
+2001,Richard Jefferson,极端,Stamina,98,接近满值
+2002,Jared Jeffries,矛盾,Crash,15,积极性高达 92 但倾向仅 15
+2002,Luis Scola,矛盾,Drive Right,99,倾向极高(99)但运球速度只有 34
+2002,Yao Ming,矛盾,Post Back Down,5,背身控制高达 91 但倾向仅 5
+2003,Chris Kaman,矛盾,Drive Right,99,倾向极高(99)但运球速度只有 43
+2003,Dahntay Jones,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 50
+2003,David West,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 30
+2004,Dwight Howard,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 57
+2004,Luol Deng,矛盾,Putback,10,积极性高达 90 但倾向仅 10
+2004,Tony Allen,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 58
+2005,Andrew Bogut,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 25
+2005,Channing Frye,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 25
+2005,Wayne Simien,矛盾,Crash,5,积极性高达 90 但倾向仅 5
+2006,Andrea Bargnani,矛盾,Alley-Oop,95,倾向极高(95)但切入扣篮只有 55
+2006,LaMarcus Aldridge,矛盾,Alley-Oop,95,倾向极高(95)但切入扣篮只有 63
+2006,Ryan Hollins,矛盾,Drive,98,倾向极高(98)但控球只有 35
+2007,Aaron Brooks,矛盾,Putback,5,积极性高达 95 但倾向仅 5
+2007,Greg Oden,矛盾,Standing Dunk,5,原地扣篮高达 95 但倾向仅 5
+2007,Jared Dudley,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 46
+2008,Brandon Rush,矛盾,Crash,4,积极性高达 92 但倾向仅 4
+2008,Brook Lopez,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 25
+2008,Marreese Speights,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 26
+2009,James Harden,矛盾,Putback,15,积极性高达 90 但倾向仅 15
+2009,Jeff Pendegraph,矛盾,Dish to Open Man,99,倾向极高(99)但传球准确性只有 40
+2009,Joe Ingles,矛盾,Drive,99,倾向极高(99)但运球速度只有 60
+2010,Evan Turner,矛盾,Crash,20,积极性高达 94 但倾向仅 20
+2010,DeMarcus Cousins,极端,Stamina,98,接近满值
+2010,Ed Davis,矛盾,Post Back Down,90,倾向极高(90)但背身控制只有 59
+2011,Bismack Biyombo,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 32
+2011,Jonas Valanciunas,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 34
+2011,Tristan Thompson,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 36
+2012,Andre Drummond,矛盾,Shot Close,95,倾向极高(95)但近距离投篮只有 52
+2012,Festus Ezeli,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 38
+2013,Kelly Olynyk,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 25
+2013,Mason Plumlee,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 59
+2013,Matthew Dellavedova,矛盾,Spot Up Shot Three,95,倾向极高(95)但三分球只有 58
+2014,Clint Capela,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 27
+2014,Dwight Powell,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 44
+2014,Jerami Grant,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 60
+2015,Javonte Green,矛盾,Pass Interception,99,倾向极高(99)但抢断只有 62
+2015,Larry Nance Jr.,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 47
+2015,Myles Turner,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 38
+2016,Damian Jones,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 44
+2016,Derrick Jones Jr.,矛盾,Putback,20,积极性高达 90 但倾向仅 20
+2016,Fred VanVleet,矛盾,Pass Interception,99,倾向极高(99)但抢断只有 59
+2017,Bam Adebayo,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 35
+2017,Chris Boucher,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 25
+2017,De'Aaron Fox,矛盾,Putback,10,积极性高达 90 但倾向仅 10
+2018,Gabe Vincent,矛盾,Pass Interception,95,倾向极高(95)但抢断只有 63
+2018,Haywood Highsmith,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 64
+2018,Jock Landale,矛盾,On-Ball Steal,99,倾向极高(99)但抢断只有 52
+2019,Brandon Clarke,矛盾,Crash,5,积极性高达 95 但倾向仅 5
+2019,Bruno Fernando,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 50
+2019,Cameron Johnson,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 43
+2020,Lamar Stevens,矛盾,Putback,15,积极性高达 90 但倾向仅 15
+2020,Lindy Waters III,矛盾,Drive Right,95,倾向极高(95)但运球速度只有 50
+2020,Mason Jones,矛盾,Drive,95,倾向极高(95)但运球速度只有 64
+2021,Aaron Wiggins,矛盾,Block Shot,99,倾向极高(99)但盖帽只有 37
+2021,Ayo Dosunmu,矛盾,On-Ball Steal,95,倾向极高(95)但抢断只有 38
+2021,Chris Duarte,矛盾,Crash,15,积极性高达 92 但倾向仅 15
+2022,Christian Koloko,矛盾,Drive Right,99,倾向极高(99)但运球速度只有 44
+2022,David Roddy,矛盾,Post Up,95,倾向极高(95)但背身控制只有 62
+2022,Dominick Barlow,矛盾,Drive Right,99,倾向极高(99)但运球速度只有 64
+2023,Amen Thompson,矛盾,Spot Up Shot Three,95,倾向极高(95)但三分球只有 60
+2023,Andre Jackson Jr.,矛盾,Post Back Down,99,倾向极高(99)但背身控制只有 44
+2023,Anthony Black,矛盾,Putback,10,积极性高达 90 但倾向仅 10
+2024,Adem Bona,矛盾,Spot Up Shot Three,99,倾向极高(99)但三分球只有 27
+2024,Alexandre Sarr,矛盾,Post Back Down,99,倾向极高(99)但背身控制只有 64
+2024,Anton Watson,矛盾,Post Back Down,99,倾向极高(99)但背身控制只有 60
+2025,Alex Toohey,矛盾,Pass Interception,95,倾向极高(95)但抢断只有 60
+2025,Asa Newell,矛盾,Crash,5,积极性高达 90 但倾向仅 5
+2025,Caleb Love,矛盾,Shot Mid-Range,10,中距离投篮高达 91 但倾向仅 10

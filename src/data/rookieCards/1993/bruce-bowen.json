@@ -5,18 +5,18 @@
   "source": "db2k-gap-historic",
   "gameVersion": "NBA2K26.exe",
   "capturedAt": "2026-08-10",
-  "overall": 87,
+  "overall": 76,
   "overallSource": "model-estimated-gap",
   "position": "SF",
-  "secondaryPosition": "SG",
+  "secondaryPosition": "N/A",
   "height": 79,
-  "weight": 220,
+  "weight": 200,
   "wingspan": 209.75,
   "faceId": 8580,
   "potential": {
-    "current": 86,
-    "min": 80,
-    "max": 80
+    "current": 83,
+    "min": 79,
+    "max": 87
   },
   "vitals": {
     "firstName": "Bruce",
@@ -26,9 +26,9 @@
     "birthMonth": 6,
     "birthDay": 14,
     "birthYear": 1971,
-    "ageAtSetYear": 2004,
-    "jerseyNumber": 12,
-    "yearsPro": 13,
+    "ageAtSetYear": 1993,
+    "jerseyNumber": 3,
+    "yearsPro": 0,
     "dominantHand": "Right",
     "dominantDunkHand": "Right",
     "peakStartAge": 27,
@@ -45,13 +45,13 @@
     "playType2": "Cutter",
     "playType3": "None",
     "playType4": "None",
-    "currentTeam": 9882768808,
+    "currentTeam": 0,
     "hometownTeam1": 0,
-    "hometownTeam2": 9882161904,
+    "hometownTeam2": 0,
     "draftYear": 1993,
     "draftPick": 0,
     "heightInches": 79,
-    "weightLb": 220,
+    "weightLb": 200,
     "wingspanCm": 209.75,
     "armScale": 50,
     "shoulderLength": 50,
@@ -93,85 +93,73 @@
     "threeRight": "Neutral"
   },
   "detailed": {
-    "Agility": 96,
+    "Agility": 84,
     "Ball Handle": 76,
-    "Block": 61,
-    "Close Shot": 70,
-    "Defensive Consistency": 97,
-    "Defensive Rebound": 47,
+    "Block": 51,
+    "Close Shot": 75,
+    "Defensive Consistency": 85,
+    "Defensive Rebound": 44,
     "Draw Foul": 79,
     "Driving Dunk": 65,
-    "Free Throw": 63,
-    "Hands": 90,
-    "Help Defense IQ": 95,
+    "Free Throw": 40,
+    "Hands": 81,
+    "Help Defense IQ": 83,
     "Hustle": 85,
-    "Intangibles": 80,
+    "Intangibles": 50,
     "Interior Defense": 64,
-    "Shot IQ": 80,
-    "Mid-Range Shot": 88,
-    "Offensive Consistency": 98,
-    "Offensive Rebound": 36,
+    "Shot IQ": 50,
+    "Mid-Range Shot": 77,
+    "Offensive Consistency": 50,
+    "Offensive Rebound": 38,
     "Pass Accuracy": 77,
     "Pass IQ": 80,
-    "Pass Perception": 88,
-    "Pass Vision": 38,
-    "Perimeter Defense": 96,
+    "Pass Perception": 80,
+    "Pass Vision": 33,
+    "Perimeter Defense": 82,
     "Post Control": 74,
     "Post Fade": 48,
     "Post Hook": 35,
     "Speed": 78,
     "Speed with Ball": 68,
-    "Stamina": 91,
+    "Stamina": 84,
     "Standing Dunk": 35,
-    "Steal": 69,
+    "Steal": 81,
     "Strength": 75,
     "Vertical": 67,
     "Layup": 70,
-    "Three-Point Shot": 91
+    "Three-Point Shot": 80
   },
   "badges": [
     {
       "name": "Challenger",
-      "tier": "HOF"
-    },
-    {
-      "name": "Glove",
-      "tier": "Gold"
-    },
-    {
-      "name": "High-Flying Denier",
-      "tier": "Gold"
-    },
-    {
-      "name": "Immovable Enforcer",
-      "tier": "Gold"
-    },
-    {
-      "name": "Limitless Range",
-      "tier": "Gold"
+      "tier": "Bronze"
     },
     {
       "name": "Off-Ball Pest",
-      "tier": "HOF"
+      "tier": "Bronze"
     },
     {
       "name": "On-Ball Menace",
-      "tier": "Gold"
+      "tier": "Bronze"
     },
     {
       "name": "Pick Dodger",
-      "tier": "Gold"
+      "tier": "Bronze"
+    },
+    {
+      "name": "Slippery Off-Ball",
+      "tier": "Bronze"
     }
   ],
   "tendencies": {
     "Alley-Oop": 25,
     "Alley-Oop Pass": 5,
-    "Attack Strong on Drive": 65,
+    "Attack Strong on Drive": 85,
     "Block Shot": 20,
     "Contested Jumper Mid-Range": 5,
     "Contested Jumper Three": 20,
     "Crash": 25,
-    "Dish to Open Man": 35,
+    "Dish to Open Man": 15,
     "Drive": 30,
     "Drive Pull-Up Mid-Range": 10,
     "Drive Pull-Up Three": 5,
@@ -198,10 +186,10 @@
     "Iso vs Good Defender": 0,
     "No Driving Dribble Move": 70,
     "No Setup Dribble": 90,
-    "Off-Screen Drive": 25,
+    "Off-Screen Drive": 30,
     "Off-Screen Shot Mid-Range": 35,
-    "Off-Screen Shot Three": 50,
-    "On-Ball Steal": 55,
+    "Off-Screen Shot Three": 35,
+    "On-Ball Steal": 25,
     "Pass Interception": 70,
     "Play Discipline": 95,
     "Post Aggressive Backdown": 15,
@@ -244,8 +232,8 @@
     "Shot Under Basket": 40,
     "Spin Jumper": 5,
     "Spin Layup": 55,
-    "Spot Up Drive": 25,
-    "Spot Up Shot Mid-Range": 45,
+    "Spot Up Drive": 30,
+    "Spot Up Shot Mid-Range": 30,
     "Spot Up Shot Three": 40,
     "Standing Dunk": 35,
     "Step Through Shot": 50,
@@ -254,7 +242,7 @@
     "Take Charge": 85,
     "Touches": 40,
     "Transition Pull-Up Three Point Shot": 10,
-    "Transition Spot Up vs Cut to the Basket": 55,
+    "Transition Spot Up vs Cut to the Basket": 50,
     "Triple Threat Idle": 75,
     "Triple Threat Jab Step": 15,
     "Triple Threat Pump Fake": 10,

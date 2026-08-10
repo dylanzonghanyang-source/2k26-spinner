@@ -5,7 +5,7 @@
   "source": "db2k-gap-historic",
   "gameVersion": "NBA2K26.exe",
   "capturedAt": "2026-08-10",
-  "overall": 67,
+  "overall": 66,
   "overallSource": "model-estimated-gap",
   "position": "PF",
   "secondaryPosition": "C",
@@ -26,9 +26,9 @@
     "birthMonth": 1,
     "birthDay": 21,
     "birthYear": 1977,
-    "ageAtSetYear": 2006,
+    "ageAtSetYear": 1999,
     "jerseyNumber": 51,
-    "yearsPro": 6,
+    "yearsPro": 2,
     "dominantHand": "Left",
     "dominantDunkHand": "Right",
     "peakStartAge": 24,
@@ -45,7 +45,7 @@
     "playType2": "Post Up Low",
     "playType3": "None",
     "playType4": "None",
-    "currentTeam": 9882536256,
+    "currentTeam": 0,
     "hometownTeam1": 0,
     "hometownTeam2": 0,
     "draftYear": 1999,
@@ -129,32 +129,7 @@
     "Layup": 57,
     "Three-Point Shot": 30
   },
-  "badges": [
-    {
-      "name": "Boxout Beast",
-      "tier": "Bronze"
-    },
-    {
-      "name": "Brick Wall",
-      "tier": "Bronze"
-    },
-    {
-      "name": "Paint Patroller",
-      "tier": "Bronze"
-    },
-    {
-      "name": "Pogo Stick",
-      "tier": "Bronze"
-    },
-    {
-      "name": "Post Lockdown",
-      "tier": "Bronze"
-    },
-    {
-      "name": "Rebound Chaser",
-      "tier": "Bronze"
-    }
-  ],
+  "badges": [],
   "tendencies": {
     "Alley-Oop": 99,
     "Alley-Oop Pass": 0,

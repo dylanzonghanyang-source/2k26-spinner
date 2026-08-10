@@ -5,7 +5,7 @@
   "source": "db2k-gap-historic",
   "gameVersion": "NBA2K26.exe",
   "capturedAt": "2026-08-10",
-  "overall": 69,
+  "overall": 68,
   "overallSource": "model-estimated-gap",
   "position": "C",
   "secondaryPosition": "PF",
@@ -26,7 +26,7 @@
     "birthMonth": 6,
     "birthDay": 11,
     "birthYear": 1946,
-    "ageAtSetYear": 1971,
+    "ageAtSetYear": 1969,
     "jerseyNumber": 43,
     "yearsPro": 2,
     "dominantHand": "Right",
@@ -45,7 +45,7 @@
     "playType2": "None",
     "playType3": "None",
     "playType4": "None",
-    "currentTeam": 9882281016,
+    "currentTeam": 0,
     "hometownTeam1": 0,
     "hometownTeam2": 0,
     "draftYear": 1969,
@@ -53,10 +53,10 @@
     "heightInches": 82,
     "weightLb": 220,
     "wingspanCm": 219.29,
-    "armScale": 50,
-    "shoulderLength": 50,
-    "neckLength": 50,
-    "trunkLength": 50
+    "armScale": 0,
+    "shoulderLength": 0,
+    "neckLength": 0,
+    "trunkLength": 0
   },
   "durability": {
     "head": 80,
@@ -129,12 +129,7 @@
     "Layup": 30,
     "Three-Point Shot": 25
   },
-  "badges": [
-    {
-      "name": "Boxout Beast",
-      "tier": "Silver"
-    }
-  ],
+  "badges": [],
   "tendencies": {
     "Alley-Oop": 45,
     "Alley-Oop Pass": 0,
@@ -220,7 +215,7 @@
     "Spot Up Shot Mid-Range": 15,
     "Spot Up Shot Three": 0,
     "Standing Dunk": 80,
-    "Step Through Shot": 40,
+    "Step Through Shot": 50,
     "Stepback Jumper Mid-Range": 0,
     "Stepback Three Point Shot": 0,
     "Take Charge": 25,

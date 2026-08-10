@@ -5,7 +5,7 @@
   "source": "db2k-gap-historic",
   "gameVersion": "NBA2K26.exe",
   "capturedAt": "2026-08-10",
-  "overall": 87,
+  "overall": 79,
   "overallSource": "model-estimated-gap",
   "position": "C",
   "secondaryPosition": "PF",
@@ -15,8 +15,8 @@
   "faceId": 8757,
   "potential": {
     "current": 87,
-    "min": 74,
-    "max": 82
+    "min": 83,
+    "max": 91
   },
   "vitals": {
     "firstName": "Jeff",
@@ -26,9 +26,9 @@
     "birthMonth": 12,
     "birthDay": 16,
     "birthYear": 1958,
-    "ageAtSetYear": 1983,
+    "ageAtSetYear": 1980,
     "jerseyNumber": 43,
-    "yearsPro": 8,
+    "yearsPro": 2,
     "dominantHand": "Right",
     "dominantDunkHand": "Right",
     "peakStartAge": 26,
@@ -42,10 +42,10 @@
     "forceNonStarter": "Off",
     "playInitiator": false,
     "playType1": "Post Up Low",
-    "playType2": "Cutter",
-    "playType3": "P&R Roll Man",
+    "playType2": "P&R Roll Man",
+    "playType3": "None",
     "playType4": "None",
-    "currentTeam": 9882802840,
+    "currentTeam": 0,
     "hometownTeam1": 0,
     "hometownTeam2": 0,
     "draftYear": 1980,
@@ -94,87 +94,79 @@
   },
   "detailed": {
     "Agility": 44,
-    "Ball Handle": 41,
+    "Ball Handle": 40,
     "Block": 52,
-    "Close Shot": 95,
-    "Defensive Consistency": 60,
-    "Defensive Rebound": 88,
-    "Draw Foul": 92,
-    "Driving Dunk": 75,
-    "Free Throw": 73,
-    "Hands": 75,
-    "Help Defense IQ": 78,
+    "Close Shot": 88,
+    "Defensive Consistency": 57,
+    "Defensive Rebound": 89,
+    "Draw Foul": 80,
+    "Driving Dunk": 71,
+    "Free Throw": 69,
+    "Hands": 74,
+    "Help Defense IQ": 80,
     "Hustle": 90,
-    "Intangibles": 95,
+    "Intangibles": 50,
     "Interior Defense": 73,
-    "Shot IQ": 95,
-    "Mid-Range Shot": 77,
-    "Offensive Consistency": 95,
-    "Offensive Rebound": 77,
-    "Pass Accuracy": 65,
-    "Pass IQ": 85,
-    "Pass Perception": 57,
-    "Pass Vision": 59,
-    "Perimeter Defense": 44,
-    "Post Control": 90,
-    "Post Fade": 87,
-    "Post Hook": 92,
-    "Speed": 48,
-    "Speed with Ball": 42,
-    "Stamina": 98,
-    "Standing Dunk": 80,
-    "Steal": 38,
-    "Strength": 88,
-    "Vertical": 68,
-    "Layup": 76,
-    "Three-Point Shot": 50
+    "Shot IQ": 50,
+    "Mid-Range Shot": 69,
+    "Offensive Consistency": 80,
+    "Offensive Rebound": 74,
+    "Pass Accuracy": 62,
+    "Pass IQ": 86,
+    "Pass Perception": 59,
+    "Pass Vision": 55,
+    "Perimeter Defense": 40,
+    "Post Control": 89,
+    "Post Fade": 86,
+    "Post Hook": 88,
+    "Speed": 47,
+    "Speed with Ball": 38,
+    "Stamina": 96,
+    "Standing Dunk": 77,
+    "Steal": 37,
+    "Strength": 85,
+    "Vertical": 70,
+    "Layup": 75,
+    "Three-Point Shot": 40
   },
   "badges": [
     {
-      "name": "Aerial Wizard",
+      "name": "Boxout Beast",
       "tier": "Bronze"
     },
     {
-      "name": "Boxout Beast",
-      "tier": "Gold"
-    },
-    {
       "name": "Brick Wall",
-      "tier": "Gold"
+      "tier": "Bronze"
     },
     {
       "name": "Paint Prodigy",
-      "tier": "Silver"
-    },
-    {
-      "name": "Physical Finisher",
       "tier": "Bronze"
     },
     {
       "name": "Post Fade Phenom",
-      "tier": "Gold"
+      "tier": "Bronze"
     },
     {
       "name": "Post Powerhouse",
-      "tier": "Gold"
+      "tier": "Bronze"
     },
     {
       "name": "Post-Up Poet",
-      "tier": "Gold"
+      "tier": "Bronze"
     },
     {
       "name": "Rebound Chaser",
-      "tier": "Gold"
+      "tier": "Bronze"
     },
     {
       "name": "Rise Up",
-      "tier": "Silver"
+      "tier": "Bronze"
     }
   ],
   "tendencies": {
     "Alley-Oop": 50,
     "Alley-Oop Pass": 0,
-    "Attack Strong on Drive": 65,
+    "Attack Strong on Drive": 75,
     "Block Shot": 25,
     "Contested Jumper Mid-Range": 20,
     "Contested Jumper Three": 0,

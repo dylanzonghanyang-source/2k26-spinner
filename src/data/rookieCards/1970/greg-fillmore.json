@@ -5,7 +5,7 @@
   "source": "db2k-gap-historic",
   "gameVersion": "NBA2K26.exe",
   "capturedAt": "2026-08-10",
-  "overall": 68,
+  "overall": 67,
   "overallSource": "model-estimated-gap",
   "position": "C",
   "secondaryPosition": "N/A",
@@ -26,7 +26,7 @@
     "birthMonth": 3,
     "birthDay": 7,
     "birthYear": 1941,
-    "ageAtSetYear": 1971,
+    "ageAtSetYear": 1970,
     "jerseyNumber": 34,
     "yearsPro": 2,
     "dominantHand": "Right",
@@ -45,7 +45,7 @@
     "playType2": "Post Up Low",
     "playType3": "Post Up High",
     "playType4": "None",
-    "currentTeam": 9882281016,
+    "currentTeam": 0,
     "hometownTeam1": 0,
     "hometownTeam2": 0,
     "draftYear": 1970,
@@ -129,16 +129,7 @@
     "Layup": 45,
     "Three-Point Shot": 25
   },
-  "badges": [
-    {
-      "name": "Boxout Beast",
-      "tier": "Bronze"
-    },
-    {
-      "name": "Rebound Chaser",
-      "tier": "Silver"
-    }
-  ],
+  "badges": [],
   "tendencies": {
     "Alley-Oop": 40,
     "Alley-Oop Pass": 0,
@@ -224,7 +215,7 @@
     "Spot Up Shot Mid-Range": 35,
     "Spot Up Shot Three": 0,
     "Standing Dunk": 60,
-    "Step Through Shot": 45,
+    "Step Through Shot": 55,
     "Stepback Jumper Mid-Range": 0,
     "Stepback Three Point Shot": 0,
     "Take Charge": 40,

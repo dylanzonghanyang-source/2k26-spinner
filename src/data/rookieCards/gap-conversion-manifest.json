@@ -1,9 +1,9 @@
 {
   "source": "DB2K Gap-by-year draft classes snapshot",
-  "inputFile": "/Users/yangzonghan/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_u99tqi61ovek22_9013/msg/file/2026-08/gap_by_year_draft_classes.json",
-  "mode": "Gap-by-year draft classes (historic values, read-only)",
-  "recordCount": 521,
-  "converted": 521,
-  "ovrEstimated": 521,
-  "capturedAt": "2026-08-10T11:33:31.199Z"
+  "inputFile": "/Users/yangzonghan/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_u99tqi61ovek22_9013/msg/file/2026-08/gap_by_year_draft_classes(1).json",
+  "mode": "Gap-by-year draft classes (ROOKIE values, draft-table region, read-only)",
+  "recordCount": 476,
+  "converted": 476,
+  "ovrEstimated": 476,
+  "capturedAt": "2026-08-10T15:33:29.771Z"
 }

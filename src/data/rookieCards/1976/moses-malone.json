@@ -5,18 +5,18 @@
   "source": "db2k-gap-historic",
   "gameVersion": "NBA2K26.exe",
   "capturedAt": "2026-08-10",
-  "overall": 99,
+  "overall": 84,
   "overallSource": "model-estimated-gap",
   "position": "C",
   "secondaryPosition": "PF",
   "height": 82,
-  "weight": 260,
+  "weight": 215,
   "wingspan": 219.29,
   "faceId": 763,
   "potential": {
     "current": 97,
-    "min": 97,
-    "max": 97
+    "min": 93,
+    "max": 99
   },
   "vitals": {
     "firstName": "Moses",
@@ -26,9 +26,9 @@
     "birthMonth": 3,
     "birthDay": 23,
     "birthYear": 1955,
-    "ageAtSetYear": 1983,
+    "ageAtSetYear": 1976,
     "jerseyNumber": 2,
-    "yearsPro": 19,
+    "yearsPro": 7,
     "dominantHand": "Right",
     "dominantDunkHand": "Right",
     "peakStartAge": 25,
@@ -45,13 +45,13 @@
     "playType2": "P&R Roll Man",
     "playType3": "None",
     "playType4": "None",
-    "currentTeam": 9882638352,
+    "currentTeam": 0,
     "hometownTeam1": 0,
     "hometownTeam2": 0,
     "draftYear": 1976,
     "draftPick": 0,
     "heightInches": 82,
-    "weightLb": 260,
+    "weightLb": 215,
     "wingspanCm": 219.29,
     "armScale": 50,
     "shoulderLength": 50,
@@ -93,114 +93,90 @@
     "threeRight": "Neutral"
   },
   "detailed": {
-    "Agility": 57,
+    "Agility": 65,
     "Ball Handle": 45,
-    "Block": 95,
-    "Close Shot": 98,
-    "Defensive Consistency": 98,
-    "Defensive Rebound": 98,
-    "Draw Foul": 98,
-    "Driving Dunk": 85,
-    "Free Throw": 82,
-    "Hands": 98,
-    "Help Defense IQ": 95,
-    "Hustle": 95,
-    "Intangibles": 55,
-    "Interior Defense": 97,
-    "Shot IQ": 98,
-    "Mid-Range Shot": 78,
-    "Offensive Consistency": 98,
-    "Offensive Rebound": 99,
-    "Pass Accuracy": 60,
-    "Pass IQ": 70,
-    "Pass Perception": 95,
-    "Pass Vision": 32,
-    "Perimeter Defense": 57,
-    "Post Control": 98,
-    "Post Fade": 97,
-    "Post Hook": 96,
-    "Speed": 78,
-    "Speed with Ball": 43,
-    "Stamina": 98,
-    "Standing Dunk": 97,
-    "Steal": 72,
-    "Strength": 97,
-    "Vertical": 85,
-    "Layup": 88,
-    "Three-Point Shot": 43
+    "Block": 65,
+    "Close Shot": 79,
+    "Defensive Consistency": 79,
+    "Defensive Rebound": 75,
+    "Draw Foul": 83,
+    "Driving Dunk": 87,
+    "Free Throw": 74,
+    "Hands": 66,
+    "Help Defense IQ": 81,
+    "Hustle": 90,
+    "Intangibles": 30,
+    "Interior Defense": 84,
+    "Shot IQ": 67,
+    "Mid-Range Shot": 64,
+    "Offensive Consistency": 89,
+    "Offensive Rebound": 79,
+    "Pass Accuracy": 57,
+    "Pass IQ": 72,
+    "Pass Perception": 83,
+    "Pass Vision": 33,
+    "Perimeter Defense": 55,
+    "Post Control": 90,
+    "Post Fade": 77,
+    "Post Hook": 83,
+    "Speed": 74,
+    "Speed with Ball": 44,
+    "Stamina": 86,
+    "Standing Dunk": 95,
+    "Steal": 37,
+    "Strength": 80,
+    "Vertical": 82,
+    "Layup": 83,
+    "Three-Point Shot": 33
   },
   "badges": [
     {
       "name": "Aerial Wizard",
-      "tier": "HOF"
-    },
-    {
-      "name": "Boxout Beast",
-      "tier": "HOF"
-    },
-    {
-      "name": "Brick Wall",
-      "tier": "Gold"
-    },
-    {
-      "name": "Challenger",
-      "tier": "Gold"
-    },
-    {
-      "name": "Float Game",
-      "tier": "Silver"
-    },
-    {
-      "name": "Glove",
       "tier": "Bronze"
     },
     {
-      "name": "Layup Mixmaster",
+      "name": "Boxout Beast",
       "tier": "Silver"
     },
     {
-      "name": "Paint Patroller",
-      "tier": "HOF"
+      "name": "Brick Wall",
+      "tier": "Bronze"
     },
     {
       "name": "Paint Prodigy",
-      "tier": "Gold"
-    },
-    {
-      "name": "Physical Finisher",
-      "tier": "Gold"
+      "tier": "Bronze"
     },
     {
       "name": "Pogo Stick",
-      "tier": "Gold"
+      "tier": "Bronze"
+    },
+    {
+      "name": "Posterizer",
+      "tier": "Bronze"
     },
     {
       "name": "Post Fade Phenom",
-      "tier": "Gold"
+      "tier": "Bronze"
     },
     {
       "name": "Post Lockdown",
-      "tier": "HOF"
+      "tier": "Silver"
     },
     {
       "name": "Post Powerhouse",
-      "tier": "HOF"
+      "tier": "Silver"
     },
     {
       "name": "Post-Up Poet",
-      "tier": "Gold"
+      "tier": "Bronze"
     },
     {
       "name": "Rebound Chaser",
-      "tier": "HOF"
+      "tier": "Silver"
     },
     {
       "name": "Rise Up",
-      "tier": "Gold"
-    },
-    {
-      "name": "Set Shot Specialist",
-      "tier": "Silver"
+      "tier": "Bronze"
     }
   ],
   "tendencies": {
@@ -241,7 +217,7 @@
     "Off-Screen Drive": 25,
     "Off-Screen Shot Mid-Range": 15,
     "Off-Screen Shot Three": 0,
-    "On-Ball Steal": 50,
+    "On-Ball Steal": 55,
     "Pass Interception": 60,
     "Play Discipline": 95,
     "Post Aggressive Backdown": 85,

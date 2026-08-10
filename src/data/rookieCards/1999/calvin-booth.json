@@ -26,9 +26,9 @@
     "birthMonth": 5,
     "birthDay": 7,
     "birthYear": 1976,
-    "ageAtSetYear": 2006,
+    "ageAtSetYear": 1999,
     "jerseyNumber": 52,
-    "yearsPro": 7,
+    "yearsPro": 0,
     "dominantHand": "Left",
     "dominantDunkHand": "Right",
     "peakStartAge": 26,
@@ -41,11 +41,11 @@
     "loyalty": 50,
     "forceNonStarter": "Off",
     "playInitiator": false,
-    "playType1": "Cutter",
-    "playType2": "P&R Roll Man",
-    "playType3": "None",
+    "playType1": "P&R Roll Man",
+    "playType2": "Post Up Low",
+    "playType3": "Post Up High",
     "playType4": "None",
-    "currentTeam": 9882536256,
+    "currentTeam": 0,
     "hometownTeam1": 0,
     "hometownTeam2": 0,
     "draftYear": 1999,
@@ -89,11 +89,11 @@
     "threeLeft": "Neutral",
     "threeLeftCenter": "Neutral",
     "threeCenter": "Neutral",
-    "threeRightCenter": "Neutral",
-    "threeRight": "Neutral"
+    "threeRightCenter": "Cold",
+    "threeRight": "Hot"
   },
   "detailed": {
-    "Agility": 66,
+    "Agility": 73,
     "Ball Handle": 51,
     "Block": 40,
     "Close Shot": 77,
@@ -132,30 +132,34 @@
   "badges": [
     {
       "name": "Brick Wall",
+      "tier": "Bronze"
+    },
+    {
+      "name": "High-Flying Denier",
       "tier": "Silver"
     },
     {
       "name": "Pogo Stick",
-      "tier": "Bronze"
+      "tier": "Silver"
     },
     {
-      "name": "Rebound Chaser",
-      "tier": "Bronze"
+      "name": "Post Lockdown",
+      "tier": "Silver"
     },
     {
       "name": "Rise Up",
-      "tier": "Silver"
+      "tier": "Bronze"
     }
   ],
   "tendencies": {
     "Alley-Oop": 55,
     "Alley-Oop Pass": 5,
-    "Attack Strong on Drive": 65,
+    "Attack Strong on Drive": 90,
     "Block Shot": 65,
     "Contested Jumper Mid-Range": 10,
     "Contested Jumper Three": 0,
     "Crash": 10,
-    "Dish to Open Man": 35,
+    "Dish to Open Man": 10,
     "Drive": 25,
     "Drive Pull-Up Mid-Range": 0,
     "Drive Pull-Up Three": 0,
@@ -185,7 +189,7 @@
     "Off-Screen Drive": 25,
     "Off-Screen Shot Mid-Range": 65,
     "Off-Screen Shot Three": 0,
-    "On-Ball Steal": 35,
+    "On-Ball Steal": 20,
     "Pass Interception": 40,
     "Play Discipline": 95,
     "Post Aggressive Backdown": 25,
@@ -229,10 +233,10 @@
     "Spin Jumper": 25,
     "Spin Layup": 25,
     "Spot Up Drive": 25,
-    "Spot Up Shot Mid-Range": 55,
+    "Spot Up Shot Mid-Range": 70,
     "Spot Up Shot Three": 0,
     "Standing Dunk": 60,
-    "Step Through Shot": 45,
+    "Step Through Shot": 50,
     "Stepback Jumper Mid-Range": 0,
     "Stepback Three Point Shot": 0,
     "Take Charge": 35,

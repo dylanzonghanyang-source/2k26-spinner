@@ -32,7 +32,7 @@ function pickOf(card: { vitals?: Record<string, unknown> }) {
 {
   const years = yearsWithCards(lookup);
   check("years desc", years[0] === 2025 && years.at(-1) === 1960, `first=${years[0]} last=${years.at(-1)}`);
-  check("years span 1960-2025", years.length >= 60 && years.length <= 66, `count=${years.length}`);
+  check("years span 1960-2025", years.length >= 50 && years.length <= 66, `count=${years.length}`);
   check("years null", yearsWithCards(null).length === 0);
 }
 

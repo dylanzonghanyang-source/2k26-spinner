@@ -5,7 +5,7 @@
   "source": "db2k-gap-historic",
   "gameVersion": "NBA2K26.exe",
   "capturedAt": "2026-08-10",
-  "overall": 88,
+  "overall": 78,
   "overallSource": "model-estimated-gap",
   "position": "C",
   "secondaryPosition": "PF",
@@ -14,9 +14,9 @@
   "wingspan": 215.04,
   "faceId": 4548,
   "potential": {
-    "current": 89,
-    "min": 89,
-    "max": 89
+    "current": 90,
+    "min": 86,
+    "max": 94
   },
   "vitals": {
     "firstName": "Ben",
@@ -26,9 +26,9 @@
     "birthMonth": 9,
     "birthDay": 10,
     "birthYear": 1974,
-    "ageAtSetYear": 2002,
-    "jerseyNumber": 3,
-    "yearsPro": 16,
+    "ageAtSetYear": 1996,
+    "jerseyNumber": 30,
+    "yearsPro": 0,
     "dominantHand": "Right",
     "dominantDunkHand": "Right",
     "peakStartAge": 25,
@@ -45,7 +45,7 @@
     "playType2": "Post Up Low",
     "playType3": "None",
     "playType4": "None",
-    "currentTeam": 9882751792,
+    "currentTeam": 0,
     "hometownTeam1": 0,
     "hometownTeam2": 0,
     "draftYear": 1996,
@@ -77,117 +77,73 @@
     "overall": 90
   },
   "hotZones": {
-    "underBasket": "Hot",
-    "closeLeft": "Cold",
-    "closeMiddle": "Neutral",
-    "closeRight": "Cold",
-    "midLeft": "Neutral",
-    "midLeftCenter": "Neutral",
-    "midCenter": "Neutral",
-    "midRightCenter": "Neutral",
-    "midRight": "Neutral",
-    "threeLeft": "Neutral",
-    "threeLeftCenter": "Neutral",
-    "threeCenter": "Neutral",
-    "threeRightCenter": "Neutral",
-    "threeRight": "Neutral"
+    "underBasket": "Neutral",
+    "closeLeft": "Hot",
+    "closeMiddle": "Hot",
+    "closeRight": "Hot",
+    "midLeft": "Hot",
+    "midLeftCenter": "Hot",
+    "midCenter": "Cold",
+    "midRightCenter": "Cold",
+    "midRight": "Hot",
+    "threeLeft": "Cold",
+    "threeLeftCenter": "Hot",
+    "threeCenter": "Cold",
+    "threeRightCenter": "Cold",
+    "threeRight": "Hot"
   },
   "detailed": {
-    "Agility": 61,
+    "Agility": 78,
     "Ball Handle": 45,
-    "Block": 95,
-    "Close Shot": 71,
-    "Defensive Consistency": 99,
-    "Defensive Rebound": 86,
-    "Draw Foul": 74,
-    "Driving Dunk": 65,
-    "Free Throw": 44,
-    "Hands": 98,
-    "Help Defense IQ": 98,
-    "Hustle": 98,
-    "Intangibles": 50,
-    "Interior Defense": 98,
-    "Shot IQ": 98,
-    "Mid-Range Shot": 45,
-    "Offensive Consistency": 65,
-    "Offensive Rebound": 82,
+    "Block": 84,
+    "Close Shot": 72,
+    "Defensive Consistency": 80,
+    "Defensive Rebound": 81,
+    "Draw Foul": 47,
+    "Driving Dunk": 70,
+    "Free Throw": 45,
+    "Hands": 80,
+    "Help Defense IQ": 80,
+    "Hustle": 89,
+    "Intangibles": 40,
+    "Interior Defense": 80,
+    "Shot IQ": 70,
+    "Mid-Range Shot": 51,
+    "Offensive Consistency": 40,
+    "Offensive Rebound": 75,
     "Pass Accuracy": 54,
     "Pass IQ": 55,
-    "Pass Perception": 97,
-    "Pass Vision": 34,
-    "Perimeter Defense": 61,
-    "Post Control": 58,
+    "Pass Perception": 77,
+    "Pass Vision": 33,
+    "Perimeter Defense": 70,
+    "Post Control": 45,
     "Post Fade": 48,
-    "Post Hook": 60,
-    "Speed": 65,
-    "Speed with Ball": 30,
-    "Stamina": 91,
+    "Post Hook": 47,
+    "Speed": 79,
+    "Speed with Ball": 32,
+    "Stamina": 89,
     "Standing Dunk": 80,
-    "Steal": 77,
-    "Strength": 92,
+    "Steal": 59,
+    "Strength": 89,
     "Vertical": 85,
     "Layup": 55,
-    "Three-Point Shot": 25
+    "Three-Point Shot": 40
   },
   "badges": [
     {
-      "name": "Aerial Wizard",
-      "tier": "Gold"
-    },
-    {
-      "name": "Boxout Beast",
-      "tier": "HOF"
-    },
-    {
-      "name": "Brick Wall",
-      "tier": "Gold"
-    },
-    {
-      "name": "Challenger",
-      "tier": "HOF"
-    },
-    {
-      "name": "High-Flying Denier",
-      "tier": "HOF"
-    },
-    {
-      "name": "Paint Patroller",
-      "tier": "HOF"
-    },
-    {
-      "name": "Physical Finisher",
-      "tier": "Gold"
-    },
-    {
-      "name": "Pogo Stick",
-      "tier": "HOF"
-    },
-    {
       "name": "Post Lockdown",
-      "tier": "HOF"
-    },
-    {
-      "name": "Post Powerhouse",
-      "tier": "Gold"
-    },
-    {
-      "name": "Rebound Chaser",
-      "tier": "HOF"
-    },
-    {
-      "name": "Rise Up",
-      "tier": "Gold"
+      "tier": "Silver"
     }
   ],
   "tendencies": {
     "Alley-Oop": 65,
     "Alley-Oop Pass": 0,
-    "Attack Strong on Drive": 55,
+    "Attack Strong on Drive": 85,
     "Block Shot": 85,
     "Contested Jumper Mid-Range": 10,
     "Contested Jumper Three": 0,
     "Crash": 5,
-    "Dish to Open Man": 45,
+    "Dish to Open Man": 15,
     "Drive": 25,
     "Drive Pull-Up Mid-Range": 0,
     "Drive Pull-Up Three": 0,
@@ -217,7 +173,7 @@
     "Off-Screen Drive": 25,
     "Off-Screen Shot Mid-Range": 25,
     "Off-Screen Shot Three": 0,
-    "On-Ball Steal": 75,
+    "On-Ball Steal": 40,
     "Pass Interception": 65,
     "Play Discipline": 95,
     "Post Aggressive Backdown": 25,
