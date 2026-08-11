@@ -1445,7 +1445,7 @@ function RookieBuilder({
                     : !hasNextBatch
                       ? "本队球员已全部展示，暂时无法更换"
                       : switchesLeft <= 0
-                          ? "本轮更换次数已用完"
+                          ? "本次生成更换次数已用完"
                           : "仅更换当前球队的候选球员，不会重新抽取球队";
                   // Disabled buttons often skip hover tooltips; wrap so the hint still appears.
                   return (
