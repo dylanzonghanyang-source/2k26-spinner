@@ -149,7 +149,7 @@ function PositionPicker({ position, secondaryPosition, secondaryEnabled = true, 
   const secondaryLocked = disabled || !secondaryEnabled;
   return (
     <>
-      <div className="min-w-0">
+      <div className="min-w-0 sm:col-span-2">
         <div className="section-label mb-1">主位置</div>
         <div aria-label="主位置" className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
           {positions.map((option) => {
@@ -165,7 +165,7 @@ function PositionPicker({ position, secondaryPosition, secondaryEnabled = true, 
           })}
         </div>
       </div>
-      <div className="min-w-0 sm:col-span-2">
+      <div className="min-w-0 sm:col-start-2 sm:row-start-3">
         <div className="section-label mb-1 flex items-center gap-1.5">
           次要位置
           {onToggleSecondary && (
@@ -1407,7 +1407,7 @@ function RookieBuilder({
                   <button aria-label="随机生成英文姓" className="icon-button flex w-8 shrink-0 items-center justify-center border-l border-ink-200 text-ink-500 hover:bg-ink-100 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-300" disabled={settingsLocked} onClick={randomizeLastName} title="随机生成姓" type="button"><RefreshCw className="h-3.5 w-3.5" /></button>
                 </div>
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 sm:col-start-1 sm:row-start-3">
                 <div className="section-label mb-1">年龄</div>
                 <div className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200">
                   {ages.map((option) => (
