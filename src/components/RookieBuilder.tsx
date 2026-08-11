@@ -181,7 +181,9 @@ function PositionPicker({ position, secondaryPosition, secondaryEnabled = true, 
             const selected = secondaryPosition === option;
             const natural = !isPrimary && isNaturalSecondaryPosition(position, option);
             const stateClass = selected
-              ? natural ? "bg-court-700 text-white" : "bg-warning-600 text-white"
+              ? !secondaryEnabled
+                ? "bg-ink-100 text-ink-400"
+                : natural ? "bg-court-700 text-white" : "bg-warning-600 text-white"
               : secondaryLocked || isPrimary
                 ? "bg-ink-50 text-ink-300"
                 : natural
