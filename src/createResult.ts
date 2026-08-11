@@ -453,7 +453,7 @@ export type HotZoneState = "冷区" | "中性" | "热区";
 function createHotZones(
   attrs: Record<string, number>,
   position: Position,
-  secondary: Position,
+  secondary: Position | null,
   hand: "左手" | "右手",
   random: () => number,
 ) {
@@ -498,7 +498,7 @@ export function createResult(
   locks: LockState,
   age: number,
   position: Position,
-  secondary: Position,
+  secondary: Position | null,
   body: BuilderBody,
   players: Map<string, PlayerSource>,
   tendencyLookup: TendencyLookup | null,

@@ -137,13 +137,16 @@ function isNaturalSecondaryPosition(position: Position, secondary: Position) {
 type PositionPickerProps = {
   position: Position;
   secondaryPosition: Position;
+  secondaryEnabled?: boolean;
   disabled?: boolean;
   onChangePrimary: (next: Position) => void;
   onChangeSecondary: (next: Position) => void;
+  onToggleSecondary?: (enabled: boolean) => void;
 };
 
 /** 主/次位置选择器：随机模式主面板与自选模式设置弹窗共用。 */
-function PositionPicker({ position, secondaryPosition, disabled = false, onChangePrimary, onChangeSecondary }: PositionPickerProps) {
+function PositionPicker({ position, secondaryPosition, secondaryEnabled = true, disabled = false, onChangePrimary, onChangeSecondary, onToggleSecondary }: PositionPickerProps) {
+  const secondaryLocked = disabled || !secondaryEnabled;
   return (
     <>
       <div className="min-w-0">
@@ -165,7 +168,14 @@ function PositionPicker({ position, secondaryPosition, disabled = false, onChang
       <div className="min-w-0 sm:col-span-2">
         <div className="section-label mb-1 flex items-center gap-1.5">
           次要位置
+          {onToggleSecondary && (
+            <label className="ml-auto flex cursor-pointer items-center gap-1 text-[9px] font-normal text-ink-500">
+              <input checked={secondaryEnabled} className="h-3 w-3 accent-court-600" disabled={disabled} onChange={(event) => onToggleSecondary(event.target.checked)} type="checkbox" />
+              启用
+            </label>
+          )}
         </div>
+        {!secondaryEnabled && <div className="mb-1 text-[9px] text-ink-400">未启用次要位置，仅按主位置计算位置距离</div>}
         <div aria-label="次要位置" className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
           {positions.map((option) => {
             const isPrimary = option === position;
@@ -173,13 +183,13 @@ function PositionPicker({ position, secondaryPosition, disabled = false, onChang
             const natural = !isPrimary && isNaturalSecondaryPosition(position, option);
             const stateClass = selected
               ? natural ? "bg-court-700 text-white" : "bg-warning-600 text-white"
-              : disabled || isPrimary
+              : secondaryLocked || isPrimary
                 ? "bg-ink-50 text-ink-300"
                 : natural
                   ? "bg-white text-ink-600 hover:bg-court-50 hover:text-court-800"
                   : "bg-warning-50/70 text-warning-600 hover:bg-warning-100 hover:text-warning-800";
             return (
-              <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`segmented-button h-full min-w-0 flex-1 px-1 text-[11px] font-semibold disabled:cursor-not-allowed ${stateClass}`} disabled={disabled || isPrimary} onClick={() => onChangeSecondary(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规搭配" : "非常规搭配：仍会结合来源属性和体型计算"} type="button">{option}</button>
+              <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`segmented-button h-full min-w-0 flex-1 px-1 text-[11px] font-semibold disabled:cursor-not-allowed ${stateClass}`} disabled={secondaryLocked || isPrimary} onClick={() => onChangeSecondary(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规搭配" : "非常规搭配：仍会结合来源属性和体型计算"} type="button">{option}</button>
             );
           })}
         </div>
@@ -188,11 +198,12 @@ function PositionPicker({ position, secondaryPosition, disabled = false, onChang
   );
 }
 
-function blendedPositionWeight(position: Position, secondary: Position, bundleId: string) {
+function blendedPositionWeight(position: Position, secondary: Position | null, bundleId: string) {
+  if (!secondary) return positionWeights[position][bundleId];
   return positionWeights[position][bundleId] * (1 - secondaryPositionShare) + positionWeights[secondary][bundleId] * secondaryPositionShare;
 }
 
-function displayedPositionWeight(position: Position, secondary: Position, bundleId: string) {
+function displayedPositionWeight(position: Position, secondary: Position | null, bundleId: string) {
   return Math.round(blendedPositionWeight(position, secondary, bundleId));
 }
 
@@ -429,7 +440,7 @@ function createExportText(
   const sep = " ｜ ";
   const vitalLines = card ? [
     `名字: ${vs("firstName")}${sep}姓氏: ${vs("lastName")}${sep}昵称: ${vs("nickname")}`,
-    `位置: ${result.position}（次要: ${result.secondary}）${sep}球衣号码: ${vn("jerseyNumber")}`,
+    `位置: ${result.position}${result.secondary ? `（次要: ${result.secondary}）` : ""}${sep}球衣号码: ${vn("jerseyNumber")}`,
     `出生: ${vn("birthYear")}年${vn("birthMonth")}月${vn("birthDay")}日${sep}年龄: ${result.age}`,
     `惯用手: ${handCN(v("dominantHand"))}（扣篮: ${handCN(v("dominantDunkHand"))}）${sep}职业年限: ${vn("yearsPro")}`,
     `巅峰年龄: ${vn("peakStartAge")}-${vn("peakEndAge")}`,
@@ -440,7 +451,7 @@ function createExportText(
     `成长速度: 每年 +${result.progressSpeed} OVR`,
   ] : [
     `姓名: ${rookieName}`,
-    `年龄: ${result.age}${sep}位置: ${result.position}（次要: ${result.secondary}）`,
+    `年龄: ${result.age}${sep}位置: ${result.position}${result.secondary ? `（次要: ${result.secondary}）` : ""}`,
     `惯用手: ${result.hand}（扣篮: ${result.dunkHand}）`,
     `巅峰年龄: ${result.peakStart}-${result.peakEnd}`,
     `成长速度: 每年 +${result.progressSpeed} OVR`,
@@ -724,6 +735,8 @@ function RookieBuilder({
   const rookieName = `${firstName} ${lastName}`.trim();
   const [position, setPosition] = useState<Position>("PG");
   const [secondaryPosition, setSecondaryPosition] = useState<Position>(() => defaultSecondaryPosition("PG"));
+  const [secondaryEnabled, setSecondaryEnabled] = useState(true);
+  const effectiveSecondaryPosition = secondaryEnabled ? secondaryPosition : null;
   const [age, setAge] = useState(19);
 
   const [body, setBody] = useState<BodySettings>(() => createBodySettings("PG", Date.now()));
@@ -940,10 +953,10 @@ function RookieBuilder({
     }
     return evaluateAll(inputs, body, {
       targetPosition: position,
-      secondaryPosition: secondaryPosition,
+      secondaryPosition: effectiveSecondaryPosition,
       skipBody: skipBodyConstraints,
     });
-  }, [allSourcesById, body, locks, position, rookieCards, secondaryPosition, skipBodyConstraints]);
+  }, [allSourcesById, body, locks, position, rookieCards, effectiveSecondaryPosition, skipBodyConstraints]);
   const selectedEvaluations = useMemo(() => {
     if (!selectedPlayer) return {};
     const currentInputs: SlotInput[] = [];
@@ -970,12 +983,12 @@ function RookieBuilder({
           card: lookupRookieCard(rookieCards, selectedPlayer.name),
         },
         body,
-        { targetPosition: position, secondaryPosition, skipBody: skipBodyConstraints },
+        { targetPosition: position, secondaryPosition: effectiveSecondaryPosition, skipBody: skipBodyConstraints },
       );
       if (evaluation) preview[bundle.id] = evaluation;
     }
     return preview;
-  }, [allSourcesById, body, locks, position, rookieCards, secondaryPosition, selectedPlayer, skipBodyConstraints]);
+  }, [allSourcesById, body, locks, position, rookieCards, effectiveSecondaryPosition, selectedPlayer, skipBodyConstraints]);
   const bodyAdjustedAttributes = useMemo(() => new Set(
     bundles.flatMap((bundle) => {
       const evaluation = evaluations[bundle.id];
@@ -988,12 +1001,13 @@ function RookieBuilder({
     }),
   ), [evaluations]);
   const effectiveAge = age;
+  const positionLabel = secondaryEnabled ? `${position}/${secondaryPosition}` : position;
   const result = useMemo(
     () => createResult(
       locks,
       effectiveAge,
       position,
-      secondaryPosition,
+      effectiveSecondaryPosition,
       body,
       allSourcesById,
       tendencyLookup,
@@ -1001,7 +1015,7 @@ function RookieBuilder({
       rookieCards,
       { skipBody: skipBodyConstraints },
     ),
-[allSourcesById, body, effectiveAge, locks, overallVersion, position, secondaryPosition, rookieCards, skipBodyConstraints, tendencyLookup],
+[allSourcesById, body, effectiveAge, locks, overallVersion, position, effectiveSecondaryPosition, rookieCards, skipBodyConstraints, tendencyLookup],
   );
   const tendencyLoadState: TendencyLoadState = tendencyLookup?.available === false
     ? "unavailable"
@@ -1309,7 +1323,9 @@ function RookieBuilder({
                   <PositionPicker
                     onChangePrimary={changePosition}
                     onChangeSecondary={changeSecondaryPosition}
+                    onToggleSecondary={setSecondaryEnabled}
                     position={position}
+                    secondaryEnabled={secondaryEnabled}
                     secondaryPosition={secondaryPosition}
                   />
                 </div>
@@ -1399,7 +1415,9 @@ function RookieBuilder({
               <PositionPicker
                 onChangePrimary={changePosition}
                 onChangeSecondary={changeSecondaryPosition}
+                onToggleSecondary={setSecondaryEnabled}
                 position={position}
+                secondaryEnabled={secondaryEnabled}
                 secondaryPosition={secondaryPosition}
               />
             </div>
@@ -1471,7 +1489,7 @@ function RookieBuilder({
             </div>
             <div className="min-w-0 flex-1">
               <div className="mb-1.5 flex items-center justify-between gap-2 text-[9px] font-semibold text-ink-500">
-                <span className="truncate">{position}/{secondaryPosition} · {effectiveAge}岁</span>
+                <span className="truncate">{positionLabel} · {effectiveAge}岁</span>
                 <span className="shrink-0 tabular-nums text-ink-700">{completed}/{bundles.length}</span>
               </div>
               <div aria-valuemax={bundles.length} aria-valuemin={0} aria-valuenow={completed} className="builder-setup-progress-track" role="progressbar">
@@ -1494,7 +1512,7 @@ function RookieBuilder({
               const sourceLabel = lock?.kind === "custom" ? "手动设置" : lockedPlayer ? getPlayerNameCN(lockedPlayer.name) : (isManualSelection ? "点击选择" : (selectedPlayer ? "可锁定" : "等待选择"));
               const weightLabel = bundle.id === "potential"
                 ? "潜力独立取值，不计入位置权重"
-                : `位置综合权重：${displayedPositionWeight(position, secondaryPosition, bundle.id)}%`;
+                : `位置综合权重：${displayedPositionWeight(position, effectiveSecondaryPosition, bundle.id)}%`;
               const bodyAdjustmentLabel = bodyAdjustment ? `身体修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "";
               const capLabels = Object.entries(activeEvaluation?.bodyCaps ?? {})
                 .map(([attr, cap]) => `${attrNameCN[attr] ?? attr}上限 ${cap}`);
@@ -1655,7 +1673,7 @@ function RookieBuilder({
                 <div className="mt-1 truncate text-[15px] font-semibold text-ink-800" data-testid="rookie-name">{rookieName}</div>
                 <div className="mt-2 flex items-end justify-between">
                   <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">模型估算综评</div></div>
-                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">非官方推测值 · 模型 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
+                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{positionLabel} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">非官方推测值 · 模型 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
                 </div>
                 <div className="mt-2 rounded-[5px] border border-warning-500/20 bg-warning-500/10 px-2 py-1.5 text-[9px] leading-4 text-warning-700">综评由本工具按最终属性、徽章和无形属性估算，不是 2K 实机读取的真实官方综评。</div>
               </div>
@@ -1673,7 +1691,7 @@ function RookieBuilder({
               <div className="mt-1 max-w-full truncate text-[12px] font-semibold text-ink-700">{rookieName}</div>
               <div className="mt-1 text-[10px] leading-5 text-ink-400">已锁定属性：{completed}/{bundles.length}</div>
               <div aria-valuemax={bundles.length} aria-valuemin={0} aria-valuenow={completed} className="builder-result-progress-track" role="progressbar"><div className="builder-result-progress-fill" style={{ transform: `scaleX(${Math.max(0, Math.min(1, completed / bundles.length))})` }} /></div>
-              <div className="mt-3 text-[11px] font-medium text-court-700">{position}/{secondaryPosition} · {effectiveAge}岁</div>
+              <div className="mt-3 text-[11px] font-medium text-court-700">{positionLabel} · {effectiveAge}岁</div>
               <div className="mt-1 text-[9px] text-ink-400">{body.height} cm · {body.weight} kg · 臂展 {body.wingspan}</div>
             </div>
           )}
