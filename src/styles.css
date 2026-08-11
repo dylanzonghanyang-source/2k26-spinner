@@ -171,6 +171,35 @@ input:focus-visible {
   backdrop-filter: blur(18px) saturate(135%);
 }
 
+/* Mobile/tablet (<1024px): the 1fr auto 1fr grid collapses into a mess
+   (columns squeeze to ~30px and the right-side controls overlap the brand).
+   Switch to two rows: brand + controls on the first line, full-width mode
+   nav below with equally split buttons. */
+@media (max-width: 1023.98px) {
+  .app-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  .app-header > :first-child {
+    margin-right: auto;
+  }
+
+  .app-header > :last-child {
+    margin-left: auto;
+  }
+
+  .mode-nav {
+    order: 3;
+    width: 100%;
+  }
+
+  .mode-nav .mode-nav-button {
+    flex: 1 1 0%;
+  }
+}
+
 .brand-mark {
   display: flex;
   height: 34px;

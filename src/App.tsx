@@ -356,7 +356,7 @@ const App = () => {
           </nav>
 
           <div className="flex shrink-0 items-center justify-end gap-2 justify-self-end">
-            <span className="meta-chip">{appVersion} / {lastUpdated}</span>
+            <span className="meta-chip hidden sm:inline-flex">{appVersion} / {lastUpdated}</span>
             <div className="data-version-toggle" role="radiogroup" aria-label="数据版本">
               <button
                 aria-checked={dataVersion === "2k26"}
