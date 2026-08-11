@@ -78,6 +78,18 @@ function DatabasePanel() {
   const years = useMemo(() => yearsWithCards(cards), [cards]);
   const rows = useMemo(() => filterCards(cards, { year, query }), [cards, query, year]);
 
+  // 默认先选最新年份，避免首屏渲染全部 1190 行（390×844 实测 13k+ DOM 节点）
+  useEffect(() => {
+    if (year === null && years.length > 0) setYear(years[0]);
+  }, [year, years]);
+
+  // 分页：默认只渲染前 PAGE_SIZE 行，减少 DOM 节点数
+  const PAGE_SIZE = 60;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  useEffect(() => setVisibleCount(PAGE_SIZE), [query, year]);
+  const visibleRows = rows.slice(0, visibleCount);
+  const remaining = rows.length - visibleRows.length;
+
   const totalCards = cards?.size ?? 0;
 
   return (
@@ -140,7 +152,7 @@ function DatabasePanel() {
         {cards && rows.length === 0 && (
           <div className="flex min-h-[240px] items-center justify-center text-[11px] text-ink-400">没有匹配的球员</div>
         )}
-        {rows.map((card) => {
+        {visibleRows.map((card) => {
           const summary = summarizeCard(card);
           const position = positionCN(positionForCard(card, positionMap));
           const key = `${card.year}:${card.slug}`;
@@ -149,8 +161,7 @@ function DatabasePanel() {
             <div
               className={`overflow-hidden rounded-[5px] border transition ${expanded ? "border-court-500/40 bg-court-50/40" : "border-ink-200 bg-white"}`}
               key={key}
-            >
-              <button
+            >              <button
                 aria-expanded={expanded}
                 className="flex w-full items-center gap-2 px-2.5 py-2 text-left hover:bg-ink-50"
                 onClick={() => setExpandedKey(expanded ? null : key)}
@@ -174,6 +185,15 @@ function DatabasePanel() {
             </div>
           );
         })}
+        {remaining > 0 && (
+          <button
+            className="flex h-9 w-full items-center justify-center gap-1 rounded-[5px] border border-ink-200 bg-white text-[10px] font-semibold text-ink-500 hover:bg-ink-50"
+            onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+            type="button"
+          >
+            <ChevronDown className="h-3.5 w-3.5" />加载更多（剩余 {remaining} 名）
+          </button>
+        )}
       </div>
     </div>
   );

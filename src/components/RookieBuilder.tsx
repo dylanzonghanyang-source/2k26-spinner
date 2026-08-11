@@ -54,6 +54,7 @@ import { type BuilderBody as BodySettings } from "../rookieBodyConstraints";
 import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../fieldCategories";
 import { createExportText } from "../exportText";
 import { useModalBehavior } from "../useModalBehavior";
+import { clearDraft, loadDraft, saveDraft, type RookieDraft } from "../draftStore";
 
 export type RookieBuilderTeam = {
   id: string;
@@ -583,6 +584,10 @@ function RookieBuilder({
   const customDialogRef = useRef<HTMLElement | null>(null);
   const manualDialogRef = useRef<HTMLElement | null>(null);
   const [setupDialogOpen, setSetupDialogOpen] = useState(true);
+  // --- 草稿恢复（刷新/Safari 回收不丢流程） ---
+  const [availableDraft, setAvailableDraft] = useState<RookieDraft | null>(() => loadDraft());
+  const [draftRestored, setDraftRestored] = useState(false);
+  const [draftNotice, setDraftNotice] = useState<string | null>(null);
   // Mirrors the latest committed lock state so rapid successive commits
   // expand from the newest state instead of a stale render closure.
   const locksRef = useRef<LockState>({});
@@ -646,6 +651,91 @@ function RookieBuilder({
     manualDialogRef,
     () => setSetupDialogOpen(false),
   );
+
+  // --- 草稿自动保存（防抖）：流程中关键状态变化后写入 localStorage ---
+  useEffect(() => {
+    if (settingsLocked === false && Object.keys(locks).length === 0 && !manualSetupDone) return;
+    const timer = window.setTimeout(() => {
+      saveDraft({
+        version: 1,
+        savedAt: Date.now(),
+        firstName,
+        lastName,
+        position,
+        secondaryPosition: effectiveSecondaryPosition,
+        secondaryEnabled,
+        age,
+        body,
+        settingsLocked,
+        manualFinalize,
+        locks,
+        switchesLeft,
+        manualSetupDone,
+        skipBodyConstraints,
+        round: { teamId: round.teamId, offset: round.offset, playerOrder: round.playerOrder },
+        status,
+      });
+      setDraftNotice(null);
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [age, body, effectiveSecondaryPosition, firstName, lastName, locks, manualFinalize, manualSetupDone, position, round, secondaryEnabled, settingsLocked, skipBodyConstraints, status, switchesLeft]);
+
+  // 流程结束后清理草稿
+  useEffect(() => {
+    if (settingsLocked && Object.keys(locks).length === bundles.length && (manualFinalize || !isManualSelection)) {
+      clearDraft();
+    }
+  }, [isManualSelection, locks, manualFinalize, settingsLocked]);
+
+  // 活跃流程离页保护（浏览器原生确认，非阻塞式）
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (settingsLocked && Object.keys(locks).length < bundles.length) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [locks, settingsLocked]);
+
+  const restoreDraft = () => {
+    const draft = availableDraft;
+    if (!draft) return;
+    setFirstName(draft.firstName);
+    setLastName(draft.lastName);
+    setPosition(draft.position);
+    setSecondaryPosition(draft.secondaryPosition ?? defaultSecondaryPosition(draft.position));
+    setSecondaryEnabled(draft.secondaryEnabled);
+    setAge(draft.age);
+    setBody(draft.body);
+    setSettingsLocked(draft.settingsLocked);
+    setManualFinalize(draft.manualFinalize);
+    setLocks(draft.locks);
+    locksRef.current = draft.locks;
+    usedPlayerIdsRef.current = new Set(
+      Object.values(draft.locks)
+        .filter((lock): lock is { kind: "player"; playerId: string } => lock.kind === "player")
+        .map((lock) => lock.playerId),
+    );
+    setSwitchesLeft(draft.switchesLeft);
+    setManualSetupDone(draft.manualSetupDone);
+    setSetupDialogOpen(!draft.manualSetupDone);
+    setSkipBodyConstraints(draft.skipBodyConstraints);
+    if (draft.round && teams.some((team) => team.id === draft.round?.teamId)) {
+      setRound({ teamId: draft.round.teamId, offset: draft.round.offset, playerOrder: draft.round.playerOrder });
+    }
+    setStatus(draft.status || "已恢复草稿");
+    setDraftRestored(true);
+    setAvailableDraft(null);
+    setDraftNotice("已恢复上次未完成的生成流程");
+  };
+
+  const discardDraft = () => {
+    clearDraft();
+    setAvailableDraft(null);
+    setDraftNotice("草稿已清空");
+  };
 
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const playersById = useMemo(
@@ -1144,6 +1234,17 @@ function RookieBuilder({
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 rounded-[5px] border border-warning/25 bg-warning-soft px-3 py-2 text-[11px] font-medium text-warning" role="alert">
           <span>新秀卡数据加载失败（网络或资源问题）。请重新加载应用重试；若持续失败请稍后再试。</span>
           <button className="action-button px-2 py-1 text-[10px]" onClick={() => window.location.reload()} type="button"><RefreshCw className="h-3 w-3" />重新加载应用</button>
+        </div>
+      )}
+      {(availableDraft || draftNotice) && (
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 rounded-[5px] border border-court-500/30 bg-court-500/10 px-3 py-2 text-[11px] font-medium text-court-800" role="status">
+          <span>{draftNotice ?? "检测到未完成的新秀生成草稿，是否恢复？"}</span>
+          {availableDraft && !draftRestored && (
+            <div className="flex items-center gap-1.5">
+              <button className="action-button primary-action px-2 py-1 text-[10px]" onClick={restoreDraft} type="button"><RefreshCw className="h-3 w-3" />恢复草稿</button>
+              <button className="action-button px-2 py-1 text-[10px]" onClick={discardDraft} type="button">清空草稿</button>
+            </div>
+          )}
         </div>
       )}
       {isManualSelection && !manualSetupDone && setupDialogOpen && (
