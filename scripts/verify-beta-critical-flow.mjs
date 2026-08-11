@@ -64,7 +64,22 @@ async function main() {
   };
 
   const clickFirstPlayer = async () => {
-    await evalJs(`(() => { const b = document.querySelector(".interactive-card"); b?.click(); return !!b; })()`);
+    // 随机模式 16 轮抽队可能撞队：已用球员 disabled，必须点第一个可用球员；
+    // 若整队已用完（同队二次出现），用"换一批"换候选再试。
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const clicked = await evalJs(`(() => {
+        const cards = [...document.querySelectorAll(".interactive-card")];
+        const available = cards.find(b => !b.disabled && !b.textContent.includes("已选用"));
+        available?.click(); return !!available;
+      })()`);
+      if (clicked) break;
+      const switched = await evalJs(`(() => {
+        const b = [...document.querySelectorAll("button")].find(b => b.textContent.includes("换一批"));
+        b?.click(); return !!b;
+      })()`);
+      if (!switched) break;
+      await sleep(600);
+    }
     await sleep(400);
   };
 
