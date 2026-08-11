@@ -707,24 +707,6 @@ export function createResult(
     : generateRookieDurability(sourceDurability, bodyStress, random);
   Object.assign(initialAttrs, durabilityValues);
   const durability = durabilityValues["Overall Durability"] ?? 82;
-  const rookieOverallConstraint = constrainRookieInitialAttributes({
-    values: initialAttrs,
-    potential,
-    age,
-    adjustableAttributes: bundles
-      .filter((bundle) => bundle.id !== "potential")
-      .flatMap((bundle) => bundle.attrs),
-    lockedValues: { ...customFinalAttrs, ...cardLockedValues },
-    badges,
-    estimateOverall: (values, candidateBadges) => calibratedOverall(
-      values,
-      position,
-      candidateBadges,
-      mean,
-      initialOverallVersion,
-    ),
-  });
-  if (rookieOverallConstraint) Object.assign(initialAttrs, rookieOverallConstraint.values);
   // Build card identity: when EVERY non-potential slot is locked to the same
   // rookie card, keep that card as the result's source record. OVR still follows
   // the generated final attributes after body/position constraints; otherwise a
@@ -739,12 +721,40 @@ export function createResult(
   )
     ? firstCard
     : null;
-  const baseOverall = calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
-  const initialStrength = baseOverall;
-  // 综评补偿 (Intangibles): 优先继承潜力来源卡的真实值，其次同卡构建的卡值，最后默认 50。
-  const intangibles = potentialCard?.detailed?.["Intangibles"]
+  // 综评补偿 (Intangibles): 优先用户自定义硬锁，其次继承潜力来源卡的真实值，
+  // 再次同卡构建的卡值，最后默认 50。
+  // MUST be resolved and written BEFORE the OVR constraint: the constraint,
+  // baseOverall and the final OVR must all see the FINAL Intangibles value.
+  // Previously Intangibles was written after the constraint — 647/1190 cards
+  // disagreed with the final attributes (e.g. Mitch Richmond showed 77 while
+  // final attributes recompute to 80 with Intangibles 98).
+  const intangibles = customFinalAttrs["Intangibles"]
+    ?? potentialCard?.detailed?.["Intangibles"]
     ?? singleCard?.detailed?.["Intangibles"]
     ?? 50;
+  initialAttrs.Intangibles = intangibles;
+  const rookieOverallConstraint = constrainRookieInitialAttributes({
+    values: initialAttrs,
+    potential,
+    age,
+    adjustableAttributes: bundles
+      .filter((bundle) => bundle.id !== "potential")
+      .flatMap((bundle) => bundle.attrs),
+    lockedValues: { ...customFinalAttrs, ...cardLockedValues, Intangibles: intangibles },
+    badges,
+    estimateOverall: (values, candidateBadges) => calibratedOverall(
+      values,
+      position,
+      candidateBadges,
+      mean,
+      initialOverallVersion,
+    ),
+  });
+  if (rookieOverallConstraint) Object.assign(initialAttrs, rookieOverallConstraint.values);
+  // Final OVR: recomputed AFTER all final attributes (including Intangibles)
+  // are in place, so the reported OVR always matches the exported attributes.
+  const baseOverall = calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
+  const initialStrength = baseOverall;
   // 惯用手: 继承运动槽来源卡的真实值；扣篮惯用手: 继承扣篮槽来源卡的真实值。
   // vitals 存 "Left"/"Right"，无卡或值无效时回退原有随机逻辑。
   const handFromVital = cardByBundle.get("athletic")?.vitals?.dominantHand;
@@ -790,7 +800,6 @@ export function createResult(
   const normal = hasVitalProbabilities
     ? vitalAverage
     : 100 - boom - bust;
-  initialAttrs.Intangibles = intangibles;
   initialAttrs.Potential = potential;
   const hotZones = createHotZones(initialAttrs, position, secondary, hand, random);
   return {
@@ -800,6 +809,8 @@ export function createResult(
     peakOverall: sourcePeakOverall,
     peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges,
     potentialMin, potentialMax,
+    /** OVR 模型 fallback mean（复现 initialStrength/baseOverall 所需）。 */
+    overallMean: mean,
     card: singleCard,
     initialOverallTarget: rookieOverallConstraint?.targetOverall ?? initialStrength,
     initialOverallConstraintApplied: rookieOverallConstraint?.changed ?? false,
