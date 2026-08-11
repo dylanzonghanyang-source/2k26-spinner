@@ -1193,6 +1193,15 @@ function RookieBuilder({
     finishLock(bundle.id, { kind: "player", playerId: playerId(selectedPlayer) });
   };
 
+  const unlockBundle = (bundleId: string) => {
+    if (!isManualSelection || !locks[bundleId]) return;
+    const nextLocks = { ...locksRef.current };
+    delete nextLocks[bundleId];
+    locksRef.current = nextLocks;
+    setLocks(nextLocks);
+    setStatus("已解锁，可重新为该槽位选择球员");
+  };
+
   const openSlotPicker = (bundle: Bundle) => {
     if (!settingsLocked || isTeamDrawing || locks[bundle.id]) return;
     setPickerBundleId(bundle.id);
@@ -1566,7 +1575,18 @@ function RookieBuilder({
                       <Pencil className="h-3 w-3" />
                     </button>
                   )}
-                  {lock && <Check className="absolute right-1 top-1 h-2.5 w-2.5 text-court-600" />}
+                  {lock && <Check className="absolute left-1 top-1 h-2.5 w-2.5 text-court-600" />}
+                  {lock && isManualSelection && (
+                    <button
+                      aria-label={`解锁${bundle.label}`}
+                      className="absolute right-1 top-1 z-10 flex h-5 w-5 items-center justify-center rounded-[4px] text-ink-400 transition hover:bg-ink-200 hover:text-ink-800"
+                      onClick={() => unlockBundle(bundle.id)}
+                      title={`解锁${bundle.label}，重新选择球员`}
+                      type="button"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
                 </div>
               );
             })}

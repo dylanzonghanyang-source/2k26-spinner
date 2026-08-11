@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronRight, Users, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Users, X } from "lucide-react";
 import type { Bundle } from "../createResult";
 import type { RookieCard, RookieCardLookup } from "../rookieCards";
 import { cardsByYear, slotAttrsForCard, slotValueForCard, yearsInLookup } from "../rookieCardBrowser";
@@ -21,11 +21,20 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
   const [year, setYear] = useState<number | null>(years[0] ?? null);
   const [query, setQuery] = useState("");
   const [positionFilter, setPositionFilter] = useState<string>("ALL");
+  // 手机端（<768px）两步流程：先选选秀届，再选球员，可返回
+  const [mobileStep, setMobileStep] = useState<"years" | "players">("years");
 
   // 数据加载完成后默认选中最新年份
   useEffect(() => {
     if (year === null && years.length > 0) setYear(years[0]);
   }, [year, years]);
+
+  const isMobileView = typeof window !== "undefined" && window.matchMedia("(max-width: 767.98px)").matches;
+
+  const selectYear = (next: number) => {
+    setYear(next);
+    if (isMobileView) setMobileStep("players");
+  };
 
   const yearCards = useMemo(
     () => (year !== null ? cardsByYear(rookieCards, year) : []),
@@ -52,7 +61,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
       <section
         aria-label={`为${bundle.label}槽位选择球员`}
         aria-modal="true"
-        className="dialog-surface flex w-full max-w-[560px] h-[min(82vh,860px)] flex-col overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl"
+        className="dialog-surface flex w-full max-w-[640px] h-[min(82vh,860px)] flex-col overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl"
         role="dialog"
       >
         <div className="workspace-toolbar flex items-center justify-between gap-3 px-3 py-2.5">
@@ -91,80 +100,105 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
 
         {tab === "rookie" && (
           <>
-            <div className="flex max-h-[28vh] flex-wrap gap-1.5 overflow-y-auto border-b border-ink-200 px-3 py-2" style={{ WebkitOverflowScrolling: "touch" }}>
-              {years.map((option) => (
-                <button
-                  aria-pressed={year === option}
-                  className={`h-6 rounded-full px-2.5 text-[10px] font-semibold ${year === option ? "bg-court-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"}`}
-                  key={option}
-                  onClick={() => setYear(option)}
-                  type="button"
-                >{option}</button>
-              ))}
-            </div>
-            <div className="flex items-center gap-1.5 border-b border-ink-200 px-3 py-2">
-              <span className="shrink-0 text-[9px] font-semibold text-ink-400">位置</span>
-              {(["ALL", "PG", "SG", "SF", "PF", "C"] as const).map((pos) => (
-                <button
-                  aria-pressed={positionFilter === pos}
-                  className={`h-6 rounded-full px-2.5 text-[10px] font-semibold ${positionFilter === pos ? "bg-court-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"}`}
-                  key={pos}
-                  onClick={() => setPositionFilter(pos)}
-                  type="button"
-                >{pos === "ALL" ? "全部" : pos}</button>
-              ))}
-            </div>
-            <div className="flex items-center gap-2 border-b border-ink-200 px-3 py-2">
-              <input
-                aria-label="筛选新秀"
-                className="h-7 w-full rounded-[5px] border border-ink-200 bg-ink-50 px-2 text-[11px] text-ink-800 outline-none focus:border-court-500 focus:bg-white"
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={`筛选 ${year ?? "--"} 届新秀（中英文名）`}
-                type="search"
-                value={query}
-              />
-            </div>
-            <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-3" style={{ WebkitOverflowScrolling: "touch" }}>
-              {filteredCards.length === 0 && (
-                <div className="py-8 text-center text-[11px] text-ink-400">
-                  {year === null ? "暂无新秀卡数据" : `${year} 届没有匹配的新秀`}
+            <div className="flex min-h-0 flex-1">
+              {/* 选秀届列：桌面常驻左栏；手机端为第一步（选完进入球员列表可返回） */}
+              <div className={`min-h-0 flex-col overflow-hidden border-ink-200 md:flex md:w-[190px] md:shrink-0 md:border-r ${mobileStep === "years" ? "flex flex-1" : "hidden"}`}>
+                <div className="px-3 pb-1 pt-2.5 text-[9px] font-semibold text-ink-400">选秀届</div>
+                <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2 md:px-2.5" style={{ WebkitOverflowScrolling: "touch" }}>
+                  {years.map((option) => (
+                    <button
+                      aria-pressed={year === option}
+                      className={`mb-1 flex h-8 w-full items-center justify-between rounded-[5px] px-2.5 text-[11px] font-semibold ${year === option ? "bg-court-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"}`}
+                      key={option}
+                      onClick={() => selectYear(option)}
+                      type="button"
+                    >
+                      <span>{option}</span>
+                      <span className="text-[8px] font-medium opacity-70">届</span>
+                    </button>
+                  ))}
                 </div>
-              )}
-              {filteredCards.map((card) => {
-                const slotValue = slotValueForCard(card, bundle);
-                const attrs = slotAttrsForCard(card, bundle);
-                return (
-                  <button
-                    className="interactive-card flex w-full items-center gap-2 rounded-[5px] border border-ink-200 bg-white px-2.5 py-2 text-left hover:border-ink-400 hover:bg-ink-50"
-                    key={card.slug}
-                    onClick={() => onPick(card)}
-                    type="button"
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-baseline gap-1.5">
-                        <span className="truncate text-[11px] font-semibold text-ink-800">{card.name}</span>
-                        <span className="truncate text-[9px] text-ink-400">{getPlayerNameCN(card.name)}</span>
-                      </span>
-                      <span className="mt-0.5 block truncate text-[9px] text-ink-400">
-                        {attrs.map(({ attr, value }) => `${attr}: ${value ?? "--"}`).join(" · ")}
-                      </span>
-                    </span>
-                    <span className="flex shrink-0 items-center gap-2.5">
-                      {slotValue !== null && (
-                        <span className="flex items-baseline gap-1">
-                          <span className="text-[8px] font-medium text-ink-400">属性</span>
-                          <span className={`text-[13px] font-bold tabular-nums ${valueColor(slotValue)}`}>{slotValue}</span>
+              </div>
+
+              {/* 球员区：桌面常驻右栏；手机端为第二步 */}
+              <div className={`min-h-0 flex-1 flex-col ${mobileStep === "players" ? "flex" : "hidden md:flex"}`}>
+                {/* 手机端返回入口 */}
+                {mobileStep === "players" && (
+                  <div className="flex items-center gap-2 border-b border-ink-200 px-3 py-2 md:hidden">
+                    <button
+                      aria-label="返回选择选秀届"
+                      className="flex h-7 items-center gap-1 rounded-[5px] border border-ink-200 bg-ink-50 px-2 text-[10px] font-semibold text-ink-600 hover:bg-ink-100"
+                      onClick={() => setMobileStep("years")}
+                      type="button"
+                    ><ArrowLeft className="h-3.5 w-3.5" />选秀届</button>
+                    <span className="truncate text-[11px] font-semibold text-ink-700">{year ?? "--"} 届新秀</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1.5 border-b border-ink-200 px-3 py-2">
+                  <span className="shrink-0 text-[9px] font-semibold text-ink-400">位置</span>
+                  {(["ALL", "PG", "SG", "SF", "PF", "C"] as const).map((pos) => (
+                    <button
+                      aria-pressed={positionFilter === pos}
+                      className={`h-6 rounded-full px-2.5 text-[10px] font-semibold ${positionFilter === pos ? "bg-court-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"}`}
+                      key={pos}
+                      onClick={() => setPositionFilter(pos)}
+                      type="button"
+                    >{pos === "ALL" ? "全部" : pos}</button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 border-b border-ink-200 px-3 py-2">
+                  <input
+                    aria-label="筛选新秀"
+                    className="h-7 w-full rounded-[5px] border border-ink-200 bg-ink-50 px-2 text-[11px] text-ink-800 outline-none focus:border-court-500 focus:bg-white"
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder={`筛选 ${year ?? "--"} 届新秀（中英文名）`}
+                    type="search"
+                    value={query}
+                  />
+                </div>
+                <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-3" style={{ WebkitOverflowScrolling: "touch" }}>
+                  {filteredCards.length === 0 && (
+                    <div className="py-8 text-center text-[11px] text-ink-400">
+                      {year === null ? "暂无新秀卡数据" : `${year} 届没有匹配的新秀`}
+                    </div>
+                  )}
+                  {filteredCards.map((card) => {
+                    const slotValue = slotValueForCard(card, bundle);
+                    const attrs = slotAttrsForCard(card, bundle);
+                    return (
+                      <button
+                        className="interactive-card flex w-full items-center gap-2 rounded-[5px] border border-ink-200 bg-white px-2.5 py-2 text-left hover:border-ink-400 hover:bg-ink-50"
+                        key={card.slug}
+                        onClick={() => onPick(card)}
+                        type="button"
+                      >
+                        <span className="min-w-0 flex-1">
+                          <span className="flex items-baseline gap-1.5">
+                            <span className="truncate text-[11px] font-semibold text-ink-800">{card.name}</span>
+                            <span className="truncate text-[9px] text-ink-400">{getPlayerNameCN(card.name)}</span>
+                          </span>
+                          <span className="mt-0.5 block truncate text-[9px] text-ink-400">
+                            {attrs.map(({ attr, value }) => `${attr}: ${value ?? "--"}`).join(" · ")}
+                          </span>
                         </span>
-                      )}
-                      <span className="flex items-baseline gap-1">
-                        <span className="text-[8px] font-medium text-ink-400">综评</span>
-                        <span className={`text-[15px] font-bold tabular-nums ${card.overall != null ? valueColor(card.overall) : "text-ink-400"}`}>{card.overall ?? "--"}</span>
-                      </span>
-                      <ChevronRight aria-hidden="true" className="h-3.5 w-3.5 text-ink-300" />
-                    </span>
-                  </button>
-                );
-              })}
+                        <span className="flex shrink-0 items-center gap-2.5">
+                          {slotValue !== null && (
+                            <span className="flex items-baseline gap-1">
+                              <span className="text-[8px] font-medium text-ink-400">属性</span>
+                              <span className={`text-[13px] font-bold tabular-nums ${valueColor(slotValue)}`}>{slotValue}</span>
+                            </span>
+                          )}
+                          <span className="flex items-baseline gap-1">
+                            <span className="text-[8px] font-medium text-ink-400">综评</span>
+                            <span className={`text-[15px] font-bold tabular-nums ${card.overall != null ? valueColor(card.overall) : "text-ink-400"}`}>{card.overall ?? "--"}</span>
+                          </span>
+                          <ChevronRight aria-hidden="true" className="h-3.5 w-3.5 text-ink-300" />
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
             <div className="flex items-center justify-between border-t border-ink-200 bg-ink-50 px-3 py-2.5">
               <span className="flex items-center gap-1 text-[10px] text-ink-500"><Users className="h-3 w-3" />{filteredCards.length} 名新秀</span>
