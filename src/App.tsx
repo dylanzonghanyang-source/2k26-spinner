@@ -415,6 +415,11 @@ const App = () => {
           />
         )}
 
+        <footer className="mt-auto px-1 pb-1 pt-3 text-center text-[9px] leading-4 text-ink-400">
+          本工具为球迷自制项目，与 NBA、NBPA、2K Games 及其母公司 Take-Two Interactive 等官方机构无任何关联，球员数据仅供参考，不用于商业用途。
+          {" "}发现问题或有建议，欢迎邮件反馈：<a className="text-court-700 underline decoration-court-300 underline-offset-2 hover:text-court-800" href="mailto:dylanzhy2025@gmail.com">dylanzhy2025@gmail.com</a>
+        </footer>
+
       </div>
 
     </main>
