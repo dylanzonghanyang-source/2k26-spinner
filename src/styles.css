@@ -394,6 +394,19 @@ input:focus-visible {
   gap: 10px;
 }
 
+/* Manual (自选) mode: only the attribute slots matter — collapse the
+   workspace to a single column (no player cards next to the slots);
+   the result pane stacks below once generation is finalized. */
+.builder-workspace[data-manual="true"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.builder-workspace[data-manual="true"] .builder-attributes-pane,
+.builder-workspace[data-manual="true"] .builder-result-pane,
+.builder-workspace[data-manual="true"] .builder-full-preview {
+  grid-column: 1;
+}
+
 /* Mobile/tablet (<1024px): two-column workspace — attribute slots left,
    team & player selection right (layout reference: activity-style builder).
    Each pane scrolls independently (left locked attributes vs right player

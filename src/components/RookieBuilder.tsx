@@ -742,6 +742,7 @@ function RookieBuilder({
 
   const [body, setBody] = useState<BodySettings>(() => createBodySettings("PG", Date.now()));
   const [settingsLocked, setSettingsLocked] = useState(false);
+  const [manualFinalize, setManualFinalize] = useState(false);
   const [tendencyLookup, setTendencyLookup] = useState<TendencyLookup | null>(null);
   const [tendencyLoadError, setTendencyLoadError] = useState(false);
   const [rookieCards, setRookieCards] = useState<RookieCardLookup | null>(null);
@@ -1029,7 +1030,7 @@ function RookieBuilder({
           : "idle";
   const tendencyCount = Object.keys(result.tendencies).length;
   const completed = Object.keys(locks).length;
-  const isComplete = completed === bundles.length;
+  const isComplete = completed === bundles.length && (!isManualSelection || manualFinalize);
   const exportReady = isComplete && tendencyLoadState !== "loading";
   const shownIds = round.playerOrder.slice(round.offset, round.offset + playersPerRound);
   const shownPlayers = settingsLocked
@@ -1366,6 +1367,7 @@ function RookieBuilder({
         data-mobile-active={!settingsLocked}
         id="builder-pane-settings"
         role="tabpanel"
+        style={(isManualSelection && settingsLocked) ? { display: "none" } : undefined}
       >
         <div className="builder-setup-grid">
           <section aria-labelledby="player-identity-label" className="builder-setup-identity bg-white px-3 py-3">
@@ -1471,7 +1473,7 @@ function RookieBuilder({
         </div>
       </div>
 
-      <div className="builder-workspace">
+      <div className="builder-workspace" data-manual={isManualSelection}>
         <aside
           aria-label="属性槽"
           className="builder-pane builder-attributes-pane panel-surface min-w-0 overflow-hidden"
@@ -1481,7 +1483,12 @@ function RookieBuilder({
         >
           <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">
             <span className="section-label">属性槽</span>
-            <span className="max-w-[130px] truncate text-[9px] font-medium text-ink-500">{selectedPlayer ? getPlayerNameCN(selectedPlayer.name) : "尚未选择球员"}</span>
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="max-w-[130px] truncate text-[9px] font-medium text-ink-500">{selectedPlayer ? getPlayerNameCN(selectedPlayer.name) : "尚未选择球员"}</span>
+              {isManualSelection && settingsLocked && !isComplete && (
+                <button className="action-button primary-action px-2.5 py-1.5 text-[10px]" disabled={completed < bundles.length} onClick={() => setManualFinalize(true)} title={completed < bundles.length ? `还需锁定 ${bundles.length - completed} 个槽位` : "锁定全部槽位后生成结果"} type="button"><Check className="h-3 w-3" />完成选择</button>
+              )}
+            </div>
           </div>
           <div className="builder-mobile-summary mb-2 flex items-center gap-3 rounded-[5px] border border-ink-200 bg-ink-50/70 px-2.5 py-2 lg:hidden">
             <div className="flex shrink-0 flex-col items-center">
@@ -1573,6 +1580,7 @@ function RookieBuilder({
           data-mobile-active={settingsLocked && !isComplete}
           id="builder-pane-players"
           role="tabpanel"
+          style={isManualSelection ? { display: "none" } : undefined}
         >
           <div className="workspace-toolbar flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
             <div>
@@ -1666,6 +1674,7 @@ function RookieBuilder({
           data-mobile-active={isComplete}
           id="builder-pane-result"
           role="tabpanel"
+          style={(isManualSelection && !isComplete) ? { display: "none" } : undefined}
         >
           {isComplete ? (
             <div className="builder-result-reveal">
