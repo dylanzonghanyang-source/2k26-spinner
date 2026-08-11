@@ -1305,7 +1305,7 @@ function RookieBuilder({
             <div className="space-y-3 border-t border-ink-200 p-3">
               <div>
                 <div className="mb-1.5 text-[10px] font-semibold text-ink-700">位置（影响位置交叉惩罚）</div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-2">
                   <PositionPicker
                     onChangePrimary={changePosition}
                     onChangeSecondary={changeSecondaryPosition}
@@ -1313,15 +1313,15 @@ function RookieBuilder({
                     secondaryPosition={secondaryPosition}
                   />
                 </div>
-                {skipBodyConstraints && <div className="mt-1.5 text-[9px] text-ink-400">已关闭降级算法，位置交叉惩罚不参与计算</div>}
+                {skipBodyConstraints && <div className="mt-1.5 text-[9px] text-ink-400">已关闭降级算法，位置仍可选择，仅不参与交叉惩罚计算</div>}
               </div>
               <div>
                 <div className="mb-1.5 text-[10px] font-semibold text-ink-700">身体设定（影响降级算法）</div>
                 <div className="grid grid-cols-2 gap-2">
-                  <BodyNumberInput disabled={skipBodyConstraints} label="身高" max={300} min={150} onChange={(value) => updateBody("height", value)} unit="cm" value={body.height} />
-                  <BodyNumberInput disabled={skipBodyConstraints} label="体重" max={200} min={50} onChange={(value) => updateBody("weight", value)} unit="kg" value={body.weight} />
+                  <BodyNumberInput disabled={false} label="身高" max={300} min={150} onChange={(value) => updateBody("height", value)} unit="cm" value={body.height} />
+                  <BodyNumberInput disabled={false} label="体重" max={200} min={50} onChange={(value) => updateBody("weight", value)} unit="kg" value={body.weight} />
                 </div>
-                {skipBodyConstraints && <div className="mt-1.5 text-[9px] text-ink-400">已关闭降级算法，身高体重不参与计算</div>}
+                {skipBodyConstraints && <div className="mt-1.5 text-[9px] text-ink-400">已关闭降级算法，身高体重仍可填写并显示在结果中，仅不参与属性计算</div>}
               </div>
               <label className="flex cursor-pointer items-start gap-2 rounded-[5px] border border-ink-200 bg-ink-50 p-2.5">
                 <input
@@ -1332,7 +1332,7 @@ function RookieBuilder({
                 />
                 <span className="min-w-0">
                   <span className="block text-[11px] font-semibold text-ink-800">关闭降级算法</span>
-                  <span className="mt-0.5 block text-[9px] leading-4 text-ink-400">不套用身高体重差异与位置交叉惩罚，新秀属性原值继承（关闭后无需填写身高体重）</span>
+                  <span className="mt-0.5 block text-[9px] leading-4 text-ink-400">不套用身高体重差异与位置交叉惩罚，新秀属性原值继承（位置与身体数据仍可填写，仅不参与计算）</span>
                 </span>
               </label>
             </div>
