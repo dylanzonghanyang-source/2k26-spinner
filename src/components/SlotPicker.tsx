@@ -101,7 +101,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
 
         {tab === "rookie" && (
           <>
-            <div className="flex min-h-0 flex-1">
+            <div className="flex min-h-0 min-w-0 flex-1">
               {/* 选秀届列：桌面常驻左栏；手机端为第一步（选完进入球员列表可返回） */}
               <div className={`min-h-0 flex-col overflow-hidden border-ink-200 md:flex md:w-[190px] md:shrink-0 md:border-r ${mobileStep === "years" ? "flex flex-1" : "hidden"}`}>
                 <div className="px-3 pb-1 pt-2.5 text-[9px] font-semibold text-ink-400">选秀届</div>
@@ -119,7 +119,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
               </div>
 
               {/* 球员区：桌面常驻右栏；手机端为第二步 */}
-              <div className={`min-h-0 flex-1 flex-col ${mobileStep === "players" ? "flex" : "hidden md:flex"}`}>
+              <div className={`min-h-0 min-w-0 flex-1 flex-col ${mobileStep === "players" ? "flex" : "hidden md:flex"}`}>
                 {/* 手机端返回入口 */}
                 {mobileStep === "players" && (
                   <div className="flex items-center gap-2 border-b border-ink-200 px-3 py-2 md:hidden">
