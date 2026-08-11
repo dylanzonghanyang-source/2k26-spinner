@@ -169,13 +169,12 @@ function PositionPicker({ position, secondaryPosition, secondaryEnabled = true, 
         <div className="section-label mb-1 flex items-center gap-1.5">
           次要位置
           {onToggleSecondary && (
-            <label className="ml-auto flex cursor-pointer items-center gap-1 text-[9px] font-normal text-ink-500">
+            <label className="flex cursor-pointer items-center gap-1 text-[9px] font-normal text-ink-500">
               <input checked={secondaryEnabled} className="h-3 w-3 accent-court-600" disabled={disabled} onChange={(event) => onToggleSecondary(event.target.checked)} type="checkbox" />
               启用
             </label>
           )}
         </div>
-        {!secondaryEnabled && <div className="mb-1 text-[9px] text-ink-400">未启用次要位置，仅按主位置计算位置距离</div>}
         <div aria-label="次要位置" className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
           {positions.map((option) => {
             const isPrimary = option === position;
