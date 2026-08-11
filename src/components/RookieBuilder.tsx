@@ -1308,7 +1308,7 @@ function RookieBuilder({
   const pickerBundle = bundles.find((bundle) => bundle.id === pickerBundleId);
 
   return (
-    <section className="flex min-h-0 flex-col gap-2.5">
+    <section className="flex min-h-0 flex-1 flex-col gap-2.5">
       {isManualSelection && !manualSetupDone && (
         <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
           <section aria-label="自选生成设置" aria-modal="true" className="dialog-surface w-full max-w-[460px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" role="dialog">
@@ -1361,12 +1361,13 @@ function RookieBuilder({
       )}
       <div
         aria-labelledby="builder-step-settings"
-        className="builder-setup panel-surface overflow-hidden"
+        className="builder-setup panel-surface flex min-h-0 flex-col overflow-hidden lg:flex-1"
         data-mobile-active={!settingsLocked}
         id="builder-pane-settings"
         role="tabpanel"
+        style={settingsLocked ? { display: "none" } : undefined}
       >
-        <div className="builder-setup-grid">
+        <div className="builder-setup-grid flex-1">
           <section aria-labelledby="player-identity-label" className="builder-setup-identity bg-white px-3 py-3">
             <div className="section-label mb-2" id="player-identity-label">球员信息</div>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -1470,7 +1471,7 @@ function RookieBuilder({
         </div>
       </div>
 
-      <div className="builder-workspace">
+      <div className="builder-workspace" data-active={settingsLocked}>
         <aside
           aria-label="属性槽"
           className="builder-pane builder-attributes-pane panel-surface min-w-0 overflow-hidden"
