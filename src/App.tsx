@@ -135,8 +135,8 @@ type VersionData = {
 // 2K27 badge/player data is lazy-loaded only when the user switches to 2K27,
 // keeping ~615 KB of chunks out of the initial page load.
 const versionData2k26: VersionData = {
-  label: "NBA 2K26 数据 · 最新阵容",
-  rosterCatalog: rosterCatalog2k27 as RosterCatalogData,
+  label: "NBA 2K26 数据",
+  rosterCatalog: rosterCatalog2k26 as RosterCatalogData,
   badgeProfiles: badgeProfiles2k26 as BadgeProfileMap,
   detailedPlayers: detailedPlayers2k26 as DetailedPlayerRecord[],
   tendenciesAvailable: true,

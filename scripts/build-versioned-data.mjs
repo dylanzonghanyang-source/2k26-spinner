@@ -96,12 +96,14 @@ console.log(JSON.stringify({
 
 function buildCurrentRoster(rows, meta) {
   const byTeam = new Map();
+  const anomalies = [];
   for (const row of rows) {
     const teamName = typeof row.team === "string" && row.team.trim() ? row.team.trim() : "Free Agency";
     if (!byTeam.has(teamName)) byTeam.set(teamName, []);
+    const height = applyHeightFixes(row, anomalies);
     byTeam.get(teamName).push({
       drivingDunk: numberOrNull(row.attributes?.drivingDunk),
-      height: row.height ?? null,
+      height,
       id: row.slug,
       name: row.name,
       overall: numberOrNull(row.overall),
@@ -125,7 +127,56 @@ function buildCurrentRoster(rows, meta) {
     source: meta.source,
     generatedAt: latestDate(rows.map((row) => row.lastUpdated ?? row.createdAt)),
     teams,
+    heightAnomalies: anomalies,
   };
+}
+
+/**
+ * Height sanity rules for roster snapshots.
+ *
+ * Known issue (2026-08 audit): some rows in third-party 2K snapshots carry the
+ * player's WINGSPAN in the HEIGHT field (height === wingspan, far above the
+ * position's realistic range). Cross-version consistency (2K26 vs 2K27) is
+ * used to decide: when both versions agree, treat the value as the game's
+ * data and do NOT override it with NBA official measurements; when they
+ * conflict AND the value is outside a plausible range, apply the explicit
+ * fix table below (values sourced from the matching 2K27 snapshot).
+ */
+const HEIGHT_FIXES = new Map([
+  // slug -> inches, from the 2K27 snapshot (same series data)
+  ["mark-williams", { inches: 85, note: "2K26 had wingspan 7'7\" in height; 2K27 says 7'1\"" }],
+  ["christian-koloko", { inches: 83, note: "2K26 had wingspan 7'5\" in height; 2K27 says 6'11\"" }],
+  ["danny-wolf", { inches: 83, note: "2K26 had 7'2\"; 2K27 says 6'11\"" }],
+]);
+
+const POSITION_HEIGHT_MAX = { PG: 79, SG: 81, SF: 83, PF: 85, C: 88 };
+
+function parseHeightInches(value) {
+  if (typeof value !== "string") return null;
+  const match = value.trim().match(/^(\d+)'(\d+)"$/);
+  return match ? Number(match[1]) * 12 + Number(match[2]) : null;
+}
+
+function formatHeightInches(inches) {
+  return `${Math.floor(inches / 12)}'${inches % 12}\"`;
+}
+
+function applyHeightFixes(row, anomalies) {
+  const rawHeight = row.height ?? null;
+  const fix = HEIGHT_FIXES.get(row.slug);
+  if (fix) {
+    anomalies.push(`height fix applied: ${row.slug} ${rawHeight} -> ${formatHeightInches(fix.inches)} (${fix.note})`);
+    return formatHeightInches(fix.inches);
+  }
+  const inches = parseHeightInches(rawHeight);
+  if (inches == null) return rawHeight;
+  const primary = (row.positions ?? [])[0] ?? "";
+  const max = POSITION_HEIGHT_MAX[primary];
+  const wingspan = parseHeightInches(row.wingspan);
+  if (max && inches > max && wingspan != null && inches === wingspan) {
+    anomalies.push(`suspicious height==wingspan: ${row.slug} ${rawHeight} position=${primary} (needs human review)`);
+  }
+  return rawHeight;
 }
 
 function normalizePlayer(row) {
