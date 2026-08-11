@@ -1081,7 +1081,12 @@ function RookieBuilder({
     setSkipBodyConstraints(false);
     setPickerBundleId(null);
     setCardSources(new Map());
-    setStatus(`确认${"新秀"}设置后开始生成`);
+    // 完整恢复默认状态（公测审计：进入流程后这些状态可能残留）
+    setSecondaryEnabled(true);
+    setManualFinalize(false);
+    setTendencyLoadError(false);
+    setRookieCardLoadError(false);
+    setStatus(`确认新秀设置后开始生成`);
   };
 
   const copyResult = async () => {
@@ -1309,6 +1314,9 @@ function RookieBuilder({
             <span className="section-label">属性槽</span>
             <div className="flex min-w-0 items-center gap-2">
               <span className="max-w-[130px] truncate text-[9px] font-medium text-ink-500">{selectedPlayer ? getPlayerNameCN(selectedPlayer.name) : "尚未选择球员"}</span>
+              {settingsLocked && (
+                <button className="action-button px-2 py-1.5 text-[10px]" onClick={reset} title={isComplete ? "清空当前结果，重新生成一名新秀" : "退出本次生成，重新开始"} type="button"><RefreshCw className="h-3 w-3" />{isComplete ? "再生成一名" : "重新开始"}</button>
+              )}
               {isManualSelection && settingsLocked && !isComplete && (
                 <button className="action-button primary-action px-2.5 py-1.5 text-[10px]" disabled={completed < bundles.length} onClick={() => setManualFinalize(true)} title={completed < bundles.length ? `还需锁定 ${bundles.length - completed} 个槽位` : "锁定全部槽位后生成结果"} type="button"><Check className="h-3 w-3" />完成选择</button>
               )}
@@ -1543,6 +1551,9 @@ function RookieBuilder({
           <div className="flex gap-1.5 px-3 py-2.5">
             <button className="action-button flex-1 justify-center px-1.5 py-1.5 text-[10px]" disabled={!exportReady} onClick={copyResult} type="button"><Copy className="h-3 w-3" />复制</button>
             <button className="action-button flex-1 justify-center px-1.5 py-1.5 text-[10px]" disabled={!exportReady} onClick={downloadResult} type="button"><Download className="h-3 w-3" />导出</button>
+            {isComplete && (
+              <button className="action-button flex-1 justify-center px-1.5 py-1.5 text-[10px]" onClick={reset} title="清空当前结果，重新生成一名新秀" type="button"><RefreshCw className="h-3 w-3" />再生成一名</button>
+            )}
           </div>
         </aside>
         {isComplete && (
