@@ -20,6 +20,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
   const [tab, setTab] = useState<EntryTab>("rookie");
   const [year, setYear] = useState<number | null>(years[0] ?? null);
   const [query, setQuery] = useState("");
+  const [positionFilter, setPositionFilter] = useState<string>("ALL");
 
   // 数据加载完成后默认选中最新年份
   useEffect(() => {
@@ -33,12 +34,16 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
 
   const filteredCards = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return yearCards;
-    return yearCards.filter((card) =>
-      card.name.toLowerCase().includes(q)
-      || getPlayerNameCN(card.name).toLowerCase().includes(q),
-    );
-  }, [query, yearCards]);
+    return yearCards.filter((card) => {
+      if (positionFilter !== "ALL") {
+        // 卡位置为单一格式（如 "PG"），按第一位置匹配，兼容未来的双位置格式
+        const firstPosition = card.position?.split("/")[0]?.trim().toUpperCase();
+        if (firstPosition !== positionFilter) return false;
+      }
+      if (q && !(card.name.toLowerCase().includes(q) || getPlayerNameCN(card.name).toLowerCase().includes(q))) return false;
+      return true;
+    });
+  }, [positionFilter, query, yearCards]);
 
   const disabledTab = (entry: EntryTab) => entry !== "rookie";
 
@@ -95,6 +100,18 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
                   onClick={() => setYear(option)}
                   type="button"
                 >{option}</button>
+              ))}
+            </div>
+            <div className="flex items-center gap-1.5 border-b border-ink-200 px-3 py-2">
+              <span className="shrink-0 text-[9px] font-semibold text-ink-400">位置</span>
+              {(["ALL", "PG", "SG", "SF", "PF", "C"] as const).map((pos) => (
+                <button
+                  aria-pressed={positionFilter === pos}
+                  className={`h-6 rounded-full px-2.5 text-[10px] font-semibold ${positionFilter === pos ? "bg-court-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"}`}
+                  key={pos}
+                  onClick={() => setPositionFilter(pos)}
+                  type="button"
+                >{pos === "ALL" ? "全部" : pos}</button>
               ))}
             </div>
             <div className="flex items-center gap-2 border-b border-ink-200 px-3 py-2">
