@@ -172,11 +172,17 @@ function getObservedAttr(player: PlayerSource, attr: string): number | undefined
   return undefined;
 }
 
-/** 从 rookie card vitals 构造来源身体（英寸/磅/cm），无数据时返回 null。 */
+/**
+ * From rookie card vitals, construct the source body (cm / kg / cm).
+ * Defensive contract: `heightInches` MUST be inches; out-of-range values
+ * (e.g. a stray centimeters value) return null instead of producing a
+ * 500+ cm body. Returns null when any required value is missing/invalid.
+ */
 export function cardSourceBody(card: RookieCard | null | undefined): SourceBody | null {
   const heightInches = card?.vitals?.heightInches;
   const weightLb = card?.vitals?.weightLb;
   if (typeof heightInches !== "number" || typeof weightLb !== "number") return null;
+  if (!Number.isFinite(heightInches) || heightInches < 60 || heightInches > 100) return null;
   const height = heightInches * 2.54;
   const wingspanCm = typeof card?.vitals?.wingspanCm === "number" ? card.vitals.wingspanCm : null;
   return {

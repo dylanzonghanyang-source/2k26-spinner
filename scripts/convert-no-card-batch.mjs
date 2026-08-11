@@ -15,6 +15,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { estimateGameOverall } from "../src/rookieOverall.ts";
+import { normalizeHeightInches } from "./lib/height-units.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -252,7 +253,7 @@ function convertRecord(rec, { overall, source }) {
     hometownTeam2: num(get("Vitals", "HOMETOWNTEAM2")),
     draftYear: num(get("Vitals", "DRAFTEDYEAR")),
     draftPick: num(get("Vitals", "DRAFTPICKNUMBER")),
-    heightInches: num(get("Vitals", "HEIGHT")),
+    heightInches: normalizeHeightInches(get("Vitals", "HEIGHT")),
     weightLb: num(get("Vitals", "WEIGHT")),
     wingspanCm: num(get("Vitals", "WINGSPANCM")),
     armScale: num(get("Vitals", "ARMSCALE")),
@@ -275,7 +276,7 @@ function convertRecord(rec, { overall, source }) {
     overall,
     position,
     secondaryPosition,
-    height: num(get("Vitals", "HEIGHT")),
+    height: normalizeHeightInches(get("Vitals", "HEIGHT")),
     weight: num(get("Vitals", "WEIGHT")),
     wingspan: num(get("Vitals", "WINGSPANCM")),
     faceId: num(get("Vitals", "FACEID")),

@@ -17,6 +17,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { estimateGameOverall } from "../src/rookieOverall.ts";
+import { normalizeHeightInches } from "./lib/height-units.mjs";
 
 const args = process.argv.slice(2);
 const getArg = (name) => {
@@ -269,7 +270,7 @@ for (const rec of records) {
     playType1: pick("PLAYTYPE1"), playType2: pick("PLAYTYPE2"), playType3: pick("PLAYTYPE3"), playType4: pick("PLAYTYPE4"),
     currentTeam: num(pick("CURRENTTEAM")), hometownTeam1: num(pick("HOMETOWNTEAM1")), hometownTeam2: num(pick("HOMETOWNTEAM2")),
     draftYear, draftPick,
-    heightInches: num(pick("HEIGHT")), weightLb: num(pick("WEIGHT")), wingspanCm: num(pick("WINGSPANCM")),
+    heightInches: normalizeHeightInches(pick("HEIGHT")), weightLb: num(pick("WEIGHT")), wingspanCm: num(pick("WINGSPANCM")),
     armScale: num(pick("ARMSCALE")), shoulderLength: num(pick("SHOULDERLENGTH")),
     neckLength: num(pick("NECKLENGTH")), trunkLength: num(pick("TRUNKLENGTH")),
   };
@@ -292,7 +293,7 @@ for (const rec of records) {
     overallSource: "model-estimated-gap",
     position: pos,
     secondaryPosition: get("Vitals", "SECONDARYPOSITION"),
-    height: num(pick("HEIGHT")),
+    height: normalizeHeightInches(pick("HEIGHT")),
     weight: num(pick("WEIGHT")),
     wingspan: num(pick("WINGSPANCM")),
     faceId: num(get("Vitals", "FACEID")),

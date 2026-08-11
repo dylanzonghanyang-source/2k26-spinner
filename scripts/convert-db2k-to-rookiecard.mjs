@@ -34,6 +34,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { normalizeHeightInches } from "./lib/height-units.mjs";
 
 const args = process.argv.slice(2);
 const getArg = (name) => {
@@ -310,7 +311,7 @@ for (const rec of records) {
   // --- identity / body ---
   const pos = get("Vitals", "POSITION");
   const pos2 = get("Vitals", "SECONDARYPOSITION");
-  const heightIn = num(get("Vitals", "HEIGHT")); // inches
+  const heightIn = normalizeHeightInches(get("Vitals", "HEIGHT")); // always inches
   const weight = num(get("Vitals", "WEIGHT"));
   const wingspanCm = num(get("Vitals", "WINGSPANCM"));
 
@@ -432,8 +433,8 @@ function extractVitals(get) {
     hometownTeam2: num(pick("HOMETOWNTEAM2")),
     draftYear: num(pick("DRAFTEDYEAR")),
     draftPick: num(pick("DRAFTPICKNUMBER")),
-    // body proportions (1-100 scale in-game ratings)
-    heightInches: num(pick("HEIGHT")),
+    // body proportions (1-100 scale in-game ratings); HEIGHT must be inches
+    heightInches: normalizeHeightInches(pick("HEIGHT")),
     weightLb: num(pick("WEIGHT")),
     wingspanCm: num(pick("WINGSPANCM")),
     armScale: num(pick("ARMSCALE")),
