@@ -277,6 +277,8 @@ function renderBadgeGroups(badges: { name: string; tier: string }[]) {
 // PG-SF and PF weights are adapted from the supplied mobile-game tables.
 // Strength is kept separate from athleticism so body weight can constrain it independently.
 // The missing C table is conservatively inferred from the PF distribution.
+// 注意：本表仅作历史参考，已不再展示；实际位置影响由 createResult 的
+// 位置交叉修正算法计算，不存在单一百分比权重。
 const positionWeights: Record<Position, Record<string, number>> = {
   PG: { three: 10, mid: 10, face: 6, post: 2, dunk: 4, handle: 14, passing: 14, perimeter: 7, interior: 4, steal: 3, block: 2, rebound: 4, athletic: 10, strength: 2, stability: 8, potential: 0 },
   SG: { three: 12, mid: 12, face: 7, post: 3, dunk: 6, handle: 10, passing: 8, perimeter: 7, interior: 4, steal: 3, block: 2, rebound: 4, athletic: 10, strength: 2, stability: 10, potential: 0 },
@@ -1356,7 +1358,7 @@ function RookieBuilder({
               const sourceLabel = lock?.kind === "custom" ? "手动设置" : lockedPlayer ? getPlayerNameCN(lockedPlayer.name) : (isManualSelection ? "点击选择" : (selectedPlayer ? "可锁定" : "等待选择"));
               const weightLabel = bundle.id === "potential"
                 ? "潜力独立取值，不计入位置权重"
-                : `位置综合权重：${displayedPositionWeight(position, effectiveSecondaryPosition, bundle.id)}%`;
+                : `位置影响：${bundle.label}槽位属性按主/次位置参与位置交叉修正`;
               const bodyAdjustmentLabel = bodyAdjustment ? `身体修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "";
               const capLabels = Object.entries(activeEvaluation?.bodyCaps ?? {})
                 .map(([attr, cap]) => `${attrNameCN[attr] ?? attr}上限 ${cap}`);
