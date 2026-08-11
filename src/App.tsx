@@ -325,7 +325,7 @@ const App = () => {
 
         {/* Header */}
         <header className="app-header">
-          <div className="flex min-w-0 shrink-0 items-center gap-2.5">
+          <div className="flex min-w-0 shrink-0 items-center gap-2.5 justify-self-start">
             <div className="brand-mark" aria-hidden="true">
               <img alt="" src={appLogo} />
             </div>
@@ -337,7 +337,7 @@ const App = () => {
             </div>
           </div>
 
-          <nav className="mode-nav" aria-label="选择模式">
+          <nav className="mode-nav justify-self-center" aria-label="选择模式">
             <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} disabled={builderFlowActive} onClick={() => setAppMode("rookie")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : undefined} type="button">
               <UserRoundPlus className="h-3.5 w-3.5" />
               <span className="lg:hidden">新秀</span>
@@ -355,9 +355,8 @@ const App = () => {
             </button>
           </nav>
 
-          <div className="flex shrink-0 items-center justify-end gap-2">
-            <span className="meta-chip">最新阵容 · {dataVersion === "2k26" ? "2K26 数据" : "2K27 数据"}</span>
-            <span className="meta-chip hidden sm:inline-flex">{appVersion} / {lastUpdated}</span>
+          <div className="flex shrink-0 items-center justify-end gap-2 justify-self-end">
+            <span className="meta-chip">{appVersion} / {lastUpdated}</span>
             <div className="data-version-toggle" role="radiogroup" aria-label="数据版本">
               <button
                 aria-checked={dataVersion === "2k26"}
