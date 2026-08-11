@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 /**
- * Experiment: train a dedicated OVR ridge model on the 667 real rookie cards
- * and compare against the production model (trained on 952 current-roster
- * samples). Read-only — writes nothing.
+ * Train a dedicated OVR ridge model on real rookie cards.
+ *
+ * This writes src/data/rookieOverallModel-rookie.json. Coefficients are clipped
+ * to be non-negative so the committed model satisfies its monotonic contract:
+ * increasing any attribute or badge category must never lower OVR.
  *
  * Run: node --experimental-strip-types scripts/train-rookie-card-ovr.mts
  */
@@ -134,13 +136,45 @@ function fitRidge(data, lambda, withBadges) {
   for (let i = 1; i <= p; i += 1) xtx[i][i] += lambda;
   const coef = solve(xtx, xty);
   if (withBadges) {
-    return {
+    return enforceNonNegative({
       intercept: coef[0],
       coefficients: Object.fromEntries(attributes.map((a, i) => [a, coef[i + 1]])),
       badgeCoefficients: Object.fromEntries(badgeCategories.map((c, i) => [c, coef[i + 1 + attributes.length]])),
-    };
+    }, data, true);
   }
-  return { intercept: coef[0], coefficients: Object.fromEntries(attributes.map((a, i) => [a, coef[i + 1]])) };
+  return enforceNonNegative({
+    intercept: coef[0],
+    coefficients: Object.fromEntries(attributes.map((a, i) => [a, coef[i + 1]])),
+  }, data, false);
+}
+
+function enforceNonNegative(model, data, withBadges) {
+  const coefficients = Object.fromEntries(
+    Object.entries(model.coefficients).map(([key, value]) => [key, Math.max(0, value)]),
+  );
+  const badgeCoefficients = withBadges
+    ? Object.fromEntries(
+      Object.entries(model.badgeCoefficients).map(([key, value]) => [key, Math.max(0, value)]),
+    )
+    : undefined;
+
+  let intercept = model.intercept;
+  if (data.length > 0) {
+    const meanOverall = avg(data.map((sample) => sample.overall));
+    const meanAttributeContribution = attributes.reduce((total, attribute, index) => (
+      total + avg(data.map((sample) => sample.features[index])) * coefficients[attribute]
+    ), 0);
+    const meanBadgeContribution = withBadges
+      ? badgeCategories.reduce((total, category, index) => (
+        total + avg(data.map((sample) => sample.badgeFeatures[index])) * badgeCoefficients[category]
+      ), 0)
+      : 0;
+    intercept = meanOverall - meanAttributeContribution - meanBadgeContribution;
+  }
+
+  return withBadges
+    ? { ...model, intercept, coefficients, badgeCoefficients }
+    : { ...model, intercept, coefficients };
 }
 function predict(model, features, nonnegativeBadges = false) {
   const est = attributes.reduce((t, a, i) => t + features[i] * (model.coefficients[a] ?? 0), model.intercept)

@@ -190,6 +190,21 @@ function CardDetails({ card, position }: { card: RookieCard; position: string | 
         <span><b className="text-ink-400">新秀球队：</b>{summary.team ?? "--"}</span>
       </div>
 
+      {/* 潜力 / 成长曲线 */}
+      <div className="flex flex-wrap gap-x-5 gap-y-1 text-[10px] text-ink-700">
+        <span><b className="text-ink-400">潜力：</b>{summary.potentialCurrent ?? "--"}</span>
+        <span><b className="text-ink-400">最低潜力：</b>{summary.potentialMin ?? "--"}</span>
+        <span><b className="text-ink-400">最高潜力：</b>{summary.potentialMax ?? "--"}</span>
+        <span><b className="text-ink-400">巅峰开始：</b>{summary.peakStartAge != null ? `${summary.peakStartAge} 岁` : "--"}</span>
+        <span><b className="text-ink-400">巅峰结束：</b>{summary.peakEndAge != null ? `${summary.peakEndAge} 岁` : "--"}</span>
+        <span><b className="text-ink-400">爆发：</b>{summary.boomPercent != null ? `${summary.boomPercent}%` : "--"}</span>
+        <span><b className="text-ink-400">平均：</b>{summary.averagePercent != null ? `${summary.averagePercent}%` : "--"}</span>
+        <span><b className="text-ink-400">衰退：</b>{summary.bustPercent != null ? `${summary.bustPercent}%` : "--"}</span>
+      </div>
+      {summary.potentialCorrected && (
+        <div className="mt-1.5 rounded-[4px] border border-warning-500/20 bg-warning-500/10 px-2 py-1 text-[9px] leading-4 text-warning-700">潜力范围曾被修正：原始数据中 current 超出 min–max，已扩展范围端点以包含 current（当前潜力值保持官方卡数据不变）。</div>
+      )}
+
       {/* 属性 */}
       <div className="space-y-2">
         <div className="text-[9px] font-semibold text-ink-400">属性</div>

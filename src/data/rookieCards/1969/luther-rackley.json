@@ -16,7 +16,7 @@
   "potential": {
     "current": 67,
     "min": 66,
-    "max": 66
+    "max": 67
   },
   "vitals": {
     "firstName": "Luther",
@@ -228,5 +228,9 @@
     "Triple Threat Shoot": 5,
     "Use Glass": 60
   },
-  "personalityBadges": []
+  "personalityBadges": [],
+  "dataQuality": {
+    "potentialRangeCorrected": true,
+    "potentialRangeNote": "min/max expanded to include current (official card value preserved)"
+  }
 }

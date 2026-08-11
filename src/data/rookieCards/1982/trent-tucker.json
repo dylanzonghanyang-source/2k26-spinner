@@ -16,7 +16,7 @@
   "potential": {
     "current": 75,
     "min": 61,
-    "max": 69
+    "max": 75
   },
   "vitals": {
     "firstName": "Trent",
@@ -228,5 +228,9 @@
     "Triple Threat Shoot": 35,
     "Use Glass": 15
   },
-  "personalityBadges": []
+  "personalityBadges": [],
+  "dataQuality": {
+    "potentialRangeCorrected": true,
+    "potentialRangeNote": "min/max expanded to include current (official card value preserved)"
+  }
 }

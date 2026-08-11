@@ -16,12 +16,14 @@ assert(
   "2K26 version data must be a named const (lazy-2K27 refactor)",
 );
 // 2K27 badges/players must be dynamic imports, not static top-level imports.
+// Dynamic import may carry JSON import attributes (Node ESM requirement), so
+// match the specifier and allow any trailing arguments.
 assert(
-  /import\(["']\.\/data\/versions\/2k27-play-now\/badges\.json["']\)/.test(appSource),
+  /import\(["']\.\/data\/versions\/2k27-play-now\/badges\.json["'][^)]*\)/.test(appSource),
   "2K27 badge data must be dynamically imported (not in the initial bundle)",
 );
 assert(
-  /import\(["']\.\/data\/versions\/2k27-play-now\/players\.json["']\)/.test(appSource),
+  /import\(["']\.\/data\/versions\/2k27-play-now\/players\.json["'][^)]*\)/.test(appSource),
   "2K27 player data must be dynamically imported (not in the initial bundle)",
 );
 assert(!/import\s+\w+\s+from\s+["']\.\/data\/versions\/2k27-play-now\/badges\.json["']/.test(appSource), "2K27 badges must not be a static import");

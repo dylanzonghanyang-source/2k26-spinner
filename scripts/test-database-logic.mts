@@ -70,6 +70,14 @@ function pickOf(card: { vitals?: Record<string, unknown> }) {
   check("summary fields", s.name === "LeBron James" && s.year === 2003 && s.overall != null, JSON.stringify(s));
   const draftPick = s.draftPick;
   check("draftPick parsed", draftPick === 1 || draftPick === null, `pick=${draftPick}`);
+  const luka = summarizeCard(lookup.get("luka doncic")!);
+  check("potential current parsed", luka.potentialCurrent === 98, JSON.stringify(luka));
+  check("potential range parsed", luka.potentialMin === 94 && luka.potentialMax === 99, JSON.stringify(luka));
+  check("growth vitals parsed", luka.peakStartAge === 25 && luka.peakEndAge === 31 && luka.boomPercent === 50 && luka.averagePercent === 49 && luka.bustPercent === 1, JSON.stringify(luka));
+  check("unmodified potential has no correction flag", luka.potentialCorrected === false);
+  const kleine = summarizeCard(lookup.get("joe kleine")!);
+  check("corrected potential flagged", kleine.potentialCorrected === true, JSON.stringify(kleine));
+  check("corrected potential range contains current", kleine.potentialMin != null && kleine.potentialMax != null && kleine.potentialCurrent != null && kleine.potentialMin <= kleine.potentialCurrent && kleine.potentialCurrent <= kleine.potentialMax, JSON.stringify(kleine));
 }
 
 // --- position helpers ---

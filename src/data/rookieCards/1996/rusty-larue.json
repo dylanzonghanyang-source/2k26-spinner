@@ -16,7 +16,7 @@
   "potential": {
     "current": 72,
     "min": 65,
-    "max": 65
+    "max": 72
   },
   "vitals": {
     "firstName": "Rusty",
@@ -228,5 +228,9 @@
     "Triple Threat Shoot": 25,
     "Use Glass": 20
   },
-  "personalityBadges": []
+  "personalityBadges": [],
+  "dataQuality": {
+    "potentialRangeCorrected": true,
+    "potentialRangeNote": "min/max expanded to include current (official card value preserved)"
+  }
 }

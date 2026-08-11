@@ -16,7 +16,7 @@
   "potential": {
     "current": 70,
     "min": 53,
-    "max": 61
+    "max": 70
   },
   "vitals": {
     "firstName": "Walter",
@@ -242,5 +242,9 @@
       "name": "laidback",
       "tier": "Bronze"
     }
-  ]
+  ],
+  "dataQuality": {
+    "potentialRangeCorrected": true,
+    "potentialRangeNote": "min/max expanded to include current (official card value preserved)"
+  }
 }

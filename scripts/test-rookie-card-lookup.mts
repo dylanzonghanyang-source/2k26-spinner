@@ -4,11 +4,11 @@ import index from "../src/data/rookieCardIndex.min.json" with { type: "json" };
 
 // --- corePlayerName normalization ---
 assert.equal(corePlayerName("Luka Doncic"), "luka doncic");
-assert.equal(corePlayerName("Bronny James Jr."), "bronny james");
-assert.equal(corePlayerName("Kevin Knox II"), "kevin knox");
-assert.equal(corePlayerName("Robert Williams III"), "robert williams");
-assert.equal(corePlayerName("Jae'Sean Tate"), "jae sean tate");
-assert.equal(corePlayerName("De'Anthony Melton"), "de anthony melton");
+assert.equal(corePlayerName("Bronny James Jr."), "bronny james jr");
+assert.equal(corePlayerName("Kevin Knox II"), "kevin knox ii");
+assert.equal(corePlayerName("Robert Williams III"), "robert williams iii");
+assert.equal(corePlayerName("Jae'Sean Tate"), "jaesean tate");
+assert.equal(corePlayerName("De'Anthony Melton"), "deanthony melton");
 assert.equal(corePlayerName("Mohamed Bamba"), "mohamed bamba");
 console.log("corePlayerName OK");
 
@@ -67,7 +67,9 @@ console.log("Wemby card OK: block=90, overall=84");
 const bronny = lookup.get(corePlayerName("Bronny James Jr."));
 assert.ok(bronny, "Bronny matches via core name");
 assert.equal(bronny.slug, "bronny-james-jr");
-console.log("Bronny card OK (suffix-stripped match)");
+const bronnyRoster = lookupRookieCard(lookup, "Bronny James");
+assert.equal(bronnyRoster?.slug, "bronny-james-jr", "roster name without suffix resolves via fallback");
+console.log("Bronny card OK (suffix-preserving key + roster fallback)");
 
 // 2003 draft class (collected 2026-08-08 from 2003_draft_class.json)
 const lebron = lookup.get(corePlayerName("LeBron James"));
@@ -85,6 +87,12 @@ assert.ok(brunson);
 assert.equal(brunson.badges.length, 0, "Brunson has zero badges (user-confirmed)");
 console.log("Brunson zero-badge OK");
 
+const patrickMills = lookupRookieCard(lookup, "Patty Mills");
+assert.ok(patrickMills, "Patty Mills roster name should resolve to official Patrick Mills rookie card");
+assert.equal(patrickMills.slug, "patrick-mills");
+assert.equal(lookup.get(corePlayerName("Patty Mills")), undefined, "duplicate Patty Mills gap card must not exist");
+console.log("Patty/Patrick Mills duplicate guard OK");
+
 // --- roster-side matching (players that appear in the 2K27 roster) ---
 const rosterNames = [
   "Luka Doncic", "Trae Young", "Shai Gilgeous-Alexander", "Jalen Brunson",
@@ -93,7 +101,7 @@ const rosterNames = [
 ];
 let matched = 0;
 for (const name of rosterNames) {
-  const card = lookup.get(corePlayerName(name));
+  const card = lookupRookieCard(lookup, name);
   if (card) matched += 1;
   else console.log(`  NO CARD for roster player: ${name}`);
 }

@@ -98,6 +98,10 @@ const luka = players.get("test:luka-doncic");
 assert.ok(luka, "Luka Doncic must exist in the 2K26 roster");
 assert.ok(luka.id, "Luka source must carry an id");
 const lukaId: string = luka.id;
+const wemby = players.get("test:victor-wembanyama");
+assert.ok(wemby, "Victor Wembanyama must exist in the 2K26 roster");
+assert.ok(wemby.id, "Wembanyama source must carry an id");
+const wembyId: string = wemby.id;
 
 // Find a current player WITHOUT a rookie card for the negative cases.
 // Prefer a player with real detailed attributes: an estimated-only player
@@ -131,18 +135,18 @@ function customLockFor(bundleId: string, values: Record<string, number>): LockSt
   return { [bundleId]: { kind: "custom", values } };
 }
 
-// --- 1. singleCard: every non-potential slot on the same card -> card OVR ---
+// --- 1. singleCard: keep card identity, but OVR follows final generated attrs ---
 {
-  const result = createResult(playerLock(lukaId), age, position, secondary, body, players, tendencyLookup, "2k26", cards);
-  assert.ok(result.card, "all-Luka lock must resolve a single rookie card");
-  assert.equal(result.card.slug, "luka-doncic");
-  assert.equal(result.card.year, 2018);
-  assert.equal(
+  const result = createResult(playerLock(wembyId), age, position, secondary, body, players, tendencyLookup, "2k26", cards);
+  assert.ok(result.card, "all-Wembanyama lock must resolve a single rookie card");
+  assert.equal(result.card.slug, "victor-wembanyama");
+  assert.equal(result.card.year, 2023);
+  assert.notEqual(
     result.baseOverall,
     result.card.overall,
-    "official Luka rookie card OVR must be used (data-driven, currently user-confirmed 81)",
+    "single-card builds with a changed target body must not reuse the official card OVR",
   );
-  assert.equal(result.initialStrength, result.card.overall);
+  assert.equal(result.initialStrength, result.baseOverall);
 }
 
 // --- 2. potential-only card must NOT hijack OVR or the full record ---
@@ -187,7 +191,11 @@ function customLockFor(bundleId: string, values: Record<string, number>): LockSt
   const result = createResult(locks, age, position, secondary, body, players, tendencyLookup, "2k26", cards);
   assert.equal(result.card, null);
   assert.ok(result.initialOverallConstraintApplied, "over-target mixed build must be lowered to the potential/age target");
-  assert.ok(result.initialStrength <= result.initialOverallTarget, "constrained OVR must not exceed the target");
+  if (result.initialOverallConstraintReachable) {
+    assert.ok(result.initialStrength <= result.initialOverallTarget, "reachable constrained OVR must not exceed the target");
+  } else {
+    assert.ok(result.initialStrength > result.initialOverallTarget, "unreachable constrained OVR must be explicitly reported");
+  }
 }
 
 // --- 3. manually locked Overall Durability is a hard lock ---

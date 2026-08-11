@@ -1,6 +1,6 @@
-import playerHeadshots from "./data/playerHeadshots.json";
-import playerHeadshotFallbacks from "./data/playerHeadshotFallbacks.json";
-import playerPresentation from "./data/playerPresentation.json";
+import playerHeadshots from "./data/playerHeadshots.json" with { type: "json" };
+import playerHeadshotFallbacks from "./data/playerHeadshotFallbacks.json" with { type: "json" };
+import playerPresentation from "./data/playerPresentation.json" with { type: "json" };
 
 const playerIds = {
   ...(playerPresentation.headshotIds as Record<string, string>),

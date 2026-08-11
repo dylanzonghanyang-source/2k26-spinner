@@ -72,6 +72,16 @@ export type CardSummary = {
   weightLb: number | null;
   wingspanCm: number | null;
   dominantHand: string | null;
+  potentialCurrent: number | null;
+  potentialMin: number | null;
+  potentialMax: number | null;
+  /** 潜力范围是否被工具修正过（min/max 扩到包含 current）。 */
+  potentialCorrected: boolean;
+  peakStartAge: number | null;
+  peakEndAge: number | null;
+  boomPercent: number | null;
+  averagePercent: number | null;
+  bustPercent: number | null;
 };
 
 export function summarizeCard(card: RookieCard): CardSummary {
@@ -88,6 +98,15 @@ export function summarizeCard(card: RookieCard): CardSummary {
     weightLb: typeof vitals.weightLb === "number" ? vitals.weightLb : null,
     wingspanCm: typeof vitals.wingspanCm === "number" ? vitals.wingspanCm : null,
     dominantHand: typeof vitals.dominantHand === "string" ? vitals.dominantHand : null,
+    potentialCurrent: typeof card.potential?.current === "number" ? card.potential.current : null,
+    potentialMin: typeof card.potential?.min === "number" ? card.potential.min : null,
+    potentialMax: typeof card.potential?.max === "number" ? card.potential.max : null,
+    potentialCorrected: card.dataQuality?.potentialRangeCorrected === true,
+    peakStartAge: typeof vitals.peakStartAge === "number" ? vitals.peakStartAge : null,
+    peakEndAge: typeof vitals.peakEndAge === "number" ? vitals.peakEndAge : null,
+    boomPercent: typeof vitals.boomPercent === "number" ? vitals.boomPercent : null,
+    averagePercent: typeof vitals.averagePercent === "number" ? vitals.averagePercent : null,
+    bustPercent: typeof vitals.bustPercent === "number" ? vitals.bustPercent : null,
   };
 }
 

@@ -26,8 +26,8 @@ export function createTendencyLoader(importTable: TendencyTableImporter): () => 
 export type TendencyDataVersion = "2k26" | "2k27";
 
 const tendencyImporters: Record<TendencyDataVersion, TendencyTableImporter> = {
-  "2k26": () => import("./data/versions/2k26/tendencyProfiles.min.json") as Promise<TendencyTableModule>,
-  "2k27": () => import("./data/versions/2k27-play-now/tendencyProfiles.min.json") as Promise<TendencyTableModule>,
+  "2k26": () => import("./data/versions/2k26/tendencyProfiles.min.json", { with: { type: "json" } }) as Promise<TendencyTableModule>,
+  "2k27": () => import("./data/versions/2k27-play-now/tendencyProfiles.min.json", { with: { type: "json" } }) as Promise<TendencyTableModule>,
 };
 
 export function loadTendencyLookup(version: TendencyDataVersion = "2k26"): Promise<TendencyLookup> {

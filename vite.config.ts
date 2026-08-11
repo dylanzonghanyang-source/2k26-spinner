@@ -84,6 +84,21 @@ export default defineConfig({
   plugins: [headshotProxyPlugin(), react()],
   build: {
     rollupOptions: {
+      // src/rookieCards.ts intentionally uses a runtime variable for JSON
+      // import attributes (Node ESM needs them; browsers reject them because
+      // the attributes form activates the native JSON module loader against
+      // Vite's JS transform). Rollup cannot statically analyze the variable
+      // and emits 4 expected warnings — filtered here; all other warnings
+      // still surface.
+      onwarn(warning, warn) {
+        if (
+          warning.id?.includes("/src/rookieCards.ts") &&
+          warning.message.includes("could not statically analyze an import attribute")
+        ) {
+          return;
+        }
+        warn(warning);
+      },
       output: {
         manualChunks(id) {
           const normalized = id.replace(/\\/g, "/");

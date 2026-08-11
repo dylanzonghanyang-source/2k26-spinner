@@ -18,17 +18,19 @@ function check(label: string, condition: boolean, detail = "") {
   }
 }
 
-function mkCard(year: number, name: string, overall: number | null, detailed: Record<string, number>): RookieCard {
+function mkCard(year: number, name: string, overall: number | null, detailed: Record<string, number>, potential: RookieCard["potential"] = null): RookieCard {
   return {
     slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
     year,
     name,
+    position: null,
     overall,
     detailed,
     tendencies: {},
     badges: [],
     personalityBadges: [],
-    potential: null,
+    potential,
+    dataQuality: null,
     vitals: {},
     durability: {},
     hotZones: {},
@@ -40,6 +42,7 @@ function buildLookup(cards: RookieCard[]): RookieCardLookup {
   const index: any = {
     keys: [], slugs: [], years: [], names: [], overalls: [],
     attrs: { fields: ["Three-Point Shot", "Mid-Range Shot"], rows: [] },
+    potentials: [],
   };
   for (const card of cards) {
     const key = card.name.toLowerCase().replace(/[^a-z0-9]+/g, " ");
@@ -49,12 +52,13 @@ function buildLookup(cards: RookieCard[]): RookieCardLookup {
     index.names.push(card.name);
     index.overalls.push(card.overall);
     index.attrs.rows.push([card.detailed["Three-Point Shot"] ?? null, card.detailed["Mid-Range Shot"] ?? null]);
+    index.potentials.push(card.potential);
   }
   return createRookieCardLookup(index);
 }
 
 const cards = [
-  mkCard(2025, "Cooper Flagg", 82, { "Three-Point Shot": 78, "Mid-Range Shot": 75 }),
+  mkCard(2025, "Cooper Flagg", 82, { "Three-Point Shot": 78, "Mid-Range Shot": 75 }, { current: 96, min: 92, max: 99 }),
   mkCard(2025, "Ace Bailey", 80, { "Three-Point Shot": 72 }),
   mkCard(2024, "Zaccharie Risacher", 76, { "Three-Point Shot": 70, "Mid-Range Shot": 68 }),
   mkCard(2024, "No OVR Guy", null, { "Three-Point Shot": 60 }),
@@ -89,7 +93,9 @@ const lookup = buildLookup(cards);
   const noVal = mkCard(2025, "No Data", 70, {});
   check("no values → null", slotValueForCard(noVal, three) === null);
   const partial = cards[1]; // Ace Bailey: only 3PT=72
-  check("mid slot with one value → that value", slotValueForCard(partial, mid) === null || slotValueForCard(partial, mid) !== null, String(slotValueForCard(partial, mid)));
+  check("mid slot with one missing attr averages present values", slotValueForCard(partial, mid) === null, String(slotValueForCard(partial, mid)));
+  const potential = bundles.find((b) => b.id === "potential")!;
+  check("potential slot = card potential current", slotValueForCard(flagg, potential) === 96, String(slotValueForCard(flagg, potential)));
 }
 
 // --- slotAttrsForCard ---

@@ -16,7 +16,7 @@
   "potential": {
     "current": 88,
     "min": 76,
-    "max": 84
+    "max": 88
   },
   "vitals": {
     "firstName": "Robert",
@@ -233,5 +233,9 @@
       "name": "expressive",
       "tier": "Bronze"
     }
-  ]
+  ],
+  "dataQuality": {
+    "potentialRangeCorrected": true,
+    "potentialRangeNote": "min/max expanded to include current (official card value preserved)"
+  }
 }

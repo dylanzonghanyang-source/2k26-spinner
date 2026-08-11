@@ -28,6 +28,8 @@ export type RookieCard = {
   badges: { name: string; tier: string }[];
   personalityBadges: { name: string; tier: string }[];
   potential: { current: number | null; min: number | null; max: number | null } | null;
+  /** 数据质量标记（如潜力范围被修正以包含 current）。 */
+  dataQuality: { potentialRangeCorrected?: boolean; potentialRangeNote?: string } | null;
   vitals: Record<string, string | number | boolean | null>;
   durability: Record<string, number>;
   hotZones: Record<string, string>;
@@ -47,6 +49,7 @@ type RawRookieCardIndex = {
   badges?: unknown[][];
   personalityBadges?: unknown[][];
   potentials?: ({ current: number | null; min: number | null; max: number | null } | null)[];
+  dataQualities?: ({ potentialRangeCorrected?: boolean; potentialRangeNote?: string } | null)[];
   vitals?: { fields?: string[]; rows?: unknown[][] };
   durability?: { fields?: string[]; rows?: unknown[][] };
   hotZones?: { fields?: string[]; rows?: unknown[][] };
@@ -85,6 +88,7 @@ const PLAYER_NAME_ALIASES: Record<string, string> = {
   "CJ McCollum": "C.J. McCollum",
   "LJ Cryer": "L.J. Cryer",
   "Nic Claxton": "Nicolas Claxton",
+  "Patty Mills": "Patrick Mills",
   "Moussa Diabate": "Moussa Diabaté",
   "AJ Green": "A.J. Green",
   "KJ Simpson": "K.J. Simpson",
@@ -124,6 +128,13 @@ export function lookupRookieCard(
   const alias = aliasKey ? PLAYER_NAME_ALIASES[aliasKey] : undefined;
   if (alias) return rookieCards.get(corePlayerName(alias)) ?? null;
   return null;
+}
+
+export function hasRookieCard(
+  rookieCards: RookieCardLookup | null | undefined,
+  playerName: string,
+): boolean {
+  return lookupRookieCard(rookieCards, playerName) !== null;
 }
 
 export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLookup {
@@ -194,6 +205,7 @@ export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLoo
       badges,
       personalityBadges,
       potential: index.potentials?.[i] ?? null,
+      dataQuality: index.dataQualities?.[i] ?? null,
       vitals,
       durability,
       hotZones,
@@ -202,36 +214,51 @@ export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLoo
   return lookup;
 }
 
-async function importLegacyIndex(): Promise<{ default: RawRookieCardIndex }> {
-  // Literal specifiers so rollup statically analyzes both calls and emits the
-  // JSON chunks. Vite dev rejects the attributes form (?import rewrite), so
-  // fall back to a bare import; Node 26 requires the attributes form.
-  try {
-    return await import("./data/rookieCardIndex-legacy.min.json", { with: { type: "json" } });
-  } catch {
-    return await import("./data/rookieCardIndex-legacy.min.json");
-  }
+// JSON import attributes: Node ESM requires `{ with: { type: "json" } }`, but
+// browsers reject it for Vite-served chunks — the attributes form activates
+// the native JSON module loader, which chokes on Vite's JS transform of the
+// JSON data. So the options must resolve at runtime: attributes under Node
+// (scripts/tests), undefined in browsers (Vite dev + production build). The
+// literal specifier keeps rollup's lazy chunk splitting working. Rollup
+// cannot statically analyze the variable options (4 expected warnings —
+// filtered in vite.config.ts onwarn); the produced code is correct in both
+// runtimes.
+const jsonImportOptions: { with: { type: "json" } } | undefined =
+  typeof process !== "undefined" && Boolean(process.versions?.node)
+    ? { with: { type: "json" } }
+    : undefined;
+
+async function importLegacyPre1990Index(): Promise<{ default: RawRookieCardIndex }> {
+  return await import("./data/rookieCardIndex-legacy-pre1990.min.json", jsonImportOptions);
+}
+
+async function importLegacy1990To2004Index(): Promise<{ default: RawRookieCardIndex }> {
+  return await import("./data/rookieCardIndex-legacy-1990-2004.min.json", jsonImportOptions);
+}
+
+async function importLegacy2005To2017Index(): Promise<{ default: RawRookieCardIndex }> {
+  return await import("./data/rookieCardIndex-legacy-2005-2017.min.json", jsonImportOptions);
 }
 
 async function importCurrentIndex(): Promise<{ default: RawRookieCardIndex }> {
-  try {
-    return await import("./data/rookieCardIndex-current.min.json", { with: { type: "json" } });
-  } catch {
-    return await import("./data/rookieCardIndex-current.min.json");
-  }
+  return await import("./data/rookieCardIndex-current.min.json", jsonImportOptions);
 }
 
 export function loadRookieCards(): Promise<RookieCardLookup> {
   return Promise.all([
-    importLegacyIndex(),
+    importLegacyPre1990Index(),
+    importLegacy1990To2004Index(),
+    importLegacy2005To2017Index(),
     importCurrentIndex(),
-  ]).then(([legacyModule, currentModule]) => {
-    // Legacy is inserted first so the earliest (true rookie) card wins if a
-    // player appears in both partitions.
-    const lookup = createRookieCardLookup(legacyModule.default);
-    const currentLookup = createRookieCardLookup(currentModule.default);
-    for (const [key, card] of currentLookup) {
-      if (!lookup.has(key)) lookup.set(key, card);
+  ]).then(([legacyPre1990Module, legacy1990To2004Module, legacy2005To2017Module, currentModule]) => {
+    // Insert older legacy chunks first so the earliest (true rookie) card wins
+    // if a player appears in multiple partitions.
+    const lookup = createRookieCardLookup(legacyPre1990Module.default);
+    for (const module of [legacy1990To2004Module, legacy2005To2017Module, currentModule]) {
+      const chunkLookup = createRookieCardLookup(module.default);
+      for (const [key, card] of chunkLookup) {
+        if (!lookup.has(key)) lookup.set(key, card);
+      }
     }
     return lookup;
   });

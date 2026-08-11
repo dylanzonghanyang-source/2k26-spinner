@@ -15,7 +15,7 @@
   "potential": {
     "current": 73,
     "min": 72,
-    "max": 72
+    "max": 73
   },
   "vitals": {
     "firstName": "Zaza",
@@ -236,5 +236,9 @@
     "Triple Threat Shoot": 0,
     "Use Glass": 20
   },
-  "personalityBadges": []
+  "personalityBadges": [],
+  "dataQuality": {
+    "potentialRangeCorrected": true,
+    "potentialRangeNote": "min/max expanded to include current (official card value preserved)"
+  }
 }

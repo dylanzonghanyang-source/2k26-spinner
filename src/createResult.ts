@@ -41,6 +41,26 @@ export type Bundle = {
 export type PlayerLock = { kind: "player"; playerId: string };
 export type CustomLock = { kind: "custom"; values: Record<string, number> };
 export type LockState = Record<string, PlayerLock | CustomLock>;
+export type BundleLock = PlayerLock | CustomLock;
+
+/**
+ * Apply one bundle lock to the current lock state (pure).
+ *
+ * Returns the SAME reference when the bundle is already locked (no-op), so
+ * callers can detect idempotency with `next === current`. Different bundles
+ * always compose — this is the race-safe primitive behind the UI's rapid
+ * click locking: every commit expands from the latest committed state, never
+ * from a stale render closure.
+ */
+export function applyBundleLock(
+  current: LockState,
+  bundleId: string,
+  lock: BundleLock,
+): LockState {
+  if (current[bundleId]) return current;
+  return { ...current, [bundleId]: lock };
+}
+
 export type Evaluation = {
   raw: number;
   adjusted: number;
@@ -699,10 +719,11 @@ export function createResult(
     ),
   });
   if (rookieOverallConstraint) Object.assign(initialAttrs, rookieOverallConstraint.values);
-  // OVR: only when EVERY non-potential slot is locked to the same rookie card
-  // (and no custom lock is mixed in) does the card's UI-confirmed overall stand
-  // in for the model estimate. A card used solely for the potential slot must
-  // not hijack the whole build's OVR or full record.
+  // Build card identity: when EVERY non-potential slot is locked to the same
+  // rookie card, keep that card as the result's source record. OVR still follows
+  // the generated final attributes after body/position constraints; otherwise a
+  // changed target body can show an official card OVR that no longer matches the
+  // visible attributes.
   const nonPotentialCards = bundles
     .filter((bundle) => bundle.id !== "potential")
     .map((bundle) => cardByBundle.get(bundle.id) ?? null);
@@ -712,8 +733,7 @@ export function createResult(
   )
     ? firstCard
     : null;
-  const cardOverall = singleCard?.overall != null ? singleCard.overall : null;
-  const baseOverall = cardOverall ?? calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
+  const baseOverall = calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
   const initialStrength = baseOverall;
   // 综评补偿 (Intangibles): 优先继承潜力来源卡的真实值，其次同卡构建的卡值，最后默认 50。
   const intangibles = potentialCard?.detailed?.["Intangibles"]

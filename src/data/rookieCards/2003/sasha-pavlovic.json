@@ -15,7 +15,7 @@
   "potential": {
     "current": 74,
     "min": 65,
-    "max": 65
+    "max": 74
   },
   "vitals": {
     "firstName": "Sasha",
@@ -227,5 +227,9 @@
     "Triple Threat Shoot": 35,
     "Use Glass": 20
   },
-  "personalityBadges": []
+  "personalityBadges": [],
+  "dataQuality": {
+    "potentialRangeCorrected": true,
+    "potentialRangeNote": "min/max expanded to include current (official card value preserved)"
+  }
 }

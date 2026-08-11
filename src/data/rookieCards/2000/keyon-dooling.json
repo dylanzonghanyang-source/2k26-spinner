@@ -16,7 +16,7 @@
   "potential": {
     "current": 82,
     "min": 70,
-    "max": 78
+    "max": 82
   },
   "vitals": {
     "firstName": "Keyon",
@@ -238,5 +238,9 @@
       "name": "laidback",
       "tier": "Bronze"
     }
-  ]
+  ],
+  "dataQuality": {
+    "potentialRangeCorrected": true,
+    "potentialRangeNote": "min/max expanded to include current (official card value preserved)"
+  }
 }

@@ -16,7 +16,7 @@
   "potential": {
     "current": 84,
     "min": 75,
-    "max": 83
+    "max": 84
   },
   "vitals": {
     "firstName": "Chris",
@@ -233,5 +233,9 @@
     "Triple Threat Shoot": 5,
     "Use Glass": 15
   },
-  "personalityBadges": []
+  "personalityBadges": [],
+  "dataQuality": {
+    "potentialRangeCorrected": true,
+    "potentialRangeNote": "min/max expanded to include current (official card value preserved)"
+  }
 }

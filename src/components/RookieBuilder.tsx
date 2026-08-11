@@ -29,22 +29,25 @@ import {
   positions,
   secondaryPositionShare,
   type Bundle,
+  type BundleLock,
   type Evaluation,
   type LockState,
   type Position,
   type SlotInput,
+  applyBundleLock,
 } from "../createResult";
 import {
   loadTendencyLookup,
   type TendencyDataVersion,
   type TendencyLookup,
 } from "../tendencies";
-import { loadRookieCards, lookupRookieCard, type RookieCard, type RookieCardLookup } from "../rookieCards";
+import { hasRookieCard, loadRookieCards, lookupRookieCard, type RookieCard, type RookieCardLookup } from "../rookieCards";
 import SlotPicker from "./SlotPicker";
 import { getTendencyNameCN } from "../tendencyNames";
 import { getPlayerHeadshotSources, prefetchPlayerHeadshots } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
 import { type OverallDataVersion } from "../rookieOverall";
+import { cardToPlayerSource } from "../rookieCardSource";
 import { generateRookieFirstName, generateRookieLastName } from "../rookieNames";
 import { type BuilderBody as BodySettings } from "../rookieBodyConstraints";
 import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../fieldCategories";
@@ -269,30 +272,6 @@ function playerId(player: PlayerSource) {
   return player.id ?? `${player.rosterTeam ?? player.team ?? "team"}:${player.slug ?? player.name}`;
 }
 
-/** 新秀卡 → 槽位来源 PlayerSource 适配（manual 模式按槽位选卡）。 */
-function cardToPlayerSource(card: RookieCard): PlayerSource {
-  const id = `card:${card.slug}`;
-  const avg = (keys: string[], fallback = 75) => {
-    const values = keys.map((key) => card.detailed[key]).filter((value): value is number => typeof value === "number");
-    return values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : fallback;
-  };
-  return {
-    id,
-    name: card.name,
-    slug: card.slug,
-    position: typeof card.vitals?.position === "string" ? card.vitals.position : "",
-    overall: card.overall ?? null,
-    shooting: avg(["Three-Point Shot", "Mid-Range Shot", "Free Throw", "Offensive Consistency", "Shot IQ"]),
-    athleticism: avg(["Speed", "Strength", "Agility", "Vertical", "Hustle", "Stamina"]),
-    playmaking: avg(["Ball Handle", "Speed with Ball", "Pass Accuracy", "Pass IQ", "Pass Vision"]),
-    defense: avg(["Block", "Steal", "Pass Perception", "Interior Defense", "Perimeter Defense", "Defensive Consistency", "Help Defense IQ"]),
-    inside: avg(["Layup", "Driving Dunk", "Standing Dunk", "Post Hook", "Post Fade", "Post Control", "Draw Foul", "Hands", "Offensive Rebound", "Defensive Rebound"]),
-    detailed: card.detailed,
-    badges: [],
-    badgesKnown: true,
-  };
-}
-
 function playerIdentity(player: PlayerSource) {
   return player.name
     .normalize("NFKD")
@@ -430,8 +409,25 @@ function createExportText(
     leftAnkle: "左踝", rightAnkle: "右踝",
     leftFoot: "左脚", rightFoot: "右脚",
   };
-  const durabilityLines = card && Object.keys(card.durability).length ? [
-    `耐久: ${cardDurabilityKeys.map((key) => `${durabilityShort[key]} ${card.durability[key] ?? "--"}`).join(sep)}${sep}综合 ${card.durability.overall ?? "--"}`,
+  const durabilityAttrByCardKey: Record<(typeof cardDurabilityKeys)[number], string> = {
+    head: "Head Durability",
+    neck: "Neck Durability",
+    back: "Back Durability",
+    leftShoulder: "Left Shoulder Durability",
+    rightShoulder: "Right Shoulder Durability",
+    leftElbow: "Left Elbow Durability",
+    rightElbow: "Right Elbow Durability",
+    leftHip: "Left Hip Durability",
+    rightHip: "Right Hip Durability",
+    leftKnee: "Left Knee Durability",
+    rightKnee: "Right Knee Durability",
+    leftAnkle: "Left Ankle Durability",
+    rightAnkle: "Right Ankle Durability",
+    leftFoot: "Left Foot Durability",
+    rightFoot: "Right Foot Durability",
+  };
+  const durabilityLines = card ? [
+    `耐久: ${cardDurabilityKeys.map((key) => `${durabilityShort[key]} ${result.initialAttrs[durabilityAttrByCardKey[key]] ?? "--"}`).join(sep)}${sep}综合 ${result.initialAttrs["Overall Durability"] ?? "--"}`,
   ] : [];
   const zoneSlots: { label: string; slots: { short: string; keys: string[] }[] }[] = [
     { label: "篮下", slots: [
@@ -455,7 +451,7 @@ function createExportText(
       { short: "右底角", keys: ["threeRight", "三分右侧底角"] },
     ] },
   ];
-  const hotZoneSource = card && Object.keys(card.hotZones).length ? card.hotZones : result.hotZones;
+  const hotZoneSource = result.hotZones;
   const zoneStateCN = (state: string) => (state === "Hot" || state === "热区") ? "热区" : (state === "Cold" || state === "冷区") ? "冷区" : "中性";
   const hotZoneLines = zoneSlots.flatMap((group) => {
     const items = group.slots.flatMap((slot) => {
@@ -511,9 +507,10 @@ function createExportText(
     return items.length ? [`${group.label}: ${items.join(sep)}`] : [];
   });
   const ovrLines = [
-    `预计初始 OVR: ${result.initialStrength}（目标 ${result.initialOverallTarget}）`,
+    "说明: 综评由本工具按最终属性、徽章和无形属性模型估算，仅作生成参考；不是 2K 实机读取的真实官方综评。",
+    `模型估算初始综评: ${result.initialStrength}（目标 ${result.initialOverallTarget}）`,
     `无形属性: ${result.intangibles}`,
-    ...(result.initialOverallConstraintReachable ? [] : ["警告：手动锁定的数值使初始 OVR 无法完全达到目标"]),
+    ...(result.initialOverallConstraintReachable ? [] : ["警告：手动锁定的数值使模型估算综评无法完全达到目标"]),
   ];
   const templateLines = bundles.map((bundle) => {
     const lock = locks[bundle.id];
@@ -530,7 +527,7 @@ function createExportText(
     "", "[身体]", ...bodyLines,
     ...(durabilityLines.length ? ["", "[耐久]", ...durabilityLines] : []),
     "", "[属性]", ...attributeLines,
-    "", "[OVR]", ...ovrLines,
+    "", "[模型估算综评]", ...ovrLines,
     "", "[热区]", ...hotZoneLines,
     "", "[徽章]", ...groupBadgeLines(result.badges),
     ...(personalityLines.length ? ["", "[个性]", ...personalityLines] : []),
@@ -697,6 +694,9 @@ function RookieBuilder({
   const pendingTeamDrawRef = useRef<{ round: TeamRound; completionStatus: string } | null>(null);
   const customDialogRef = useRef<HTMLElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  // Mirrors the latest committed lock state so rapid successive commits
+  // expand from the newest state instead of a stale render closure.
+  const locksRef = useRef<LockState>({});
 
   useEffect(() => {
     onFlowActiveChange?.(settingsLocked);
@@ -856,6 +856,7 @@ function RookieBuilder({
     ? `已抽中${drawingTeamLabel ?? "球队"}`
     : status;
   const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : undefined;
+  const rookieCardsReady = rookieCards !== null;
   // Roster pool + manual-mode rookie-card pseudo sources share one id space.
   const allSourcesById = useMemo(() => {
     const merged = new Map(playersById);
@@ -1055,6 +1056,10 @@ function RookieBuilder({
   }, [hasNextBatch, isTeamDrawing, playersById, round.offset, round.playerOrder, settingsLocked]);
 
   const confirmSettings = () => {
+    if (!rookieCardsReady) {
+      setStatus(rookieCardLoadError ? "新秀卡数据加载失败，请刷新后重试" : "正在加载新秀卡数据，请稍候…");
+      return;
+    }
     setFirstName((current) => current.trim().replace(/\s+/g, " ") || generateRookieFirstName());
     setLastName((current) => current.trim().replace(/\s+/g, " ") || generateRookieLastName());
     setSettingsLocked(true);
@@ -1083,7 +1088,7 @@ function RookieBuilder({
 
   const choosePlayer = (player: PlayerSource) => {
     const id = playerId(player);
-    if (!settingsLocked || isTeamDrawing || (!isManualSelection && usedBy.has(id))) return;
+    if (!settingsLocked || isTeamDrawing || (!isManualSelection && (usedBy.has(id) || !hasRookieCard(rookieCards, player.name)))) return;
     setSelectedPlayerId(id);
     setPlayerVersionGroupKey(null);
     setStatus(`已选择${getPlayerNameCN(player.name)}`);
@@ -1095,7 +1100,10 @@ function RookieBuilder({
     setPlayerVersionGroupKey(group.key);
   };
 
-  const finishLock = (nextLocks: LockState) => {
+  const finishLock = (bundleId: string, lock: BundleLock) => {
+    const nextLocks = applyBundleLock(locksRef.current, bundleId, lock);
+    if (nextLocks === locksRef.current) return; // already locked / duplicate commit
+    locksRef.current = nextLocks;
     setLocks(nextLocks);
     setSelectedPlayerId(null);
     setPlayerVersionGroupKey(null);
@@ -1111,8 +1119,8 @@ function RookieBuilder({
 
   const clickBundle = (bundle: Bundle) => {
     const existing = locks[bundle.id];
-    if (existing || !settingsLocked || isTeamDrawing || !selectedPlayer || usedBy.has(playerId(selectedPlayer))) return;
-    finishLock({ ...locks, [bundle.id]: { kind: "player", playerId: playerId(selectedPlayer) } });
+    if (existing || !settingsLocked || isTeamDrawing || !selectedPlayer || usedBy.has(playerId(selectedPlayer)) || !hasRookieCard(rookieCards, selectedPlayer.name)) return;
+    finishLock(bundle.id, { kind: "player", playerId: playerId(selectedPlayer) });
   };
 
   const openSlotPicker = (bundle: Bundle) => {
@@ -1125,11 +1133,15 @@ function RookieBuilder({
     const source = cardToPlayerSource(card);
     const id = source.id!;
     setCardSources((current) => new Map(current).set(id, source));
-    finishLock({ ...locks, [pickerBundleId]: { kind: "player", playerId: id } });
+    finishLock(pickerBundleId, { kind: "player", playerId: id });
     setPickerBundleId(null);
   };
 
   const confirmManualSetup = () => {
+    if (!rookieCardsReady) {
+      setStatus(rookieCardLoadError ? "新秀卡数据加载失败，请刷新后重试" : "正在加载新秀卡数据，请稍候…");
+      return;
+    }
     setManualSetupDone(true);
     setSettingsLocked(true);
     setStatus(skipBodyConstraints ? "已关闭降级算法，请点击左侧属性槽选择新秀球员" : "请点击左侧属性槽，为每个槽位选择新秀球员");
@@ -1146,7 +1158,7 @@ function RookieBuilder({
   const confirmCustomLock = () => {
     if (!customizingBundle || customizingBundle.id === "potential" || !customDraftIsValid || locks[customizingBundle.id] || isTeamDrawing) return;
     const values = Object.fromEntries(customizingBundle.attrs.map((attr) => [attr, clamp(Number(customDraft[attr]))]));
-    finishLock({ ...locks, [customizingBundle.id]: { kind: "custom", values } });
+    finishLock(customizingBundle.id, { kind: "custom", values });
   };
 
   const reset = () => {
@@ -1164,6 +1176,7 @@ function RookieBuilder({
     setTeamDrawPhase("rolling");
     setDrawingTeamId(null);
     setLocks({});
+    locksRef.current = {};
     setSwitchesLeft(playerSwitchLimit);
     setSelectedPlayerId(null);
     setPlayerVersionGroupKey(null);
@@ -1259,7 +1272,7 @@ function RookieBuilder({
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-ink-200 bg-ink-50 px-3 py-2.5">
               <span className="mr-auto text-[9px] text-ink-400">进入后点击左侧属性槽选择球员</span>
-              <button className="action-button primary-action px-3 py-1.5 text-[10px]" onClick={confirmManualSetup} type="button"><Check className="h-3.5 w-3.5" />进入自选生成</button>
+              <button className="action-button primary-action px-3 py-1.5 text-[10px]" disabled={!rookieCardsReady} onClick={confirmManualSetup} title={!rookieCardsReady ? (rookieCardLoadError ? "新秀卡数据加载失败，请刷新后重试" : "正在加载新秀卡数据") : undefined} type="button"><Check className="h-3.5 w-3.5" />进入自选生成</button>
             </div>
           </section>
         </div>
@@ -1393,7 +1406,7 @@ function RookieBuilder({
             </div>
             <div className="builder-setup-actions flex shrink-0 items-center justify-end gap-1.5" aria-label="设置操作">
               {!settingsLocked && !isManualSelection && (
-                <button className="action-button primary-action justify-center px-3 py-1.5 text-[11px] font-semibold" onClick={confirmSettings} type="button">
+                <button className="action-button primary-action justify-center px-3 py-1.5 text-[11px] font-semibold" disabled={!rookieCardsReady} onClick={confirmSettings} title={!rookieCardsReady ? (rookieCardLoadError ? "新秀卡数据加载失败，请刷新后重试" : "正在加载新秀卡数据") : undefined} type="button">
                   <Check className="h-3.5 w-3.5" />确认并抽取
                 </button>
               )}
@@ -1574,14 +1587,15 @@ function RookieBuilder({
           </div> : <div className="grid flex-1 auto-rows-[62px] grid-cols-2 gap-2 p-2.5">
             {shownPlayers.map((player) => {
               const id = playerId(player);
-              const unavailable = usedBy.has(id);
-              const selected = selectedPlayerId === id;
               const cardForPlayer = lookupRookieCard(rookieCards, player.name);
+              const missingRookieCard = cardForPlayer === null;
+              const unavailable = usedBy.has(id) || missingRookieCard;
+              const selected = selectedPlayerId === id;
               const displayedPlayerOverall = cardForPlayer?.overall ?? player.overall;
               return (
-                <button key={id} className={`interactive-card flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : unavailable || isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`} disabled={unavailable || isComplete} onClick={() => choosePlayer(player)} type="button">
+                <button key={id} className={`interactive-card flex min-w-0 items-center gap-2 rounded-[6px] border px-2 text-left ${selected ? "border-ink-700 bg-ink-50 shadow-[inset_3px_0_0_#2b8969]" : unavailable || isComplete ? "cursor-not-allowed border-ink-100 bg-ink-50 opacity-40" : "border-ink-200 bg-white hover:border-ink-400 hover:bg-ink-50"}`} disabled={unavailable || isComplete} onClick={() => choosePlayer(player)} title={missingRookieCard ? "暂无新秀卡数据，不能用于生成" : undefined} type="button">
                   <PlayerHeadshot name={player.name} priority />
-                  <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(player.name)}</span><span className="block text-[9px] text-ink-400">{player.position ?? "--"}{player.isEstimated ? " · 估算值" : ""}{unavailable ? " · 已选用" : ""}{cardForPlayer?.overall != null ? " · 新秀卡" : ""}</span></span>
+                  <span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(player.name)}</span><span className="block text-[9px] text-ink-400">{player.position ?? "--"}{player.isEstimated ? " · 估算值" : ""}{usedBy.has(id) ? " · 已选用" : ""}{missingRookieCard ? " · 暂无新秀卡" : ""}{cardForPlayer?.overall != null ? " · 新秀卡" : ""}</span></span>
                   <span className="flex shrink-0 items-center gap-1"><span className={`shrink-0 text-[14px] font-bold tabular-nums ${typeof displayedPlayerOverall === "number" ? valueColor(displayedPlayerOverall) : "text-ink-400"}`}>{displayedPlayerOverall ?? "--"}</span>{cardForPlayer?.overall != null && <span className="rounded-[3px] bg-court-500/10 px-1 py-0.5 text-[8px] font-semibold text-court-700">新秀</span>}</span>
                 </button>
               );
@@ -1606,9 +1620,10 @@ function RookieBuilder({
                 <div className="section-label">{"新秀球员卡"}</div>
                 <div className="mt-1 truncate text-[15px] font-semibold text-ink-800" data-testid="rookie-name">{rookieName}</div>
                 <div className="mt-2 flex items-end justify-between">
-                  <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">{"新秀 OVR"}</div></div>
-                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">游戏 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
+                  <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">模型估算综评</div></div>
+                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{position}/{secondaryPosition} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">非官方推测值 · 模型 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
                 </div>
+                <div className="mt-2 rounded-[5px] border border-warning-500/20 bg-warning-500/10 px-2 py-1.5 text-[9px] leading-4 text-warning-700">综评由本工具按最终属性、徽章和无形属性估算，不是 2K 实机读取的真实官方综评。</div>
               </div>
               <div className="grid grid-cols-2 gap-px bg-ink-200 text-[10px]">
                 <div className="bg-white px-2.5 py-2"><span className="text-ink-400">身高</span><strong className="float-right">{result.height}</strong></div>

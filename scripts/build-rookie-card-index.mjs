@@ -112,6 +112,7 @@ function buildIndex(cardList) {
     badges: cardList.map((card) => (card.badges ?? []).map((badge) => [badge.name, badge.tier])),
     personalityBadges: cardList.map((card) => (card.personalityBadges ?? []).map((badge) => [badge.name, badge.tier])),
     potentials: cardList.map((card) => card.potential ?? null),
+    dataQualities: cardList.map((card) => card.dataQuality ?? null),
     vitals: {
       fields: vitalsFields,
       rows: cardList.map((card) => vitalsFields.map((field) => card.vitals?.[field] ?? null)),
@@ -128,20 +129,34 @@ function buildIndex(cardList) {
 }
 
 // Keep the combined index for offline scripts/tests and backwards compatibility.
-// Production loading uses the two split files below so each lazy chunk stays under
-// the repository's 500 kB bundle budget.
+// Production loading uses the split files below so each lazy chunk stays under
+// the repository's 500 kB bundle budget. Legacy cards are split into broad year
+// bands because the full pre-2018 index is now larger than the budget.
 const index = buildIndex(unique);
 const legacy = buildIndex(unique.filter((card) => card.year < 2018));
+const legacyPre1990 = buildIndex(unique.filter((card) => card.year < 1990));
+const legacy1990To2004 = buildIndex(unique.filter((card) => card.year >= 1990 && card.year <= 2004));
+const legacy2005To2017 = buildIndex(unique.filter((card) => card.year >= 2005 && card.year < 2018));
 const current = buildIndex(unique.filter((card) => card.year >= 2018));
 const OUT_LEGACY = path.join(ROOT, "src", "data", "rookieCardIndex-legacy.min.json");
+const OUT_LEGACY_PRE_1990 = path.join(ROOT, "src", "data", "rookieCardIndex-legacy-pre1990.min.json");
+const OUT_LEGACY_1990_2004 = path.join(ROOT, "src", "data", "rookieCardIndex-legacy-1990-2004.min.json");
+const OUT_LEGACY_2005_2017 = path.join(ROOT, "src", "data", "rookieCardIndex-legacy-2005-2017.min.json");
 const OUT_CURRENT = path.join(ROOT, "src", "data", "rookieCardIndex-current.min.json");
 
 fs.writeFileSync(OUT, JSON.stringify(index), "utf8");
 fs.writeFileSync(OUT_LEGACY, JSON.stringify(legacy), "utf8");
+fs.writeFileSync(OUT_LEGACY_PRE_1990, JSON.stringify(legacyPre1990), "utf8");
+fs.writeFileSync(OUT_LEGACY_1990_2004, JSON.stringify(legacy1990To2004), "utf8");
+fs.writeFileSync(OUT_LEGACY_2005_2017, JSON.stringify(legacy2005To2017), "utf8");
 fs.writeFileSync(OUT_CURRENT, JSON.stringify(current), "utf8");
 const bytes = fs.statSync(OUT).size;
 const legacyBytes = fs.statSync(OUT_LEGACY).size;
+const legacyPre1990Bytes = fs.statSync(OUT_LEGACY_PRE_1990).size;
+const legacy1990To2004Bytes = fs.statSync(OUT_LEGACY_1990_2004).size;
+const legacy2005To2017Bytes = fs.statSync(OUT_LEGACY_2005_2017).size;
 const currentBytes = fs.statSync(OUT_CURRENT).size;
 console.log(`rookieCardIndex.min.json: ${unique.length} unique cards (from ${cards.length} raw across ${years.length} years), ${(bytes / 1024).toFixed(1)} KB`);
 console.log(`split indexes: legacy=${legacy.keys.length} cards / ${(legacyBytes / 1024).toFixed(1)} KB, current=${current.keys.length} cards / ${(currentBytes / 1024).toFixed(1)} KB`);
+console.log(`legacy runtime chunks: pre1990=${legacyPre1990.keys.length} cards / ${(legacyPre1990Bytes / 1024).toFixed(1)} KB, 1990-2004=${legacy1990To2004.keys.length} cards / ${(legacy1990To2004Bytes / 1024).toFixed(1)} KB, 2005-2017=${legacy2005To2017.keys.length} cards / ${(legacy2005To2017Bytes / 1024).toFixed(1)} KB`);
 console.log(`attr fields: ${index.attrs.fields.length}, tendency fields: ${index.tendencies.fields.length}`);

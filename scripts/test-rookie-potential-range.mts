@@ -4,7 +4,7 @@ import index from "../src/data/rookieCardIndex.min.json" with { type: "json" };
 
 const lookup = createRookieCardLookup(index);
 
-// Luka card: potential min/max must survive the columnar round-trip
+// Known card ranges must survive the columnar round-trip.
 const luka = lookup.get(corePlayerName("Luka Doncic"));
 assert.ok(luka, "Luka card exists");
 assert.deepEqual(
@@ -13,7 +13,6 @@ assert.deepEqual(
   "Luka potential range from DB2K export",
 );
 
-// A couple more cards with known ranges
 const wemby = lookup.get(corePlayerName("Victor Wembanyama"));
 assert.ok(wemby, "Wemby card exists");
 assert.deepEqual(wemby.potential, { current: 99, min: 95, max: 99 });
@@ -22,11 +21,22 @@ const flagg = lookup.get(corePlayerName("Cooper Flagg"));
 assert.ok(flagg, "Flagg card exists");
 assert.ok(flagg.potential && flagg.potential.min != null && flagg.potential.max != null);
 
-// All 421 cards should carry a potential range (or null only if source had none)
-let nullRanges = 0;
+let missingRanges = 0;
+let checkedRanges = 0;
 for (const [key, card] of lookup) {
-  if (!card.potential || card.potential.min == null || card.potential.max == null) nullRanges += 1;
+  const range = card.potential;
+  if (!range || range.current == null || range.min == null || range.max == null) {
+    missingRanges += 1;
+    continue;
+  }
+  checkedRanges += 1;
+  assert.ok(range.min <= range.max, `${key}: potential min must be <= max (${range.min}-${range.max})`);
+  assert.ok(
+    range.current >= range.min && range.current <= range.max,
+    `${key}: potential current ${range.current} must be within ${range.min}-${range.max}`,
+  );
 }
-console.log(`cards with missing potential range: ${nullRanges}/421`);
 
+assert.equal(missingRanges, 0, "all indexed rookie cards should carry a complete potential range");
+console.log(`potential ranges OK: ${checkedRanges}/${lookup.size} cards, missing=${missingRanges}`);
 console.log("POTENTIAL RANGE DATA CHECKS PASSED");

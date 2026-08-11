@@ -26,6 +26,11 @@ export function cardsByYear(lookup: RookieCardLookup | null | undefined, year: n
 
 /** 槽位对应属性值：bundle attrs 中卡有真实值的均值（取整），无任何值时返回 null。 */
 export function slotValueForCard(card: RookieCard, bundle: Bundle): number | null {
+  if (bundle.id === "potential") {
+    return typeof card.potential?.current === "number" && Number.isFinite(card.potential.current)
+      ? card.potential.current
+      : null;
+  }
   const values = bundle.attrs
     .map((attr) => card.detailed[attr])
     .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
@@ -35,5 +40,12 @@ export function slotValueForCard(card: RookieCard, bundle: Bundle): number | nul
 
 /** 槽位属性显示文案：多属性槽位列出各属性值。 */
 export function slotAttrsForCard(card: RookieCard, bundle: Bundle): Array<{ attr: string; value: number | null }> {
+  if (bundle.id === "potential") {
+    return [
+      { attr: "潜力", value: typeof card.potential?.current === "number" ? card.potential.current : null },
+      { attr: "最低", value: typeof card.potential?.min === "number" ? card.potential.min : null },
+      { attr: "最高", value: typeof card.potential?.max === "number" ? card.potential.max : null },
+    ];
+  }
   return bundle.attrs.map((attr) => ({ attr, value: typeof card.detailed[attr] === "number" ? card.detailed[attr] : null }));
 }

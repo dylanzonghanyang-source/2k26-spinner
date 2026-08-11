@@ -9,8 +9,8 @@ import {
 } from "./domain";
 import rosterCatalog2k26 from "./data/versions/2k26/rosterCatalog.json";
 import rosterCatalog2k27 from "./data/versions/2k27-play-now/rosterCatalog.json";
-import badgeProfiles2k26 from "./data/versions/2k26/badges.json";
-import detailedPlayers2k26 from "./data/versions/2k26/players.json";
+import badgeProfiles2k26 from "./data/versions/2k26/badges.json" with { type: "json" };
+import detailedPlayers2k26 from "./data/versions/2k26/players.json" with { type: "json" };
 
 const appVersion = "v0.6.2";
 const lastUpdated = "2026-08-02";
@@ -145,8 +145,8 @@ const versionData2k26: VersionData = {
 let versionData2k27Promise: Promise<VersionData> | null = null;
 function loadVersionData2k27(): Promise<VersionData> {
   versionData2k27Promise ??= Promise.all([
-    import("./data/versions/2k27-play-now/badges.json"),
-    import("./data/versions/2k27-play-now/players.json"),
+    import("./data/versions/2k27-play-now/badges.json", { with: { type: "json" } }),
+    import("./data/versions/2k27-play-now/players.json", { with: { type: "json" } }),
   ]).then(([badgesModule, playersModule]) => ({
     label: "NBA 2K27 数据 · 最新阵容",
     rosterCatalog: rosterCatalog2k27 as RosterCatalogData,
@@ -348,7 +348,7 @@ const App = () => {
               <span className="lg:hidden">自选</span>
               <span className="hidden lg:inline">自选生成</span>
             </button>
-            <button aria-pressed={appMode === "database"} className="mode-nav-button" data-active={appMode === "database"} onClick={() => setAppMode("database")} title="浏览全部新秀卡数据" type="button">
+            <button aria-pressed={appMode === "database"} className="mode-nav-button" data-active={appMode === "database"} disabled={builderFlowActive} onClick={() => setAppMode("database")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "浏览全部新秀卡数据"} type="button">
               <Database className="h-3.5 w-3.5" />
               <span className="lg:hidden">数据库</span>
               <span className="hidden lg:inline">数据库</span>

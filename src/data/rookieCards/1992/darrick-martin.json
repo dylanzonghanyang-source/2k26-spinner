@@ -16,7 +16,7 @@
   "potential": {
     "current": 70,
     "min": 65,
-    "max": 65
+    "max": 70
   },
   "vitals": {
     "firstName": "Darrick",
@@ -228,5 +228,9 @@
     "Triple Threat Shoot": 10,
     "Use Glass": 45
   },
-  "personalityBadges": []
+  "personalityBadges": [],
+  "dataQuality": {
+    "potentialRangeCorrected": true,
+    "potentialRangeNote": "min/max expanded to include current (official card value preserved)"
+  }
 }
