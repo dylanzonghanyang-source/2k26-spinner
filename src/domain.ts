@@ -1,5 +1,5 @@
-import { badgeTierRank, type BadgeTier } from "./badgeTiers";
-export type { BadgeTier } from "./badgeTiers";
+import { badgeTierRank, type BadgeTier } from "./badgeTiers.ts";
+export type { BadgeTier } from "./badgeTiers.ts";
 
 export type PlayerSource = {
   id?: string;

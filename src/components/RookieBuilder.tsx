@@ -51,6 +51,7 @@ import { cardToPlayerSource } from "../rookieCardSource";
 import { generateRookieFirstName, generateRookieLastName } from "../rookieNames";
 import { type BuilderBody as BodySettings } from "../rookieBodyConstraints";
 import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../fieldCategories";
+import { createExportText } from "../exportText";
 
 export type RookieBuilderTeam = {
   id: string;
@@ -415,192 +416,6 @@ async function copyText(text: string) {
   }
 }
 
-function createExportText(
-  rookieName: string,
-  result: ReturnType<typeof createResult>,
-  locks: LockState,
-  evaluations: Record<string, Evaluation>,
-  players: Map<string, PlayerSource>,
-  tendencyLoadState: TendencyLoadState,
-  dataVersionLabel: string,
-) {
-  const card = result.card ?? null;
-  const v = (key: string) => card?.vitals?.[key];
-  const vs = (key: string) => {
-    const value = v(key);
-    return value == null || value === "" ? "--" : String(value);
-  };
-  const vn = (key: string) => {
-    const value = v(key);
-    return typeof value === "number" && Number.isFinite(value) ? String(value) : "--";
-  };
-  const handCN = (hand: string | number | boolean | null | undefined) =>
-    hand === "Right" ? "右手" : hand === "Left" ? "左手" : hand == null ? "--" : String(hand);
-  // Full record sections come from the locked rookie card (single-card build);
-  // without a card the export keeps the classic reduced fields.
-  const sep = " ｜ ";
-  const vitalLines = card ? [
-    `名字: ${vs("firstName")}${sep}姓氏: ${vs("lastName")}${sep}昵称: ${vs("nickname")}`,
-    `位置: ${result.position}${result.secondary ? `（次要: ${result.secondary}）` : ""}${sep}球衣号码: ${vn("jerseyNumber")}`,
-    `出生: ${vn("birthYear")}年${vn("birthMonth")}月${vn("birthDay")}日${sep}年龄: ${result.age}`,
-    `惯用手: ${handCN(v("dominantHand"))}（扣篮: ${handCN(v("dominantDunkHand"))}）${sep}职业年限: ${vn("yearsPro")}`,
-    `巅峰年龄: ${vn("peakStartAge")}-${vn("peakEndAge")}`,
-    `进攻方式: ${[1, 2, 3, 4].map((n) => vs(`playType${n}`)).join(sep)}`,
-    `比赛主控者: ${v("playInitiator") == null ? "--" : v("playInitiator") ? "是" : "否"}${sep}强制不先发: ${vs("forceNonStarter")}`,
-    `胜利重要性: ${vn("playForWinner")}${sep}经济重要性: ${vn("financialSecurity")}${sep}忠诚度: ${vn("loyalty")}`,
-    `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）${sep}成长概率: ${vn("boomPercent")}%${sep}平均: ${vn("averagePercent")}%${sep}衰退: ${vn("bustPercent")}%`,
-    `成长速度: 每年 +${result.progressSpeed} OVR`,
-  ] : [
-    `姓名: ${rookieName}`,
-    `年龄: ${result.age}${sep}位置: ${result.position}${result.secondary ? `（次要: ${result.secondary}）` : ""}`,
-    `惯用手: ${result.hand}（扣篮: ${result.dunkHand}）`,
-    `巅峰年龄: ${result.peakStart}-${result.peakEnd}`,
-    `成长速度: 每年 +${result.progressSpeed} OVR`,
-    `潜力: ${result.potential}（${result.potentialMin}-${result.potentialMax}）${sep}成长概率: ${result.boom}%${sep}平均: ${result.normal}%${sep}衰退: ${result.bust}%`,
-  ];
-  const bodyLines = card ? [
-    `身高: ${typeof v("heightInches") === "number" ? `${Math.round((v("heightInches") as number) * 2.54)} cm` : `${result.height} cm`}${sep}体重: ${typeof v("weightLb") === "number" ? `${Math.round((v("weightLb") as number) * 0.4536)} kg` : `${result.weight} kg`}`,
-    `臂展: ${typeof v("wingspanCm") === "number" ? `${v("wingspanCm")} cm` : result.wingspan}${sep}肩宽: ${vs("shoulderLength") === "--" ? result.shoulder : vs("shoulderLength")}${sep}颈长: ${vs("neckLength") === "--" ? result.neck : vs("neckLength")}${sep}躯干: ${vs("trunkLength") === "--" ? result.torso : vs("trunkLength")}`,
-  ] : [
-    `身高: ${result.height} cm${sep}体重: ${result.weight} kg`,
-    `臂展（1-100）: ${result.wingspan}${sep}肩宽: ${result.shoulder}${sep}颈长: ${result.neck}${sep}躯干: ${result.torso}`,
-  ];
-  const cardDurabilityKeys = ["head", "neck", "back", "leftShoulder", "rightShoulder", "leftElbow", "rightElbow", "leftHip", "rightHip", "leftKnee", "rightKnee", "leftAnkle", "rightAnkle", "leftFoot", "rightFoot"] as const;
-  const durabilityShort: Record<(typeof cardDurabilityKeys)[number], string> = {
-    head: "头部", neck: "颈部", back: "背部",
-    leftShoulder: "左肩", rightShoulder: "右肩",
-    leftElbow: "左肘", rightElbow: "右肘",
-    leftHip: "左髋", rightHip: "右髋",
-    leftKnee: "左膝", rightKnee: "右膝",
-    leftAnkle: "左踝", rightAnkle: "右踝",
-    leftFoot: "左脚", rightFoot: "右脚",
-  };
-  const durabilityAttrByCardKey: Record<(typeof cardDurabilityKeys)[number], string> = {
-    head: "Head Durability",
-    neck: "Neck Durability",
-    back: "Back Durability",
-    leftShoulder: "Left Shoulder Durability",
-    rightShoulder: "Right Shoulder Durability",
-    leftElbow: "Left Elbow Durability",
-    rightElbow: "Right Elbow Durability",
-    leftHip: "Left Hip Durability",
-    rightHip: "Right Hip Durability",
-    leftKnee: "Left Knee Durability",
-    rightKnee: "Right Knee Durability",
-    leftAnkle: "Left Ankle Durability",
-    rightAnkle: "Right Ankle Durability",
-    leftFoot: "Left Foot Durability",
-    rightFoot: "Right Foot Durability",
-  };
-  const durabilityLines = card ? [
-    `耐久: ${cardDurabilityKeys.map((key) => `${durabilityShort[key]} ${result.initialAttrs[durabilityAttrByCardKey[key]] ?? "--"}`).join(sep)}${sep}综合 ${result.initialAttrs["Overall Durability"] ?? "--"}`,
-  ] : [];
-  const zoneSlots: { label: string; slots: { short: string; keys: string[] }[] }[] = [
-    { label: "篮下", slots: [
-      { short: "篮下", keys: ["underBasket", "篮下"] },
-      { short: "近距离左侧", keys: ["closeLeft", "近距离左侧"] },
-      { short: "近距离中央", keys: ["closeMiddle", "近距离中央"] },
-      { short: "近距离右侧", keys: ["closeRight", "近距离右侧"] },
-    ] },
-    { label: "中距离", slots: [
-      { short: "左底角", keys: ["midLeft", "中距离左侧底角"] },
-      { short: "左45", keys: ["midLeftCenter", "中距离左侧45度"] },
-      { short: "弧顶", keys: ["midCenter", "中距离弧顶"] },
-      { short: "右45", keys: ["midRightCenter", "中距离右侧45度"] },
-      { short: "右底角", keys: ["midRight", "中距离右侧底角"] },
-    ] },
-    { label: "三分", slots: [
-      { short: "左底角", keys: ["threeLeft", "三分左侧底角"] },
-      { short: "左45", keys: ["threeLeftCenter", "三分左侧45度"] },
-      { short: "弧顶", keys: ["threeCenter", "三分弧顶"] },
-      { short: "右45", keys: ["threeRightCenter", "三分右侧45度"] },
-      { short: "右底角", keys: ["threeRight", "三分右侧底角"] },
-    ] },
-  ];
-  const hotZoneSource = result.hotZones;
-  const zoneStateCN = (state: string) => (state === "Hot" || state === "热区") ? "热区" : (state === "Cold" || state === "冷区") ? "冷区" : "中性";
-  const hotZoneLines = zoneSlots.flatMap((group) => {
-    const items = group.slots.flatMap((slot) => {
-      const key = slot.keys.find((k) => hotZoneSource[k] !== undefined);
-      return key != null ? [`${slot.short} ${zoneStateCN(hotZoneSource[key])}`] : [];
-    });
-    return items.length ? [`${group.label}: ${items.join(sep)}`] : [];
-  });
-  const badgeLabel = (badge: { name: string; tier: string }) => `${getBadgeNameCN(badge.name)} ${badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}`;
-  const personalityLines = card?.personalityBadges?.length
-    ? card.personalityBadges.map(badgeLabel)
-    : [];
-  const groupBadgeLines = (badges: { name: string; tier: string }[]): string[] => {
-    const grouped = badgeGroups.flatMap((group) => {
-      const members = badges.filter((badge) =>
-        group.badges.some((candidate) => normalizeBadgeName(candidate) === normalizeBadgeName(badge.name)),
-      );
-      return members.length ? [`${group.label}: ${members.map(badgeLabel).join(sep)}`] : [];
-    });
-    const ungrouped = badges.filter((badge) =>
-      !badgeGroups.some((group) => group.badges.some((candidate) => normalizeBadgeName(candidate) === normalizeBadgeName(badge.name))),
-    );
-    return [...grouped, ...(ungrouped.length ? [`其他: ${ungrouped.map(badgeLabel).join(sep)}`] : [])];
-  };
-  const tendencyLines = tendencyLoadState === "loading"
-    ? ["正在加载倾向数据"]
-    : tendencyLoadState === "error"
-      ? ["倾向数据加载失败，请刷新后重试"]
-      : tendencyLoadState === "unavailable"
-        ? ["当前版本暂无独立倾向数据"]
-        : Object.keys(result.tendencies).length
-        ? tendencyGroups.flatMap((group) => {
-          const members = group.fields.filter((field) => result.tendencies[field] !== undefined);
-          return members.length ? [`${group.label}: ${members.map((field) => `${getTendencyNameCN(field)} ${result.tendencies[field]}`).join(sep)}`] : [];
-        })
-        : ["暂无倾向数据"];
-  const durabilityAttrShort: Record<string, string> = {
-    "Head Durability": "头部", "Neck Durability": "颈部", "Back Durability": "背部",
-    "Left Shoulder Durability": "左肩", "Right Shoulder Durability": "右肩",
-    "Left Elbow Durability": "左肘", "Right Elbow Durability": "右肘",
-    "Left Hip Durability": "左髋", "Right Hip Durability": "右髋",
-    "Left Knee Durability": "左膝", "Right Knee Durability": "右膝",
-    "Left Ankle Durability": "左踝", "Right Ankle Durability": "右踝",
-    "Left Foot Durability": "左脚", "Right Foot Durability": "右脚",
-    "Overall Durability": "综合",
-  };
-  const attributeLines = attributeGroups.flatMap((group) => {
-    const items = group.attrs.flatMap((attr) => {
-      if (attr === "Potential Min" || attr === "Potential Max") return [];
-      const value = result.initialAttrs[attr];
-      return value == null ? [] : [`${durabilityAttrShort[attr] ?? attrNameCN[attr] ?? attr} ${value}`];
-    });
-    return items.length ? [`${group.label}: ${items.join(sep)}`] : [];
-  });
-  const ovrLines = [
-    "说明: 综评由本工具按最终属性、徽章和无形属性模型估算，仅作生成参考；不是 2K 实机读取的真实官方综评。",
-    `模型估算初始综评: ${result.initialStrength}（目标 ${result.initialOverallTarget}）`,
-    `无形属性: ${result.intangibles}`,
-    ...(result.initialOverallConstraintReachable ? [] : ["警告：手动锁定的数值使模型估算综评无法完全达到目标"]),
-  ];
-  const templateLines = bundles.map((bundle) => {
-    const lock = locks[bundle.id];
-    if (lock?.kind === "custom") {
-      const values = bundle.attrs.map((attr) => `${attrNameCN[attr] ?? attr} ${lock.values[attr]}`).join("，");
-      return `${bundle.label}: 手动设置（${values}）`;
-    }
-    const player = lock?.kind === "player" ? players.get(lock.playerId) : undefined;
-    return `${bundle.label}: ${player ? getPlayerNameCN(player.name) : "--"}`;
-  });
-  return [
-    `${dataVersionLabel} 新秀生成清单`, "",
-    "[资料]", ...vitalLines,
-    "", "[身体]", ...bodyLines,
-    ...(durabilityLines.length ? ["", "[耐久]", ...durabilityLines] : []),
-    "", "[属性]", ...attributeLines,
-    "", "[模型估算综评]", ...ovrLines,
-    "", "[热区]", ...hotZoneLines,
-    "", "[徽章]", ...groupBadgeLines(result.badges),
-    ...(personalityLines.length ? ["", "[个性]", ...personalityLines] : []),
-    "", "[倾向]", ...tendencyLines,
-    "", "[模板]", ...templateLines,
-  ].join("\n");
-}
 
 const headshotSourceTimeoutMs = 2500;
 
@@ -1271,7 +1086,7 @@ function RookieBuilder({
 
   const copyResult = async () => {
     try {
-      await copyText(createExportText(rookieName, result, locks, evaluations, playersById, tendencyLoadState, dataVersionLabel));
+      await copyText(createExportText(rookieName, result, locks, evaluations, allSourcesById, tendencyLoadState, dataVersionLabel));
       setStatus("已复制生成报告");
     } catch {
       setStatus("复制失败，请手动复制");
@@ -1279,7 +1094,7 @@ function RookieBuilder({
   };
 
   const downloadResult = async () => {
-    const blob = new Blob([createExportText(rookieName, result, locks, evaluations, playersById, tendencyLoadState, dataVersionLabel)], { type: "text/plain;charset=utf-8" });
+    const blob = new Blob([createExportText(rookieName, result, locks, evaluations, allSourcesById, tendencyLoadState, dataVersionLabel)], { type: "text/plain;charset=utf-8" });
     const nameSlug = rookieName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     const suggestedName = `2k26-rookie-${nameSlug || position.toLowerCase()}.txt`;
     const showSaveFilePicker = (window as Window & { showSaveFilePicker?: SaveFilePicker }).showSaveFilePicker;
@@ -1313,7 +1128,7 @@ function RookieBuilder({
     anchor.click();
     anchor.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setStatus("已导出生成数据");
+    setStatus("已发起下载，请查看浏览器保存位置");
   };
 
   const pickerBundle = bundles.find((bundle) => bundle.id === pickerBundleId);
