@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ChevronRight, Users, X } from "lucide-react";
 import type { Bundle } from "../createResult";
 import type { RookieCard, RookieCardLookup } from "../rookieCards";
@@ -24,9 +24,6 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
   const [positionFilter, setPositionFilter] = useState<string>("ALL");
   // 手机端（<768px）两步流程：先选选秀届，再选球员，可返回
   const [mobileStep, setMobileStep] = useState<"years" | "players">("years");
-  // 触摸滚动不显示滚动条：底部渐隐提示告知列表可继续滑动
-  const [listHint, setListHint] = useState({ canScroll: false, atBottom: false });
-  const listRef = useRef<HTMLDivElement>(null);
 
   // 数据加载完成后默认选中最新年份
   useEffect(() => {
@@ -59,16 +56,6 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
   }, [positionFilter, query, yearCards]);
 
   const disabledTab = (entry: EntryTab) => entry !== "rookie";
-
-  // 初始/数据变化后评估列表滚动能力（未滚动时 onScroll 不会触发）
-  useEffect(() => {
-    const el = listRef.current;
-    if (!el) return;
-    setListHint({
-      canScroll: el.scrollHeight > el.clientHeight + 4,
-      atBottom: el.scrollTop + el.clientHeight >= el.scrollHeight - 8,
-    });
-  }, [filteredCards.length, positionFilter, query, year]);
 
   return (
     <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
@@ -167,19 +154,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
                     value={query}
                   />
                 </div>
-                <div className="relative min-h-0 flex-1">
-                  <div
-                    ref={listRef}
-                    className="h-full space-y-1.5 overflow-y-auto p-3"
-                    onScroll={(event) => {
-                      const el = event.currentTarget;
-                      setListHint({
-                        canScroll: el.scrollHeight > el.clientHeight + 4,
-                        atBottom: el.scrollTop + el.clientHeight >= el.scrollHeight - 8,
-                      });
-                    }}
-                    style={{ WebkitOverflowScrolling: "touch" }}
-                  >
+                <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-3" style={{ WebkitOverflowScrolling: "touch" }}>
                     {filteredCards.length === 0 && (
                       <div className="py-8 text-center text-[11px] text-ink-400">
                         {year === null ? "暂无新秀卡数据" : `${year} 届没有匹配的新秀`}
@@ -221,12 +196,6 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
                       );
                     })}
                   </div>
-                  {listHint.canScroll && !listHint.atBottom && (
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-ink-50 via-ink-50/70 to-transparent pb-1 pt-8 text-[9px] font-medium text-ink-500">
-                      滑动查看全部 {filteredCards.length} 名
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
             <div className="flex items-center justify-between border-t border-ink-200 bg-ink-50 px-3 py-2.5">

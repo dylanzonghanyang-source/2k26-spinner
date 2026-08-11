@@ -37,6 +37,8 @@ html, body, #root {
 
 body {
   margin: 0;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   background:
     radial-gradient(circle at 12% -18%, rgb(var(--color-accent-rgb) / 0.065), transparent 34rem),
     #f5f5f2;
@@ -896,11 +898,9 @@ input:focus-visible {
   transform: scale(0.985);
 }
 
-/* The manual-mode player pool can render 1000+ cards; let the browser skip
-   off-screen layout/paint work (fixed 62px rows make the intrinsic size safe). */
 .builder-player-pane .interactive-card {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 62px;
+  /* content-visibility removed: off-screen rows re-layout on scroll entry,
+     causing visible size jumps / flicker on mobile (估算尺寸→实际尺寸). */
 }
 
 .draw-status-icon {
