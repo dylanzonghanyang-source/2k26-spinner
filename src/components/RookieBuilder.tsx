@@ -1164,6 +1164,12 @@ function RookieBuilder({
 
   return (
     <section className="flex min-h-0 flex-1 flex-col gap-2.5">
+      {rookieCardLoadError && (
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 rounded-[5px] border border-warning/25 bg-warning-soft px-3 py-2 text-[11px] font-medium text-warning" role="alert">
+          <span>新秀卡数据加载失败（网络或资源问题）。请重新加载应用重试；若持续失败请稍后再试。</span>
+          <button className="action-button px-2 py-1 text-[10px]" onClick={() => window.location.reload()} type="button"><RefreshCw className="h-3 w-3" />重新加载应用</button>
+        </div>
+      )}
       {isManualSelection && !manualSetupDone && (
         <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
           <section aria-label="自选生成设置" aria-modal="true" className="dialog-surface w-full max-w-[460px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" role="dialog">

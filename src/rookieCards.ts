@@ -271,6 +271,11 @@ export function loadRookieCards(): Promise<RookieCardLookup> {
         if (!lookup.has(key)) lookup.set(key, card);
       }
     }
+    // Ready 校验：合并结果必须达到最小数据量，否则视为 chunk 半加载失败。
+    // （当前完整集为 1190 张；500 为保守下界，防止未来数据精简时误报。）
+    if (lookup.size < 500) {
+      throw new Error(`rookie card index incomplete: only ${lookup.size} entries after merge`);
+    }
     return lookup;
   });
 }

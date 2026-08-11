@@ -82,6 +82,12 @@ function DatabasePanel() {
 
   return (
     <div className="database-panel flex min-h-0 flex-col gap-2.5">
+      {loadError && (
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 rounded-[5px] border border-warning/25 bg-warning-soft px-3 py-2 text-[11px] font-medium text-warning" role="alert">
+          <span>新秀卡数据加载失败（网络或资源问题）。请重新加载应用重试。</span>
+          <button className="action-button px-2 py-1 text-[10px]" onClick={() => window.location.reload()} type="button">重新加载应用</button>
+        </div>
+      )}
       <div className="panel-surface overflow-hidden">
         <div className="workspace-toolbar flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
           <div className="min-w-0">
