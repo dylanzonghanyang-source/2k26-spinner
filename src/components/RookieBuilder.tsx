@@ -1361,13 +1361,12 @@ function RookieBuilder({
       )}
       <div
         aria-labelledby="builder-step-settings"
-        className="builder-setup panel-surface flex min-h-0 flex-col overflow-hidden lg:flex-1"
+        className="builder-setup panel-surface overflow-hidden"
         data-mobile-active={!settingsLocked}
         id="builder-pane-settings"
         role="tabpanel"
-        style={settingsLocked ? { display: "none" } : undefined}
       >
-        <div className="builder-setup-grid flex-1">
+        <div className="builder-setup-grid">
           <section aria-labelledby="player-identity-label" className="builder-setup-identity bg-white px-3 py-3">
             <div className="section-label mb-2" id="player-identity-label">球员信息</div>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -1471,7 +1470,7 @@ function RookieBuilder({
         </div>
       </div>
 
-      <div className="builder-workspace" data-active={settingsLocked}>
+      <div className="builder-workspace">
         <aside
           aria-label="属性槽"
           className="builder-pane builder-attributes-pane panel-surface min-w-0 overflow-hidden"

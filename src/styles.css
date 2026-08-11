@@ -316,7 +316,6 @@ input:focus-visible {
 @media (min-width: 1024px) {
   .builder-setup-grid {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas:
       "identity body"
       "footer footer";
@@ -331,6 +330,9 @@ input:focus-visible {
 
   .builder-setup-body {
     grid-area: body;
+    /* Match the identity column: content vertically centered so the
+       compact panel doesn't look bottom-heavy with blank space under
+       the numeric inputs. */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -346,11 +348,7 @@ input:focus-visible {
   display: none;
 }
 
-.builder-setup[data-mobile-active="true"] {
-  display: flex;
-  flex-direction: column;
-}
-
+.builder-setup[data-mobile-active="true"],
 .builder-attributes-pane[data-mobile-active="true"],
 .builder-result-pane[data-mobile-active="true"],
 .builder-full-preview[data-mobile-active="true"] {
@@ -365,13 +363,6 @@ input:focus-visible {
   display: grid;
   min-height: 0;
   gap: 10px;
-}
-
-/* Before settings are confirmed the workspace has nothing to show;
-   hide it so the setup panel fills the viewport instead of an empty
-   400px+ placeholder below the body settings. */
-.builder-workspace[data-active="false"] {
-  display: none;
 }
 
 /* Mobile/tablet (<1024px): two-column workspace — attribute slots left,
