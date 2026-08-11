@@ -35,6 +35,7 @@ import {
   type Position,
   type SlotInput,
   applyBundleLock,
+  applyBundleLockTransaction,
 } from "../createResult";
 import {
   loadTendencyLookup,
@@ -581,6 +582,10 @@ function RookieBuilder({
   // Mirrors the latest committed lock state so rapid successive commits
   // expand from the newest state instead of a stale render closure.
   const locksRef = useRef<LockState>({});
+  /** 同步事务镜像：已锁定的来源球员（同一球员一次，跨槽位）。 */
+  const usedPlayerIdsRef = useRef<Set<string>>(new Set());
+  /** 同步事务锁：防同一事件循环内的 lock/draw 并发提交。 */
+  const lockMutationRef = useRef(false);
 
   useEffect(() => {
     onFlowActiveChange?.(settingsLocked);
@@ -986,19 +991,29 @@ function RookieBuilder({
   };
 
   const finishLock = (bundleId: string, lock: BundleLock) => {
-    const nextLocks = applyBundleLock(locksRef.current, bundleId, lock);
-    if (nextLocks === locksRef.current) return; // already locked / duplicate commit
-    locksRef.current = nextLocks;
-    setLocks(nextLocks);
-    setSelectedPlayerId(null);
-    setPlayerVersionGroupKey(null);
-    setCustomizingBundleId(null);
-    if (Object.keys(nextLocks).length === bundles.length) {
-      setStatus(`${"新秀"}已生成`);
-    } else if (isManualSelection) {
-      setStatus("已锁定。请继续为下一个属性槽选择来源球员");
-    } else {
-      drawNextTeam();
+    // 同步事务：同 tick 的并发提交必须在提交层串行化（UI disable 层无法
+    // 阻止旧 render 的 usedBy 放行）。规则见 applyBundleLockTransaction：
+    // 目标槽未锁 + 同 playerId 未使用；一次提交只触发一次 drawNextTeam。
+    if (lockMutationRef.current) return;
+    const transaction = applyBundleLockTransaction(locksRef.current, bundleId, lock, usedPlayerIdsRef.current);
+    if (!transaction.accepted) return;
+    lockMutationRef.current = true;
+    try {
+      locksRef.current = transaction.next;
+      usedPlayerIdsRef.current = transaction.usedPlayerIds;
+      setLocks(transaction.next);
+      setSelectedPlayerId(null);
+      setPlayerVersionGroupKey(null);
+      setCustomizingBundleId(null);
+      if (Object.keys(transaction.next).length === bundles.length) {
+        setStatus(`新秀已生成`);
+      } else if (isManualSelection) {
+        setStatus("已锁定。请继续为下一个属性槽选择来源球员");
+      } else {
+        drawNextTeam();
+      }
+    } finally {
+      lockMutationRef.current = false;
     }
   };
 
@@ -1009,10 +1024,17 @@ function RookieBuilder({
   };
 
   const unlockBundle = (bundleId: string) => {
-    if (!isManualSelection || !locks[bundleId]) return;
+    if (!isManualSelection || !locksRef.current[bundleId]) return;
+    const released = locksRef.current[bundleId];
     const nextLocks = { ...locksRef.current };
     delete nextLocks[bundleId];
     locksRef.current = nextLocks;
+    if (released.kind === "player") {
+      const stillUsed = Object.values(nextLocks).some(
+        (lock) => lock.kind === "player" && lock.playerId === released.playerId,
+      );
+      if (!stillUsed) usedPlayerIdsRef.current.delete(released.playerId);
+    }
     setLocks(nextLocks);
     setStatus("已解锁，可重新为该槽位选择球员");
   };
@@ -1071,6 +1093,8 @@ function RookieBuilder({
     setDrawingTeamId(null);
     setLocks({});
     locksRef.current = {};
+    usedPlayerIdsRef.current = new Set();
+    lockMutationRef.current = false;
     setSwitchesLeft(playerSwitchLimit);
     setSelectedPlayerId(null);
     setPlayerVersionGroupKey(null);

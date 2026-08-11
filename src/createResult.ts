@@ -61,6 +61,37 @@ export function applyBundleLock(
   return { ...current, [bundleId]: lock };
 }
 
+export type BundleLockTransaction = {
+  next: LockState;
+  usedPlayerIds: Set<string>;
+  accepted: boolean;
+};
+
+/**
+ * Transactional lock commit used by the builder's rapid-click path.
+ *
+ * Same-tick concurrent commits must serialize on: target slot unlocked, the
+ * source player not already used by another slot, and no in-flight mutation.
+ * UI disable layers cannot stop two clicks landing before a re-render, so the
+ * rule lives here as a pure function (the builder mirrors usedPlayerIds in a
+ * ref and re-checks lockMutation before each commit).
+ */
+export function applyBundleLockTransaction(
+  current: LockState,
+  bundleId: string,
+  lock: BundleLock,
+  usedPlayerIds: ReadonlySet<string>,
+): BundleLockTransaction {
+  const nextUsed = new Set(usedPlayerIds);
+  if (current[bundleId]) return { next: current, usedPlayerIds: nextUsed, accepted: false };
+  if (lock.kind === "player" && usedPlayerIds.has(lock.playerId)) {
+    return { next: current, usedPlayerIds: nextUsed, accepted: false };
+  }
+  const next = { ...current, [bundleId]: lock };
+  if (lock.kind === "player") nextUsed.add(lock.playerId);
+  return { next, usedPlayerIds: nextUsed, accepted: true };
+}
+
 export type Evaluation = {
   raw: number;
   adjusted: number;

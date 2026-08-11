@@ -7,7 +7,7 @@
  * state; these tests pin the contract that made the ref removable.
  */
 import assert from "node:assert/strict";
-import { applyBundleLock, bundles, type BundleLock } from "../src/createResult.ts";
+import { applyBundleLock, applyBundleLockTransaction, bundles, type BundleLock } from "../src/createResult.ts";
 
 const playerLock = (playerId: string): BundleLock => ({ kind: "player", playerId });
 const customLock = (value: number): BundleLock => ({ kind: "custom", values: { "Three-Point Shot": value } });
@@ -61,6 +61,50 @@ const customLock = (value: number): BundleLock => ({ kind: "custom", values: { "
   }
   assert.equal(Object.keys(state).length, bundles.length, "all bundles lockable");
   console.log(`applyBundleLock: all ${bundles.length} bundle ids lock cleanly`);
+}
+
+// 6. Transactional rule: the SAME playerId cannot lock a second slot (audit
+// race — two rapid clicks on different slots with one selected player).
+{
+  let state: Record<string, BundleLock> = {};
+  let used = new Set<string>();
+  const first = applyBundleLockTransaction(state, "three", playerLock("p1"), used);
+  assert.equal(first.accepted, true, "first slot accepts");
+  state = first.next;
+  used = first.usedPlayerIds;
+  // Same tick, no re-render: second click targets a DIFFERENT slot but the
+  // same playerId — must be rejected.
+  const second = applyBundleLockTransaction(state, "mid", playerLock("p1"), used);
+  assert.equal(second.accepted, false, "same playerId on a second slot must be rejected");
+  assert.equal(second.next, state, "rejected commit must not mutate state");
+  assert.deepEqual(second.usedPlayerIds, used, "rejected commit must not extend usedPlayerIds");
+  assert.equal(Object.keys(state).length, 1, "only one slot locked");
+  console.log("applyBundleLockTransaction: same playerId across two slots commits once");
+}
+
+// 7. Transactional rule: distinct playerIds on distinct slots compose in one tick.
+{
+  let state: Record<string, BundleLock> = {};
+  let used = new Set<string>();
+  let accepted = 0;
+  for (const [bundle, playerId] of [["three", "p1"], ["mid", "p2"], ["face", "p3"]] as const) {
+    const t = applyBundleLockTransaction(state, bundle, playerLock(playerId), used);
+    if (t.accepted) accepted++;
+    state = t.next;
+    used = t.usedPlayerIds;
+  }
+  assert.equal(accepted, 3, "three distinct commits accepted");
+  assert.equal(Object.keys(state).length, 3);
+  assert.equal(used.size, 3, "three distinct players tracked");
+  console.log("applyBundleLockTransaction: distinct commits all accepted");
+}
+
+// 8. Transactional rule: custom locks never consume a player id.
+{
+  const t = applyBundleLockTransaction({}, "three", customLock(88), new Set());
+  assert.equal(t.accepted, true);
+  assert.equal(t.usedPlayerIds.size, 0, "custom lock must not consume a player id");
+  console.log("applyBundleLockTransaction: custom lock leaves player pool untouched");
 }
 
 console.log("bundle lock contract OK");

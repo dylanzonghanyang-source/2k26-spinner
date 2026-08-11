@@ -1,5 +1,5 @@
 import { Database, Moon, Sun, UserRoundPlus, UsersRound } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import RookieBuilder, { type RookieBuilderTeam } from "./components/RookieBuilder";
 import DatabasePanel from "./components/DatabasePanel";
 import appLogo from "./assets/2kspinner-logo.png";
@@ -255,8 +255,16 @@ const App = () => {
   const [builderFlowActive, setBuilderFlowActive] = useState(false);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
+  // 同步镜像：builder 的 flow 状态经 effect 回传有一帧窗口，模式切换 handler
+  // 必须二次校验该 ref，防止"确认并抽取 → 同 tick 切数据库"竞态。
+  const flowActiveRef = useRef(false);
   const handleBuilderFlowActiveChange = useCallback((active: boolean) => {
+    flowActiveRef.current = active;
     setBuilderFlowActive(active);
+  }, []);
+  const switchMode = useCallback((mode: AppMode) => {
+    if (flowActiveRef.current) return;
+    setAppMode(mode);
   }, []);
 
   useEffect(() => {
@@ -338,17 +346,17 @@ const App = () => {
           </div>
 
           <nav className="mode-nav justify-self-center" aria-label="选择模式">
-            <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} disabled={builderFlowActive} onClick={() => setAppMode("rookie")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : undefined} type="button">
+            <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} disabled={builderFlowActive} onClick={() => switchMode("rookie")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : undefined} type="button">
               <UserRoundPlus className="h-3.5 w-3.5" />
               <span className="lg:hidden">新秀</span>
               <span className="hidden lg:inline">新秀生成</span>
             </button>
-            <button aria-pressed={appMode === "custom"} className="mode-nav-button" data-active={appMode === "custom"} disabled={builderFlowActive} onClick={() => setAppMode("custom")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "逐项为属性槽选择来源球员"} type="button">
+            <button aria-pressed={appMode === "custom"} className="mode-nav-button" data-active={appMode === "custom"} disabled={builderFlowActive} onClick={() => switchMode("custom")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "逐项为属性槽选择来源球员"} type="button">
               <UsersRound className="h-3.5 w-3.5" />
               <span className="lg:hidden">自选</span>
               <span className="hidden lg:inline">自选生成</span>
             </button>
-            <button aria-pressed={appMode === "database"} className="mode-nav-button" data-active={appMode === "database"} disabled={builderFlowActive} onClick={() => setAppMode("database")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "浏览全部新秀卡数据"} type="button">
+            <button aria-pressed={appMode === "database"} className="mode-nav-button" data-active={appMode === "database"} disabled={builderFlowActive} onClick={() => switchMode("database")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "浏览全部新秀卡数据"} type="button">
               <Database className="h-3.5 w-3.5" />
               <span className="lg:hidden">数据库</span>
               <span className="hidden lg:inline">数据库</span>
@@ -363,7 +371,7 @@ const App = () => {
                 aria-label="切换到 2K26 数据"
                 className={`version-option ${dataVersion === "2k26" ? "version-active" : ""}`}
                 disabled={builderFlowActive}
-                onClick={() => setDataVersion("2k26")}
+                onClick={() => { if (!flowActiveRef.current) setDataVersion("2k26"); }}
                 role="radio"
                 type="button"
               >
