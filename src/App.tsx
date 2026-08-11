@@ -12,7 +12,7 @@ import rosterCatalog2k27 from "./data/versions/2k27-play-now/rosterCatalog.json"
 import badgeProfiles2k26 from "./data/versions/2k26/badges.json" with { type: "json" };
 import detailedPlayers2k26 from "./data/versions/2k26/players.json" with { type: "json" };
 
-const appVersion = "v0.7.0";
+const appVersion = "v0.7.1";
 const lastUpdated = "2026-08-11";
 
 type AppMode = "rookie" | "custom" | "database";

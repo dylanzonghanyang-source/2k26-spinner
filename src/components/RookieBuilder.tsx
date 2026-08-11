@@ -134,6 +134,60 @@ function isNaturalSecondaryPosition(position: Position, secondary: Position) {
   return naturalSecondaryPositions[position].includes(secondary);
 }
 
+type PositionPickerProps = {
+  position: Position;
+  secondaryPosition: Position;
+  disabled?: boolean;
+  onChangePrimary: (next: Position) => void;
+  onChangeSecondary: (next: Position) => void;
+};
+
+/** 主/次位置选择器：随机模式主面板与自选模式设置弹窗共用。 */
+function PositionPicker({ position, secondaryPosition, disabled = false, onChangePrimary, onChangeSecondary }: PositionPickerProps) {
+  return (
+    <>
+      <div className="min-w-0">
+        <div className="section-label mb-1">主位置</div>
+        <div aria-label="主位置" className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
+          {positions.map((option) => {
+            const selected = position === option;
+            const stateClass = selected
+              ? "bg-ink-900 text-white"
+              : disabled
+                ? "bg-ink-50 text-ink-300"
+                : "bg-white text-ink-500 hover:bg-ink-50 hover:text-ink-800";
+            return (
+              <button key={option} aria-label={`主位置 ${option}`} aria-pressed={selected} className={`segmented-button h-full min-w-0 flex-1 px-1 text-[11px] font-semibold disabled:cursor-not-allowed ${stateClass}`} disabled={disabled} onClick={() => onChangePrimary(option)} type="button">{option}</button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="min-w-0 sm:col-span-2">
+        <div className="section-label mb-1 flex items-center gap-1.5">
+          次要位置
+        </div>
+        <div aria-label="次要位置" className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
+          {positions.map((option) => {
+            const isPrimary = option === position;
+            const selected = secondaryPosition === option;
+            const natural = !isPrimary && isNaturalSecondaryPosition(position, option);
+            const stateClass = selected
+              ? natural ? "bg-court-700 text-white" : "bg-warning-600 text-white"
+              : disabled || isPrimary
+                ? "bg-ink-50 text-ink-300"
+                : natural
+                  ? "bg-white text-ink-600 hover:bg-court-50 hover:text-court-800"
+                  : "bg-warning-50/70 text-warning-600 hover:bg-warning-100 hover:text-warning-800";
+            return (
+              <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`segmented-button h-full min-w-0 flex-1 px-1 text-[11px] font-semibold disabled:cursor-not-allowed ${stateClass}`} disabled={disabled || isPrimary} onClick={() => onChangeSecondary(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规搭配" : "非常规搭配：仍会结合来源属性和体型计算"} type="button">{option}</button>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
+
 function blendedPositionWeight(position: Position, secondary: Position, bundleId: string) {
   return positionWeights[position][bundleId] * (1 - secondaryPositionShare) + positionWeights[secondary][bundleId] * secondaryPositionShare;
 }
@@ -1250,6 +1304,18 @@ function RookieBuilder({
             </div>
             <div className="space-y-3 border-t border-ink-200 p-3">
               <div>
+                <div className="mb-1.5 text-[10px] font-semibold text-ink-700">位置（影响位置交叉惩罚）</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <PositionPicker
+                    onChangePrimary={changePosition}
+                    onChangeSecondary={changeSecondaryPosition}
+                    position={position}
+                    secondaryPosition={secondaryPosition}
+                  />
+                </div>
+                {skipBodyConstraints && <div className="mt-1.5 text-[9px] text-ink-400">已关闭降级算法，位置交叉惩罚不参与计算</div>}
+              </div>
+              <div>
                 <div className="mb-1.5 text-[10px] font-semibold text-ink-700">身体设定（影响降级算法）</div>
                 <div className="grid grid-cols-2 gap-2">
                   <BodyNumberInput disabled={skipBodyConstraints} label="身高" max={300} min={150} onChange={(value) => updateBody("height", value)} unit="cm" value={body.height} />
@@ -1330,44 +1396,12 @@ function RookieBuilder({
                   ))}
                 </div>
               </div>
-              <div className="min-w-0">
-                <div className="section-label mb-1">主位置</div>
-                <div aria-label="主位置" className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
-                  {positions.map((option) => {
-                    const selected = position === option;
-                    const stateClass = selected
-                      ? "bg-ink-900 text-white"
-                      : settingsLocked
-                        ? "bg-ink-50 text-ink-300"
-                        : "bg-white text-ink-500 hover:bg-ink-50 hover:text-ink-800";
-                    return (
-                      <button key={option} aria-label={`主位置 ${option}`} aria-pressed={selected} className={`segmented-button h-full min-w-0 flex-1 px-1 text-[11px] font-semibold disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked} onClick={() => changePosition(option)} type="button">{option}</button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="min-w-0 sm:col-span-2">
-                <div className="section-label mb-1 flex items-center gap-1.5">
-                  次要位置
-                </div>
-                <div aria-label="次要位置" className="flex h-8 w-full gap-px overflow-hidden rounded-[5px] border border-ink-200 bg-ink-200" role="group">
-                  {positions.map((option) => {
-                    const isPrimary = option === position;
-                    const selected = secondaryPosition === option;
-                    const natural = !isPrimary && isNaturalSecondaryPosition(position, option);
-                    const stateClass = selected
-                      ? natural ? "bg-court-700 text-white" : "bg-warning-600 text-white"
-                      : settingsLocked || isPrimary
-                        ? "bg-ink-50 text-ink-300"
-                        : natural
-                          ? "bg-white text-ink-600 hover:bg-court-50 hover:text-court-800"
-                          : "bg-warning-50/70 text-warning-600 hover:bg-warning-100 hover:text-warning-800";
-                    return (
-                      <button key={option} aria-label={`次要位置 ${option}`} aria-pressed={selected} className={`segmented-button h-full min-w-0 flex-1 px-1 text-[11px] font-semibold disabled:cursor-not-allowed ${stateClass}`} disabled={settingsLocked || isPrimary} onClick={() => changeSecondaryPosition(option)} title={isPrimary ? "次要位置不能与主位置相同" : natural ? "常规搭配" : "非常规搭配：仍会结合来源属性和体型计算"} type="button">{option}</button>
-                    );
-                  })}
-                </div>
-              </div>
+              <PositionPicker
+                onChangePrimary={changePosition}
+                onChangeSecondary={changeSecondaryPosition}
+                position={position}
+                secondaryPosition={secondaryPosition}
+              />
             </div>
           </section>
 
