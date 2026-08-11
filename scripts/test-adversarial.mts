@@ -193,7 +193,9 @@ function isFiniteNumber(v: unknown): v is number {
   check("parsePositionRoles(null)", parsePositionRoles(null).length === 0);
   check("parsePositionRoles('CENTER')", parsePositionRoles("CENTER").length === 0);
   const d = effectivePositionDistance("PG", "SG", ["PG"]);
-  check("effectivePositionDistance PG target, PG source", d === 0, `d=${d}`);
+  // 规格：同主位置（primaryDistance=0）但提供 secondary 时按
+  // SECONDARY_BODY_DISTANCE_WEIGHT 加权 —— PG 目标 + SG 次要 + PG 来源 = 0.2
+  check("effectivePositionDistance PG target, PG source w/ secondary", typeof d === "number" && Math.abs(d - 0.2) < 1e-9, `d=${d}`);
   const d2 = effectivePositionDistance("C", "PF", ["PG"]);
   check("effectivePositionDistance C target, PG source w/ secondary", typeof d2 === "number" && d2 !== null && d2 > 2, `d=${d2}`);
 }
