@@ -24,7 +24,11 @@ const getArg = (name) => {
   const i = args.indexOf(name);
   return i >= 0 ? args[i + 1] : undefined;
 };
-const INPUT = getArg("--input") || "/Users/yangzonghan/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_u99tqi61ovek22_9013/msg/file/2026-08/gap_by_year_draft_classes.json";
+const INPUT = getArg("--input") ?? "";
+if (!INPUT) {
+  console.error("ERROR: --input is required (path to the gap_by_year_draft_classes.json snapshot).");
+  process.exit(1);
+}
 const OUT_ROOT = getArg("--out") || path.join("src", "data", "rookieCards");
 
 // ============================================================

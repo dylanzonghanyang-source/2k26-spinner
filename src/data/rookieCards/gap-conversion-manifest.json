@@ -1,6 +1,6 @@
 {
   "source": "DB2K Gap-by-year draft classes snapshot",
-  "inputFile": "/Users/yangzonghan/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_u99tqi61ovek22_9013/msg/file/2026-08/eight_players_draft_snapshot.json",
+  "inputFile": "eight_players_draft_snapshot.json",
   "mode": "8 players draft-class snapshot (ROOKIE values, read-only)",
   "recordCount": 8,
   "converted": 8,

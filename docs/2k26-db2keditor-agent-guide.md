@@ -233,7 +233,7 @@ Get-Content D:\2K26Export\2018_roster_snapshot.json -Raw | Select-String -Patter
 **方式 A（推荐，若 Windows Hermes 配了 SSH terminal backend 到 Mac）：**
 ```powershell
 # 直接把文件推到 Mac（若已配置 SSH）
-scp D:\2K26Export\2018_roster_snapshot.json yangzonghan@<MAC_IP>:/Users/yangzonghan/Projects/Personal/2k26-spinner/data/raw/db2k/2018_roster_snapshot.json
+scp D:\2K26Export\2018_roster_snapshot.json <USER>@<MAC_IP>:<REPO>/data/raw/db2k/2018_roster_snapshot.json
 ```
 Mac 侧转换脚本（由 Mac 端 Hermes 执行，不在本 Windows 任务范围）：`scripts/convert-db2k-to-rookiecard.py --input ... --output rookieCards/2018/ --validate`。
 
@@ -245,7 +245,7 @@ Mac 侧转换脚本（由 Mac 端 Hermes 执行，不在本 Windows 任务范围
 原因：文件在 Windows 上，需要转给 Mac 端处理。
 请你做：
 1. 把 D:\2K26Export\2018_roster_snapshot.json 传到 Mac（微信/网盘/U 盘均可）
-2. 放到 /Users/yangzonghan/Projects/Personal/2k26-spinner/data/raw/db2k/ 下
+2. 放到 <REPO>/data/raw/db2k/ 下
 完成后回复我：「已传」
 ```
 

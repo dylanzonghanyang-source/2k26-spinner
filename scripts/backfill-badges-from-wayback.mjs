@@ -416,6 +416,7 @@ function parseArgs(args) {
   let concurrency = 2;
   let onlySlugs = null;
   let retryFailed = false;
+  const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === "--limit") {
@@ -424,6 +425,12 @@ function parseArgs(args) {
       concurrency = Number(args[++index]) || 4;
     } else if (arg === "--slugs") {
       onlySlugs = String(args[++index]).split(",").map((value) => value.trim()).filter(Boolean);
+      // 路径边界（公测审计 12.5）：slug 必须匹配规范格式，禁止路径穿越。
+      const invalid = onlySlugs.filter((slug) => !SLUG_RE.test(slug));
+      if (invalid.length > 0) {
+        console.error(`ERROR: invalid --slugs entries (must match ${SLUG_RE}): ${invalid.join(", ")}`);
+        process.exit(1);
+      }
     } else if (arg === "--retry-failed") {
       retryFailed = true;
     }
