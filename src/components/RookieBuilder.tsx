@@ -1424,7 +1424,7 @@ function RookieBuilder({
           </section>
 
 
-          <section aria-labelledby="body-settings-label" className="builder-setup-body bg-ink-50/60 px-3 py-3">
+          <section aria-labelledby="body-settings-label" className="builder-setup-body bg-white px-3 py-3">
             <div className="mb-2 flex items-center justify-between gap-2">
               <div className="section-label" id="body-settings-label">身体设定</div>
               <button aria-label="随机生成身体设定" className="action-button h-7 w-7 justify-center" disabled={settingsLocked} onClick={randomizeBody} title="随机生成身体设定" type="button"><Shuffle className="h-3.5 w-3.5" /></button>
