@@ -149,11 +149,17 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
                         {attrs.map(({ attr, value }) => `${attr}: ${value ?? "--"}`).join(" · ")}
                       </span>
                     </span>
-                    <span className="flex shrink-0 items-center gap-2">
+                    <span className="flex shrink-0 items-center gap-2.5">
                       {slotValue !== null && (
-                        <span className={`text-[13px] font-bold tabular-nums ${valueColor(slotValue)}`}>{slotValue}</span>
+                        <span className="flex items-baseline gap-1">
+                          <span className="text-[8px] font-medium text-ink-400">属性</span>
+                          <span className={`text-[13px] font-bold tabular-nums ${valueColor(slotValue)}`}>{slotValue}</span>
+                        </span>
                       )}
-                      <span className={`text-[15px] font-bold tabular-nums ${card.overall != null ? valueColor(card.overall) : "text-ink-400"}`}>{card.overall ?? "--"}</span>
+                      <span className="flex items-baseline gap-1">
+                        <span className="text-[8px] font-medium text-ink-400">综评</span>
+                        <span className={`text-[15px] font-bold tabular-nums ${card.overall != null ? valueColor(card.overall) : "text-ink-400"}`}>{card.overall ?? "--"}</span>
+                      </span>
                       <ChevronRight aria-hidden="true" className="h-3.5 w-3.5 text-ink-300" />
                     </span>
                   </button>
