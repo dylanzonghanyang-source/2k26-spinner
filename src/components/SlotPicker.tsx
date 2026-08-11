@@ -4,6 +4,7 @@ import type { Bundle } from "../createResult";
 import type { RookieCard, RookieCardLookup } from "../rookieCards";
 import { cardsByYear, slotAttrsForCard, slotValueForCard, yearsInLookup } from "../rookieCardBrowser";
 import { getPlayerNameCN } from "../playerNames";
+import { attrNameCN } from "../domain";
 import { valueColor } from "../valueColor";
 
 type SlotPickerProps = {
@@ -108,14 +109,11 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
                   {years.map((option) => (
                     <button
                       aria-pressed={year === option}
-                      className={`mb-1 flex h-8 w-full items-center justify-between rounded-[5px] px-2.5 text-[11px] font-semibold ${year === option ? "bg-court-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"}`}
+                      className={`mb-1 flex h-8 w-full items-center rounded-[5px] px-2.5 text-[11px] font-semibold ${year === option ? "bg-court-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"}`}
                       key={option}
                       onClick={() => selectYear(option)}
                       type="button"
-                    >
-                      <span>{option}</span>
-                      <span className="text-[8px] font-medium opacity-70">届</span>
-                    </button>
+                    >{option}</button>
                   ))}
                 </div>
               </div>
@@ -174,11 +172,11 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
                       >
                         <span className="min-w-0 flex-1">
                           <span className="flex items-baseline gap-1.5">
-                            <span className="truncate text-[11px] font-semibold text-ink-800">{card.name}</span>
-                            <span className="truncate text-[9px] text-ink-400">{getPlayerNameCN(card.name)}</span>
+                            <span className="truncate text-[12px] font-semibold text-ink-800">{getPlayerNameCN(card.name)}</span>
+                            <span className="truncate text-[9px] text-ink-400">{card.name}</span>
                           </span>
                           <span className="mt-0.5 block truncate text-[9px] text-ink-400">
-                            {attrs.map(({ attr, value }) => `${attr}: ${value ?? "--"}`).join(" · ")}
+                            {attrs.map(({ attr, value }) => `${attrNameCN[attr] ?? attr}: ${value ?? "--"}`).join(" · ")}
                           </span>
                         </span>
                         <span className="flex shrink-0 items-center gap-2.5">
