@@ -53,6 +53,7 @@ import { generateRookieFirstName, generateRookieLastName } from "../rookieNames"
 import { type BuilderBody as BodySettings } from "../rookieBodyConstraints";
 import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../fieldCategories";
 import { createExportText } from "../exportText";
+import { useModalBehavior } from "../useModalBehavior";
 
 export type RookieBuilderTeam = {
   id: string;
@@ -578,7 +579,8 @@ function RookieBuilder({
 
   const pendingTeamDrawRef = useRef<{ round: TeamRound; completionStatus: string } | null>(null);
   const customDialogRef = useRef<HTMLElement | null>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const manualDialogRef = useRef<HTMLElement | null>(null);
+  const [setupDialogOpen, setSetupDialogOpen] = useState(true);
   // Mirrors the latest committed lock state so rapid successive commits
   // expand from the newest state instead of a stale render closure.
   const locksRef = useRef<LockState>({});
@@ -630,48 +632,18 @@ function RookieBuilder({
     };
   }, [rookieCardLoadError, rookieCards]);
 
-  useEffect(() => {
-    if (!customizingBundleId && !playerVersionGroupKey) return;
-
-    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const focusDialog = () => {
-      const focusable = customDialogRef.current?.querySelector<HTMLElement>("button:not([disabled]), input:not([disabled])");
-      focusable?.focus();
-    };
-    const animationFrame = window.requestAnimationFrame(focusDialog);
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        if (customizingBundleId) setCustomizingBundleId(null);
-        else setPlayerVersionGroupKey(null);
-        return;
-      }
-      if (event.key !== "Tab") return;
-
-      const focusable = [...(customDialogRef.current?.querySelectorAll<HTMLElement>(
-        "button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex='-1'])",
-      ) ?? [])];
-      if (focusable.length === 0) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.cancelAnimationFrame(animationFrame);
-      document.removeEventListener("keydown", handleKeyDown);
-      if (previousFocusRef.current?.isConnected) previousFocusRef.current.focus();
-      previousFocusRef.current = null;
-    };
-  }, [customizingBundleId, playerVersionGroupKey]);
+  // 共享 Modal 行为：焦点进入、Tab 循环、Escape 关闭、焦点恢复、背景 inert、
+  // body scroll lock（aria-modal 与真实交互一致）。
+  const customDialogOpen = Boolean(customizingBundleId || playerVersionGroupKey);
+  useModalBehavior(customDialogOpen, customDialogRef, () => {
+    if (customizingBundleId) setCustomizingBundleId(null);
+    else setPlayerVersionGroupKey(null);
+  });
+  useModalBehavior(
+    isManualSelection && !manualSetupDone && setupDialogOpen,
+    manualDialogRef,
+    () => setSetupDialogOpen(false),
+  );
 
   const teamsById = useMemo(() => new Map(teams.map((team) => [team.id, team])), [teams]);
   const playersById = useMemo(
@@ -1059,6 +1031,7 @@ function RookieBuilder({
       return;
     }
     setManualSetupDone(true);
+    setSetupDialogOpen(false);
     setSettingsLocked(true);
     setStatus(skipBodyConstraints ? "已关闭降级算法，请点击左侧属性槽选择新秀球员" : "请点击左侧属性槽，为每个槽位选择新秀球员");
   };
@@ -1102,6 +1075,7 @@ function RookieBuilder({
     setCustomDraft({});
     setPlayerSearch("");
     setManualSetupDone(false);
+    setSetupDialogOpen(true);
     setSkipBodyConstraints(false);
     setPickerBundleId(null);
     setCardSources(new Map());
@@ -1170,9 +1144,9 @@ function RookieBuilder({
           <button className="action-button px-2 py-1 text-[10px]" onClick={() => window.location.reload()} type="button"><RefreshCw className="h-3 w-3" />重新加载应用</button>
         </div>
       )}
-      {isManualSelection && !manualSetupDone && (
+      {isManualSelection && !manualSetupDone && setupDialogOpen && (
         <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
-          <section aria-label="自选生成设置" aria-modal="true" className="dialog-surface w-full max-w-[460px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" role="dialog">
+          <section aria-label="自选生成设置" aria-modal="true" className="dialog-surface w-full max-w-[460px] overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl" ref={manualDialogRef} role="dialog">
             <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">
               <div className="section-label">自选生成设置</div>
               <span className="text-[9px] text-ink-400">按槽位选择新秀球员</span>

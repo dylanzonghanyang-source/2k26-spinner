@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, Users, X } from "lucide-react";
 import type { Bundle } from "../createResult";
 import type { RookieCard, RookieCardLookup } from "../rookieCards";
@@ -6,6 +6,7 @@ import { cardsByYear, slotAttrsForCard, slotValueForCard, yearsInLookup } from "
 import { getPlayerNameCN } from "../playerNames";
 import { attrNameCN } from "../domain";
 import { valueColor } from "../valueColor";
+import { useModalBehavior } from "../useModalBehavior";
 
 type SlotPickerProps = {
   bundle: Bundle;
@@ -17,6 +18,8 @@ type SlotPickerProps = {
 type EntryTab = "rookie" | "all" | "classic";
 
 function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
+  const dialogRef = useRef<HTMLElement | null>(null);
+  useModalBehavior(true, dialogRef, onClose);
   const years = useMemo(() => yearsInLookup(rookieCards), [rookieCards]);
   const [tab, setTab] = useState<EntryTab>("rookie");
   const [year, setYear] = useState<number | null>(years[0] ?? null);
@@ -63,6 +66,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
         aria-label={`为${bundle.label}槽位选择球员`}
         aria-modal="true"
         className="dialog-surface flex w-full max-w-[640px] h-[min(82vh,860px)] flex-col overflow-hidden rounded-[7px] border border-ink-300 bg-white shadow-xl"
+        ref={dialogRef}
         role="dialog"
       >
         <div className="workspace-toolbar flex items-center justify-between gap-3 px-3 py-2.5">
