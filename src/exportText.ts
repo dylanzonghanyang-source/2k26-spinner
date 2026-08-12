@@ -79,9 +79,11 @@ export function createExportText(
     leftAnkle: "Left Ankle Durability", rightAnkle: "Right Ankle Durability",
     leftFoot: "Left Foot Durability", rightFoot: "Right Foot Durability",
   };
-  const durabilityLines = [(
-    `耐久: ${cardDurabilityKeys.map((key) => `${durabilityShort[key]} ${result.initialAttrs[durabilityAttrByCardKey[key]] ?? "--"}`).join(sep)}${sep}综合 ${result.initialAttrs["Overall Durability"] ?? "--"}`
-  )];
+  // 复制/下载文案：每个字段独占一行（名称 数值），组标签单独成行。
+  const durabilityLines = [
+    `综合 ${result.initialAttrs["Overall Durability"] ?? "--"}`,
+    ...cardDurabilityKeys.map((key) => `${durabilityShort[key]} ${result.initialAttrs[durabilityAttrByCardKey[key]] ?? "--"}`),
+  ];
   const zoneSlots: { label: string; slots: { short: string; keys: string[] }[] }[] = [
     { label: "篮下", slots: [
       { short: "篮下", keys: ["underBasket", "篮下"] },
@@ -111,7 +113,7 @@ export function createExportText(
       const key = slot.keys.find((k) => hotZoneSource[k] !== undefined);
       return key != null ? [`${slot.short} ${zoneStateCN(hotZoneSource[key])}`] : [];
     });
-    return items.length ? [`${group.label}: ${items.join(sep)}`] : [];
+    return items.length ? [group.label, ...items] : [];
   });
   const badgeLabel = (badge: { name: string; tier: string }) => `${getBadgeNameCN(badge.name)} ${badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}`;
   const personalityLines = card?.personalityBadges?.length
@@ -122,12 +124,12 @@ export function createExportText(
       const members = badges.filter((badge) =>
         group.badges.some((candidate) => normalizeBadgeName(candidate) === normalizeBadgeName(badge.name)),
       );
-      return members.length ? [`${group.label}: ${members.map(badgeLabel).join(sep)}`] : [];
+      return members.length ? [group.label, ...members.map(badgeLabel)] : [];
     });
     const ungrouped = badges.filter((badge) =>
       !badgeGroups.some((group) => group.badges.some((candidate) => normalizeBadgeName(candidate) === normalizeBadgeName(badge.name))),
     );
-    return [...grouped, ...(ungrouped.length ? [`其他: ${ungrouped.map(badgeLabel).join(sep)}`] : [])];
+    return [...grouped, ...(ungrouped.length ? ["其他", ...ungrouped.map(badgeLabel)] : [])];
   };
   const tendencyLines = tendencyLoadState === "loading"
     ? ["正在加载倾向数据"]
@@ -138,7 +140,7 @@ export function createExportText(
         : Object.keys(result.tendencies).length
         ? tendencyGroups.flatMap((group) => {
           const members = group.fields.filter((field) => result.tendencies[field] !== undefined);
-          return members.length ? [`${group.label}: ${members.map((field) => `${getTendencyNameCN(field)} ${result.tendencies[field]}`).join(sep)}`] : [];
+          return members.length ? [group.label, ...members.map((field) => `${getTendencyNameCN(field)} ${result.tendencies[field]}`)] : [];
         })
         : ["暂无倾向数据"];
   const durabilityAttrShort: Record<string, string> = {
@@ -157,7 +159,7 @@ export function createExportText(
       const value = result.initialAttrs[attr];
       return value == null ? [] : [`${durabilityAttrShort[attr] ?? attrNameCN[attr] ?? attr} ${value}`];
     });
-    return items.length ? [`${group.label}: ${items.join(sep)}`] : [];
+    return items.length ? [group.label, ...items] : [];
   });
   const ovrLines = [
     "说明: 综评由本工具按最终属性、徽章和无形属性模型估算，仅作生成参考；不是 2K 实机读取的真实官方综评。",
