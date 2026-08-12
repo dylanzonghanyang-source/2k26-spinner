@@ -1931,6 +1931,33 @@ function RookieBuilder({
               </div>
             </div>
           ) : null}
+          {/* 16 槽来源履历：槽位 / 来源球员 / 原始值 → 修正值（默认收起） */}
+          <details className="border-t border-ink-200 px-3 py-2.5">
+            <summary className="cursor-pointer select-none text-[10px] font-semibold text-ink-700">16 槽来源履历</summary>
+            <div className="mt-2 space-y-0.5">
+              {bundles.map((bundle) => {
+                const lock = locks[bundle.id];
+                const evaluation = evaluations[bundle.id];
+                if (!lock || !evaluation) return null;
+                const isCustom = lock.kind === "custom";
+                const player = !isCustom ? allSourcesById.get(lock.playerId) : undefined;
+                const sourceLabel = isCustom
+                  ? "手动设置"
+                  : player
+                    ? `${getPlayerNameCN(player.name)}${player.rosterTeam ? ` · ${localizedTeamName(player.rosterTeam)}` : ""}`
+                    : lock.playerId;
+                return (
+                  <div className="flex min-h-5 items-center justify-between gap-3 border-t border-ink-700/5 py-0.5 text-[10px]" key={bundle.id}>
+                    <span className="min-w-0 truncate text-ink-500">{bundle.label}</span>
+                    <span className="flex shrink-0 items-baseline gap-1.5">
+                      <span className="max-w-[110px] truncate text-[9px] text-ink-400">{sourceLabel}</span>
+                      <span className="tabular-nums text-ink-700">{evaluation.raw} → {evaluation.adjusted}</span>
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </details>
         </section>
         )}
       </div>

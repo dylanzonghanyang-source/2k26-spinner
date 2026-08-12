@@ -90,7 +90,16 @@ function allPlayerLock(playerId: string): LockState {
   return Object.fromEntries(bundles.map((b) => [b.id, { kind: "player", playerId } as const]));
 }
 
-const evaluations: Record<string, Evaluation> = {};
+const evaluations: Record<string, Evaluation> = Object.fromEntries(
+  bundles.map((bundle, index) => [bundle.id, {
+    raw: 80,
+    adjusted: 75 + (index % 4),
+    bodyAdjustment: -5 + (index % 4),
+    bodyAdjustments: {},
+    bodyCaps: {},
+    values: Object.fromEntries(bundle.attrs.map((attr) => [attr, 75 + (index % 4)])),
+  } as Evaluation]),
+);
 const cardVitals = {
   firstName: "Zion", lastName: "Williamson", nickname: "Zanos",
   jerseyNumber: 1, birthYear: 2000, birthMonth: 7, birthDay: 6,
@@ -141,7 +150,7 @@ const cardResult = makeResult({
     locks[bundle.id] = { kind: "player", playerId: index % 2 === 0 ? "card:zion-williamson" : "player:1" };
   });
   const text = createExportText("测试新秀", cardResult, locks, evaluations, sources, tendencyState, "NBA 2K26 数据");
-  const templateSection = text.split("[模板]")[1].split("[来源卡资料]")[0];
+  const templateSection = text.split("[模板]")[1].split("[生成履历]")[0];
   assert.ok(!templateSection.includes("--"), "self-pick card sources must resolve (no -- in templates)");
   assert.ok(templateSection.includes("锡安·威廉姆森"), "card pseudo-source name must appear");
   assert.ok(templateSection.includes("贾·莫兰特"), "roster source name must appear");
@@ -198,7 +207,7 @@ const cardResult = makeResult({
   const sources = new Map<string, PlayerSource>([["player:1", makeSource("player:1", "Anthony Edwards")]]);
   const locks: LockState = allPlayerLock("player:1");
   const text = createExportText("全模板", makeResult(), locks, evaluations, sources, tendencyState, "NBA 2K26 数据");
-  const templateSection = text.split("[模板]")[1].split("[来源卡资料]")[0];
+  const templateSection = text.split("[模板]")[1].split("[生成履历]")[0];
   const lines = templateSection.trim().split("\n");
   assert.equal(lines.length, bundles.length, "one template line per bundle");
   for (const line of lines) {
@@ -206,4 +215,37 @@ const cardResult = makeResult({
   }
 }
 
-console.log("✅ test-export-text: self-pick resolution, appendix split, custom slots, identical copy/download, 16 templates all pass");
+// ---- 6. [生成履历] ledger: one line per locked slot with raw → adjusted ----
+{
+  const sources = new Map<string, PlayerSource>([["player:1", makeSource("player:1", "Anthony Edwards")]]);
+  const locks: LockState = allPlayerLock("player:1");
+  const text = createExportText("履历新秀", makeResult(), locks, evaluations, sources, tendencyState, "NBA 2K26 数据");
+  const ledger = text.split("[生成履历]")[1]?.split("[来源卡资料]")[0] ?? "";
+  const lines = ledger.trim().split("\n").filter(Boolean);
+  assert.equal(lines.length, bundles.length, "one ledger line per locked bundle");
+  for (const line of lines) {
+    assert.ok(line.includes("｜"), `ledger line uses separator: ${line}`);
+    assert.ok(line.includes("→"), `ledger line has raw→adjusted: ${line}`);
+  }
+  assert.ok(ledger.includes("安东尼·爱德华兹"), "ledger names the source player (Chinese)");
+  assert.ok(ledger.includes("Test"), "ledger shows the source team");
+}
+
+// ---- 7. mixed custom + player ledger lines ----
+{
+  const sources = new Map<string, PlayerSource>([["player:1", makeSource("player:1", "Luka Doncic")]]);
+  const locks: LockState = {};
+  bundles.forEach((bundle, index) => {
+    if (index === 0) {
+      locks[bundle.id] = { kind: "custom", values: Object.fromEntries(bundle.attrs.map((a) => [a, 90])) };
+    } else {
+      locks[bundle.id] = { kind: "player", playerId: "player:1" };
+    }
+  });
+  const text = createExportText("混合履历", makeResult(), locks, evaluations, sources, tendencyState, "NBA 2K26 数据");
+  const ledger = text.split("[生成履历]")[1]?.split("[来源卡资料]")[0] ?? "";
+  assert.ok(ledger.includes("手动设置"), "custom slot ledger line reads 手动设置");
+  assert.ok(ledger.includes("卢卡·东契奇"), "player slot ledger line resolves the name");
+}
+
+console.log("✅ test-export-text: self-pick resolution, appendix split, custom slots, identical copy/download, 16 templates, ledger all pass");

@@ -196,6 +196,22 @@ export function createExportText(
     );
   }
 
+  // --- [生成履历] appendix: 16-slot provenance (bundle / source / raw → adjusted) ---
+  const ledgerLines: string[] = [];
+  for (const bundle of bundles) {
+    const lock = locks[bundle.id];
+    const evaluation = evaluations[bundle.id];
+    if (!lock || !evaluation) continue;
+    if (lock.kind === "custom") {
+      ledgerLines.push(`${bundle.label}${sep}手动设置${sep}${evaluation.raw} → ${evaluation.adjusted}`);
+      continue;
+    }
+    const player = sources.get(lock.playerId);
+    const sourceName = player ? player.name : lock.playerId;
+    const team = player?.rosterTeam ?? player?.team ?? "--";
+    ledgerLines.push(`${bundle.label}${sep}${getPlayerNameCN(sourceName)}（${team}）${sep}${evaluation.raw} → ${evaluation.adjusted}`);
+  }
+
   return [
     `${dataVersionLabel} 新秀生成清单`, "",
     "[资料]", ...vitalLines,
@@ -208,6 +224,7 @@ export function createExportText(
     ...(personalityLines.length ? ["", "[个性]", ...personalityLines] : []),
     "", "[倾向]", ...tendencyLines,
     "", "[模板]", ...templateLines,
+    ...(ledgerLines.length ? ["", "[生成履历]", ...ledgerLines] : []),
     ...(cardAppendix.length ? ["", "[来源卡资料]", ...cardAppendix] : []),
   ].join("\n");
 }
