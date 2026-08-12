@@ -980,6 +980,15 @@ function RookieBuilder({
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
     });
   };
+  /** 属性 → 所属槽位 → 来源球员名（用于最终页来源追踪） */
+  const attrSourceName = (attr: string): string | null => {
+    const bundle = bundles.find((b) => b.attrs.includes(attr));
+    if (!bundle) return null;
+    const lock = locks[bundle.id];
+    if (lock?.kind !== "player") return null;
+    const player = allSourcesById.get(lock.playerId);
+    return player ? getPlayerNameCN(player.name) : null;
+  };
   const completed = Object.keys(locks).length;
   const isComplete = completed === bundles.length && (!isManualSelection || manualFinalize);
   const exportReady = isComplete && tendencyLoadState !== "loading";
@@ -1546,12 +1555,12 @@ function RookieBuilder({
                     className={`flex h-full w-full min-w-0 items-center gap-1.5 px-2 pr-7 text-left transition ${lock ? "cursor-not-allowed" : isManualSelection || selectedPlayer ? "hover:bg-ink-50" : "cursor-not-allowed"}`}
                     disabled={Boolean(lock) || !settingsLocked || isTeamDrawing || (!isManualSelection && !selectedPlayer)}
                     onClick={isManualSelection ? () => openSlotPicker(bundle) : () => clickBundle(bundle)}
-                    title={lock ? `${weightLabel} · 已锁定；如需修改，请重新开始` : typeof value === "number" ? `${weightLabel} · ${sourceLabel}：${lockedEvaluation?.raw ?? preview?.raw} → ${value}${adjustmentLabel ? `（${adjustmentLabel}）` : ""}` : `${bundle.label} · ${weightLabel}`}
+                    title={lock ? `${weightLabel} · 已锁定；如需修改，请重新开始` : typeof value === "number" ? `${weightLabel} · ${sourceLabel}：来源值 ${lockedEvaluation?.raw ?? preview?.raw} → 身体修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment} → 最终 ${value}${capLabels.length ? ` · ${capLabels.join(" · ")}` : ""}` : `${bundle.label} · ${weightLabel}`}
                     type="button"
                   >
                     <span className="min-w-0 flex-1">
                       <span className="block text-[11px] font-semibold text-ink-800">{bundle.label}</span>
-                      <span className="block truncate text-[8px] text-ink-400">{sourceLabel}{bodyAdjustmentLabel ? ` · ${bodyAdjustmentLabel}` : ""}</span>
+                      <span className="block truncate text-[8px] text-ink-400">{sourceLabel}{typeof value === "number" && bodyAdjustment !== 0 ? ` · ${lockedEvaluation?.raw ?? preview?.raw}→${value}` : bodyAdjustmentLabel ? ` · ${bodyAdjustmentLabel}` : ""}</span>
                     </span>
                     {typeof value === "number" ? (
                       <span className="flex shrink-0 items-center gap-1" title={hasBodyConstraint ? adjustmentLabel : undefined}>
@@ -1773,6 +1782,7 @@ function RookieBuilder({
                     const hasBodyAdjustment = bodyAdjustedAttributes.has(attr);
                     const entryKey = entryFieldKey("属性", attr);
                     const entered = entrySet.has(entryKey);
+                    const sourceName = attrSourceName(attr);
                     return (
                       <div
                         className={`flex min-h-6 cursor-pointer select-none items-center justify-between gap-3 border-t border-ink-700/5 py-1 text-[10px] ${entered ? "bg-court-500/5" : "hover:bg-ink-50"}`}
@@ -1784,10 +1794,12 @@ function RookieBuilder({
                         role="button"
                         style={entered ? { boxShadow: "inset 2px 0 0 #2b8969" } : undefined}
                         tabIndex={0}
+                        title={sourceName || hasBodyAdjustment ? `${sourceName ?? ""}${hasBodyAdjustment ? " · 含身体修正或上限" : ""}`.trim() : undefined}
                       >
-                        <span className="min-w-0 text-ink-500">{attr === "Potential Min" ? "最低潜力" : attr === "Potential Max" ? "最高潜力" : attrNameCN[attr] ?? attr}</span>
-                        <span className="flex shrink-0 items-center gap-1" title={hasBodyAdjustment ? "该属性包含身体修正或上限" : undefined}>
+                        <span className="min-w-0 truncate text-ink-500">{attr === "Potential Min" ? "最低潜力" : attr === "Potential Max" ? "最高潜力" : attrNameCN[attr] ?? attr}</span>
+                        <span className="flex shrink-0 items-center gap-1">
                           {hasBodyAdjustment && <span className="text-[8px] font-semibold text-court-600">身体</span>}
+                          {sourceName && <span className="max-w-[64px] truncate text-[8px] text-ink-300">{sourceName}</span>}
                           <span className={`font-semibold tabular-nums ${typeof value === "number" ? valueColor(value) : "text-ink-300"}`}>{value ?? "--"}</span>
                         </span>
                       </div>
