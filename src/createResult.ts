@@ -226,7 +226,7 @@ export function cardSourceBody(card: RookieCard | null | undefined): SourceBody 
 export type EvaluateOptions = {
   targetPosition?: Position | null;
   secondaryPosition?: Position | null;
-  /** 关闭降级算法：跳过身体约束与位置交叉（自选模式开关） */
+  /** 关闭身体适配校正：跳过身体约束与位置交叉（自选模式开关） */
   skipBody?: boolean;
 };
 

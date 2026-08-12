@@ -65,7 +65,7 @@ export type BodyConstraintOptions = {
   secondaryPosition?: PositionCode | null;
   /** 来源球员位置字符串（可含 C/PF 等双位置，null/unknown 时不启用位置交叉） */
   sourcePosition?: string | null;
-  /** 关闭降级算法：跳过身体约束与位置交叉，原值继承（仅 clamp 到 25-99） */
+  /** 关闭身体适配校正：跳过身体约束与位置交叉，原值继承（仅 clamp 到 25-99） */
   skipBody?: boolean;
 };
 
@@ -206,7 +206,7 @@ export function applyBodyConstraints(
   let usedGraceZone = false;
 
   if (options?.skipBody) {
-    // 降级算法关闭：原值继承，不做来源比较/位置交叉/目标 cap。
+    // 身体适配校正关闭：原值继承，不做来源比较/位置交叉/目标 cap。
     for (const [attr, rawValue] of Object.entries(sourceValues)) {
       const nextValue = clampRating(rawValue);
       values[attr] = nextValue;
