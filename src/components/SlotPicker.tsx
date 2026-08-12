@@ -65,6 +65,9 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
     });
   }, [positionFilter, query, yearCards]);
 
+  // 排序模式：顺位（默认）/ 槽位主值 / 综评 / 适配后值
+  const [sortMode, setSortMode] = useState<"pick" | "slot" | "ovr" | "adapted">("pick");
+
   // 衰减后属性：按生成路径（目标位置/身体/skipBody + 卡自身身体）计算每个候选
   // 卡在该槽位下的身体约束后值，让"挑人"时看到的就是锁定后的实际生成值。
   const decayedBySlug = useMemo(() => {
@@ -84,6 +87,27 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
     }
     return map;
   }, [body, bundle, filteredCards, secondaryPosition, skipBody, targetPosition]);
+
+  const sortedCards = useMemo(() => {
+    const cards = [...filteredCards];
+    if (sortMode === "pick") {
+      cards.sort((a, b) => {
+        const pickOf = (card: RookieCard) => {
+          const raw = Number(card.vitals?.draftPick);
+          return Number.isFinite(raw) && raw > 0 ? raw : 999;
+        };
+        return pickOf(a) - pickOf(b) || a.name.localeCompare(b.name);
+      });
+    } else if (sortMode === "slot") {
+      cards.sort((a, b) => (slotValueForCard(b, bundle) ?? -1) - (slotValueForCard(a, bundle) ?? -1));
+    } else if (sortMode === "ovr") {
+      cards.sort((a, b) => (b.overall ?? -1) - (a.overall ?? -1) || a.name.localeCompare(b.name));
+    } else if (sortMode === "adapted") {
+      const adapted = (card: RookieCard) => decayedBySlug.get(card.slug)?.adjusted ?? slotValueForCard(card, bundle) ?? -1;
+      cards.sort((a, b) => adapted(b) - adapted(a) || a.name.localeCompare(b.name));
+    }
+    return cards;
+  }, [bundle, decayedBySlug, filteredCards, sortMode]);
 
   const disabledTab = (entry: EntryTab) => entry !== "rookie";
 
@@ -175,6 +199,18 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
                     >{pos === "ALL" ? "全部" : pos}</button>
                   ))}
                 </div>
+                <div className="flex items-center gap-1.5 border-b border-ink-200 px-3 py-2">
+                  <span className="shrink-0 text-[9px] font-semibold text-ink-400">排序</span>
+                  {([["pick", "顺位"], ["slot", "槽位主值"], ["ovr", "综评"], ["adapted", "适配后"]] as const).map(([mode, label]) => (
+                    <button
+                      aria-pressed={sortMode === mode}
+                      className={`h-6 rounded-full px-2.5 text-[10px] font-semibold ${sortMode === mode ? "bg-court-600 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"}`}
+                      key={mode}
+                      onClick={() => setSortMode(mode)}
+                      type="button"
+                    >{label}</button>
+                  ))}
+                </div>
                 <div className="flex items-center gap-2 border-b border-ink-200 px-3 py-2">
                   <input
                     aria-label="筛选新秀"
@@ -186,12 +222,12 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
                   />
                 </div>
                 <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-3" style={{ WebkitOverflowScrolling: "touch" }}>
-                    {filteredCards.length === 0 && (
+                    {sortedCards.length === 0 && (
                       <div className="py-8 text-center text-[11px] text-ink-400">
                         {year === null ? "暂无新秀卡数据" : `${year} 届没有匹配的新秀`}
                       </div>
                     )}
-                    {filteredCards.map((card) => {
+                    {sortedCards.map((card) => {
                       const slotValue = slotValueForCard(card, bundle);
                       const attrs = slotAttrsForCard(card, bundle);
                       // 衰减后值：与生成路径一致（身体约束后）；有差异时显示 原→衰减
