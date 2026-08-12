@@ -42,35 +42,39 @@ export type TendencyGroup = { key: string; label: string; fields: string[] };
 export const tendencyGroups: TendencyGroup[] = [
   {
     key: "jumpshot", label: "跳投",
-    fields: ["Shot Under Basket", "Shot Close", "Shot Close Left", "Shot Close Middle", "Shot Close Right",
+    // 字段顺序对齐 DB2K「2k26 球员全部字段」表（跨步跳投在前，区域按底角-45°-弧顶展开）。
+    fields: ["Step Through Shot", "Shot Under Basket", "Shot Close", "Shot Close Left", "Shot Close Middle", "Shot Close Right",
       "Shot Mid-Range", "Spot Up Shot Mid-Range", "Off-Screen Shot Mid-Range",
       "Shot Mid Left", "Shot Mid Left-Center", "Shot Mid Center", "Shot Mid Right-Center", "Shot Mid Right",
       "Shot Three", "Spot Up Shot Three", "Off-Screen Shot Three",
       "Shot Three Left", "Shot Three Left-Center", "Shot Three Center", "Shot Three Right-Center", "Shot Three Right",
       "Contested Jumper Three", "Contested Jumper Mid-Range", "Stepback Three Point Shot",
-      "Stepback Jumper Mid-Range", "Spin Jumper", "Use Glass", "Step Through Shot",
-      "Transition Pull-Up Three Point Shot", "Drive Pull-Up Three", "Drive Pull-Up Mid-Range"],
+      "Stepback Jumper Mid-Range", "Spin Jumper", "Transition Pull-Up Three Point Shot",
+      "Drive Pull-Up Three", "Drive Pull-Up Mid-Range", "Use Glass"],
   },
   {
     key: "finish", label: "上篮和扣篮",
-    fields: ["Driving Layup", "Spin Layup", "Euro Step Layup", "Hop Step Layup",
-      "Standing Dunk", "Driving Dunk", "Flashy Dunk", "Alley-Oop", "Putback", "Crash", "Floater"],
+    // 对齐表格顺序：上篮 → 扣篮系列 → 空接/补篮/冲抢 → 转身/跳步/欧洲步/抛投。
+    fields: ["Driving Layup", "Standing Dunk", "Driving Dunk", "Flashy Dunk",
+      "Alley-Oop", "Putback", "Crash", "Spin Layup", "Hop Step Layup", "Euro Step Layup", "Floater"],
   },
   {
     key: "drive", label: "切入",
+    // 对齐表格顺序：三威胁 → 运球调整 → 突破系列（变向→转身→后撤步→半转身→二次变相→…）。
     fields: ["Triple Threat Pump Fake", "Triple Threat Jab Step", "Triple Threat Idle", "Triple Threat Shoot",
       "Setup With Sizeup", "Setup With Hesitation", "No Setup Dribble",
       "Drive", "Spot Up Drive", "Off-Screen Drive", "Drive Right",
-      "Driving Crossover", "Driving Double Crossover", "Driving Spin", "Driving Half Spin",
-      "Driving Stepback", "Driving Behind the Back", "Driving Dribble Hesitation", "Driving In & Out",
+      "Driving Crossover", "Driving Spin", "Driving Stepback", "Driving Half Spin",
+      "Driving Double Crossover", "Driving Behind the Back", "Driving Dribble Hesitation", "Driving In & Out",
       "No Driving Dribble Move", "Attack Strong on Drive"],
   },
   { key: "pass", label: "传球", fields: ["Dish to Open Man", "Flashy Pass", "Alley-Oop Pass"] },
   {
     key: "post", label: "背身",
-    fields: ["Post Up", "Post Back Down", "Post Aggressive Backdown", "Post Face Up", "Post Spin",
-      "Post Drive", "Post Drop Step", "Post Hop Step", "Shoot From Post", "Post Hook Left", "Post Hook Right",
-      "Post Fade Left", "Post Fade Right", "Post Shimmy Shot", "Post Stepback Shot", "Post Up & Under"],
+    // 对齐表格顺序：单打 → 晃肩 → 面框 → 低位推进 → 强力单打 → 禁区投篮 → 勾手/后仰 → 上下步 → 后撤步 → 切入/转身/沉底步/跳步。
+    fields: ["Post Up", "Post Shimmy Shot", "Post Face Up", "Post Back Down", "Post Aggressive Backdown",
+      "Shoot From Post", "Post Hook Left", "Post Hook Right", "Post Fade Left", "Post Fade Right",
+      "Post Up & Under", "Post Stepback Shot", "Post Drive", "Post Spin", "Post Drop Step", "Post Hop Step"],
   },
   {
     key: "iso", label: "自由发挥",
@@ -80,7 +84,8 @@ export const tendencyGroups: TendencyGroup[] = [
   },
   {
     key: "defense", label: "防守",
-    fields: ["Take Charge", "Pass Interception", "On-Ball Steal", "ContestShot", "Block Shot", "Foul", "Hard Foul"],
+    // 对齐表格顺序：干扰传球 → 制造进攻犯规 → 持球抢断 → 干扰投篮 → 盖帽 → 犯规 → 强硬犯规。
+    fields: ["Pass Interception", "Take Charge", "On-Ball Steal", "ContestShot", "Block Shot", "Foul", "Hard Foul"],
   },
 ];
 
