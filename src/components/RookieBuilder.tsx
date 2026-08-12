@@ -22,6 +22,7 @@ import {
   bodyBases,
   bundles,
   clamp,
+  hash,
   createResult,
   evaluateAll,
   evaluateAllPreview,
@@ -55,6 +56,7 @@ import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../
 import { createExportText } from "../exportText";
 import { useModalBehavior } from "../useModalBehavior";
 import { clearDraft, loadDraft, saveDraft, type RookieDraft } from "../draftStore";
+import { clearEntrySet, entryFieldKey, loadEntrySet, saveEntrySet, toggleEntrySet } from "../entryProgress";
 
 export type RookieBuilderTeam = {
   id: string;
@@ -234,7 +236,11 @@ const hotZoneCNGroups: { key: string; label: string; keys: string[] }[] = [
 ];
 
 /** 按徽章分类分组渲染（表格「徽章」列分类），无法归类的徽章放入「其他」。 */
-function renderBadgeGroups(badges: { name: string; tier: string }[]) {
+function renderBadgeGroups(
+  badges: { name: string; tier: string }[],
+  entrySet?: ReadonlySet<string>,
+  onToggleEntry?: (key: string) => void,
+) {
   if (!badges.length) return <div className="text-[9px] text-ink-400">无</div>;
   const rows: React.ReactNode[] = [];
   for (const group of badgeGroups) {
@@ -246,11 +252,23 @@ function renderBadgeGroups(badges: { name: string; tier: string }[]) {
       <div key={group.key} className="mb-2">
         <div className="mb-1 text-[9px] font-semibold text-court-700">{group.label}</div>
         <div className="flex flex-wrap gap-1">
-          {members.map((badge) => (
-            <span key={`${group.key}:${badge.name}:${badge.tier}`} className="border border-warning-500/20 bg-warning-50 px-1 py-0.5 text-[8px] text-warning-800">
-              {getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}
-            </span>
-          ))}
+          {members.map((badge) => {
+            const entryKey = entryFieldKey("徽章", badge.name);
+            const entered = entrySet?.has(entryKey) ?? false;
+            return (
+              <button
+                className={`border px-1 py-0.5 text-[8px] ${entered
+                  ? "border-court-500/40 bg-court-50 text-court-800"
+                  : "border-warning-500/20 bg-warning-50 text-warning-800 hover:bg-warning-100"}`}
+                key={`${group.key}:${badge.name}:${badge.tier}`}
+                onClick={onToggleEntry ? () => onToggleEntry(entryKey) : undefined}
+                role={onToggleEntry ? "checkbox" : undefined}
+                type="button"
+              >
+                {getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}
+              </button>
+            );
+          })}
         </div>
       </div>,
     );
@@ -263,11 +281,23 @@ function renderBadgeGroups(badges: { name: string; tier: string }[]) {
       <div key="other">
         <div className="mb-1 text-[9px] font-semibold text-ink-400">其他</div>
         <div className="flex flex-wrap gap-1">
-          {ungrouped.map((badge) => (
-            <span key={`other:${badge.name}:${badge.tier}`} className="border border-ink-200 bg-ink-50 px-1 py-0.5 text-[8px] text-ink-600">
-              {getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}
-            </span>
-          ))}
+          {ungrouped.map((badge) => {
+            const entryKey = entryFieldKey("徽章", badge.name);
+            const entered = entrySet?.has(entryKey) ?? false;
+            return (
+              <button
+                className={`border px-1 py-0.5 text-[8px] ${entered
+                  ? "border-court-500/40 bg-court-50 text-court-800"
+                  : "border-ink-200 bg-ink-50 text-ink-600 hover:bg-ink-100"}`}
+                key={`other:${badge.name}:${badge.tier}`}
+                onClick={onToggleEntry ? () => onToggleEntry(entryKey) : undefined}
+                role={onToggleEntry ? "checkbox" : undefined}
+                type="button"
+              >
+                {getBadgeNameCN(badge.name)} · {badgeTierCN[badge.tier as keyof typeof badgeTierCN] ?? badge.tier}
+              </button>
+            );
+          })}
         </div>
       </div>,
     );
@@ -584,6 +614,30 @@ function RookieBuilder({
   const customDialogRef = useRef<HTMLElement | null>(null);
   const manualDialogRef = useRef<HTMLElement | null>(null);
   const [setupDialogOpen, setSetupDialogOpen] = useState(true);
+
+  // --- 录入进度（结果签名命名空间，localStorage 持久化） ---
+  const resultSignature = useMemo(() => {
+    const lockPart = bundles.map((bundle) => {
+      const lock = locks[bundle.id];
+      return lock?.kind === "player" ? lock.playerId : lock?.kind === "custom" ? JSON.stringify(lock.values) : "-";
+    }).join("|");
+    return String(hash(`${lockPart}|${JSON.stringify(body)}|${age}|${position}|${effectiveSecondaryPosition ?? ""}`));
+  }, [age, body, locks, position, effectiveSecondaryPosition]);
+  const [entrySet, setEntrySet] = useState<Set<string>>(() => new Set());
+  useEffect(() => {
+    setEntrySet(loadEntrySet(resultSignature));
+  }, [resultSignature]);
+  const toggleEntry = (key: string) => {
+    setEntrySet((current) => {
+      const next = toggleEntrySet(current, key);
+      saveEntrySet(resultSignature, next);
+      return next;
+    });
+  };
+  const clearEntries = () => {
+    clearEntrySet(resultSignature);
+    setEntrySet(new Set());
+  };
   // --- 草稿恢复（刷新/Safari 回收不丢流程） ---
   const [availableDraft, setAvailableDraft] = useState<RookieDraft | null>(() => loadDraft());
   const [draftRestored, setDraftRestored] = useState(false);
@@ -913,6 +967,19 @@ function RookieBuilder({
           ? "loading"
           : "idle";
   const tendencyCount = Object.keys(result.tendencies).length;
+  // 录入进度总数：属性 + 倾向 + 热区 + 徽章（行级单位）
+  const entryTotal = result
+    ? fullAttributeGroups.reduce((total, group) => total + group.attrs.length, 0)
+      + tendencyCount
+      + Object.keys(result.hotZones).length
+      + (result.badges.length || result.peakBadges.length)
+    : 0;
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({
+      block: "start",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    });
+  };
   const completed = Object.keys(locks).length;
   const isComplete = completed === bundles.length && (!isManualSelection || manualFinalize);
   const exportReady = isComplete && tendencyLoadState !== "loading";
@@ -1671,9 +1738,27 @@ function RookieBuilder({
         >
           <div className="workspace-toolbar flex items-center justify-between px-3 py-2.5">
             <div className="section-label">属性明细</div>
-            <div className="text-[10px] text-ink-400">{fullAttributeGroups.reduce((total, group) => total + group.attrs.length, 0)} 项属性</div>
+            <div className="flex items-center gap-2 text-[10px] text-ink-400">
+              {entryTotal > 0 && (
+                <span className="tabular-nums">已录入 <b className="font-semibold text-court-700">{entrySet.size}</b> / {entryTotal}</span>
+              )}
+              {entrySet.size > 0 && (
+                <button className="rounded-[4px] border border-ink-200 bg-ink-50 px-1.5 py-0.5 text-[9px] font-semibold text-ink-600 hover:bg-ink-100" onClick={clearEntries} type="button">清除进度</button>
+              )}
+              <span>{fullAttributeGroups.reduce((total, group) => total + group.attrs.length, 0)} 项属性</span>
+            </div>
           </div>
-          <div className="attribute-preview-grid bg-ink-200">
+          <div className="sticky top-0 z-20 flex flex-wrap items-center gap-1 border-b border-ink-200 bg-white/95 px-3 py-1.5 backdrop-blur">
+            {[["entry-attrs", "属性"], ["entry-tendencies", "倾向"], ["entry-hotzones", "热区"], ["entry-badges", "徽章"]].map(([id, label]) => (
+              <button
+                className="h-6 rounded-full bg-ink-100 px-2.5 text-[10px] font-semibold text-ink-600 hover:bg-ink-200"
+                key={id}
+                onClick={() => scrollToSection(id)}
+                type="button"
+              >{label}</button>
+            ))}
+          </div>
+          <div className="attribute-preview-grid bg-ink-200" id="entry-attrs">
             {fullAttributeGroups.map((group) => (
               <div key={group.key} className="attribute-preview-group bg-white px-3 py-2.5">
                 <div className="mb-2 text-[10px] font-semibold text-court-700">{group.label}</div>
@@ -1686,8 +1771,20 @@ function RookieBuilder({
                         ? result.potentialMax
                         : result.initialAttrs[attr];
                     const hasBodyAdjustment = bodyAdjustedAttributes.has(attr);
+                    const entryKey = entryFieldKey("属性", attr);
+                    const entered = entrySet.has(entryKey);
                     return (
-                      <div key={attr} className="flex min-h-6 items-center justify-between gap-3 border-t border-ink-700/5 py-1 text-[10px]">
+                      <div
+                        className={`flex min-h-6 cursor-pointer select-none items-center justify-between gap-3 border-t border-ink-700/5 py-1 text-[10px] ${entered ? "bg-court-500/5" : "hover:bg-ink-50"}`}
+                        key={attr}
+                        onClick={() => toggleEntry(entryKey)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") { event.preventDefault(); toggleEntry(entryKey); }
+                        }}
+                        role="button"
+                        style={entered ? { boxShadow: "inset 2px 0 0 #2b8969" } : undefined}
+                        tabIndex={0}
+                      >
                         <span className="min-w-0 text-ink-500">{attr === "Potential Min" ? "最低潜力" : attr === "Potential Max" ? "最高潜力" : attrNameCN[attr] ?? attr}</span>
                         <span className="flex shrink-0 items-center gap-1" title={hasBodyAdjustment ? "该属性包含身体修正或上限" : undefined}>
                           {hasBodyAdjustment && <span className="text-[8px] font-semibold text-court-600">身体</span>}
@@ -1702,7 +1799,7 @@ function RookieBuilder({
           </div>
           {/* 倾向明细：按表格分类分组 */}
           {tendencyCount ? (
-            <div className="border-t border-ink-200 px-3 py-2.5">
+            <div className="border-t border-ink-200 px-3 py-2.5" id="entry-tendencies">
               <div className="mb-2 flex items-center justify-between text-[10px]"><span className="font-semibold">倾向明细</span><span className="text-ink-400">{tendencyCount} 项</span></div>
               <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
                 {tendencyGroups.map((group) => {
@@ -1711,12 +1808,23 @@ function RookieBuilder({
                   return (
                     <div key={group.key}>
                       <div className="mb-1 text-[9px] font-semibold text-court-700">{group.label}</div>
-                      {members.map((field) => (
-                        <div key={field} className="flex min-h-5 items-center justify-between gap-3 border-t border-ink-700/5 py-0.5 text-[10px]">
-                          <span className="min-w-0 text-ink-500">{getTendencyNameCN(field)}</span>
-                          <span className={`shrink-0 font-semibold tabular-nums ${typeof result.tendencies[field] === "number" ? valueColor(result.tendencies[field]) : "text-ink-300"}`}>{result.tendencies[field] ?? "--"}</span>
-                        </div>
-                      ))}
+                      {members.map((field) => {
+                        const entryKey = entryFieldKey("倾向", field);
+                        const entered = entrySet.has(entryKey);
+                        return (
+                          <div
+                            className={`flex min-h-5 cursor-pointer select-none items-center justify-between gap-3 border-t border-ink-700/5 py-0.5 text-[10px] ${entered ? "bg-court-500/5" : "hover:bg-ink-50"}`}
+                            key={field}
+                            onClick={() => toggleEntry(entryKey)}
+                            role="button"
+                            style={entered ? { boxShadow: "inset 2px 0 0 #2b8969" } : undefined}
+                            tabIndex={0}
+                          >
+                            <span className="min-w-0 text-ink-500">{getTendencyNameCN(field)}</span>
+                            <span className={`shrink-0 font-semibold tabular-nums ${typeof result.tendencies[field] === "number" ? valueColor(result.tendencies[field]) : "text-ink-300"}`}>{result.tendencies[field] ?? "--"}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 })}
@@ -1724,7 +1832,7 @@ function RookieBuilder({
             </div>
           ) : null}
           {/* 热区明细：按表格分类分组 */}
-          <div className="border-t border-ink-200 px-3 py-2.5">
+          <div className="border-t border-ink-200 px-3 py-2.5" id="entry-hotzones">
             <div className="mb-2 text-[10px] font-semibold">热区明细</div>
             <div className="grid gap-x-6 gap-y-3 sm:grid-cols-3">
               {hotZoneCNGroups.map((group) => {
@@ -1740,12 +1848,23 @@ function RookieBuilder({
                 return (
                   <div key={group.key}>
                     <div className="mb-1 text-[9px] font-semibold text-court-700">{group.label}</div>
-                    {entries.map(([cnKey, state]) => (
-                      <div key={cnKey} className="flex min-h-5 items-center justify-between gap-3 border-t border-ink-700/5 py-0.5 text-[10px]">
-                        <span className="min-w-0 text-ink-500">{cnKey}</span>
-                        <span className={`shrink-0 font-semibold ${state === "热区" ? "text-rose-600" : state === "冷区" ? "text-blue-600" : "text-ink-500"}`}>{state}</span>
-                      </div>
-                    ))}
+                    {entries.map(([cnKey, state]) => {
+                      const entryKey = entryFieldKey("热区", cnKey);
+                      const entered = entrySet.has(entryKey);
+                      return (
+                        <div
+                          className={`flex min-h-5 cursor-pointer select-none items-center justify-between gap-3 border-t border-ink-700/5 py-0.5 text-[10px] ${entered ? "bg-court-500/5" : "hover:bg-ink-50"}`}
+                          key={cnKey}
+                          onClick={() => toggleEntry(entryKey)}
+                          role="button"
+                          style={entered ? { boxShadow: "inset 2px 0 0 #2b8969" } : undefined}
+                          tabIndex={0}
+                        >
+                          <span className="min-w-0 text-ink-500">{cnKey}</span>
+                          <span className={`shrink-0 font-semibold ${state === "热区" ? "text-rose-600" : state === "冷区" ? "text-blue-600" : "text-ink-500"}`}>{state}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })}
@@ -1753,11 +1872,11 @@ function RookieBuilder({
           </div>
           {/* 徽章明细：直接继承结果，按表格分类分组 */}
           {result.badges.length || result.peakBadges.length ? (
-            <div className="border-t border-ink-200 px-3 py-2.5">
+            <div className="border-t border-ink-200 px-3 py-2.5" id="entry-badges">
               <div className="mb-2 text-[10px] font-semibold">徽章明细</div>
               <div>
                 <div className="mb-1 text-[9px] font-semibold text-court-700">{"徽章"}</div>
-                {renderBadgeGroups(result.badges.length ? result.badges : result.peakBadges)}
+                {renderBadgeGroups(result.badges.length ? result.badges : result.peakBadges, entrySet, toggleEntry)}
               </div>
             </div>
           ) : null}
