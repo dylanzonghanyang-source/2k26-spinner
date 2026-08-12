@@ -407,6 +407,9 @@ input:focus-visible {
 .builder-workspace[data-manual="true"] .builder-result-pane,
 .builder-workspace[data-manual="true"] .builder-full-preview {
   grid-column: 1;
+  /* Override the desktop media query's grid-row: 1 so the three panes
+     stack vertically instead of overlapping in the same grid row. */
+  grid-row: auto;
 }
 
 /* Mobile/tablet (<1024px): two-column workspace — attribute slots left,
@@ -1482,4 +1485,11 @@ html[data-theme="dark"] .value-rating-green {
 
 html[data-theme="dark"] .value-rating-common {
   color: var(--rating-common) !important;
+}
+/* 最终页分段锚点：sticky 快捷导航（约 37px 高）不得压住目标区块标题（M1）。 */
+#entry-attrs,
+#entry-tendencies,
+#entry-hotzones,
+#entry-badges {
+  scroll-margin-top: 44px;
 }

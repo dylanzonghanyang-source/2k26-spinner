@@ -44,6 +44,11 @@ export function clearEntrySet(resultSignature: string): void {
   safeRemoveStorageItem(entryStorageKey(resultSignature));
 }
 
+/** Remove stale/corrupt keys before rendering a persisted result's progress. */
+export function filterEntrySet(entries: ReadonlySet<string>, allowed: ReadonlySet<string>): Set<string> {
+  return new Set([...entries].filter((key) => allowed.has(key)));
+}
+
 export function toggleEntrySet(entries: ReadonlySet<string>, key: string): Set<string> {
   const next = new Set(entries);
   if (next.has(key)) next.delete(key);

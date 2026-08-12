@@ -28,6 +28,7 @@ function getInitialDataVersion(): DataVersion {
 }
 
 import { safeGetStorageItem, safeRemoveStorageItem, safeSetStorageItem } from "./storage";
+import { loadDraft } from "./draftStore";
 
 function getInitialTheme(): Theme {
   const savedTheme = safeGetStorageItem(themeStorageKey)
@@ -251,8 +252,12 @@ function rosterPlayerSource(
   };
 }
 
+function getInitialAppMode(): AppMode {
+  return loadDraft()?.selectionMode === "manual" ? "custom" : "rookie";
+}
+
 const App = () => {
-  const [appMode, setAppMode] = useState<AppMode>("rookie");
+  const [appMode, setAppMode] = useState<AppMode>(getInitialAppMode);
   const [builderFlowActive, setBuilderFlowActive] = useState(false);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
 

@@ -21,3 +21,7 @@ test-results/
 spikes/
 .hermes/
 data/raw/
+
+# Python bytecode cache
+__pycache__/
+*.py[cod]

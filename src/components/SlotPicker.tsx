@@ -99,7 +99,9 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
         return pickOf(a) - pickOf(b) || a.name.localeCompare(b.name);
       });
     } else if (sortMode === "slot") {
-      cards.sort((a, b) => (slotValueForCard(b, bundle) ?? -1) - (slotValueForCard(a, bundle) ?? -1));
+      cards.sort((a, b) => (
+        (slotValueForCard(b, bundle) ?? -1) - (slotValueForCard(a, bundle) ?? -1)
+      ) || a.name.localeCompare(b.name));
     } else if (sortMode === "ovr") {
       cards.sort((a, b) => (b.overall ?? -1) - (a.overall ?? -1) || a.name.localeCompare(b.name));
     } else if (sortMode === "adapted") {

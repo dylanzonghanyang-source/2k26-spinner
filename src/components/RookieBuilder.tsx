@@ -50,14 +50,14 @@ import { getTendencyNameCN } from "../tendencyNames";
 import { getPlayerHeadshotSources, prefetchPlayerHeadshots } from "../playerHeadshots";
 import { getPlayerNameCN } from "../playerNames";
 import { type OverallDataVersion } from "../rookieOverall";
-import { cardToPlayerSource } from "../rookieCardSource";
+import { cardSourcesFromLocks, filterResolvableLocks } from "../rookieCardSource";
 import { generateRookieFirstName, generateRookieLastName } from "../rookieNames";
 import { type BuilderBody as BodySettings } from "../rookieBodyConstraints";
 import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../fieldCategories";
 import { createExportText } from "../exportText";
 import { useModalBehavior } from "../useModalBehavior";
-import { clearDraft, loadDraft, saveDraft, type RookieDraft, type BuilderDifficulty, SWITCH_LIMIT_BY_DIFFICULTY } from "../draftStore";
-import { clearEntrySet, entryFieldKey, loadEntrySet, saveEntrySet, toggleEntrySet } from "../entryProgress";
+import { clearDraft, loadDraft, saveDraft, type RookieDraft, type ResultSnapshot, type BuilderDifficulty, normalizeBuilderDifficulty, normalizeSwitchesLeft, SWITCH_LIMIT_BY_DIFFICULTY } from "../draftStore";
+import { clearEntrySet, entryFieldKey, filterEntrySet, loadEntrySet, saveEntrySet, toggleEntrySet } from "../entryProgress";
 import { tendencyBundleMap } from "./tendencyBundleMap";
 import { badgeBundleMap } from "./badgeBundleMap";
 import { buildProfile } from "../buildProfile";
@@ -265,6 +265,7 @@ function renderBadgeGroups(
                   : "border-warning-500/20 bg-warning-50 text-warning-800 hover:bg-warning-100"}`}
                 key={`${group.key}:${badge.name}:${badge.tier}`}
                 onClick={onToggleEntry ? () => onToggleEntry(entryKey) : undefined}
+                aria-checked={onToggleEntry ? entered : undefined}
                 role={onToggleEntry ? "checkbox" : undefined}
                 type="button"
               >
@@ -294,6 +295,7 @@ function renderBadgeGroups(
                   : "border-ink-200 bg-ink-50 text-ink-600 hover:bg-ink-100"}`}
                 key={`other:${badge.name}:${badge.tier}`}
                 onClick={onToggleEntry ? () => onToggleEntry(entryKey) : undefined}
+                aria-checked={onToggleEntry ? entered : undefined}
                 role={onToggleEntry ? "checkbox" : undefined}
                 type="button"
               >
@@ -583,7 +585,6 @@ function RookieBuilder({
   const [manualSetupDone, setManualSetupDone] = useState(false);
   const [skipBodyConstraints, setSkipBodyConstraints] = useState(false);
   const [pickerBundleId, setPickerBundleId] = useState<string | null>(null);
-  const [cardSources, setCardSources] = useState<Map<string, PlayerSource>>(new Map());
   const [firstName, setFirstName] = useState<string>(() => generateRookieFirstName());
   const [lastName, setLastName] = useState<string>(() => generateRookieLastName());
   const rookieName = `${firstName} ${lastName}`.trim();
@@ -625,22 +626,28 @@ function RookieBuilder({
       const lock = locks[bundle.id];
       return lock?.kind === "player" ? lock.playerId : lock?.kind === "custom" ? JSON.stringify(lock.values) : "-";
     }).join("|");
-    return String(hash(`${lockPart}|${JSON.stringify(body)}|${age}|${position}|${effectiveSecondaryPosition ?? ""}`));
-  }, [age, body, locks, position, effectiveSecondaryPosition]);
-  const [entrySet, setEntrySet] = useState<Set<string>>(() => new Set());
-  useEffect(() => {
-    setEntrySet(loadEntrySet(resultSignature));
-  }, [resultSignature]);
+    // Every input that can change the final generated fields must namespace progress.
+    return String(hash(`${lockPart}|${rookieName}|${JSON.stringify(body)}|${age}|${position}|${effectiveSecondaryPosition ?? ""}|${skipBodyConstraints}|${overallVersion}|${tendencyVersion}`));
+  }, [age, body, locks, position, effectiveSecondaryPosition, overallVersion, rookieName, skipBodyConstraints, tendencyVersion]);
+  const [entryProgress, setEntryProgress] = useState<{ signature: string | null; entries: Set<string> }>({
+    signature: null,
+    entries: new Set(),
+  });
+  /** 完成态结果快照恢复（H1）：刷新后结果页不再丢失。 */
+  const [restoredResult, setRestoredResult] = useState<ReturnType<typeof createResult> | null>(null);
   const toggleEntry = (key: string) => {
-    setEntrySet((current) => {
-      const next = toggleEntrySet(current, key);
+    setEntryProgress((current) => {
+      const currentEntries = current.signature === resultSignature
+        ? filterEntrySet(current.entries, entryAllowedKeys)
+        : new Set<string>();
+      const next = toggleEntrySet(currentEntries, key);
       saveEntrySet(resultSignature, next);
-      return next;
+      return { signature: resultSignature, entries: next };
     });
   };
   const clearEntries = () => {
     clearEntrySet(resultSignature);
-    setEntrySet(new Set());
+    setEntryProgress({ signature: resultSignature, entries: new Set() });
   };
   // --- 草稿恢复（刷新/Safari 回收不丢流程） ---
   const [availableDraft, setAvailableDraft] = useState<RookieDraft | null>(() => loadDraft());
@@ -712,7 +719,10 @@ function RookieBuilder({
 
   // --- 草稿自动保存（防抖）：流程中关键状态变化后写入 localStorage ---
   useEffect(() => {
-    if (settingsLocked === false && Object.keys(locks).length === 0 && !manualSetupDone) return;
+    const completedFlow = settingsLocked
+      && Object.keys(locks).length === bundles.length
+      && (manualFinalize || !isManualSelection);
+    if (completedFlow || (settingsLocked === false && Object.keys(locks).length === 0 && !manualSetupDone)) return;
     const timer = window.setTimeout(() => {
       saveDraft({
         version: 1,
@@ -728,23 +738,23 @@ function RookieBuilder({
         manualFinalize,
         locks,
         switchesLeft,
+        selectionMode: isManualSelection ? "manual" : "random",
         manualSetupDone,
         skipBodyConstraints,
         difficulty,
         round: { teamId: round.teamId, offset: round.offset, playerOrder: round.playerOrder },
         status,
       });
-      setDraftNotice(null);
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [age, body, effectiveSecondaryPosition, firstName, lastName, locks, manualFinalize, manualSetupDone, position, round, secondaryEnabled, settingsLocked, skipBodyConstraints, status, switchesLeft]);
+  }, [age, body, difficulty, effectiveSecondaryPosition, firstName, isManualSelection, lastName, locks, manualFinalize, manualSetupDone, position, round, secondaryEnabled, settingsLocked, skipBodyConstraints, status, switchesLeft]);
 
-  // 流程结束后清理草稿
+  // 一次性反馈通知（已恢复/已清空）3 秒后自动消失，不依赖自动保存时序（L1/L2）。
   useEffect(() => {
-    if (settingsLocked && Object.keys(locks).length === bundles.length && (manualFinalize || !isManualSelection)) {
-      clearDraft();
-    }
-  }, [isManualSelection, locks, manualFinalize, settingsLocked]);
+    if (!draftNotice) return;
+    const timer = window.setTimeout(() => setDraftNotice(null), 3000);
+    return () => window.clearTimeout(timer);
+  }, [draftNotice]);
 
   // 活跃流程离页保护（浏览器原生确认，非阻塞式）
   useEffect(() => {
@@ -761,6 +771,24 @@ function RookieBuilder({
   const restoreDraft = () => {
     const draft = availableDraft;
     if (!draft) return;
+    // Manual card pseudo sources are loaded lazily. Do not discard their locks
+    // before the index exists; the button is disabled until this condition.
+    if (draft.selectionMode === "manual" && !rookieCardsReady) return;
+    // 恢复即消费：清除持久化草稿，防止切模式/刷新后横幅复活（M3）。
+    clearDraft();
+    // 完成态快照：直接恢复最终结果页，不重新生成（避免数据版本漂移）。
+    if (draft.resultSnapshot) {
+      try {
+        const parsed = JSON.parse(draft.resultSnapshot.resultJson) as ReturnType<typeof createResult>;
+        setRestoredResult(parsed);
+      } catch {
+        setRestoredResult(null);
+      }
+    } else {
+      setRestoredResult(null);
+    }
+    const restoredLocks = filterResolvableLocks(draft.locks, playersById, rookieCards);
+    const discardedLockCount = Object.keys(draft.locks).length - Object.keys(restoredLocks).length;
     setFirstName(draft.firstName);
     setLastName(draft.lastName);
     setPosition(draft.position);
@@ -770,22 +798,25 @@ function RookieBuilder({
     setBody(draft.body);
     setSettingsLocked(draft.settingsLocked);
     setManualFinalize(draft.manualFinalize);
-    setLocks(draft.locks);
-    locksRef.current = draft.locks;
+    setLocks(restoredLocks);
+    locksRef.current = restoredLocks;
     usedPlayerIdsRef.current = new Set(
-      Object.values(draft.locks)
+      Object.values(restoredLocks)
         .filter((lock): lock is { kind: "player"; playerId: string } => lock.kind === "player")
         .map((lock) => lock.playerId),
     );
-    setSwitchesLeft(draft.switchesLeft);
+    const restoredDifficulty = normalizeBuilderDifficulty(draft.difficulty);
+    setSwitchesLeft(normalizeSwitchesLeft(draft.switchesLeft, restoredDifficulty));
     setManualSetupDone(draft.manualSetupDone);
     setSetupDialogOpen(!draft.manualSetupDone);
     setSkipBodyConstraints(draft.skipBodyConstraints);
-    setDifficulty(draft.difficulty ?? "standard");
+    setDifficulty(restoredDifficulty);
     if (draft.round && teams.some((team) => team.id === draft.round?.teamId)) {
       setRound({ teamId: draft.round.teamId, offset: draft.round.offset, playerOrder: draft.round.playerOrder });
     }
-    setStatus(draft.status || "已恢复草稿");
+    setStatus(discardedLockCount > 0
+      ? `已恢复草稿；${discardedLockCount} 个来源已不在当前数据中，已取消锁定`
+      : (draft.status || "已恢复草稿"));
     setDraftRestored(true);
     setAvailableDraft(null);
     setDraftNotice("已恢复上次未完成的生成流程");
@@ -794,6 +825,7 @@ function RookieBuilder({
   const discardDraft = () => {
     clearDraft();
     setAvailableDraft(null);
+    setRestoredResult(null);
     setDraftNotice("草稿已清空");
   };
 
@@ -870,12 +902,13 @@ function RookieBuilder({
     : status;
   const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : undefined;
   const rookieCardsReady = rookieCards !== null;
-  // Roster pool + manual-mode rookie-card pseudo sources share one id space.
+  // Manual-mode card sources are derived from durable `card:<slug>` locks, so
+  // refresh / draft restore cannot lose the transient picker map.
   const allSourcesById = useMemo(() => {
     const merged = new Map(playersById);
-    for (const [id, source] of cardSources) merged.set(id, source);
+    for (const [id, source] of cardSourcesFromLocks(locks, rookieCards)) merged.set(id, source);
     return merged;
-  }, [cardSources, playersById]);
+  }, [locks, playersById, rookieCards]);
   // Keyed by the concrete roster version id, not by normalized identity: the
   // same player's different versions (current / classic / all-time) are
   // intentionally allowed to lock different slots.
@@ -948,8 +981,9 @@ function RookieBuilder({
   ), [evaluations]);
   const effectiveAge = age;
   const positionLabel = secondaryEnabled ? `${position}/${secondaryPosition}` : position;
-  const result = useMemo(
-    () => createResult(
+  const result = useMemo(() => {
+    if (restoredResult) return restoredResult;
+    return createResult(
       locks,
       effectiveAge,
       position,
@@ -960,9 +994,43 @@ function RookieBuilder({
       overallVersion,
       rookieCards,
       { skipBody: skipBodyConstraints },
-    ),
-[allSourcesById, body, effectiveAge, locks, overallVersion, position, effectiveSecondaryPosition, rookieCards, skipBodyConstraints, tendencyLookup],
-  );
+    );
+  }, [allSourcesById, body, effectiveAge, locks, overallVersion, position, effectiveSecondaryPosition, restoredResult, rookieCards, skipBodyConstraints, tendencyLookup]);
+
+  // 流程结束后：把完成态结果快照持久化，刷新后仍可恢复结果页（H1）。
+  // 同时清理任何尚未处理的旧草稿提示，避免旧横幅残留覆盖新结果。
+  useEffect(() => {
+    if (!(settingsLocked && Object.keys(locks).length === bundles.length && (manualFinalize || !isManualSelection))) return;
+    if (!result || restoredResult) return;
+    try {
+      saveDraft({
+        version: 1,
+        savedAt: Date.now(),
+        firstName,
+        lastName,
+        position,
+        secondaryPosition: effectiveSecondaryPosition,
+        secondaryEnabled,
+        age,
+        body,
+        settingsLocked,
+        manualFinalize,
+        locks,
+        switchesLeft,
+        selectionMode: isManualSelection ? "manual" : "random",
+        manualSetupDone,
+        skipBodyConstraints,
+        difficulty,
+        round: { teamId: round.teamId, offset: round.offset, playerOrder: round.playerOrder },
+        status: "已完成",
+        resultSnapshot: { resultJson: JSON.stringify(result), status: "已完成" },
+      });
+    } catch {
+      // 序列化失败时静默跳过快照，内存结果不受影响。
+    }
+    setAvailableDraft(null);
+    setDraftNotice(null);
+  }, [age, body, difficulty, effectiveSecondaryPosition, firstName, isManualSelection, lastName, locks, manualFinalize, manualSetupDone, position, restoredResult, result, round, secondaryEnabled, settingsLocked, skipBodyConstraints, switchesLeft]);
   const tendencyLoadState: TendencyLoadState = tendencyLookup?.available === false
     ? "unavailable"
     : tendencyLookup
@@ -973,15 +1041,41 @@ function RookieBuilder({
           ? "loading"
           : "idle";
   const tendencyCount = Object.keys(result.tendencies).length;
+  const entryAllowedKeys = useMemo(() => {
+    const keys = new Set<string>();
+    fullAttributeGroups.forEach((group) => group.attrs.forEach((attr) => keys.add(entryFieldKey("属性", attr))));
+    Object.keys(result.tendencies).forEach((field) => keys.add(entryFieldKey("倾向", field)));
+    hotZoneCNGroups.forEach((group) => group.keys.forEach((cnKey) => {
+      const enKey = Object.entries(hotZoneLabelCN).find(([, label]) => label === cnKey)?.[0];
+      if (result.hotZones[cnKey] !== undefined || (enKey && result.hotZones[enKey] !== undefined)) {
+        keys.add(entryFieldKey("热区", cnKey));
+      }
+    }));
+    (result.badges.length ? result.badges : result.peakBadges)
+      .forEach((badge) => keys.add(entryFieldKey("徽章", badge.name)));
+    return keys;
+  }, [result]);
+  // A signature mismatch is intentionally rendered empty immediately: never flash
+  // the prior rookie's checkmarks while localStorage for the new result loads.
+  const entrySet = useMemo(() => (
+    entryProgress.signature === resultSignature
+      ? filterEntrySet(entryProgress.entries, entryAllowedKeys)
+      : new Set<string>()
+  ), [entryAllowedKeys, entryProgress, resultSignature]);
+  useLayoutEffect(() => {
+    const loaded = filterEntrySet(loadEntrySet(resultSignature), entryAllowedKeys);
+    setEntryProgress({ signature: resultSignature, entries: loaded });
+  }, [entryAllowedKeys, resultSignature]);
   // 规则化画像标签（由最终属性推导）
   const profileTags = useMemo(() => (result ? buildProfile(result.initialAttrs) : []), [result]);
-  // 录入进度总数：属性 + 倾向 + 热区 + 徽章（行级单位）
-  const entryTotal = result
-    ? fullAttributeGroups.reduce((total, group) => total + group.attrs.length, 0)
-      + tendencyCount
-      + Object.keys(result.hotZones).length
-      + (result.badges.length || result.peakBadges.length)
-    : 0;
+  // 录入进度总数与可录入字段同源，避免损坏 localStorage 让计数超过总数。
+  const entryTotal = entryAllowedKeys.size;
+  const entryNavigationSections = [
+    ["entry-attrs", "属性"],
+    ...(tendencyCount ? [["entry-tendencies", "倾向"]] : []),
+    ["entry-hotzones", "热区"],
+    ...((result.badges.length || result.peakBadges.length) ? [["entry-badges", "徽章"]] : []),
+  ];
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({
       block: "start",
@@ -1024,6 +1118,22 @@ function RookieBuilder({
         .map(([name]) => name),
     }
     : null;
+  useEffect(() => {
+    if (!infoBundleId) return;
+    const close = () => setInfoBundleId(null);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+    };
+    // A fixed-position popover would detach from its trigger after scroll/resize.
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("resize", close);
+    window.addEventListener("scroll", close, true);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("resize", close);
+      window.removeEventListener("scroll", close, true);
+    };
+  }, [infoBundleId]);
   const completed = Object.keys(locks).length;
   const isComplete = completed === bundles.length && (!isManualSelection || manualFinalize);
   const exportReady = isComplete && tendencyLoadState !== "loading";
@@ -1221,9 +1331,7 @@ function RookieBuilder({
 
   const pickCard = (card: RookieCard) => {
     if (!pickerBundleId || locks[pickerBundleId]) return;
-    const source = cardToPlayerSource(card);
-    const id = source.id!;
-    setCardSources((current) => new Map(current).set(id, source));
+    const id = `card:${card.slug}`;
     finishLock(pickerBundleId, { kind: "player", playerId: id });
     setPickerBundleId(null);
   };
@@ -1255,6 +1363,11 @@ function RookieBuilder({
 
   const reset = () => {
     const seed = Date.now();
+    clearDraft();
+    setAvailableDraft(null);
+    setDraftNotice(null);
+    setDraftRestored(false);
+    setRestoredResult(null);
     pendingTeamDrawRef.current = null;
     setFirstName(generateRookieFirstName());
     setLastName(generateRookieLastName());
@@ -1281,7 +1394,6 @@ function RookieBuilder({
     setSetupDialogOpen(true);
     setSkipBodyConstraints(false);
     setPickerBundleId(null);
-    setCardSources(new Map());
     // 完整恢复默认状态（公测审计：进入流程后这些状态可能残留）
     setSecondaryEnabled(true);
     setManualFinalize(false);
@@ -1349,10 +1461,16 @@ function RookieBuilder({
       )}
       {(availableDraft || draftNotice) && (
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 rounded-[5px] border border-court-500/30 bg-court-500/10 px-3 py-2 text-[11px] font-medium text-court-800" role="status">
-          <span>{draftNotice ?? "检测到未完成的新秀生成草稿，是否恢复？"}</span>
+          <span>{draftNotice ?? (availableDraft?.resultSnapshot ? "检测到已完成的生成结果，是否恢复？" : "检测到未完成的新秀生成草稿，是否恢复？")}</span>
           {availableDraft && !draftRestored && (
             <div className="flex items-center gap-1.5">
-              <button className="action-button primary-action px-2 py-1 text-[10px]" onClick={restoreDraft} type="button"><RefreshCw className="h-3 w-3" />恢复草稿</button>
+              <button
+                className="action-button primary-action px-2 py-1 text-[10px]"
+                disabled={availableDraft.selectionMode === "manual" && !rookieCardsReady}
+                onClick={restoreDraft}
+                title={availableDraft.selectionMode === "manual" && !rookieCardsReady ? "正在加载新秀卡数据" : undefined}
+                type="button"
+              ><RefreshCw className="h-3 w-3" />{availableDraft.resultSnapshot ? "恢复结果" : "恢复草稿"}</button>
               <button className="action-button px-2 py-1 text-[10px]" onClick={discardDraft} type="button">清空草稿</button>
             </div>
           )}
@@ -1611,12 +1729,14 @@ function RookieBuilder({
                     className={`flex h-full w-full min-w-0 items-center gap-1.5 px-2 pr-7 text-left transition ${lock ? "cursor-not-allowed" : isManualSelection || selectedPlayer ? "hover:bg-ink-50" : "cursor-not-allowed"}`}
                     disabled={Boolean(lock) || !settingsLocked || isTeamDrawing || (!isManualSelection && !selectedPlayer)}
                     onClick={isManualSelection ? () => openSlotPicker(bundle) : () => clickBundle(bundle)}
-                    title={lock ? `${weightLabel} · 已锁定；如需修改，请重新开始` : typeof value === "number" ? `${weightLabel} · ${sourceLabel}：来源值 ${lockedEvaluation?.raw ?? preview?.raw} → 身体修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment} → 最终 ${value}${capLabels.length ? ` · ${capLabels.join(" · ")}` : ""}` : `${bundle.label} · ${weightLabel}`}
+                    title={typeof value === "number"
+                      ? `${weightLabel} · ${sourceLabel}：来源值 ${lockedEvaluation?.raw ?? preview?.raw} → 身体修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment} → 最终 ${value}${capLabels.length ? ` · ${capLabels.join(" · ")}` : ""}${lock ? " · 已锁定；如需修改，请重新开始" : ""}`
+                      : `${bundle.label} · ${weightLabel}`}
                     type="button"
                   >
                     <span className="min-w-0 flex-1">
                       <span className="block text-[11px] font-semibold text-ink-800">{bundle.label}</span>
-                      <span className="block truncate text-[8px] text-ink-400">{sourceLabel}{typeof value === "number" && bodyAdjustment !== 0 ? ` · ${lockedEvaluation?.raw ?? preview?.raw}→${value}` : bodyAdjustmentLabel ? ` · ${bodyAdjustmentLabel}` : ""}</span>
+                      <span className="block truncate text-[8px] text-ink-400">{sourceLabel}{typeof value === "number" ? ` · ${lockedEvaluation?.raw ?? preview?.raw}→${value}` : bodyAdjustmentLabel ? ` · ${bodyAdjustmentLabel}` : ""}</span>
                     </span>
                     {typeof value === "number" ? (
                       <span className="flex shrink-0 items-center gap-1" title={hasBodyConstraint ? adjustmentLabel : undefined}>
@@ -1628,18 +1748,20 @@ function RookieBuilder({
                   {!lock && bundle.id !== "potential" && (
                     <button
                       aria-label={`手动设置${bundle.label}`}
-                      className="absolute right-1 top-1/2 z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-[4px] text-ink-400 transition hover:bg-ink-200 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-200"
+                      className="absolute right-1 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-[5px] text-ink-400 transition hover:bg-ink-200 hover:text-ink-800 disabled:cursor-not-allowed disabled:text-ink-200"
                       disabled={!settingsLocked || isTeamDrawing}
                       onClick={() => openCustomEditor(bundle)}
                       title={`手动设置${bundle.label}的最终数值`}
                       type="button"
                     >
-                      <Pencil className="h-3 w-3" />
+                      <Pencil className="h-3.5 w-3.5" />
                     </button>
                   )}
                   <button
+                    aria-controls={`slot-info-${bundle.id}`}
+                    aria-expanded={infoBundleId === bundle.id}
                     aria-label={`查看${bundle.label}槽位字段`}
-                    className="absolute right-7 top-1/2 z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-[4px] text-ink-300 transition hover:bg-ink-200 hover:text-ink-700"
+                    className="absolute right-10 top-0 z-10 flex h-full w-8 items-center justify-center rounded-[4px] text-ink-300 transition hover:bg-ink-200 hover:text-ink-700"
                     onClick={(event) => toggleInfo(bundle.id, event.currentTarget)}
                     title="查看该槽位包含的属性/倾向/徽章字段"
                     type="button"
@@ -1650,12 +1772,12 @@ function RookieBuilder({
                   {lock && isManualSelection && (
                     <button
                       aria-label={`解锁${bundle.label}`}
-                      className="absolute right-1 top-1 z-10 flex h-5 w-5 items-center justify-center rounded-[4px] text-ink-400 transition hover:bg-ink-200 hover:text-ink-800"
+                      className="absolute right-1 top-1 z-10 flex h-7 w-7 items-center justify-center rounded-[5px] text-ink-400 transition hover:bg-ink-200 hover:text-ink-800"
                       onClick={() => unlockBundle(bundle.id)}
                       title={`解锁${bundle.label}，重新选择球员`}
                       type="button"
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-3.5 w-3.5" />
                     </button>
                   )}
                 </div>
@@ -1828,7 +1950,7 @@ function RookieBuilder({
             </div>
           </div>
           <div className="sticky top-0 z-20 flex flex-wrap items-center gap-1 border-b border-ink-200 bg-white/95 px-3 py-1.5 backdrop-blur">
-            {[["entry-attrs", "属性"], ["entry-tendencies", "倾向"], ["entry-hotzones", "热区"], ["entry-badges", "徽章"]].map(([id, label]) => (
+            {entryNavigationSections.map(([id, label]) => (
               <button
                 className="h-6 rounded-full bg-ink-100 px-2.5 text-[10px] font-semibold text-ink-600 hover:bg-ink-200"
                 key={id}
@@ -1861,6 +1983,7 @@ function RookieBuilder({
                         onKeyDown={(event) => {
                           if (event.key === "Enter" || event.key === " ") { event.preventDefault(); toggleEntry(entryKey); }
                         }}
+                        aria-pressed={entered}
                         role="button"
                         style={entered ? { boxShadow: "inset 2px 0 0 #2b8969" } : undefined}
                         tabIndex={0}
@@ -1898,6 +2021,10 @@ function RookieBuilder({
                             className={`flex min-h-5 cursor-pointer select-none items-center justify-between gap-3 border-t border-ink-700/5 py-0.5 text-[10px] ${entered ? "bg-court-500/5" : "hover:bg-ink-50"}`}
                             key={field}
                             onClick={() => toggleEntry(entryKey)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") { event.preventDefault(); toggleEntry(entryKey); }
+                            }}
+                            aria-pressed={entered}
                             role="button"
                             style={entered ? { boxShadow: "inset 2px 0 0 #2b8969" } : undefined}
                             tabIndex={0}
@@ -1938,6 +2065,10 @@ function RookieBuilder({
                           className={`flex min-h-5 cursor-pointer select-none items-center justify-between gap-3 border-t border-ink-700/5 py-0.5 text-[10px] ${entered ? "bg-court-500/5" : "hover:bg-ink-50"}`}
                           key={cnKey}
                           onClick={() => toggleEntry(entryKey)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") { event.preventDefault(); toggleEntry(entryKey); }
+                          }}
+                          aria-pressed={entered}
                           role="button"
                           style={entered ? { boxShadow: "inset 2px 0 0 #2b8969" } : undefined}
                           tabIndex={0}
@@ -2054,7 +2185,7 @@ function RookieBuilder({
       {infoBundle && infoSummary && infoPos && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setInfoBundleId(null)} role="presentation" />
-          <div className="fixed z-50 max-h-[280px] w-[240px] overflow-y-auto rounded-[6px] border border-ink-300 bg-white p-2.5 shadow-xl" style={{ top: infoPos.top, left: infoPos.left }}>
+          <div aria-label={`${infoBundle.label}槽位字段映射`} className="fixed z-50 max-h-[280px] w-[240px] overflow-y-auto rounded-[6px] border border-ink-300 bg-white p-2.5 shadow-xl" id={`slot-info-${infoBundle.id}`} role="region" style={{ top: infoPos.top, left: infoPos.left }}>
             <div className="mb-1.5 text-[10px] font-semibold text-ink-800">{infoBundle.label}槽位 · 字段映射</div>
             {infoSummary.attrs.length > 0 && (
               <div className="mb-1.5">

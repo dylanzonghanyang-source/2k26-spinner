@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { clearEntrySet, entryFieldKey, entryStorageKey, loadEntrySet, saveEntrySet, toggleEntrySet } from "../src/entryProgress.ts";
+import { clearEntrySet, entryFieldKey, entryStorageKey, filterEntrySet, loadEntrySet, saveEntrySet, toggleEntrySet } from "../src/entryProgress.ts";
 
 // Node has no window: provide an in-memory mock so storage paths run.
 const memory = new Map<string, string>();
@@ -69,7 +69,15 @@ const keyB = entryFieldKey("倾向", "切入倾向");
   console.log("✅ corrupted storage degrades safely");
 }
 
-// 6. storage blocked (no window.localStorage) degrades to empty set
+// 6. stale/corrupt keys never make visible progress exceed the current result
+{
+  const allowed = new Set([keyA]);
+  const filtered = filterEntrySet(new Set([keyA, keyB, "unknown:field"]), allowed);
+  assert.deepEqual([...filtered], [keyA], "only fields present in the current result remain");
+  console.log("✅ stale keys are filtered against the current result");
+}
+
+// 7. storage blocked (no window.localStorage) degrades to empty set
 {
   const originalWindow = (globalThis as Record<string, unknown>).window;
   delete (globalThis as Record<string, unknown>).window;
