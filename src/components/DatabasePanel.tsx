@@ -10,6 +10,8 @@ import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../
 import { buildPositionMap, filterCards, positionCN, positionForCard, summarizeCard, yearsWithCards } from "../databaseLogic";
 import { getPlayerNameCN } from "../playerNames";
 import { valueColor } from "../valueColor";
+import { bundles } from "../createResult";
+import { slotAttrsForCard, slotValueForCard } from "../rookieCardBrowser";
 
 const ZONE_CN: Record<string, string> = {
   underBasket: "篮下",
@@ -205,6 +207,31 @@ function CardDetails({ card, position }: { card: RookieCard; position: string | 
 
   return (
     <div className="space-y-3 border-t border-ink-200 bg-ink-50/60 px-3 py-3">
+      {/* 16 槽属性（无衰减）：该卡作为来源球员时各槽位的原始卡值（不套年龄
+          曲线/身体约束/位置交叉，即生成前的模板值） */}
+      <div className="space-y-1.5">
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="text-[9px] font-semibold text-ink-400">16 槽属性（无衰减）</div>
+          <div className="text-[8px] text-ink-300">原始卡值 · 生成时可能因身体/位置约束而衰减</div>
+        </div>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
+          {bundles.map((bundle) => {
+            const value = slotValueForCard(card, bundle);
+            const attrs = slotAttrsForCard(card, bundle);
+            return (
+              <div
+                className="flex min-w-0 items-center justify-between gap-2 rounded-[4px] bg-white px-2 py-1"
+                key={bundle.id}
+                title={attrs.filter(({ value: v }) => v != null).map(({ attr, value: v }) => `${attrNameCN[attr] ?? attr} ${v}`).join(" · ") || undefined}
+              >
+                <span className="truncate text-[9px] text-ink-500">{bundle.label}</span>
+                <span className="shrink-0 text-[10px] font-bold tabular-nums text-ink-700">{value ?? "--"}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* 资料 + 身体 */}
       <div className="flex flex-wrap gap-x-5 gap-y-1 text-[10px] text-ink-700">
         <span><b className="text-ink-400">位置：</b>{position ?? "--"}</span>

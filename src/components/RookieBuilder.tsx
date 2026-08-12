@@ -1813,10 +1813,14 @@ function RookieBuilder({
       )}
       {pickerBundle && (
         <SlotPicker
+          body={body}
           bundle={pickerBundle}
           onClose={() => setPickerBundleId(null)}
           onPick={pickCard}
           rookieCards={rookieCards}
+          secondaryPosition={effectiveSecondaryPosition}
+          skipBody={skipBodyConstraints}
+          targetPosition={position}
         />
       )}
       {customizingBundle && (

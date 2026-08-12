@@ -1,23 +1,31 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, Users, X } from "lucide-react";
-import type { Bundle } from "../createResult";
+import { evaluate, type Bundle, type Position } from "../createResult";
 import type { RookieCard, RookieCardLookup } from "../rookieCards";
 import { cardsByYear, slotAttrsForCard, slotValueForCard, yearsInLookup } from "../rookieCardBrowser";
 import { getPlayerNameCN } from "../playerNames";
 import { attrNameCN } from "../domain";
 import { valueColor } from "../valueColor";
 import { useModalBehavior } from "../useModalBehavior";
+import { cardToPlayerSource } from "../rookieCardSource";
+import type { BuilderBody } from "../rookieBodyConstraints";
+import { cardSourceBody } from "../createResult";
 
 type SlotPickerProps = {
   bundle: Bundle;
   rookieCards: RookieCardLookup | null;
   onClose: () => void;
   onPick: (card: RookieCard) => void;
+  /** 目标位置/身体：用于展示该卡在生成路径下的衰减后（身体约束后）属性。 */
+  targetPosition: Position;
+  secondaryPosition: Position | null;
+  body: BuilderBody;
+  skipBody: boolean;
 };
 
 type EntryTab = "rookie" | "all" | "classic";
 
-function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
+function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, secondaryPosition, body, skipBody }: SlotPickerProps) {
   const dialogRef = useRef<HTMLElement | null>(null);
   useModalBehavior(true, dialogRef, onClose);
   const years = useMemo(() => yearsInLookup(rookieCards), [rookieCards]);
@@ -48,8 +56,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
   const filteredCards = useMemo(() => {
     const q = query.trim().toLowerCase();
     return yearCards.filter((card) => {
-      if (positionFilter !== "ALL") {
-        // 卡位置为单一格式（如 "PG"），按第一位置匹配，兼容未来的双位置格式
+      if (positionFilter !== "ALL") {        // 卡位置为单一格式（如 "PG"），按第一位置匹配，兼容未来的双位置格式
         const firstPosition = card.position?.split("/")[0]?.trim().toUpperCase();
         if (firstPosition !== positionFilter) return false;
       }
@@ -57,6 +64,26 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
       return true;
     });
   }, [positionFilter, query, yearCards]);
+
+  // 衰减后属性：按生成路径（目标位置/身体/skipBody + 卡自身身体）计算每个候选
+  // 卡在该槽位下的身体约束后值，让"挑人"时看到的就是锁定后的实际生成值。
+  const decayedBySlug = useMemo(() => {
+    const map = new Map<string, { adjusted: number; raw: number; values: Record<string, number> }>();
+    for (const card of filteredCards) {
+      const source = cardToPlayerSource(card);
+      const evaluation = evaluate(source, bundle, body, card, {
+        targetPosition,
+        secondaryPosition,
+        skipBody,
+      }, cardSourceBody(card));
+      map.set(card.slug, {
+        adjusted: evaluation.adjusted,
+        raw: evaluation.raw,
+        values: evaluation.values,
+      });
+    }
+    return map;
+  }, [body, bundle, filteredCards, secondaryPosition, skipBody, targetPosition]);
 
   const disabledTab = (entry: EntryTab) => entry !== "rookie";
 
@@ -167,11 +194,15 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
                     {filteredCards.map((card) => {
                       const slotValue = slotValueForCard(card, bundle);
                       const attrs = slotAttrsForCard(card, bundle);
+                      // 衰减后值：与生成路径一致（身体约束后）；有差异时显示 原→衰减
+                      const decayed = decayedBySlug.get(card.slug);
+                      const decayedAttr = (attr: string) => decayed?.values[attr] ?? null;
                       return (
                         <button
                           className="interactive-card flex w-full items-center gap-2 rounded-[5px] border border-ink-200 bg-white px-2.5 py-2 text-left hover:border-ink-400 hover:bg-ink-50"
                           key={card.slug}
                           onClick={() => onPick(card)}
+                          title={decayed && decayed.adjusted !== decayed.raw ? `含身体/位置修正：${decayed.raw} → ${decayed.adjusted}` : undefined}
                           type="button"
                         >
                           <span className="min-w-0 flex-1">
@@ -180,14 +211,21 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick }: SlotPickerProps) {
                               <span className="truncate text-[9px] text-ink-400">{card.name}</span>
                             </span>
                             <span className="mt-0.5 block truncate text-[9px] text-ink-400">
-                              {attrs.map(({ attr, value }) => `${attrNameCN[attr] ?? attr}: ${value ?? "--"}`).join(" · ")}
+                              {attrs.map(({ attr, value }) => {
+                                const after = decayedAttr(attr);
+                                const display = after != null && value != null && after !== value ? `${value}→${after}` : (after ?? value ?? "--");
+                                return `${attrNameCN[attr] ?? attr}: ${display}`;
+                              }).join(" · ")}
                             </span>
                           </span>
                           <span className="flex shrink-0 items-center gap-2.5">
                             {slotValue !== null && (
                               <span className="flex items-baseline gap-1">
                                 <span className="text-[8px] font-medium text-ink-400">属性</span>
-                                <span className={`text-[13px] font-bold tabular-nums ${valueColor(slotValue)}`}>{slotValue}</span>
+                                <span className={`text-[13px] font-bold tabular-nums ${valueColor(decayed?.adjusted ?? slotValue)}`}>{decayed?.adjusted ?? slotValue}</span>
+                                {decayed && decayed.adjusted !== decayed.raw && (
+                                  <span className="text-[8px] tabular-nums text-ink-300">{decayed.raw}</span>
+                                )}
                               </span>
                             )}
                             <span className="flex items-baseline gap-1">
