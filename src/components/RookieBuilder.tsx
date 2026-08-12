@@ -56,7 +56,7 @@ import { type BuilderBody as BodySettings } from "../rookieBodyConstraints";
 import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../fieldCategories";
 import { createExportText } from "../exportText";
 import { useModalBehavior } from "../useModalBehavior";
-import { clearDraft, loadDraft, saveDraft, type RookieDraft } from "../draftStore";
+import { clearDraft, loadDraft, saveDraft, type RookieDraft, type BuilderDifficulty, SWITCH_LIMIT_BY_DIFFICULTY } from "../draftStore";
 import { clearEntrySet, entryFieldKey, loadEntrySet, saveEntrySet, toggleEntrySet } from "../entryProgress";
 import { tendencyBundleMap } from "./tendencyBundleMap";
 import { badgeBundleMap } from "./badgeBundleMap";
@@ -95,7 +95,6 @@ type SaveFilePicker = (options?: {
 }>;
 
 const playersPerRound = 8;
-const playerSwitchLimit = 3;
 const teamDrawDurationMs = 1800;
 const teamDrawSettleHoldMs = 360;
 
@@ -606,7 +605,8 @@ function RookieBuilder({
   const [isTeamDrawing, setIsTeamDrawing] = useState(false);
   const [teamDrawPhase, setTeamDrawPhase] = useState<"rolling" | "landing">("rolling");
   const [drawingTeamId, setDrawingTeamId] = useState<string | null>(null);
-  const [switchesLeft, setSwitchesLeft] = useState(playerSwitchLimit);
+  const [switchesLeft, setSwitchesLeft] = useState(SWITCH_LIMIT_BY_DIFFICULTY.standard);
+  const [difficulty, setDifficulty] = useState<BuilderDifficulty>("standard");
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [playerVersionGroupKey, setPlayerVersionGroupKey] = useState<string | null>(null);
   const [customizingBundleId, setCustomizingBundleId] = useState<string | null>(null);
@@ -730,6 +730,7 @@ function RookieBuilder({
         switchesLeft,
         manualSetupDone,
         skipBodyConstraints,
+        difficulty,
         round: { teamId: round.teamId, offset: round.offset, playerOrder: round.playerOrder },
         status,
       });
@@ -780,6 +781,7 @@ function RookieBuilder({
     setManualSetupDone(draft.manualSetupDone);
     setSetupDialogOpen(!draft.manualSetupDone);
     setSkipBodyConstraints(draft.skipBodyConstraints);
+    setDifficulty(draft.difficulty ?? "standard");
     if (draft.round && teams.some((team) => team.id === draft.round?.teamId)) {
       setRound({ teamId: draft.round.teamId, offset: draft.round.offset, playerOrder: draft.round.playerOrder });
     }
@@ -1269,7 +1271,7 @@ function RookieBuilder({
     locksRef.current = {};
     usedPlayerIdsRef.current = new Set();
     lockMutationRef.current = false;
-    setSwitchesLeft(playerSwitchLimit);
+    setSwitchesLeft(SWITCH_LIMIT_BY_DIFFICULTY[difficulty]);
     setSelectedPlayerId(null);
     setPlayerVersionGroupKey(null);
     setCustomizingBundleId(null);
@@ -1486,6 +1488,27 @@ function RookieBuilder({
               <BodyNumberInput disabled={settingsLocked} label="躯干" max={100} min={1} onChange={(value) => updateBody("torso", value)} value={body.torso} />
             </div>
           </section>
+
+          {!isManualSelection && (
+            <section aria-labelledby="difficulty-label" className="builder-setup-body bg-white px-3 py-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div className="section-label" id="difficulty-label">难度（换一批次数）</div>
+                <span className="text-[9px] text-ink-400">每局固定次数，用完后只能按当前候选锁定</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {([["relaxed", "休闲"], ["standard", "标准"], ["hard", "困难"], ["ironman", "铁人"]] as const).map(([mode, label]) => (
+                  <button
+                    aria-pressed={difficulty === mode}
+                    className={`h-7 flex-1 rounded-[5px] text-[10px] font-semibold ${difficulty === mode ? "bg-ink-900 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200"}`}
+                    disabled={settingsLocked}
+                    key={mode}
+                    onClick={() => { setDifficulty(mode); setSwitchesLeft(SWITCH_LIMIT_BY_DIFFICULTY[mode]); }}
+                    type="button"
+                  >{label} {SWITCH_LIMIT_BY_DIFFICULTY[mode]}</button>
+                ))}
+              </div>
+            </section>
+          )}
 
           <div className="builder-setup-footer bg-ink-50/80 px-3 py-2.5">
             <div className="builder-setup-status flex min-w-0 items-center gap-1.5 text-[10px] font-medium text-ink-500">

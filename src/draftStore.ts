@@ -15,6 +15,15 @@ import type { BuilderBody } from "./rookieBodyConstraints.ts";
 export const DRAFT_STORAGE_KEY = "2kspinner.draft.v1";
 export const DRAFT_VERSION = 1;
 
+/** 难度预设：控制随机模式每局的"换一批"次数。 */
+export type BuilderDifficulty = "relaxed" | "standard" | "hard" | "ironman";
+export const SWITCH_LIMIT_BY_DIFFICULTY: Record<BuilderDifficulty, number> = {
+  relaxed: 5,
+  standard: 3,
+  hard: 1,
+  ironman: 0,
+};
+
 export type RookieDraft = {
   version: typeof DRAFT_VERSION;
   savedAt: number;
@@ -31,6 +40,7 @@ export type RookieDraft = {
   switchesLeft: number;
   manualSetupDone: boolean;
   skipBodyConstraints: boolean;
+  difficulty?: BuilderDifficulty;
   round: { teamId: string; offset: number; playerOrder: string[] } | null;
   status: string;
 };
