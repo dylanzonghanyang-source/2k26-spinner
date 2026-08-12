@@ -11,8 +11,16 @@
  *     --input /path/to/player_roster_snapshot.json \
  *     --year 2018 \
  *     --out src/data/rookieCards/2018 \
+ *     [--source-draft-year 2018] \
+ *     [--draft-picks scripts/official-draft-picks-1960-2025.json] \
+ *     [--append] \
  *     [--whitelist data/raw/db2k/2018-whitelist.json] \
  *     [--overrides data/raw/db2k/2018-overrides.json]
+ *
+ * `--source-draft-year` filters a multi-year source snapshot (e.g. the merged
+ * 2003–2018 capture). Omit it for a single-year DB2K draft-class snapshot,
+ * whose Vitals/DRAFTEDYEAR may be an editor sentinel such as 1900.
+ * `--append` preserves cards absent from the source instead of deleting them.
  *
  * Output per player (schema: references/rookie-card-schema.md):
  *   { slug, name, draftYear, source, gameVersion, capturedAt, overall,
@@ -48,9 +56,13 @@ if (!INPUT) {
   process.exit(1);
 }
 const YEAR = Number(getArg("--year") || 2018);
+const SOURCE_DRAFT_YEAR_ARG = getArg("--source-draft-year");
+const SOURCE_DRAFT_YEAR = SOURCE_DRAFT_YEAR_ARG == null ? null : Number(SOURCE_DRAFT_YEAR_ARG);
 const OUT_DIR = getArg("--out") || path.join("src", "data", "rookieCards", String(YEAR));
 const WHITELIST = getArg("--whitelist");
+const DRAFT_PICKS = getArg("--draft-picks");
 const OVERRIDES = getArg("--overrides");
+const APPEND = process.argv.includes("--append");
 const DRY_RUN = process.argv.includes("--dry-run");
 
 // 路径边界（公测审计 12.5）：--out 必须限定在 src/data/rookieCards/<year>/ 内，
@@ -304,13 +316,42 @@ const whitelist = WHITELIST && fs.existsSync(WHITELIST)
 const overrides = OVERRIDES && fs.existsSync(OVERRIDES)
   ? JSON.parse(fs.readFileSync(OVERRIDES, "utf8"))
   : {};
+const coreName = (raw) => String(raw ?? "")
+  .normalize("NFKD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase()
+  .replace(/[.'’]/g, "")
+  .replace(/[^a-z0-9 ]/g, " ")
+  .replace(/\s+/g, " ")
+  .trim();
+const draftPicks = DRAFT_PICKS && fs.existsSync(DRAFT_PICKS)
+  ? new Map(
+    Object.entries(JSON.parse(fs.readFileSync(DRAFT_PICKS, "utf8")).years?.[String(YEAR)] ?? {})
+      .map(([pick, name]) => [coreName(name), Number(pick)]),
+  )
+  : null;
+if (DRAFT_PICKS && !draftPicks) {
+  console.error(`FATAL: draft-picks file not found: ${DRAFT_PICKS}`);
+  process.exit(1);
+}
+const draftNameAliases = new Map([
+  ["otto porter", "otto porter jr"],
+  ["terry rozier iii", "terry rozier"],
+  ["patrick mills", "patty mills"],
+  ["bobby portis jr", "bobby portis"],
+]);
+const officialDraftPick = (name) => {
+  if (!draftPicks) return null;
+  const key = coreName(name);
+  return draftPicks.get(key) ?? draftPicks.get(draftNameAliases.get(key));
+};
 
 // ============================================================
 // Convert
 // ============================================================
 
 const out = [];
-const review = { skipped_generated: [], missing_overall: [], warning: [] };
+const review = { skipped_generated: [], skipped_not_official_draft: [], missing_overall: [], warning: [] };
 
 for (const rec of records) {
   const f = rec.fields ?? {};
@@ -321,6 +362,13 @@ for (const rec of records) {
   const name = `${first} ${last}`.trim();
   if (!name) continue;
   const slug = slugify(name);
+  const sourceDraftYear = num(get("Vitals", "DRAFTEDYEAR"));
+  if (SOURCE_DRAFT_YEAR != null && sourceDraftYear !== SOURCE_DRAFT_YEAR) continue;
+  const officialPick = officialDraftPick(name);
+  if (draftPicks && officialPick == null) {
+    review.skipped_not_official_draft.push(slug);
+    continue;
+  }
   const faceId = num(get("Vitals", "FACEID"));
 
   // --- identity / body ---
@@ -362,9 +410,16 @@ for (const rec of records) {
   }
 
   // --- potential / durability (record as extra metadata) ---
+  // DB2K stores current/min/max independently. Keep the official current value
+  // intact, but normalize a contradictory range so downstream generation never
+  // receives current outside min–max (the correction is disclosed on the card).
   const potential = num(get("Attributes", "POTENTIAL"));
-  const potentialMin = num(get("Vitals", "MINIMUMPOTENTIAL"));
-  const potentialMax = num(get("Vitals", "MAXIMUMPOTENTIAL"));
+  const rawPotentialMin = num(get("Vitals", "MINIMUMPOTENTIAL"));
+  const rawPotentialMax = num(get("Vitals", "MAXIMUMPOTENTIAL"));
+  const potentialRangeCorrected = potential != null && rawPotentialMin != null && rawPotentialMax != null
+    && (potential < rawPotentialMin || potential > rawPotentialMax || rawPotentialMin > rawPotentialMax);
+  const potentialMin = potentialRangeCorrected ? Math.min(rawPotentialMin, rawPotentialMax, potential) : rawPotentialMin;
+  const potentialMax = potentialRangeCorrected ? Math.max(rawPotentialMin, rawPotentialMax, potential) : rawPotentialMax;
 
   // --- whitelist filter ---
   const nameLower = name.toLowerCase().trim();
@@ -393,13 +448,19 @@ for (const rec of records) {
     wingspan: wingspanCm,
     faceId,
     potential: { current: potential, min: potentialMin, max: potentialMax },
-    vitals: extractVitals(get),
+    vitals: { ...extractVitals(get), ...(officialPick == null ? {} : { draftPick: officialPick }) },
     durability: extractDurability(get),
     hotZones: extractHotZones(get),
     detailed,
     badges,
     tendencies,
     personalityBadges,
+    ...(potentialRangeCorrected ? {
+      dataQuality: {
+        potentialRangeCorrected: true,
+        potentialRangeNote: "min/max expanded to include current (official card value preserved)",
+      },
+    } : {}),
   };
   out.push(card);
 }
@@ -503,22 +564,24 @@ function extractHotZones(get) {
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 let written = 0;
+let preservedExisting = 0;
 for (const card of out) {
+  const outputPath = path.join(OUT_DIR, `${card.slug}.json`);
+  if (APPEND && fs.existsSync(outputPath)) {
+    preservedExisting++;
+    continue;
+  }
   if (DRY_RUN) {
     written++;
     continue;
   }
-  fs.writeFileSync(
-    path.join(OUT_DIR, `${card.slug}.json`),
-    JSON.stringify(card, null, 2) + "\n",
-    "utf8",
-  );
+  fs.writeFileSync(outputPath, JSON.stringify(card, null, 2) + "\n", "utf8");
   written++;
 }
 
-// Remove stale per-player cards from a previous conversion of the same year so
-// the directory always mirrors exactly this snapshot (idempotent re-runs).
-if (!DRY_RUN) {
+// Default replacement mode mirrors the source exactly. `--append` is used for
+// partial historic snapshots so cards absent from that source stay intact.
+if (!DRY_RUN && !APPEND) {
   const writtenSlugs = new Set(out.map((card) => `${card.slug}.json`));
   for (const file of fs.readdirSync(OUT_DIR)) {
     if (!file.endsWith(".json")) continue;
@@ -533,34 +596,40 @@ if (DRY_RUN) {
   console.log(`[dry-run] would write ${written}/${records.length} cards to ${OUT_DIR} (no files touched)`);
   process.exit(0);
 }
-fs.writeFileSync(
-  path.join(OUT_DIR, "capture-manifest.json"),
-  JSON.stringify(
-    {
-      source: "DB2K Editor Draft Class snapshot",
-      inputFile: INPUT,
-      targetExecutable: snapshot.target_executable,
-      mode: snapshot.mode,
-      recordCount: records.length,
-      converted: written,
-      year: YEAR,
-      capturedAt: new Date().toISOString(),
-      badgeTierMap: BADGE_TIER,
-      whitelistUsed: !!whitelist,
-    },
-    null,
-    2,
-  ) + "\n",
-  "utf8",
-);
-fs.writeFileSync(
-  path.join(OUT_DIR, "review.json"),
-  JSON.stringify(review, null, 2) + "\n",
-  "utf8",
-);
+if (!APPEND) {
+  fs.writeFileSync(
+    path.join(OUT_DIR, "capture-manifest.json"),
+    JSON.stringify(
+      {
+        source: "DB2K Editor Draft Class snapshot",
+        inputFile: INPUT,
+        targetExecutable: snapshot.target_executable,
+        mode: snapshot.mode,
+        recordCount: records.length,
+        converted: written,
+        preservedExisting,
+        append: APPEND,
+        year: YEAR,
+        capturedAt: new Date().toISOString(),
+        badgeTierMap: BADGE_TIER,
+        whitelistUsed: !!whitelist,
+      },
+      null,
+      2,
+    ) + "\n",
+    "utf8",
+  );
+  fs.writeFileSync(
+    path.join(OUT_DIR, "review.json"),
+    JSON.stringify(review, null, 2) + "\n",
+    "utf8",
+  );
+}
 
 console.log(`\nconverted ${written}/${records.length} -> ${OUT_DIR}`);
+if (APPEND) console.log(`preserved existing cards: ${preservedExisting}`);
 console.log(`skipped (not in whitelist): ${review.skipped_generated.length}`);
+console.log(`skipped (not an official draftee of ${YEAR}): ${review.skipped_not_official_draft.length}`);
 console.log(`missing OVR override: ${review.missing_overall.length}`);
 if (review.warning.length) {
   console.log(`warnings: ${review.warning.length}`);
