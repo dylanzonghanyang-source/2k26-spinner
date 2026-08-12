@@ -257,7 +257,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
                           <span className="flex shrink-0 items-center gap-2.5">
                             {slotValue !== null && (
                               <span className="flex items-baseline gap-1">
-                                <span className="text-[8px] font-medium text-ink-400">属性</span>
+                                <span className="text-[8px] font-medium text-ink-400">槽位主值</span>
                                 <span className={`text-[13px] font-bold tabular-nums ${valueColor(decayed?.adjusted ?? slotValue)}`}>{decayed?.adjusted ?? slotValue}</span>
                                 {decayed && decayed.adjusted !== decayed.raw && (
                                   <span className="text-[8px] tabular-nums text-ink-300">{decayed.raw}</span>
