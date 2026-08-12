@@ -60,6 +60,7 @@ import { clearDraft, loadDraft, saveDraft, type RookieDraft } from "../draftStor
 import { clearEntrySet, entryFieldKey, loadEntrySet, saveEntrySet, toggleEntrySet } from "../entryProgress";
 import { tendencyBundleMap } from "./tendencyBundleMap";
 import { badgeBundleMap } from "./badgeBundleMap";
+import { buildProfile } from "../buildProfile";
 
 export type RookieBuilderTeam = {
   id: string;
@@ -970,6 +971,8 @@ function RookieBuilder({
           ? "loading"
           : "idle";
   const tendencyCount = Object.keys(result.tendencies).length;
+  // 规则化画像标签（由最终属性推导）
+  const profileTags = useMemo(() => (result ? buildProfile(result.initialAttrs) : []), [result]);
   // 录入进度总数：属性 + 倾向 + 热区 + 徽章（行级单位）
   const entryTotal = result
     ? fullAttributeGroups.reduce((total, group) => total + group.attrs.length, 0)
@@ -1746,6 +1749,11 @@ function RookieBuilder({
               <div className="workspace-toolbar px-3 py-2.5">
                 <div className="section-label">{"新秀球员卡"}</div>
                 <div className="mt-1 truncate text-[15px] font-semibold text-ink-800" data-testid="rookie-name">{rookieName}</div>
+                {profileTags.length > 0 && (
+                  <div className="mt-1.5 flex flex-wrap gap-1">
+                    {profileTags.map((tag) => <span className="rounded-[3px] bg-court-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-court-700" key={tag}>{tag}</span>)}
+                  </div>
+                )}
                 <div className="mt-2 flex items-end justify-between">
                   <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">模型估算综评</div></div>
                   <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{positionLabel} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">非官方推测值 · 模型 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
