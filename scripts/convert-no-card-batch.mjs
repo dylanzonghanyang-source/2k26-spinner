@@ -15,14 +15,19 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { estimateGameOverall } from "../src/rookieOverall.ts";
+import { normalizeHeightInches } from "./lib/height-units.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const OUT_BASE = path.join(ROOT, "src", "data", "rookieCards");
 const CSV = process.argv[2] ?? path.join(ROOT, ".hermes", "desktop-attachments", "no-card-ovr-collection-2026-08-08(1).csv");
-const AB_SNAP = process.argv[3] ?? "/Users/yangzonghan/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_u99tqi61ovek22_9013/msg/file/2026-08/no_card_AB_rookie_current.json";
-const C_SNAP = process.argv[4] ?? "/Users/yangzonghan/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_u99tqi61ovek22_9013/msg/file/2026-08/no_card_C_capped80(1).json";
+const AB_SNAP = process.argv[3] ?? "";
+const C_SNAP = process.argv[4] ?? "";
 const DJG_SNAP = process.argv[5] ?? path.join(ROOT, ".hermes", "desktop-attachments", "david_jones_garcia_current.json");
+if (!AB_SNAP || !C_SNAP) {
+  console.error("ERROR: AB and C snapshot paths are required as positional args (AB_SNAP C_SNAP).");
+  process.exit(1);
+}
 
 // ---- field maps (copied from convert-db2k-to-rookiecard.mjs) ----
 const ATTR_MAP = {
@@ -252,7 +257,7 @@ function convertRecord(rec, { overall, source }) {
     hometownTeam2: num(get("Vitals", "HOMETOWNTEAM2")),
     draftYear: num(get("Vitals", "DRAFTEDYEAR")),
     draftPick: num(get("Vitals", "DRAFTPICKNUMBER")),
-    heightInches: num(get("Vitals", "HEIGHT")),
+    heightInches: normalizeHeightInches(get("Vitals", "HEIGHT")),
     weightLb: num(get("Vitals", "WEIGHT")),
     wingspanCm: num(get("Vitals", "WINGSPANCM")),
     armScale: num(get("Vitals", "ARMSCALE")),
@@ -275,7 +280,7 @@ function convertRecord(rec, { overall, source }) {
     overall,
     position,
     secondaryPosition,
-    height: num(get("Vitals", "HEIGHT")),
+    height: normalizeHeightInches(get("Vitals", "HEIGHT")),
     weight: num(get("Vitals", "WEIGHT")),
     wingspan: num(get("Vitals", "WINGSPANCM")),
     faceId: num(get("Vitals", "FACEID")),

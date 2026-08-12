@@ -34,6 +34,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { normalizeHeightInches } from "./lib/height-units.mjs";
 
 const args = process.argv.slice(2);
 const getArg = (name) => {
@@ -41,11 +42,26 @@ const getArg = (name) => {
   return i >= 0 ? args[i + 1] : undefined;
 };
 
-const INPUT = getArg("--input") || "/Users/yangzonghan/Downloads/player_roster_snapshot.json";
+const INPUT = getArg("--input") ?? "";
+if (!INPUT) {
+  console.error("ERROR: --input is required (path to the DB2K player roster snapshot).");
+  process.exit(1);
+}
 const YEAR = Number(getArg("--year") || 2018);
 const OUT_DIR = getArg("--out") || path.join("src", "data", "rookieCards", String(YEAR));
 const WHITELIST = getArg("--whitelist");
 const OVERRIDES = getArg("--overrides");
+const DRY_RUN = process.argv.includes("--dry-run");
+
+// 路径边界（公测审计 12.5）：--out 必须限定在 src/data/rookieCards/<year>/ 内，
+// stale 清理只能作用于卡片目录，禁止枚举删除任意目录的 JSON。
+const ROOT_DIR = path.resolve(".");
+const CARDS_ROOT = path.resolve(ROOT_DIR, "src", "data", "rookieCards");
+const OUT_RESOLVED = path.resolve(ROOT_DIR, OUT_DIR);
+if (OUT_RESOLVED !== CARDS_ROOT && !OUT_RESOLVED.startsWith(CARDS_ROOT + path.sep)) {
+  console.error(`ERROR: --out must be inside src/data/rookieCards/<year>/ (got ${OUT_DIR})`);
+  process.exit(1);
+}
 
 // ============================================================
 // Field name maps
@@ -310,7 +326,7 @@ for (const rec of records) {
   // --- identity / body ---
   const pos = get("Vitals", "POSITION");
   const pos2 = get("Vitals", "SECONDARYPOSITION");
-  const heightIn = num(get("Vitals", "HEIGHT")); // inches
+  const heightIn = normalizeHeightInches(get("Vitals", "HEIGHT")); // always inches
   const weight = num(get("Vitals", "WEIGHT"));
   const wingspanCm = num(get("Vitals", "WINGSPANCM"));
 
@@ -432,8 +448,8 @@ function extractVitals(get) {
     hometownTeam2: num(pick("HOMETOWNTEAM2")),
     draftYear: num(pick("DRAFTEDYEAR")),
     draftPick: num(pick("DRAFTPICKNUMBER")),
-    // body proportions (1-100 scale in-game ratings)
-    heightInches: num(pick("HEIGHT")),
+    // body proportions (1-100 scale in-game ratings); HEIGHT must be inches
+    heightInches: normalizeHeightInches(pick("HEIGHT")),
     weightLb: num(pick("WEIGHT")),
     wingspanCm: num(pick("WINGSPANCM")),
     armScale: num(pick("ARMSCALE")),
@@ -488,6 +504,10 @@ function extractHotZones(get) {
 fs.mkdirSync(OUT_DIR, { recursive: true });
 let written = 0;
 for (const card of out) {
+  if (DRY_RUN) {
+    written++;
+    continue;
+  }
   fs.writeFileSync(
     path.join(OUT_DIR, `${card.slug}.json`),
     JSON.stringify(card, null, 2) + "\n",
@@ -498,14 +518,20 @@ for (const card of out) {
 
 // Remove stale per-player cards from a previous conversion of the same year so
 // the directory always mirrors exactly this snapshot (idempotent re-runs).
-const writtenSlugs = new Set(out.map((card) => `${card.slug}.json`));
-for (const file of fs.readdirSync(OUT_DIR)) {
-  if (!file.endsWith(".json")) continue;
-  if (file === "review.json" || file === "capture-manifest.json") continue;
-  if (!writtenSlugs.has(file)) {
-    fs.unlinkSync(path.join(OUT_DIR, file));
-    console.log(`removed stale card: ${file}`);
+if (!DRY_RUN) {
+  const writtenSlugs = new Set(out.map((card) => `${card.slug}.json`));
+  for (const file of fs.readdirSync(OUT_DIR)) {
+    if (!file.endsWith(".json")) continue;
+    if (file === "review.json" || file === "capture-manifest.json") continue;
+    if (!writtenSlugs.has(file)) {
+      fs.unlinkSync(path.join(OUT_DIR, file));
+      console.log(`removed stale card: ${file}`);
+    }
   }
+}
+if (DRY_RUN) {
+  console.log(`[dry-run] would write ${written}/${records.length} cards to ${OUT_DIR} (no files touched)`);
+  process.exit(0);
 }
 fs.writeFileSync(
   path.join(OUT_DIR, "capture-manifest.json"),

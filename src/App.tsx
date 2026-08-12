@@ -1,5 +1,6 @@
 import { Database, Moon, Sun, UserRoundPlus, UsersRound } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Component } from "react";
 import RookieBuilder, { type RookieBuilderTeam } from "./components/RookieBuilder";
 import DatabasePanel from "./components/DatabasePanel";
 import appLogo from "./assets/2kspinner-logo.png";
@@ -27,6 +28,7 @@ function getInitialDataVersion(): DataVersion {
 }
 
 import { safeGetStorageItem, safeRemoveStorageItem, safeSetStorageItem } from "./storage";
+import { loadDraft } from "./draftStore";
 
 function getInitialTheme(): Theme {
   const savedTheme = safeGetStorageItem(themeStorageKey)
@@ -135,8 +137,8 @@ type VersionData = {
 // 2K27 badge/player data is lazy-loaded only when the user switches to 2K27,
 // keeping ~615 KB of chunks out of the initial page load.
 const versionData2k26: VersionData = {
-  label: "NBA 2K26 数据 · 最新阵容",
-  rosterCatalog: rosterCatalog2k27 as RosterCatalogData,
+  label: "NBA 2K26 数据",
+  rosterCatalog: rosterCatalog2k26 as RosterCatalogData,
   badgeProfiles: badgeProfiles2k26 as BadgeProfileMap,
   detailedPlayers: detailedPlayers2k26 as DetailedPlayerRecord[],
   tendenciesAvailable: true,
@@ -250,13 +252,25 @@ function rosterPlayerSource(
   };
 }
 
+function getInitialAppMode(): AppMode {
+  return loadDraft()?.selectionMode === "manual" ? "custom" : "rookie";
+}
+
 const App = () => {
-  const [appMode, setAppMode] = useState<AppMode>("rookie");
+  const [appMode, setAppMode] = useState<AppMode>(getInitialAppMode);
   const [builderFlowActive, setBuilderFlowActive] = useState(false);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
+  // 同步镜像：builder 的 flow 状态经 effect 回传有一帧窗口，模式切换 handler
+  // 必须二次校验该 ref，防止"确认并抽取 → 同 tick 切数据库"竞态。
+  const flowActiveRef = useRef(false);
   const handleBuilderFlowActiveChange = useCallback((active: boolean) => {
+    flowActiveRef.current = active;
     setBuilderFlowActive(active);
+  }, []);
+  const switchMode = useCallback((mode: AppMode) => {
+    if (flowActiveRef.current) return;
+    setAppMode(mode);
   }, []);
 
   useEffect(() => {
@@ -266,16 +280,8 @@ const App = () => {
   }, [theme]);
   const [dataVersion, setDataVersion] = useState<DataVersion>(getInitialDataVersion);
   const [versionData2k27, setVersionData2k27] = useState<VersionData | null>(null);
-
-  // Pre-fetch 2K27 data in the background once the builder is idle so the
-  // toggle (when it opens) feels instant. Never blocks initial render.
-  useEffect(() => {
-    let active = true;
-    loadVersionData2k27().then((data) => {
-      if (active) setVersionData2k27(data);
-    }).catch(() => {});
-    return () => { active = false; };
-  }, []);
+  // 2K27 仍是禁用入口：不预取其 badges/players 数据（保持初始加载最小化，
+  // 启用前必须有独立的 idle/loading/ready/error 状态与完整数据再切换）。
 
   const activeVersionData = dataVersion === "2k26"
     ? versionData2k26
@@ -321,6 +327,7 @@ const App = () => {
 
   return (
     <main className="min-h-screen text-ink-900">
+      <AppErrorBoundary>
       <div className="mx-auto flex min-h-screen w-full max-w-[1520px] flex-col gap-2.5 px-2.5 py-2.5 sm:px-4 sm:py-3">
 
         {/* Header */}
@@ -338,17 +345,17 @@ const App = () => {
           </div>
 
           <nav className="mode-nav justify-self-center" aria-label="选择模式">
-            <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} disabled={builderFlowActive} onClick={() => setAppMode("rookie")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : undefined} type="button">
+            <button aria-pressed={appMode === "rookie"} className="mode-nav-button" data-active={appMode === "rookie"} disabled={builderFlowActive} onClick={() => switchMode("rookie")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : undefined} type="button">
               <UserRoundPlus className="h-3.5 w-3.5" />
               <span className="lg:hidden">新秀</span>
               <span className="hidden lg:inline">新秀生成</span>
             </button>
-            <button aria-pressed={appMode === "custom"} className="mode-nav-button" data-active={appMode === "custom"} disabled={builderFlowActive} onClick={() => setAppMode("custom")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "逐项为属性槽选择来源球员"} type="button">
+            <button aria-pressed={appMode === "custom"} className="mode-nav-button" data-active={appMode === "custom"} disabled={builderFlowActive} onClick={() => switchMode("custom")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "逐项为属性槽选择来源球员"} type="button">
               <UsersRound className="h-3.5 w-3.5" />
               <span className="lg:hidden">自选</span>
               <span className="hidden lg:inline">自选生成</span>
             </button>
-            <button aria-pressed={appMode === "database"} className="mode-nav-button" data-active={appMode === "database"} disabled={builderFlowActive} onClick={() => setAppMode("database")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "浏览全部新秀卡数据"} type="button">
+            <button aria-pressed={appMode === "database"} className="mode-nav-button" data-active={appMode === "database"} disabled={builderFlowActive} onClick={() => switchMode("database")} title={builderFlowActive ? "当前正在生成，请先点击“重新开始”" : "浏览全部新秀卡数据"} type="button">
               <Database className="h-3.5 w-3.5" />
               <span className="lg:hidden">数据库</span>
               <span className="hidden lg:inline">数据库</span>
@@ -363,7 +370,7 @@ const App = () => {
                 aria-label="切换到 2K26 数据"
                 className={`version-option ${dataVersion === "2k26" ? "version-active" : ""}`}
                 disabled={builderFlowActive}
-                onClick={() => setDataVersion("2k26")}
+                onClick={() => { if (!flowActiveRef.current) setDataVersion("2k26"); }}
                 role="radio"
                 type="button"
               >
@@ -420,9 +427,35 @@ const App = () => {
         </footer>
 
       </div>
+      </AppErrorBoundary>
 
     </main>
   );
+}
+
+/** 渲染级兜底：chunk/运行时异常时给出可见错误与恢复入口，而不是白屏。 */
+class AppErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state: { error: Error | null } = { error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <main className="flex min-h-screen items-center justify-center px-4 text-ink-900">
+          <div className="w-full max-w-[420px] rounded-[7px] border border-warning/25 bg-warning-soft p-4" role="alert">
+            <h1 className="text-[14px] font-semibold text-warning">应用出现错误</h1>
+            <p className="mt-2 break-all text-[11px] leading-5 text-warning/90">{String(this.state.error)}</p>
+            <p className="mt-1 text-[10px] text-ink-400">可能是资源加载失败或运行时异常。重新加载应用可恢复。</p>
+            <button className="action-button primary-action mt-3 px-3 py-1.5 text-[11px] font-semibold" onClick={() => window.location.reload()} type="button">重新加载应用</button>
+          </div>
+        </main>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 export default App;

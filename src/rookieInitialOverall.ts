@@ -18,21 +18,18 @@ type DevelopmentGap = {
   elite: number;
 };
 
+// 年龄不再参与计算：起始综评的成长空间固定为中性基准（原 20 岁档），
+// 18-23 岁生成的起始综评完全一致，大龄新秀不再获得起始加成。
 const developmentGapByAge: Record<number, DevelopmentGap> = {
-  18: { standard: 14, elite: 17 },
-  19: { standard: 12, elite: 14 },
   20: { standard: 9, elite: 12 },
-  21: { standard: 7, elite: 10 },
-  22: { standard: 5, elite: 8 },
-  23: { standard: 4, elite: 6 },
 };
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, Math.round(value)));
 }
 
-function developmentGap(potential: number, age: number) {
-  const gaps = developmentGapByAge[age] ?? developmentGapByAge[19];
+function developmentGap(potential: number) {
+  const gaps = developmentGapByAge[20];
   const eliteFactor = Math.max(0, Math.min(1, (potential - 87) / 5));
   return gaps.standard + (gaps.elite - gaps.standard) * eliteFactor;
 }
@@ -44,10 +41,9 @@ function developmentGap(potential: number, age: number) {
  * current-player OVR model. In particular, a 19-year-old prospect with 98
  * potential targets 84 OVR, leaving a meaningful growth gap.
  */
-export function initialOverallForPotential(potential: number, age: number) {
+export function initialOverallForPotential(potential: number) {
   const normalizedPotential = clamp(potential, 40, 99);
-  const normalizedAge = Math.round(age);
-  return clamp(normalizedPotential - developmentGap(normalizedPotential, normalizedAge), 40, 95);
+  return clamp(normalizedPotential - developmentGap(normalizedPotential), 40, 95);
 }
 
 /**
@@ -59,7 +55,6 @@ export function initialOverallForPotential(potential: number, age: number) {
 export function constrainRookieInitialAttributes({
   values,
   potential,
-  age,
   adjustableAttributes,
   lockedValues = {},
   badges = [],
@@ -67,13 +62,12 @@ export function constrainRookieInitialAttributes({
 }: {
   values: Record<string, number>;
   potential: number;
-  age: number;
   adjustableAttributes: readonly string[];
   lockedValues?: Record<string, number>;
   badges?: RookieInitialOverallBadge[];
   estimateOverall: (values: Record<string, number>, badges: RookieInitialOverallBadge[]) => number;
 }): RookieInitialOverallConstraint {
-  const targetOverall = initialOverallForPotential(potential, age);
+  const targetOverall = initialOverallForPotential(potential);
   const originalValues = { ...values };
   const originalOverall = estimateOverall(originalValues, badges);
 

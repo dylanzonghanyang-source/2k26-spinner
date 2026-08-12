@@ -1,6 +1,6 @@
 {
   "source": "DB2K Editor Draft Class snapshot",
-  "inputFile": "/Users/yangzonghan/Downloads/player_roster_snapshot(1).json",
+  "inputFile": "player_roster_snapshot(1).json",
   "targetExecutable": "NBA2K26.exe",
   "mode": "Draft Class",
   "recordCount": 150,

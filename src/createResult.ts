@@ -61,6 +61,37 @@ export function applyBundleLock(
   return { ...current, [bundleId]: lock };
 }
 
+export type BundleLockTransaction = {
+  next: LockState;
+  usedPlayerIds: Set<string>;
+  accepted: boolean;
+};
+
+/**
+ * Transactional lock commit used by the builder's rapid-click path.
+ *
+ * Same-tick concurrent commits must serialize on: target slot unlocked, the
+ * source player not already used by another slot, and no in-flight mutation.
+ * UI disable layers cannot stop two clicks landing before a re-render, so the
+ * rule lives here as a pure function (the builder mirrors usedPlayerIds in a
+ * ref and re-checks lockMutation before each commit).
+ */
+export function applyBundleLockTransaction(
+  current: LockState,
+  bundleId: string,
+  lock: BundleLock,
+  usedPlayerIds: ReadonlySet<string>,
+): BundleLockTransaction {
+  const nextUsed = new Set(usedPlayerIds);
+  if (current[bundleId]) return { next: current, usedPlayerIds: nextUsed, accepted: false };
+  if (lock.kind === "player" && usedPlayerIds.has(lock.playerId)) {
+    return { next: current, usedPlayerIds: nextUsed, accepted: false };
+  }
+  const next = { ...current, [bundleId]: lock };
+  if (lock.kind === "player") nextUsed.add(lock.playerId);
+  return { next, usedPlayerIds: nextUsed, accepted: true };
+}
+
 export type Evaluation = {
   raw: number;
   adjusted: number;
@@ -172,11 +203,17 @@ function getObservedAttr(player: PlayerSource, attr: string): number | undefined
   return undefined;
 }
 
-/** 从 rookie card vitals 构造来源身体（英寸/磅/cm），无数据时返回 null。 */
+/**
+ * From rookie card vitals, construct the source body (cm / kg / cm).
+ * Defensive contract: `heightInches` MUST be inches; out-of-range values
+ * (e.g. a stray centimeters value) return null instead of producing a
+ * 500+ cm body. Returns null when any required value is missing/invalid.
+ */
 export function cardSourceBody(card: RookieCard | null | undefined): SourceBody | null {
   const heightInches = card?.vitals?.heightInches;
   const weightLb = card?.vitals?.weightLb;
   if (typeof heightInches !== "number" || typeof weightLb !== "number") return null;
+  if (!Number.isFinite(heightInches) || heightInches < 60 || heightInches > 100) return null;
   const height = heightInches * 2.54;
   const wingspanCm = typeof card?.vitals?.wingspanCm === "number" ? card.vitals.wingspanCm : null;
   return {
@@ -189,7 +226,7 @@ export function cardSourceBody(card: RookieCard | null | undefined): SourceBody 
 export type EvaluateOptions = {
   targetPosition?: Position | null;
   secondaryPosition?: Position | null;
-  /** 关闭降级算法：跳过身体约束与位置交叉（自选模式开关） */
+  /** 关闭身体适配校正：跳过身体约束与位置交叉（自选模式开关） */
   skipBody?: boolean;
 };
 
@@ -391,14 +428,15 @@ export function evaluateAllPreview(
   return evaluateAll(inputs, body, options)[candidate.bundle.id];
 }
 
-function rookieValue(value: number, age: number, category: BundleCategory) {
-  const progressByCategory: Record<BundleCategory, number[]> = {
-    technical: [0.82, 0.85, 0.88, 0.91, 0.93, 0.95],
-    physical: [0.92, 0.94, 0.96, 0.97, 0.98, 0.99],
-    mental: [0.77, 0.81, 0.85, 0.88, 0.9, 0.92],
+function rookieValue(value: number, category: BundleCategory) {
+  // 年龄不再参与计算：新秀成熟度固定为中性基准（原 20 岁档系数），
+  // 18-23 岁生成的初始属性完全一致，大龄新秀不再获得综评加成。
+  const progressByCategory: Record<BundleCategory, number> = {
+    technical: 0.88,
+    physical: 0.96,
+    mental: 0.85,
   };
-  const ageIndex = Math.max(0, Math.min(ages.length - 1, age - ages[0]));
-  const progress = Math.max(0.55, Math.min(1, progressByCategory[category][ageIndex]));
+  const progress = progressByCategory[category];
   return clamp(25 + (value - 25) * progress);
 }
 
@@ -611,7 +649,7 @@ export function createResult(
     const lock = locks[bundle.id];
     return lock?.kind === "player" ? lock.playerId : lock?.kind === "custom" ? JSON.stringify(lock.values) : "-";
   }).join("|")}|${Object.values(body).join("|")}`;
-  const random = makeRandom(hash(`${signature}|${age}|${position}|${secondary}`));
+  const random = makeRandom(hash(`${signature}|${position}|${secondary}`));
   const mean = average(scores, 71);
   const sourcePeakOverall = calibratedOverall(peakAttrs, position, peakBadges, mean, overallVersion);
   // Rookie-mode initial OVR uses the rookie-card-trained model.
@@ -663,7 +701,7 @@ export function createResult(
         continue;
       }
       const value = peakAttrs[attr];
-      if (typeof value === "number") initialAttrs[attr] = rookieValue(value, age, bundle.category);
+      if (typeof value === "number") initialAttrs[attr] = rookieValue(value, bundle.category);
     }
   }
   // Card attributes are locked (real game data) — the OVR constraint must not
@@ -701,24 +739,6 @@ export function createResult(
     : generateRookieDurability(sourceDurability, bodyStress, random);
   Object.assign(initialAttrs, durabilityValues);
   const durability = durabilityValues["Overall Durability"] ?? 82;
-  const rookieOverallConstraint = constrainRookieInitialAttributes({
-    values: initialAttrs,
-    potential,
-    age,
-    adjustableAttributes: bundles
-      .filter((bundle) => bundle.id !== "potential")
-      .flatMap((bundle) => bundle.attrs),
-    lockedValues: { ...customFinalAttrs, ...cardLockedValues },
-    badges,
-    estimateOverall: (values, candidateBadges) => calibratedOverall(
-      values,
-      position,
-      candidateBadges,
-      mean,
-      initialOverallVersion,
-    ),
-  });
-  if (rookieOverallConstraint) Object.assign(initialAttrs, rookieOverallConstraint.values);
   // Build card identity: when EVERY non-potential slot is locked to the same
   // rookie card, keep that card as the result's source record. OVR still follows
   // the generated final attributes after body/position constraints; otherwise a
@@ -733,12 +753,39 @@ export function createResult(
   )
     ? firstCard
     : null;
-  const baseOverall = calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
-  const initialStrength = baseOverall;
-  // 综评补偿 (Intangibles): 优先继承潜力来源卡的真实值，其次同卡构建的卡值，最后默认 50。
-  const intangibles = potentialCard?.detailed?.["Intangibles"]
+  // 综评补偿 (Intangibles): 优先用户自定义硬锁，其次继承潜力来源卡的真实值，
+  // 再次同卡构建的卡值，最后默认 50。
+  // MUST be resolved and written BEFORE the OVR constraint: the constraint,
+  // baseOverall and the final OVR must all see the FINAL Intangibles value.
+  // Previously Intangibles was written after the constraint — 647/1190 cards
+  // disagreed with the final attributes (e.g. Mitch Richmond showed 77 while
+  // final attributes recompute to 80 with Intangibles 98).
+  const intangibles = customFinalAttrs["Intangibles"]
+    ?? potentialCard?.detailed?.["Intangibles"]
     ?? singleCard?.detailed?.["Intangibles"]
     ?? 50;
+  initialAttrs.Intangibles = intangibles;
+  const rookieOverallConstraint = constrainRookieInitialAttributes({
+    values: initialAttrs,
+    potential,
+    adjustableAttributes: bundles
+      .filter((bundle) => bundle.id !== "potential")
+      .flatMap((bundle) => bundle.attrs),
+    lockedValues: { ...customFinalAttrs, ...cardLockedValues, Intangibles: intangibles },
+    badges,
+    estimateOverall: (values, candidateBadges) => calibratedOverall(
+      values,
+      position,
+      candidateBadges,
+      mean,
+      initialOverallVersion,
+    ),
+  });
+  if (rookieOverallConstraint) Object.assign(initialAttrs, rookieOverallConstraint.values);
+  // Final OVR: recomputed AFTER all final attributes (including Intangibles)
+  // are in place, so the reported OVR always matches the exported attributes.
+  const baseOverall = calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
+  const initialStrength = baseOverall;
   // 惯用手: 继承运动槽来源卡的真实值；扣篮惯用手: 继承扣篮槽来源卡的真实值。
   // vitals 存 "Left"/"Right"，无卡或值无效时回退原有随机逻辑。
   const handFromVital = cardByBundle.get("athletic")?.vitals?.dominantHand;
@@ -768,23 +815,22 @@ export function createResult(
   const hasVitalProbabilities = vitalBoom !== null && vitalBust !== null && vitalAverage !== null;
   const progressSpeed = Math.round(Math.max(2.2, Math.min(5.4, 2.4 + Math.max(0, (potential - 87) / 10) + (random() - 0.5) * 0.6)) * 10) / 10;
   const yearsToPeak = progressSpeed === 0 ? 0 : Math.ceil(growthGap / progressSpeed);
-  const peakStart = vitalPeakStart !== null && vitalPeakStart >= age
+  const peakStart = vitalPeakStart !== null
     ? vitalPeakStart
-    : clamp(Math.max(24, age + yearsToPeak), age, 30);
+    : clamp(Math.max(24, 20 + yearsToPeak), 20, 30);
   const peakDuration = Math.max(5, Math.min(11, 7 + (durability - 70) / 15 + random() * 1.5));
   const peakEnd = vitalPeakEnd !== null && vitalPeakEnd >= peakStart
     ? vitalPeakEnd
     : clamp(peakStart + peakDuration, peakStart, 40);
   const boom = hasVitalProbabilities
     ? vitalBoom
-    : clamp(28 + potential - 84 - (age - 18) * 2 + (random() - 0.5) * 8, 10, 55);
+    : clamp(28 + potential - 84 + (random() - 0.5) * 8, 10, 55);
   const bust = hasVitalProbabilities
     ? vitalBust
-    : clamp(18 - (age - 18) + (random() - 0.5) * 8, 8, 40);
+    : clamp(18 + (random() - 0.5) * 8, 8, 40);
   const normal = hasVitalProbabilities
     ? vitalAverage
     : 100 - boom - bust;
-  initialAttrs.Intangibles = intangibles;
   initialAttrs.Potential = potential;
   const hotZones = createHotZones(initialAttrs, position, secondary, hand, random);
   return {
@@ -794,6 +840,8 @@ export function createResult(
     peakOverall: sourcePeakOverall,
     peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges,
     potentialMin, potentialMax,
+    /** OVR 模型 fallback mean（复现 initialStrength/baseOverall 所需）。 */
+    overallMean: mean,
     card: singleCard,
     initialOverallTarget: rookieOverallConstraint?.targetOverall ?? initialStrength,
     initialOverallConstraintApplied: rookieOverallConstraint?.changed ?? false,

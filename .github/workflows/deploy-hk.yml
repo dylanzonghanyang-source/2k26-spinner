@@ -10,38 +10,54 @@ concurrency:
   group: hk-deploy
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # 受保护 environment：部署前需经 environment 审批/规则
+    environment:
+      name: hk-production
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.1
+        with:
+          persist-credentials: false
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@9fd676a19091d4595eefd76e4bd31c97133911f1 # v4.2.0
         with:
           version: 11.9.0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Full verification gate
+        run: pnpm run verify
+        env:
+          VITE_BASE: "/"
+
+      - name: Build all-cards dataset (public/data/all-cards.min.json)
+        run: pnpm run build:all-cards
 
       - name: Build
         run: pnpm run build
         env:
           VITE_BASE: "/"
 
-      - name: Deploy dist/ to HK server via rsync
+      - name: Atomic deploy to HK server
         env:
           HK_SSH_KEY: ${{ secrets.HK_SSH_KEY }}
           HK_KNOWN_HOSTS: ${{ secrets.HK_KNOWN_HOSTS }}
           HK_HOST: ${{ secrets.HK_HOST }}
-          HK_DEPLOY_PATH: ${{ secrets.HK_DEPLOY_PATH }}
+          HK_DEPLOY_USER: ${{ secrets.HK_DEPLOY_USER }}
         run: |
           set -euo pipefail
           mkdir -p ~/.ssh
@@ -51,8 +67,13 @@ jobs:
           chmod 600 ~/.ssh/hk_key
           printf '%s\n' "$HK_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
-          rsync -az --delete \
-            -e "ssh -i ~/.ssh/hk_key -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes" \
-            dist/ root@${HK_HOST}:${HK_DEPLOY_PATH}/
-          ssh -i ~/.ssh/hk_key -o StrictHostKeyChecking=yes root@${HK_HOST} \
-            "ls ${HK_DEPLOY_PATH}/ | head -5 && du -sh ${HK_DEPLOY_PATH}"
+          ssh_opts="-i ~/.ssh/hk_key -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes"
+          ssh $ssh_opts "${HK_DEPLOY_USER:-2kspinner}@${HK_HOST}" "mkdir -p /var/www/2kspinner/releases"
+          stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+          rel="/var/www/2kspinner/releases/$stamp"
+          rsync -az --delete -e "ssh $ssh_opts" \
+            dist/ "${HK_DEPLOY_USER:-2kspinner}@${HK_HOST}:${rel}/"
+          ssh $ssh_opts "${HK_DEPLOY_USER:-2kspinner}@${HK_HOST}" "
+            ln -sfn '$rel' /var/www/2kspinner/current &&
+            ls -1t /var/www/2kspinner/releases | tail -n +6 | while read -r old; do rm -rf /var/www/2kspinner/releases/\$old; done &&
+            ls -l /var/www/2kspinner/current | head -3"

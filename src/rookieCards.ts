@@ -23,6 +23,8 @@ export type RookieCard = {
   name: string;
   position: string | null;
   overall: number | null;
+  /** Top-level body values; height ALWAYS inches (see vitals unit contract). */
+  height: number | null;
   detailed: Record<string, number>;
   tendencies: Record<string, number>;
   badges: { name: string; tier: string }[];
@@ -30,6 +32,14 @@ export type RookieCard = {
   potential: { current: number | null; min: number | null; max: number | null } | null;
   /** 数据质量标记（如潜力范围被修正以包含 current）。 */
   dataQuality: { potentialRangeCorrected?: boolean; potentialRangeNote?: string } | null;
+  /**
+   * Vitals record. Unit contract:
+   * - `heightInches` / top-level `height`: ALWAYS inches, plausible range 60–100.
+   *   DB2K snapshots historically mixed cm values (150–250) into this field;
+   *   converters normalize via scripts/lib/height-units.mjs. Never write cm here.
+   * - `weightLb`: pounds. `wingspanCm`: centimeters.
+   * - `dominantHand` / `dominantDunkHand`: "Left" | "Right".
+   */
   vitals: Record<string, string | number | boolean | null>;
   durability: Record<string, number>;
   hotZones: Record<string, string>;
@@ -206,6 +216,7 @@ export function createRookieCardLookup(index: RawRookieCardIndex): RookieCardLoo
       personalityBadges,
       potential: index.potentials?.[i] ?? null,
       dataQuality: index.dataQualities?.[i] ?? null,
+      height: typeof vitals["heightInches"] === "number" ? vitals.heightInches : null,
       vitals,
       durability,
       hotZones,
@@ -259,6 +270,11 @@ export function loadRookieCards(): Promise<RookieCardLookup> {
       for (const [key, card] of chunkLookup) {
         if (!lookup.has(key)) lookup.set(key, card);
       }
+    }
+    // Ready 校验：合并结果必须达到最小数据量，否则视为 chunk 半加载失败。
+    // （当前完整集为 1190 张；500 为保守下界，防止未来数据精简时误报。）
+    if (lookup.size < 500) {
+      throw new Error(`rookie card index incomplete: only ${lookup.size} entries after merge`);
     }
     return lookup;
   });

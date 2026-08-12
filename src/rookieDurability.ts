@@ -72,13 +72,18 @@ function shiftGroup(values: Record<string, number>, group: DurabilityPartGroup, 
 }
 
 function rebalancePartMean(values: Record<string, number>, targetMean: number) {
+  if (!Number.isFinite(targetMean)) return false;
   const targetSum = targetMean * (DURABILITY_ATTRIBUTES.length - 1);
   let currentSum = DURABILITY_ATTRIBUTES
     .filter((attribute) => attribute !== "Overall Durability")
     .reduce((sum, attribute) => sum + (values[attribute] ?? 0), 0);
   let difference = targetSum - currentSum;
 
-  while (difference !== 0) {
+  // 有限性 + 最大迭代保护：非法输入（NaN/Infinity）或无法收敛时必须快速
+  // 退出，绝不能冻结主线程（公测审计 10.1）。
+  let iterations = 0;
+  while (difference !== 0 && Number.isFinite(difference) && iterations < 200) {
+    iterations += 1;
     const direction: 1 | -1 = difference > 0 ? 1 : -1;
     let progressed = false;
     for (const group of durabilityPartGroups) {
@@ -92,12 +97,13 @@ function rebalancePartMean(values: Record<string, number>, targetMean: number) {
     if (!progressed) break;
   }
 
-  return currentSum === targetSum;
+  return Number.isFinite(difference) && currentSum === targetSum;
 }
 
 /** Generate the 15 body-part ratings plus Overall Durability for a fixed mean. */
 export function generateDurabilityAttributes(mean: number, random: RandomSource) {
-  const targetMean = clampRating(mean);
+  // 非法均值（NaN/Infinity）快速回退到默认 80，避免生成语义错误的全 25 结果。
+  const targetMean = clampRating(Number.isFinite(mean) ? mean : 80);
   const values: Record<string, number> = {};
 
   for (const group of durabilityPartGroups) {

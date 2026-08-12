@@ -10,6 +10,8 @@ import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../
 import { buildPositionMap, filterCards, positionCN, positionForCard, summarizeCard, yearsWithCards } from "../databaseLogic";
 import { getPlayerNameCN } from "../playerNames";
 import { valueColor } from "../valueColor";
+import { bundles } from "../createResult";
+import { slotAttrsForCard, slotValueForCard } from "../rookieCardBrowser";
 
 const ZONE_CN: Record<string, string> = {
   underBasket: "篮下",
@@ -78,10 +80,28 @@ function DatabasePanel() {
   const years = useMemo(() => yearsWithCards(cards), [cards]);
   const rows = useMemo(() => filterCards(cards, { year, query }), [cards, query, year]);
 
+  // 默认先选最新年份，避免首屏渲染全部 1190 行（390×844 实测 13k+ DOM 节点）
+  useEffect(() => {
+    if (year === null && years.length > 0) setYear(years[0]);
+  }, [year, years]);
+
+  // 分页：默认只渲染前 PAGE_SIZE 行，减少 DOM 节点数
+  const PAGE_SIZE = 60;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  useEffect(() => setVisibleCount(PAGE_SIZE), [query, year]);
+  const visibleRows = rows.slice(0, visibleCount);
+  const remaining = rows.length - visibleRows.length;
+
   const totalCards = cards?.size ?? 0;
 
   return (
     <div className="database-panel flex min-h-0 flex-col gap-2.5">
+      {loadError && (
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 rounded-[5px] border border-warning/25 bg-warning-soft px-3 py-2 text-[11px] font-medium text-warning" role="alert">
+          <span>新秀卡数据加载失败（网络或资源问题）。请重新加载应用重试。</span>
+          <button className="action-button px-2 py-1 text-[10px]" onClick={() => window.location.reload()} type="button">重新加载应用</button>
+        </div>
+      )}
       <div className="panel-surface overflow-hidden">
         <div className="workspace-toolbar flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
           <div className="min-w-0">
@@ -134,7 +154,7 @@ function DatabasePanel() {
         {cards && rows.length === 0 && (
           <div className="flex min-h-[240px] items-center justify-center text-[11px] text-ink-400">没有匹配的球员</div>
         )}
-        {rows.map((card) => {
+        {visibleRows.map((card) => {
           const summary = summarizeCard(card);
           const position = positionCN(positionForCard(card, positionMap));
           const key = `${card.year}:${card.slug}`;
@@ -143,8 +163,7 @@ function DatabasePanel() {
             <div
               className={`overflow-hidden rounded-[5px] border transition ${expanded ? "border-court-500/40 bg-court-50/40" : "border-ink-200 bg-white"}`}
               key={key}
-            >
-              <button
+            >              <button
                 aria-expanded={expanded}
                 className="flex w-full items-center gap-2 px-2.5 py-2 text-left hover:bg-ink-50"
                 onClick={() => setExpandedKey(expanded ? null : key)}
@@ -168,6 +187,15 @@ function DatabasePanel() {
             </div>
           );
         })}
+        {remaining > 0 && (
+          <button
+            className="flex h-9 w-full items-center justify-center gap-1 rounded-[5px] border border-ink-200 bg-white text-[10px] font-semibold text-ink-500 hover:bg-ink-50"
+            onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+            type="button"
+          >
+            <ChevronDown className="h-3.5 w-3.5" />加载更多（剩余 {remaining} 名）
+          </button>
+        )}
       </div>
     </div>
   );
@@ -179,6 +207,31 @@ function CardDetails({ card, position }: { card: RookieCard; position: string | 
 
   return (
     <div className="space-y-3 border-t border-ink-200 bg-ink-50/60 px-3 py-3">
+      {/* 16 槽属性（无衰减）：该卡作为来源球员时各槽位的原始卡值（不套年龄
+          曲线/身体约束/位置交叉，即生成前的模板值） */}
+      <div className="space-y-1.5">
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="text-[9px] font-semibold text-ink-400">16 槽属性（无衰减）</div>
+          <div className="text-[8px] text-ink-300">原始卡值 · 生成时可能因身体/位置约束而衰减</div>
+        </div>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
+          {bundles.map((bundle) => {
+            const value = slotValueForCard(card, bundle);
+            const attrs = slotAttrsForCard(card, bundle);
+            return (
+              <div
+                className="flex min-w-0 items-center justify-between gap-2 rounded-[4px] bg-white px-2 py-1"
+                key={bundle.id}
+                title={attrs.filter(({ value: v }) => v != null).map(({ attr, value: v }) => `${attrNameCN[attr] ?? attr} ${v}`).join(" · ") || undefined}
+              >
+                <span className="truncate text-[9px] text-ink-500">{bundle.label}</span>
+                <span className="shrink-0 text-[10px] font-bold tabular-nums text-ink-700">{value ?? "--"}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* 资料 + 身体 */}
       <div className="flex flex-wrap gap-x-5 gap-y-1 text-[10px] text-ink-700">
         <span><b className="text-ink-400">位置：</b>{position ?? "--"}</span>

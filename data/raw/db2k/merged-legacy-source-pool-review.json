@@ -1,6 +1,6 @@
 {
-  "input": "/Users/yangzonghan/Downloads/merged_2003_2018_draft_class.json",
-  "sourcePoolCsv": "/Users/yangzonghan/Projects/Personal/2k26-spinner/data/raw/db2k/ovr-collection-legacy-2003-2017.csv",
+  "input": "merged_2003_2018_draft_class.json",
+  "sourcePoolCsv": "ovr-collection-legacy-2003-2017.csv",
   "sourcePoolCount": 154,
   "classificationCorrections": [
     {
@@ -915,7 +915,7 @@
   "totalMissing": 0,
   "supplementalInputs": [
     {
-      "path": "/Users/yangzonghan/Downloads/2010_draft_class_filtered.json",
+      "path": "2010_draft_class_filtered.json",
       "year": 2010,
       "reason": "adds John Wall omitted from the original merged 2003–2018 file",
       "recordCount": 29

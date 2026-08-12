@@ -37,7 +37,7 @@
         },
         {
           "drivingDunk": 75,
-          "height": "7'5\"",
+          "height": "6'11\"",
           "id": "christian-koloko",
           "name": "Christian Koloko",
           "overall": 73,
@@ -330,7 +330,7 @@
         },
         {
           "drivingDunk": 70,
-          "height": "7'2\"",
+          "height": "6'11\"",
           "id": "danny-wolf",
           "name": "Danny Wolf",
           "overall": 77,
@@ -3681,7 +3681,7 @@
         },
         {
           "drivingDunk": 75,
-          "height": "7'7\"",
+          "height": "7'1\"",
           "id": "mark-williams",
           "name": "Mark Williams",
           "overall": 82,
@@ -4668,5 +4668,6 @@
         }
       ]
     }
-  ]
+  ],
+  "heightAnomalies": []
 }

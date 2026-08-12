@@ -56,25 +56,23 @@ try {
   const constrained = constrainRookieInitialAttributes({
     values,
     potential: 98,
-    age: 19,
     adjustableAttributes: Object.keys(values),
     badges,
     estimateOverall: estimate,
   });
 
-  assert(initialOverallForPotential(98, 19) === 84, "98 potential at age 19 must target 84 OVR");
+  assert(initialOverallForPotential(98) === 86, "98 potential must target 86 OVR (age no longer participates)");
   // Golden fixture: re-trained with non-negative coefficient constraint on 2026-08-10 (958 samples).
   assert(rawOverall === 93, `Reece Martin fixture should reproduce 93 OVR, received ${rawOverall}`);
   assert(constrained.changed, "the 90 OVR fixture must be adjusted");
   assert(constrained.reachable, "the unlocked 90 OVR fixture must reach its target");
-  assert(constrained.actualOverall <= 84, `constrained fixture must be <=84, received ${constrained.actualOverall}`);
+  assert(constrained.actualOverall <= 86, `constrained fixture must be <=86, received ${constrained.actualOverall}`);
   assert(estimate(constrained.values, []) === constrained.actualOverall, "reported constrained OVR must match the final attributes");
 
   const lowValues = Object.fromEntries(Object.keys(values).map((attribute) => [attribute, 65]));
   const unchanged = constrainRookieInitialAttributes({
     values: lowValues,
     potential: 98,
-    age: 19,
     adjustableAttributes: Object.keys(lowValues),
     estimateOverall: estimate,
   });
