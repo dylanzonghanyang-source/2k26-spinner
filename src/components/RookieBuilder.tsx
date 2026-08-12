@@ -10,6 +10,7 @@ import {
   UserRound,
   UsersRound,
   X,
+  Info,
 } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { normalizePlayerSearch, matchesPlayerSearch } from "../playerSearch";
@@ -57,6 +58,8 @@ import { createExportText } from "../exportText";
 import { useModalBehavior } from "../useModalBehavior";
 import { clearDraft, loadDraft, saveDraft, type RookieDraft } from "../draftStore";
 import { clearEntrySet, entryFieldKey, loadEntrySet, saveEntrySet, toggleEntrySet } from "../entryProgress";
+import { tendencyBundleMap } from "./tendencyBundleMap";
+import { badgeBundleMap } from "./badgeBundleMap";
 
 export type RookieBuilderTeam = {
   id: string;
@@ -989,6 +992,33 @@ function RookieBuilder({
     const player = allSourcesById.get(lock.playerId);
     return player ? getPlayerNameCN(player.name) : null;
   };
+  // --- 槽位字段映射 info（属性/倾向/徽章） ---
+  const [infoBundleId, setInfoBundleId] = useState<string | null>(null);
+  const [infoPos, setInfoPos] = useState<{ top: number; left: number } | null>(null);
+  const toggleInfo = (bundleId: string, anchor: HTMLElement) => {
+    if (infoBundleId === bundleId) {
+      setInfoBundleId(null);
+      return;
+    }
+    const rect = anchor.getBoundingClientRect();
+    setInfoBundleId(bundleId);
+    setInfoPos({
+      top: Math.min(rect.bottom + 4, Math.max(8, window.innerHeight - 280)),
+      left: Math.max(8, Math.min(rect.left, window.innerWidth - 248)),
+    });
+  };
+  const infoBundle = infoBundleId ? bundles.find((b) => b.id === infoBundleId) ?? null : null;
+  const infoSummary = infoBundle
+    ? {
+      attrs: infoBundle.attrs,
+      tendencies: Object.entries(tendencyBundleMap)
+        .filter(([, slot]) => slot === infoBundle.id)
+        .map(([field]) => field),
+      badges: Object.entries(badgeBundleMap)
+        .filter(([, slots]) => (Array.isArray(slots) ? slots : [slots]).includes(infoBundle.id))
+        .map(([name]) => name),
+    }
+    : null;
   const completed = Object.keys(locks).length;
   const isComplete = completed === bundles.length && (!isManualSelection || manualFinalize);
   const exportReady = isComplete && tendencyLoadState !== "loading";
@@ -1581,6 +1611,15 @@ function RookieBuilder({
                       <Pencil className="h-3 w-3" />
                     </button>
                   )}
+                  <button
+                    aria-label={`查看${bundle.label}槽位字段`}
+                    className="absolute right-7 top-1/2 z-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-[4px] text-ink-300 transition hover:bg-ink-200 hover:text-ink-700"
+                    onClick={(event) => toggleInfo(bundle.id, event.currentTarget)}
+                    title="查看该槽位包含的属性/倾向/徽章字段"
+                    type="button"
+                  >
+                    <Info className="h-3 w-3" />
+                  </button>
                   {lock && <Check className="absolute left-1 top-1 h-2.5 w-2.5 text-court-600" />}
                   {lock && isManualSelection && (
                     <button
@@ -1953,6 +1992,38 @@ function RookieBuilder({
           skipBody={skipBodyConstraints}
           targetPosition={position}
         />
+      )}
+      {infoBundle && infoSummary && infoPos && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setInfoBundleId(null)} role="presentation" />
+          <div className="fixed z-50 max-h-[280px] w-[240px] overflow-y-auto rounded-[6px] border border-ink-300 bg-white p-2.5 shadow-xl" style={{ top: infoPos.top, left: infoPos.left }}>
+            <div className="mb-1.5 text-[10px] font-semibold text-ink-800">{infoBundle.label}槽位 · 字段映射</div>
+            {infoSummary.attrs.length > 0 && (
+              <div className="mb-1.5">
+                <div className="mb-0.5 text-[8px] font-semibold text-court-700">属性</div>
+                <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-[9px] text-ink-600">
+                  {infoSummary.attrs.map((attr) => <span key={attr}>{attrNameCN[attr] ?? attr}</span>)}
+                </div>
+              </div>
+            )}
+            {infoSummary.tendencies.length > 0 && (
+              <div className="mb-1.5">
+                <div className="mb-0.5 text-[8px] font-semibold text-court-700">倾向</div>
+                <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-[9px] text-ink-600">
+                  {infoSummary.tendencies.map((field) => <span key={field}>{getTendencyNameCN(field)}</span>)}
+                </div>
+              </div>
+            )}
+            {infoSummary.badges.length > 0 && (
+              <div>
+                <div className="mb-0.5 text-[8px] font-semibold text-court-700">徽章</div>
+                <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-[9px] text-ink-600">
+                  {infoSummary.badges.map((name) => <span key={name}>{getBadgeNameCN(name)}</span>)}
+                </div>
+              </div>
+            )}
+          </div>
+        </>
       )}
       {customizingBundle && (
         <div className="dialog-backdrop fixed inset-0 z-50 flex items-center justify-center bg-ink-900/35 px-4 py-6" role="presentation">
