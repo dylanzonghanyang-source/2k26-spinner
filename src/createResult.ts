@@ -428,14 +428,15 @@ export function evaluateAllPreview(
   return evaluateAll(inputs, body, options)[candidate.bundle.id];
 }
 
-function rookieValue(value: number, age: number, category: BundleCategory) {
-  const progressByCategory: Record<BundleCategory, number[]> = {
-    technical: [0.82, 0.85, 0.88, 0.91, 0.93, 0.95],
-    physical: [0.92, 0.94, 0.96, 0.97, 0.98, 0.99],
-    mental: [0.77, 0.81, 0.85, 0.88, 0.9, 0.92],
+function rookieValue(value: number, category: BundleCategory) {
+  // 年龄不再参与计算：新秀成熟度固定为中性基准（原 20 岁档系数），
+  // 18-23 岁生成的初始属性完全一致，大龄新秀不再获得综评加成。
+  const progressByCategory: Record<BundleCategory, number> = {
+    technical: 0.88,
+    physical: 0.96,
+    mental: 0.85,
   };
-  const ageIndex = Math.max(0, Math.min(ages.length - 1, age - ages[0]));
-  const progress = Math.max(0.55, Math.min(1, progressByCategory[category][ageIndex]));
+  const progress = progressByCategory[category];
   return clamp(25 + (value - 25) * progress);
 }
 
@@ -648,7 +649,7 @@ export function createResult(
     const lock = locks[bundle.id];
     return lock?.kind === "player" ? lock.playerId : lock?.kind === "custom" ? JSON.stringify(lock.values) : "-";
   }).join("|")}|${Object.values(body).join("|")}`;
-  const random = makeRandom(hash(`${signature}|${age}|${position}|${secondary}`));
+  const random = makeRandom(hash(`${signature}|${position}|${secondary}`));
   const mean = average(scores, 71);
   const sourcePeakOverall = calibratedOverall(peakAttrs, position, peakBadges, mean, overallVersion);
   // Rookie-mode initial OVR uses the rookie-card-trained model.
@@ -700,7 +701,7 @@ export function createResult(
         continue;
       }
       const value = peakAttrs[attr];
-      if (typeof value === "number") initialAttrs[attr] = rookieValue(value, age, bundle.category);
+      if (typeof value === "number") initialAttrs[attr] = rookieValue(value, bundle.category);
     }
   }
   // Card attributes are locked (real game data) — the OVR constraint must not
@@ -767,7 +768,6 @@ export function createResult(
   const rookieOverallConstraint = constrainRookieInitialAttributes({
     values: initialAttrs,
     potential,
-    age,
     adjustableAttributes: bundles
       .filter((bundle) => bundle.id !== "potential")
       .flatMap((bundle) => bundle.attrs),
@@ -815,19 +815,19 @@ export function createResult(
   const hasVitalProbabilities = vitalBoom !== null && vitalBust !== null && vitalAverage !== null;
   const progressSpeed = Math.round(Math.max(2.2, Math.min(5.4, 2.4 + Math.max(0, (potential - 87) / 10) + (random() - 0.5) * 0.6)) * 10) / 10;
   const yearsToPeak = progressSpeed === 0 ? 0 : Math.ceil(growthGap / progressSpeed);
-  const peakStart = vitalPeakStart !== null && vitalPeakStart >= age
+  const peakStart = vitalPeakStart !== null
     ? vitalPeakStart
-    : clamp(Math.max(24, age + yearsToPeak), age, 30);
+    : clamp(Math.max(24, 20 + yearsToPeak), 20, 30);
   const peakDuration = Math.max(5, Math.min(11, 7 + (durability - 70) / 15 + random() * 1.5));
   const peakEnd = vitalPeakEnd !== null && vitalPeakEnd >= peakStart
     ? vitalPeakEnd
     : clamp(peakStart + peakDuration, peakStart, 40);
   const boom = hasVitalProbabilities
     ? vitalBoom
-    : clamp(28 + potential - 84 - (age - 18) * 2 + (random() - 0.5) * 8, 10, 55);
+    : clamp(28 + potential - 84 + (random() - 0.5) * 8, 10, 55);
   const bust = hasVitalProbabilities
     ? vitalBust
-    : clamp(18 - (age - 18) + (random() - 0.5) * 8, 8, 40);
+    : clamp(18 + (random() - 0.5) * 8, 8, 40);
   const normal = hasVitalProbabilities
     ? vitalAverage
     : 100 - boom - bust;
