@@ -44,6 +44,9 @@ jobs:
         env:
           VITE_BASE: "/"
 
+      - name: Build all-cards dataset (public/data/all-cards.min.json)
+        run: pnpm run build:all-cards
+
       - name: Build
         run: pnpm run build
         env:

@@ -28,6 +28,7 @@
     "validate:data": "node scripts/validate-data.mjs",
     "convert:players": "node scripts/convert-raw-players.mjs",
     "convert:rookie-cards": "node scripts/convert-db2k-to-rookiecard.mjs",
+    "build:all-cards": "node scripts/build-all-cards.mjs",
     "train:overall": "node scripts/train-rookie-overall-model.mjs",
     "train:overall:combined": "node scripts/train-rookie-overall-model.mjs combined src/data/versions/2k26/rookieOverallModel.json && node scripts/train-rookie-overall-model.mjs combined src/data/versions/2k27-play-now/rookieOverallModel.json",
     "train:overall:rookie": "node --experimental-strip-types scripts/train-rookie-card-ovr.mts",
