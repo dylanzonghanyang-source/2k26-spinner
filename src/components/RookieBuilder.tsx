@@ -1608,7 +1608,7 @@ function RookieBuilder({
           </section>
 
           {!isManualSelection && (
-            <section aria-labelledby="difficulty-label" className="builder-setup-body bg-white px-3 py-3">
+            <section aria-labelledby="difficulty-label" className="builder-setup-difficulty bg-white px-3 py-3">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <div className="section-label" id="difficulty-label">难度（换一批次数）</div>
                 <span className="text-[9px] text-ink-400">每局固定次数，用完后只能按当前候选锁定</span>

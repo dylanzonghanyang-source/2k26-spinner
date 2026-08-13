@@ -319,6 +319,7 @@ const overrides = OVERRIDES && fs.existsSync(OVERRIDES)
 const coreName = (raw) => String(raw ?? "")
   .normalize("NFKD")
   .replace(/[\u0300-\u036f]/g, "")
+  .replace(/\u0131/g, "i")
   .toLowerCase()
   .replace(/[.'’]/g, "")
   .replace(/[^a-z0-9 ]/g, " ")
@@ -339,6 +340,26 @@ const draftNameAliases = new Map([
   ["terry rozier iii", "terry rozier"],
   ["patrick mills", "patty mills"],
   ["bobby portis jr", "bobby portis"],
+  // 游戏/卡名拼写变体 -> 官方选秀表名（选秀时/标准写法）
+  ["mohamed bamba", "mo bamba"],
+  ["cameron reddish", "cam reddish"],
+  ["cameron thomas", "cam thomas"],
+  ["nicolas claxton", "nic claxton"],
+  ["nahshon hyland", "bones hyland"],
+  ["kevin knox ii", "kevin knox"],
+  ["robert williams iii", "robert williams"],
+  ["michael sweetney", "mike sweetney"],
+  ["jianlian yi", "yi jianlian"],
+  ["ming yao", "yao ming"],
+  ["zhi zhi wang", "wang zhi zhi"],
+  ["louis williams", "lou williams"],
+  ["kenyon martin jr", "kj martin"],
+  ["johnny r davis", "johnny davis"],
+  ["eddie a johnson", "eddie johnson"],
+  ["cliff t robinson", "cliff robinson"],
+  ["gerald henderson sr", "gerald henderson"],
+  ["walker russell sr", "walker russell"],
+  ["micheal ray richardson", "michael ray richardson"],
 ]);
 const officialDraftPick = (name) => {
   if (!draftPicks) return null;

@@ -26,14 +26,18 @@ try {
 
   const y2013 = byYear.get(2013) as Record<string, number | boolean>;
   assert.equal(y2013.sourceSnapshotAvailable, true, "2013 merged snapshot is registered");
-  assert.equal(y2013.sourceOfficialDraftees, 24, "2013 has 24 official draftees in retained source data");
-  assert.equal(y2013.sourceDrafteesMissingCard, 14, "2013 source draftees missing cards are reportable append candidates");
+  assert.equal(y2013.sourceOfficialDraftees, 25, "2013 has 25 official draftees in retained source data (merged + all-found)");
+  assert.equal(y2013.sourceDrafteesMissingCard, 15, "2013 source draftees missing cards are reportable append candidates");
 
   const y2017 = byYear.get(2017) as Record<string, number | boolean>;
   assert.equal(y2017.sourceSnapshotAvailable, true, "2017 merged snapshot is registered");
   assert.equal(y2017.sourceOfficialDraftees, 23, "2017 retains Fultz and other official draftees");
   assert.equal(y2017.sourceDrafteesMissingCard, 3, "2017 exposes Fultz, Čančar and Monte Morris as missing cards");
-  assert.equal(y2017.sourceNotOfficialDraft, 4, "2017 source's false draft-year records are not counted as draftees");
+  assert.equal(y2017.sourceNotOfficialDraft, 8, "2017 source's false draft-year records are not counted as draftees");
+
+  const y1960 = byYear.get(1960) as Record<string, number | boolean>;
+  assert.equal(y1960.sourceSnapshotAvailable, true, "all-found merged capture registers pre-2003 eras");
+  assert.equal(y1960.sourceDrafteesMissingCard, 2, "1960 new cards are exposed as needing rookie OVR");
 
   const y2024 = byYear.get(2024) as Record<string, number | boolean>;
   const y2025 = byYear.get(2025) as Record<string, number | boolean>;

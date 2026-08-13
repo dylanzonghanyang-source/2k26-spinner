@@ -276,6 +276,7 @@ input:focus-visible {
 
 .builder-setup-identity,
 .builder-setup-body,
+.builder-setup-difficulty,
 .builder-setup-footer {
   min-width: 0;
 }
@@ -349,6 +350,7 @@ input:focus-visible {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
     grid-template-areas:
       "identity body"
+      "identity difficulty"
       "footer footer";
   }
 
@@ -364,6 +366,13 @@ input:focus-visible {
     /* Match the identity column: content vertically centered so the
        compact panel doesn't look bottom-heavy with blank space under
        the numeric inputs. */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .builder-setup-difficulty {
+    grid-area: difficulty;
     display: flex;
     flex-direction: column;
     justify-content: center;

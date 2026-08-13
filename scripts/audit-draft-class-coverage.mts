@@ -43,6 +43,12 @@ type SourceSpec = {
 };
 
 const sources: SourceSpec[] = [
+  // Windows-Hermes merged capture covers every era with real rookie values.
+  ...Array.from({ length: 2023 - 1960 + 1 }, (_, index) => ({
+    year: 1960 + index,
+    file: "data/raw/db2k/merged-all-found.json",
+    sourceDraftYear: 1960 + index,
+  })),
   // The merged legacy capture has a real DRAFTEDYEAR field; its duplicate
   // standalone captures are included only where they may contain supplements.
   ...Array.from({ length: 16 }, (_, index) => ({
@@ -73,12 +79,33 @@ const explicitNameAliases: Record<string, string> = {
   "r j barrett": "rj barrett",
   "aj green": "a j green",
   "gg jackson": "gregory jackson ii",
+  // 游戏/卡名拼写变体 -> 官方选秀表名（选秀时/标准写法）
+  "mohamed bamba": "mo bamba",
+  "cameron reddish": "cam reddish",
+  "cameron thomas": "cam thomas",
+  "nicolas claxton": "nic claxton",
+  "nahshon hyland": "bones hyland",
+  "kevin knox ii": "kevin knox",
+  "robert williams iii": "robert williams",
+  "michael sweetney": "mike sweetney",
+  "jianlian yi": "yi jianlian",
+  "ming yao": "yao ming",
+  "zhi zhi wang": "wang zhi zhi",
+  "louis williams": "lou williams",
+  "kenyon martin jr": "kj martin",
+  "johnny r davis": "johnny davis",
+  "eddie a johnson": "eddie johnson",
+  "cliff t robinson": "cliff robinson",
+  "gerald henderson sr": "gerald henderson",
+  "walker russell sr": "walker russell",
+  "micheal ray richardson": "michael ray richardson",
 };
 
 function coreName(raw: string): string {
   return String(raw ?? "")
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\u0131/g, "i")
     .toLowerCase()
     .replace(/[.'’]/g, "")
     .replace(/[^a-z0-9 ]/g, " ")
