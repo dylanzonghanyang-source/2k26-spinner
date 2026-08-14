@@ -1743,7 +1743,7 @@ function RookieBuilder({
                 >
                   <button
                     aria-label={lock ? `已锁定${bundle.label}` : `锁定${bundle.label}`}
-                    className={`flex h-full w-full min-w-0 items-center gap-1.5 px-2 pr-7 text-left transition ${lock ? "cursor-not-allowed" : isManualSelection || selectedPlayer ? "hover:bg-ink-50" : "cursor-not-allowed"}`}
+                    className={`flex h-full w-full min-w-0 items-center gap-1.5 px-2 pr-12 text-left transition ${lock ? "cursor-not-allowed" : isManualSelection || selectedPlayer ? "hover:bg-ink-50" : "cursor-not-allowed"}`}
                     disabled={Boolean(lock) || !settingsLocked || isTeamDrawing || (!isManualSelection && !selectedPlayer)}
                     onClick={isManualSelection ? () => openSlotPicker(bundle) : () => clickBundle(bundle)}
                     title={typeof value === "number"
@@ -1779,7 +1779,7 @@ function RookieBuilder({
                     aria-controls={`slot-info-${bundle.id}`}
                     aria-expanded={infoBundleId === bundle.id}
                     aria-label={`查看${bundle.label}槽位字段`}
-                    className="absolute right-20 top-0 z-10 flex h-full w-8 items-center justify-center rounded-[4px] text-ink-300 transition hover:bg-ink-200 hover:text-ink-700"
+                    className="absolute right-24 top-0 z-10 flex h-full w-8 items-center justify-center rounded-[4px] text-ink-300 transition hover:bg-ink-200 hover:text-ink-700"
                     onClick={(event) => toggleInfo(bundle.id, event.currentTarget)}
                     title="查看该槽位包含的属性/倾向/徽章字段"
                     type="button"
