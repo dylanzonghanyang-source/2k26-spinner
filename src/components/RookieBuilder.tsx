@@ -1779,7 +1779,7 @@ function RookieBuilder({
                     aria-controls={`slot-info-${bundle.id}`}
                     aria-expanded={infoBundleId === bundle.id}
                     aria-label={`查看${bundle.label}槽位字段`}
-                    className="absolute right-10 top-0 z-10 flex h-full w-8 items-center justify-center rounded-[4px] text-ink-300 transition hover:bg-ink-200 hover:text-ink-700"
+                    className="absolute right-20 top-0 z-10 flex h-full w-8 items-center justify-center rounded-[4px] text-ink-300 transition hover:bg-ink-200 hover:text-ink-700"
                     onClick={(event) => toggleInfo(bundle.id, event.currentTarget)}
                     title="查看该槽位包含的属性/倾向/徽章字段"
                     type="button"
