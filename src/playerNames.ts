@@ -1,9 +1,11 @@
 import playerNamesCN from "./data/playerNamesCN.json" with { type: "json" };
+import playerNamesCNExtra from "./data/playerNamesCN-extra.json" with { type: "json" };
 import playerPresentation from "./data/playerPresentation.json" with { type: "json" };
 
 const names = {
   ...(playerPresentation.namesCN as Record<string, string>),
   ...(playerNamesCN as Record<string, string>),
+  ...(playerNamesCNExtra as Record<string, string>),
 };
 const normalizedNames = new Map(
   Object.entries(names).map(([english, chinese]) => [normalizeName(english), chinese]),
