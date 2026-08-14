@@ -46,5 +46,49 @@
   "mason-plumlee": {
     "overall": 72,
     "source": "user-ui-confirmed-2026-08-08"
+  },
+  "andre-roberson": {
+    "overall": 72,
+    "estimated": true
+  },
+  "gorgui-dieng": {
+    "overall": 70,
+    "estimated": true
+  },
+  "lex-abrines": {
+    "overall": 70,
+    "estimated": true
+  },
+  "lucas-nogueira": {
+    "overall": 70,
+    "estimated": true
+  },
+  "michael-carter-williams": {
+    "overall": 78,
+    "estimated": true
+  },
+  "mike-muscala": {
+    "overall": 72,
+    "estimated": true
+  },
+  "raul-neto": {
+    "overall": 69,
+    "estimated": true
+  },
+  "shabazz-muhammad": {
+    "overall": 76,
+    "estimated": true
+  },
+  "shane-larkin": {
+    "overall": 70,
+    "estimated": true
+  },
+  "tony-snell": {
+    "overall": 71,
+    "estimated": true
+  },
+  "trey-burke": {
+    "overall": 74,
+    "estimated": true
   }
 }

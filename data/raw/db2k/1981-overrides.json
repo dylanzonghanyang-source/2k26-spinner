@@ -1,44 +1,104 @@
 {
- "tom-chambers": {
-  "overall": 79
- },
- "isiah-thomas": {
-  "overall": 81
- },
- "mark-aguirre": {
-  "overall": 77
- },
- "rolando-blackman": {
-  "overall": 77
- },
- "gene-banks": {
-  "overall": 74
- },
- "buck-williams": {
-  "overall": 76
- },
- "eddie-a-johnson": {
-  "overall": 73
- },
- "herb-williams": {
-  "overall": 72
- },
- "kelly-tripucka": {
-  "overall": 75
- },
- "charles-davis": {
-  "overall": 70
- },
- "danny-ainge": {
-  "overall": 70
- },
- "frank-brickowski": {
-  "overall": 69
- },
- "alton-lister": {
-  "overall": 71
- },
- "larry-nance": {
-  "overall": 76
- }
+  "tom-chambers": {
+    "overall": 79
+  },
+  "isiah-thomas": {
+    "overall": 81
+  },
+  "mark-aguirre": {
+    "overall": 77
+  },
+  "rolando-blackman": {
+    "overall": 77
+  },
+  "gene-banks": {
+    "overall": 74
+  },
+  "buck-williams": {
+    "overall": 76
+  },
+  "eddie-a-johnson": {
+    "overall": 73
+  },
+  "herb-williams": {
+    "overall": 72
+  },
+  "kelly-tripucka": {
+    "overall": 75
+  },
+  "charles-davis": {
+    "overall": 70
+  },
+  "danny-ainge": {
+    "overall": 70
+  },
+  "frank-brickowski": {
+    "overall": 69
+  },
+  "alton-lister": {
+    "overall": 71
+  },
+  "larry-nance": {
+    "overall": 76
+  },
+  "albert-king": {
+    "overall": 81,
+    "estimated": true
+  },
+  "danny-schayes": {
+    "overall": 76,
+    "estimated": true
+  },
+  "darnell-valentine": {
+    "overall": 75,
+    "estimated": true
+  },
+  "elston-turner": {
+    "overall": 71,
+    "estimated": true
+  },
+  "franklin-edwards": {
+    "overall": 68,
+    "estimated": true
+  },
+  "hank-mcdowell": {
+    "overall": 68,
+    "estimated": true
+  },
+  "jay-vincent": {
+    "overall": 79,
+    "estimated": true
+  },
+  "jeff-lamp": {
+    "overall": 72,
+    "estimated": true
+  },
+  "kenny-dennard": {
+    "overall": 72,
+    "estimated": true
+  },
+  "kevin-loder": {
+    "overall": 71,
+    "estimated": true
+  },
+  "kevin-mckenna": {
+    "overall": 69,
+    "estimated": true
+  },
+  "larry-spriggs": {
+    "overall": 68,
+    "estimated": true
+  },
+  "mike-mcgee": {
+    "overall": 74,
+    "estimated": true
+  },
+  "pete-verhoeven": {
+    "overall": 68,
+    "estimated": true
+  },
+  "rudy-macklin": {
+    "overall": 67,
+    "estimated": true
+  }
 }

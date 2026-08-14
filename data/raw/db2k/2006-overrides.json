@@ -70,5 +70,49 @@
   "c-j-watson": {
     "overall": 75,
     "source": "user-ui-confirmed-2026-08-08"
+  },
+  "bobby-jones": {
+    "overall": 69,
+    "estimated": true
+  },
+  "craig-smith": {
+    "overall": 72,
+    "estimated": true
+  },
+  "jordan-farmar": {
+    "overall": 77,
+    "estimated": true
+  },
+  "maurice-ager": {
+    "overall": 71,
+    "estimated": true
+  },
+  "p-j-tucker": {
+    "overall": 69,
+    "estimated": true
+  },
+  "paul-millsap": {
+    "overall": 80,
+    "estimated": true
+  },
+  "renaldo-balkman": {
+    "overall": 66,
+    "estimated": true
+  },
+  "rodney-carney": {
+    "overall": 69,
+    "estimated": true
+  },
+  "sergio-rodriguez": {
+    "overall": 68,
+    "estimated": true
+  },
+  "shawne-williams": {
+    "overall": 72,
+    "estimated": true
+  },
+  "solomon-jones": {
+    "overall": 64,
+    "estimated": true
   }
 }

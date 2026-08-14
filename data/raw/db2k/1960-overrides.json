@@ -1,8 +1,12 @@
 {
- "oscar-robertson": {
-  "overall": 85
- },
- "jerry-west": {
-  "overall": 85
- }
+  "oscar-robertson": {
+    "overall": 85
+  },
+  "jerry-west": {
+    "overall": 85
+  },
+  "tom-sanders": {
+    "overall": 78,
+    "estimated": true
+  }
 }

@@ -1,38 +1,86 @@
 {
- "david-robinson": {
-  "overall": 84
- },
- "kevin-johnson": {
-  "overall": 79
- },
- "dennis-hopson": {
-  "overall": 78
- },
- "scottie-pippen": {
-  "overall": 80
- },
- "horace-grant": {
-  "overall": 77
- },
- "kenny-smith": {
-  "overall": 78
- },
- "muggsy-bogues": {
-  "overall": 76
- },
- "vincent-askew": {
-  "overall": 71
- },
- "sarunas-marciulionis": {
-  "overall": 71
- },
- "donald-royal": {
-  "overall": 67
- },
- "chris-dudley": {
-  "overall": 70
- },
- "scott-brooks": {
-  "overall": 69
- }
+  "david-robinson": {
+    "overall": 84
+  },
+  "kevin-johnson": {
+    "overall": 79
+  },
+  "dennis-hopson": {
+    "overall": 78
+  },
+  "scottie-pippen": {
+    "overall": 80
+  },
+  "horace-grant": {
+    "overall": 77
+  },
+  "kenny-smith": {
+    "overall": 78
+  },
+  "muggsy-bogues": {
+    "overall": 76
+  },
+  "vincent-askew": {
+    "overall": 71
+  },
+  "sarunas-marciulionis": {
+    "overall": 71
+  },
+  "donald-royal": {
+    "overall": 67
+  },
+  "chris-dudley": {
+    "overall": 70
+  },
+  "scott-brooks": {
+    "overall": 69
+  },
+  "derrick-mckey": {
+    "overall": 81,
+    "estimated": true
+  },
+  "doug-lee": {
+    "overall": 67,
+    "estimated": true
+  },
+  "greg-anderson": {
+    "overall": 73,
+    "estimated": true
+  },
+  "joe-wolf": {
+    "overall": 72,
+    "estimated": true
+  },
+  "kevin-gamble": {
+    "overall": 74,
+    "estimated": true
+  },
+  "mark-jackson": {
+    "overall": 76,
+    "estimated": true
+  },
+  "olden-polynice": {
+    "overall": 78,
+    "estimated": true
+  },
+  "reggie-lewis": {
+    "overall": 81,
+    "estimated": true
+  },
+  "ron-grandison": {
+    "overall": 66,
+    "estimated": true
+  },
+  "steve-alford": {
+    "overall": 73,
+    "estimated": true
+  },
+  "tellis-frank": {
+    "overall": 68,
+    "estimated": true
+  },
+  "winston-garland": {
+    "overall": 77,
+    "estimated": true
+  }
 }

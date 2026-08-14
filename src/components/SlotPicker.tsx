@@ -70,8 +70,10 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
 
   // 衰减后属性：按生成路径（目标位置/身体/skipBody + 卡自身身体）计算每个候选
   // 卡在该槽位下的身体约束后值，让"挑人"时看到的就是锁定后的实际生成值。
+  // displayScore 为 Slot Presentation V2 position-aware 展示分；adjusted 保留
+  // legacy simple-average（生产 OVR fallback 输入，UI 不用）。
   const decayedBySlug = useMemo(() => {
-    const map = new Map<string, { adjusted: number; raw: number; values: Record<string, number> }>();
+    const map = new Map<string, { adjusted: number; displayScore: number; raw: number; values: Record<string, number>; provisional: boolean }>();
     for (const card of filteredCards) {
       const source = cardToPlayerSource(card);
       const evaluation = evaluate(source, bundle, body, card, {
@@ -79,10 +81,16 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
         secondaryPosition,
         skipBody,
       }, cardSourceBody(card));
+      const reasons = new Set(Object.values(evaluation.supportIncomplete?.reasons ?? {}).flat());
+      const provisional = reasons.has("target_context_missing")
+        && !reasons.has("donor_support_missing")
+        && !reasons.has("donor_context_missing");
       map.set(card.slug, {
         adjusted: evaluation.adjusted,
+        displayScore: evaluation.displayScore,
         raw: evaluation.raw,
         values: evaluation.values,
+        provisional,
       });
     }
     return map;
@@ -105,7 +113,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
     } else if (sortMode === "ovr") {
       cards.sort((a, b) => (b.overall ?? -1) - (a.overall ?? -1) || a.name.localeCompare(b.name));
     } else if (sortMode === "adapted") {
-      const adapted = (card: RookieCard) => decayedBySlug.get(card.slug)?.adjusted ?? slotValueForCard(card, bundle) ?? -1;
+      const adapted = (card: RookieCard) => decayedBySlug.get(card.slug)?.displayScore ?? decayedBySlug.get(card.slug)?.adjusted ?? slotValueForCard(card, bundle) ?? -1;
       cards.sort((a, b) => adapted(b) - adapted(a) || a.name.localeCompare(b.name));
     }
     return cards;
@@ -240,7 +248,7 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
                           className="interactive-card flex w-full items-center gap-2 rounded-[5px] border border-ink-200 bg-white px-2.5 py-2 text-left hover:border-ink-400 hover:bg-ink-50"
                           key={card.slug}
                           onClick={() => onPick(card)}
-                          title={decayed && decayed.adjusted !== decayed.raw ? `含身体/位置修正：${decayed.raw} → ${decayed.adjusted}` : undefined}
+                          title={decayed && (decayed.displayScore !== decayed.raw || decayed.adjusted !== decayed.raw) ? `含身体/位置修正：${decayed.raw} → ${decayed.displayScore}` : undefined}
                           type="button"
                         >
                           <span className="min-w-0 flex-1">
@@ -260,8 +268,9 @@ function SlotPicker({ bundle, rookieCards, onClose, onPick, targetPosition, seco
                             {slotValue !== null && (
                               <span className="flex items-baseline gap-1">
                                 <span className="text-[8px] font-medium text-ink-400">槽位主值</span>
-                                <span className={`text-[13px] font-bold tabular-nums ${valueColor(decayed?.adjusted ?? slotValue)}`}>{decayed?.adjusted ?? slotValue}</span>
-                                {decayed && decayed.adjusted !== decayed.raw && (
+                                {decayed?.provisional && <span className="text-[10px] font-semibold text-ink-400">≈</span>}
+                                <span className={`text-[13px] font-bold tabular-nums ${valueColor(decayed?.displayScore ?? decayed?.adjusted ?? slotValue)}`}>{decayed?.displayScore ?? decayed?.adjusted ?? slotValue}</span>
+                                {decayed && (decayed.displayScore !== decayed.raw || decayed.adjusted !== decayed.raw) && (
                                   <span className="text-[8px] tabular-nums text-ink-300">{decayed.raw}</span>
                                 )}
                               </span>

@@ -1,53 +1,117 @@
 {
- "gilbert-arenas": {
-  "overall": 80
- },
- "jason-richardson": {
-  "overall": 75
- },
- "pau-gasol": {
-  "overall": 80
- },
- "joe-johnson": {
-  "overall": 76
- },
- "tony-parker": {
-  "overall": 76
- },
- "shane-battier": {
-  "overall": 75
- },
- "tyson-chandler": {
-  "overall": 76
- },
- "richard-jefferson": {
-  "overall": 73
- },
- "trenton-hassell": {
-  "overall": 72
- },
- "zach-randolph": {
-  "overall": 74
- },
- "steven-hunter": {
-  "overall": 70
- },
- "gerald-wallace": {
-  "overall": 73
- },
- "brendan-haywood": {
-  "overall": 69
- },
- "brian-scalabrine": {
-  "overall": 72
- },
- "mike-wilks": {
-  "overall": 70
- },
- "brandon-armstrong": {
-  "overall": 72
- },
- "jason-collins": {
-  "overall": 70
- }
+  "gilbert-arenas": {
+    "overall": 80
+  },
+  "jason-richardson": {
+    "overall": 75
+  },
+  "pau-gasol": {
+    "overall": 80
+  },
+  "joe-johnson": {
+    "overall": 76
+  },
+  "tony-parker": {
+    "overall": 76
+  },
+  "shane-battier": {
+    "overall": 75
+  },
+  "tyson-chandler": {
+    "overall": 76
+  },
+  "richard-jefferson": {
+    "overall": 73
+  },
+  "trenton-hassell": {
+    "overall": 72
+  },
+  "zach-randolph": {
+    "overall": 74
+  },
+  "steven-hunter": {
+    "overall": 70
+  },
+  "gerald-wallace": {
+    "overall": 73
+  },
+  "brendan-haywood": {
+    "overall": 69
+  },
+  "brian-scalabrine": {
+    "overall": 72
+  },
+  "mike-wilks": {
+    "overall": 70
+  },
+  "brandon-armstrong": {
+    "overall": 72
+  },
+  "jason-collins": {
+    "overall": 70
+  },
+  "alvin-jones": {
+    "overall": 68,
+    "estimated": true
+  },
+  "bobby-simmons": {
+    "overall": 71,
+    "estimated": true
+  },
+  "desagana-diop": {
+    "overall": 65,
+    "estimated": true
+  },
+  "earl-watson": {
+    "overall": 73,
+    "estimated": true
+  },
+  "jamaal-tinsley": {
+    "overall": 75,
+    "estimated": true
+  },
+  "jarron-collins": {
+    "overall": 63,
+    "estimated": true
+  },
+  "jeff-trepagnier": {
+    "overall": 62,
+    "estimated": true
+  },
+  "joseph-forte": {
+    "overall": 60,
+    "estimated": true
+  },
+  "kenny-satterfield": {
+    "overall": 64,
+    "estimated": true
+  },
+  "loren-woods": {
+    "overall": 70,
+    "estimated": true
+  },
+  "michael-bradley": {
+    "overall": 71,
+    "estimated": true
+  },
+  "rodney-white": {
+    "overall": 74,
+    "estimated": true
+  },
+  "ruben-boumtje-boumtje": {
+    "overall": 62,
+    "estimated": true
+  },
+  "terence-morris": {
+    "overall": 70,
+    "estimated": true
+  },
+  "troy-murphy": {
+    "overall": 72,
+    "estimated": true
+  },
+  "vladimir-radmanovic": {
+    "overall": 70,
+    "estimated": true
+  }
 }

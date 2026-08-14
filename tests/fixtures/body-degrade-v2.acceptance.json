@@ -1,0 +1,1531 @@
+{
+  "schemaVersion": "body-degrade-v2.acceptance/1.0",
+  "status": "SPEC_READY_IMPLEMENTATION_PENDING",
+  "ratingRange": {
+    "min": 25,
+    "max": 99
+  },
+  "numericRules": {
+    "bmiFormula": "weightKg / (heightCm / 100)^2",
+    "severityFormula": "x=clamp(violation/saturationDistance,0,1); severity=3*x^2-2*x^3",
+    "internalPrecision": "float; do not round intermediate ceilings/reductions",
+    "finalRounding": "JavaScript Math.round semantics for positive ratings, then clamp to [25,99]",
+    "finalFormula": "min(rawClamped, structuralCeiling, supportCeiling)"
+  },
+  "hardConstraints": {
+    "positionAffectsAtomicGeneration": false,
+    "wingspanAffectsAtomicGeneration": false,
+    "targetWingspanScoreMappingToCmAllowed": false,
+    "shoulderNeckTorsoAffectAtomicGeneration": false,
+    "supportCanBuff": false,
+    "structuralAndSupportReductionsAreAdditiveAcrossStages": false,
+    "durabilityHandledByThisEngine": false,
+    "slotSummariesFeedBackIntoAtomicGeneration": false
+  },
+  "structuralRules": {
+    "donorExpandedThreshold": {
+      "MIN": "effectiveThreshold=min(baseThreshold, donorValue) when donor value is available; otherwise baseThreshold",
+      "MAX": "effectiveThreshold=max(baseThreshold, donorValue) when donor value is available; otherwise baseThreshold",
+      "note": "Donor expansion is per atomic attribute donor, not global per generated player."
+    },
+    "profiles": {
+      "Agility": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MAX",
+            "baseThreshold": 213,
+            "saturationDistance": 15,
+            "maxCeilingReduction": 18
+          },
+          {
+            "variable": "bmi",
+            "mode": "MAX",
+            "baseThreshold": 28.0,
+            "saturationDistance": 4.5,
+            "maxCeilingReduction": 16
+          }
+        ],
+        "totalCap": 24
+      },
+      "Ball Handle": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MAX",
+            "baseThreshold": 210,
+            "saturationDistance": 18,
+            "maxCeilingReduction": 20
+          },
+          {
+            "variable": "bmi",
+            "mode": "MAX",
+            "baseThreshold": 27.5,
+            "saturationDistance": 5.0,
+            "maxCeilingReduction": 14
+          }
+        ],
+        "totalCap": 26
+      },
+      "Block": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MIN",
+            "baseThreshold": 200,
+            "saturationDistance": 20,
+            "maxCeilingReduction": 32
+          }
+        ],
+        "totalCap": 32
+      },
+      "Defensive Rebound": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MIN",
+            "baseThreshold": 195,
+            "saturationDistance": 15,
+            "maxCeilingReduction": 24
+          },
+          {
+            "variable": "bmi",
+            "mode": "MIN",
+            "baseThreshold": 22.5,
+            "saturationDistance": 4.0,
+            "maxCeilingReduction": 18
+          }
+        ],
+        "totalCap": 32
+      },
+      "Driving Dunk": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MIN",
+            "baseThreshold": 180,
+            "saturationDistance": 15,
+            "maxCeilingReduction": 10
+          }
+        ],
+        "totalCap": 10
+      },
+      "Interior Defense": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MIN",
+            "baseThreshold": 198,
+            "saturationDistance": 18,
+            "maxCeilingReduction": 24
+          },
+          {
+            "variable": "bmi",
+            "mode": "MIN",
+            "baseThreshold": 22.5,
+            "saturationDistance": 4.0,
+            "maxCeilingReduction": 20
+          }
+        ],
+        "totalCap": 32
+      },
+      "Layup": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MIN",
+            "baseThreshold": 175,
+            "saturationDistance": 15,
+            "maxCeilingReduction": 8
+          }
+        ],
+        "totalCap": 8
+      },
+      "Mid-Range Shot": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MAX",
+            "baseThreshold": 220,
+            "saturationDistance": 20,
+            "maxCeilingReduction": 6
+          },
+          {
+            "variable": "bmi",
+            "mode": "MAX",
+            "baseThreshold": 30.0,
+            "saturationDistance": 6.0,
+            "maxCeilingReduction": 6
+          }
+        ],
+        "totalCap": 8
+      },
+      "Offensive Rebound": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MIN",
+            "baseThreshold": 198,
+            "saturationDistance": 18,
+            "maxCeilingReduction": 24
+          },
+          {
+            "variable": "bmi",
+            "mode": "MIN",
+            "baseThreshold": 22.5,
+            "saturationDistance": 4.0,
+            "maxCeilingReduction": 16
+          }
+        ],
+        "totalCap": 30
+      },
+      "Perimeter Defense": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MAX",
+            "baseThreshold": 215,
+            "saturationDistance": 15,
+            "maxCeilingReduction": 10
+          },
+          {
+            "variable": "bmi",
+            "mode": "MAX",
+            "baseThreshold": 27.5,
+            "saturationDistance": 5.0,
+            "maxCeilingReduction": 10
+          }
+        ],
+        "totalCap": 14
+      },
+      "Post Control": {
+        "dependencies": [
+          {
+            "variable": "bmi",
+            "mode": "MIN",
+            "baseThreshold": 22.0,
+            "saturationDistance": 3.5,
+            "maxCeilingReduction": 20
+          }
+        ],
+        "totalCap": 20
+      },
+      "Post Hook": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MIN",
+            "baseThreshold": 198,
+            "saturationDistance": 18,
+            "maxCeilingReduction": 20
+          }
+        ],
+        "totalCap": 20
+      },
+      "Speed": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MAX",
+            "baseThreshold": 215,
+            "saturationDistance": 15,
+            "maxCeilingReduction": 14
+          },
+          {
+            "variable": "bmi",
+            "mode": "MAX",
+            "baseThreshold": 28.5,
+            "saturationDistance": 4.5,
+            "maxCeilingReduction": 14
+          }
+        ],
+        "totalCap": 20
+      },
+      "Stamina": {
+        "dependencies": [
+          {
+            "variable": "bmi",
+            "mode": "MAX",
+            "baseThreshold": 30.0,
+            "saturationDistance": 5.0,
+            "maxCeilingReduction": 12
+          }
+        ],
+        "totalCap": 12
+      },
+      "Standing Dunk": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MIN",
+            "baseThreshold": 198,
+            "saturationDistance": 18,
+            "maxCeilingReduction": 35
+          }
+        ],
+        "totalCap": 35
+      },
+      "Strength": {
+        "dependencies": [
+          {
+            "variable": "bmi",
+            "mode": "MIN",
+            "baseThreshold": 22.5,
+            "saturationDistance": 4.0,
+            "maxCeilingReduction": 25
+          }
+        ],
+        "totalCap": 25
+      },
+      "Three-Point Shot": {
+        "dependencies": [
+          {
+            "variable": "heightCm",
+            "mode": "MAX",
+            "baseThreshold": 218,
+            "saturationDistance": 20,
+            "maxCeilingReduction": 8
+          },
+          {
+            "variable": "bmi",
+            "mode": "MAX",
+            "baseThreshold": 30.0,
+            "saturationDistance": 6.0,
+            "maxCeilingReduction": 8
+          }
+        ],
+        "totalCap": 10
+      },
+      "Vertical": {
+        "dependencies": [
+          {
+            "variable": "bmi",
+            "mode": "MAX",
+            "baseThreshold": 29.0,
+            "saturationDistance": 4.0,
+            "maxCeilingReduction": 18
+          }
+        ],
+        "totalCap": 18
+      }
+    }
+  },
+  "supportRules": {
+    "donorException": {
+      "constant": "donorException=max(0, baseRequirement-donorSupport)",
+      "contextual": "donorException=max(0, requirement(sourceContext)-donorSupport); effectiveRequirement=max(0, requirement(targetContext)-donorException)",
+      "source": "donorSupport must come from the same donor that supplied the target atomic skill.",
+      "target": "target support uses the already-finalized V2 atomic value in the DAG.",
+      "missing": "If observed donor support is missing, skip that dependency and report supportIncomplete; do not infer. For contextual requirements, source context must also be available."
+    },
+    "contextCurves": {
+      "standingDunk.vertical": {
+        "input": "heightCm",
+        "interpolation": "linear",
+        "clampOutside": true,
+        "anchors": [
+          {
+            "heightCm": 198,
+            "requirement": 90
+          },
+          {
+            "heightCm": 206,
+            "requirement": 65
+          },
+          {
+            "heightCm": 213,
+            "requirement": 50
+          },
+          {
+            "heightCm": 221,
+            "requirement": 40
+          },
+          {
+            "heightCm": 229,
+            "requirement": 30
+          }
+        ]
+      },
+      "offensiveRebound.vertical": {
+        "input": "heightCm",
+        "interpolation": "linear",
+        "clampOutside": true,
+        "anchors": [
+          {
+            "heightCm": 198,
+            "requirement": 65
+          },
+          {
+            "heightCm": 203,
+            "requirement": 60
+          },
+          {
+            "heightCm": 208,
+            "requirement": 55
+          },
+          {
+            "heightCm": 213,
+            "requirement": 48
+          },
+          {
+            "heightCm": 218,
+            "requirement": 38
+          },
+          {
+            "heightCm": 229,
+            "requirement": 30
+          }
+        ]
+      },
+      "defensiveRebound.vertical": {
+        "input": "heightCm",
+        "interpolation": "linear",
+        "clampOutside": true,
+        "anchors": [
+          {
+            "heightCm": 198,
+            "requirement": 65
+          },
+          {
+            "heightCm": 203,
+            "requirement": 58
+          },
+          {
+            "heightCm": 208,
+            "requirement": 52
+          },
+          {
+            "heightCm": 213,
+            "requirement": 42
+          },
+          {
+            "heightCm": 218,
+            "requirement": 35
+          },
+          {
+            "heightCm": 229,
+            "requirement": 30
+          }
+        ]
+      },
+      "interiorDefense.vertical": {
+        "input": "heightCm",
+        "interpolation": "linear",
+        "clampOutside": true,
+        "anchors": [
+          {
+            "heightCm": 198,
+            "requirement": 65
+          },
+          {
+            "heightCm": 203,
+            "requirement": 58
+          },
+          {
+            "heightCm": 208,
+            "requirement": 50
+          },
+          {
+            "heightCm": 213,
+            "requirement": 40
+          },
+          {
+            "heightCm": 218,
+            "requirement": 32
+          },
+          {
+            "heightCm": 229,
+            "requirement": 30
+          }
+        ]
+      },
+      "block.vertical": {
+        "input": "heightCm",
+        "interpolation": "linear",
+        "clampOutside": true,
+        "anchors": [
+          {
+            "heightCm": 200,
+            "requirement": 75
+          },
+          {
+            "heightCm": 203,
+            "requirement": 70
+          },
+          {
+            "heightCm": 208,
+            "requirement": 62
+          },
+          {
+            "heightCm": 213,
+            "requirement": 50
+          },
+          {
+            "heightCm": 218,
+            "requirement": 38
+          },
+          {
+            "heightCm": 229,
+            "requirement": 30
+          }
+        ]
+      }
+    },
+    "profiles": {
+      "Ball Handle": {
+        "dependencies": [
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 70
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 18
+          }
+        ],
+        "totalCap": 18
+      },
+      "Speed with Ball": {
+        "dependencies": [
+          {
+            "supportAttr": "Speed",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 80
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 18
+          },
+          {
+            "supportAttr": "Ball Handle",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 75
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 24
+          },
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 65
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 10
+          }
+        ],
+        "totalCap": 32
+      },
+      "Layup": {
+        "dependencies": [
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 65
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 14
+          },
+          {
+            "supportAttr": "Speed with Ball",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 65
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 9
+          },
+          {
+            "supportAttr": "Strength",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 35
+            },
+            "saturationDistance": 20,
+            "maxCeilingReduction": 8
+          },
+          {
+            "supportAttr": "Vertical",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 55
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 7
+          }
+        ],
+        "totalCap": 22
+      },
+      "Standing Dunk": {
+        "dependencies": [
+          {
+            "supportAttr": "Vertical",
+            "baseRequirement": {
+              "kind": "context",
+              "curve": "standingDunk.vertical",
+              "contextVariable": "heightCm",
+              "interpolation": "linear",
+              "clampOutside": true
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 24
+          },
+          {
+            "supportAttr": "Strength",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 50
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 16
+          }
+        ],
+        "totalCap": 30
+      },
+      "Driving Dunk": {
+        "dependencies": [
+          {
+            "supportAttr": "Vertical",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 80
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 38
+          },
+          {
+            "supportAttr": "Speed with Ball",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 60
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 18
+          },
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 60
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 14
+          },
+          {
+            "supportAttr": "Strength",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 40
+            },
+            "saturationDistance": 20,
+            "maxCeilingReduction": 10
+          }
+        ],
+        "totalCap": 46
+      },
+      "Post Control": {
+        "dependencies": [
+          {
+            "supportAttr": "Strength",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 60
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 20
+          },
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 35
+            },
+            "saturationDistance": 20,
+            "maxCeilingReduction": 10
+          }
+        ],
+        "totalCap": 24
+      },
+      "Post Hook": {
+        "dependencies": [
+          {
+            "supportAttr": "Strength",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 55
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 12
+          },
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 30
+            },
+            "saturationDistance": 20,
+            "maxCeilingReduction": 6
+          }
+        ],
+        "totalCap": 14
+      },
+      "Post Fade": {
+        "dependencies": [
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 35
+            },
+            "saturationDistance": 20,
+            "maxCeilingReduction": 10
+          }
+        ],
+        "totalCap": 10
+      },
+      "Offensive Rebound": {
+        "dependencies": [
+          {
+            "supportAttr": "Vertical",
+            "baseRequirement": {
+              "kind": "context",
+              "curve": "offensiveRebound.vertical",
+              "contextVariable": "heightCm",
+              "interpolation": "linear",
+              "clampOutside": true
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 18
+          },
+          {
+            "supportAttr": "Strength",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 60
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 18
+          },
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 30
+            },
+            "saturationDistance": 20,
+            "maxCeilingReduction": 6
+          }
+        ],
+        "totalCap": 28
+      },
+      "Defensive Rebound": {
+        "dependencies": [
+          {
+            "supportAttr": "Vertical",
+            "baseRequirement": {
+              "kind": "context",
+              "curve": "defensiveRebound.vertical",
+              "contextVariable": "heightCm",
+              "interpolation": "linear",
+              "clampOutside": true
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 16
+          },
+          {
+            "supportAttr": "Strength",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 65
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 20
+          },
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 30
+            },
+            "saturationDistance": 20,
+            "maxCeilingReduction": 5
+          }
+        ],
+        "totalCap": 28
+      },
+      "Interior Defense": {
+        "dependencies": [
+          {
+            "supportAttr": "Strength",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 65
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 26
+          },
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 40
+            },
+            "saturationDistance": 20,
+            "maxCeilingReduction": 11
+          },
+          {
+            "supportAttr": "Vertical",
+            "baseRequirement": {
+              "kind": "context",
+              "curve": "interiorDefense.vertical",
+              "contextVariable": "heightCm",
+              "interpolation": "linear",
+              "clampOutside": true
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 7
+          }
+        ],
+        "totalCap": 34
+      },
+      "Perimeter Defense": {
+        "dependencies": [
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 75
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 28
+          },
+          {
+            "supportAttr": "Speed",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 70
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 18
+          },
+          {
+            "supportAttr": "Strength",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 45
+            },
+            "saturationDistance": 20,
+            "maxCeilingReduction": 9
+          }
+        ],
+        "totalCap": 36
+      },
+      "Block": {
+        "dependencies": [
+          {
+            "supportAttr": "Vertical",
+            "baseRequirement": {
+              "kind": "context",
+              "curve": "block.vertical",
+              "contextVariable": "heightCm",
+              "interpolation": "linear",
+              "clampOutside": true
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 40
+          }
+        ],
+        "totalCap": 40
+      },
+      "Steal": {
+        "dependencies": [
+          {
+            "supportAttr": "Agility",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 65
+            },
+            "saturationDistance": 25,
+            "maxCeilingReduction": 10
+          },
+          {
+            "supportAttr": "Speed",
+            "baseRequirement": {
+              "kind": "constant",
+              "value": 65
+            },
+            "saturationDistance": 30,
+            "maxCeilingReduction": 5
+          }
+        ],
+        "totalCap": 12
+      }
+    }
+  },
+  "dag": {
+    "level0Roots": [
+      "Speed",
+      "Agility",
+      "Vertical",
+      "Strength",
+      "Stamina"
+    ],
+    "level0Also": "All atomic attributes with no support dependencies can be structurally evaluated here or any time after roots; they may not mutate roots.",
+    "level1": [
+      "Ball Handle",
+      "Standing Dunk",
+      "Post Control",
+      "Post Hook",
+      "Post Fade",
+      "Offensive Rebound",
+      "Defensive Rebound",
+      "Interior Defense",
+      "Perimeter Defense",
+      "Block",
+      "Steal"
+    ],
+    "level2": [
+      "Speed with Ball"
+    ],
+    "level3": [
+      "Layup",
+      "Driving Dunk"
+    ],
+    "invariant": "Target support values always read finalized predecessor atomics, never slot averages."
+  },
+  "cases": [
+    {
+      "id": "F01",
+      "title": "Position label must not change atomic attributes",
+      "kind": "pair_invariance",
+      "notes": "Run identical donor/body/support graph twice; only targetPosition differs PG vs C. Atomic engine must ignore position.",
+      "inputs": {
+        "mutations": [
+          {
+            "targetPosition": "PG"
+          },
+          {
+            "targetPosition": "C"
+          }
+        ]
+      },
+      "expected": {
+        "relation": "allAtomicAttributesEqual",
+        "tolerance": 0
+      }
+    },
+    {
+      "id": "F02",
+      "title": "Passing is body-invariant",
+      "kind": "variants",
+      "notes": "Pass Accuracy has no structural/support dependencies.",
+      "inputs": {
+        "variants": [
+          {
+            "raw": 94,
+            "targetBody": {
+              "heightCm": 180,
+              "weightKg": 59.940000000000005
+            },
+            "targetPosition": "PG"
+          },
+          {
+            "raw": 94,
+            "targetBody": {
+              "heightCm": 225,
+              "weightKg": 167.0625
+            },
+            "targetPosition": "C"
+          }
+        ],
+        "attribute": "Pass Accuracy"
+      },
+      "expected": {
+        "finalByVariant": [
+          94,
+          94
+        ]
+      }
+    },
+    {
+      "id": "F03",
+      "title": "Support never buffs low raw skill",
+      "kind": "atomic",
+      "notes": "Agility 99 cannot manufacture Ball Handle above donor raw 42.",
+      "inputs": {
+        "attribute": "Ball Handle",
+        "raw": 42,
+        "sourceBody": {
+          "heightCm": 200,
+          "weightKg": 98.0
+        },
+        "sourceSupports": {
+          "Agility": 80
+        },
+        "targetBody": {
+          "heightCm": 195,
+          "weightKg": 91.25999999999999
+        },
+        "targetFinalSupports": {
+          "Agility": 99
+        }
+      },
+      "expected": {
+        "final": 42,
+        "finalBeforeRound": 42
+      }
+    },
+    {
+      "id": "F04",
+      "title": "Ceiling model protects already-low raw ratings",
+      "kind": "variants",
+      "notes": "Same broken support hardware: raw 60 stays 60 because support ceiling is 67; raw 95 is capped to 67.",
+      "inputs": {
+        "attribute": "Speed with Ball",
+        "sourceBody": {
+          "heightCm": 200,
+          "weightKg": 98.0
+        },
+        "sourceSupports": {
+          "Speed": 90,
+          "Ball Handle": 90,
+          "Agility": 80
+        },
+        "targetBody": {
+          "heightCm": 195,
+          "weightKg": 91.25999999999999
+        },
+        "targetFinalSupports": {
+          "Speed": 50,
+          "Ball Handle": 45,
+          "Agility": 40
+        },
+        "rawVariants": [
+          60,
+          95
+        ]
+      },
+      "expected": {
+        "supportCeiling": 67,
+        "finalByRaw": [
+          60,
+          67
+        ]
+      }
+    },
+    {
+      "id": "F05",
+      "title": "Donor self-reproduction property",
+      "kind": "dataset_property",
+      "notes": "For each rookie-card atomic attribute with complete required source body/support, set target body and target supports equal to the donor's own observed values. Final must equal donor raw.",
+      "inputs": {
+        "dataset": "rookie-snapshot.json",
+        "filter": "complete required body/support observations"
+      },
+      "expected": {
+        "relation": "finalEqualsRawForEveryEligibleAttribute",
+        "tolerance": 0
+      }
+    },
+    {
+      "id": "F06",
+      "title": "Structural donor-expanded MIN threshold",
+      "kind": "atomic",
+      "notes": "Post Hook base Height MIN 198 is expanded downward to donor height 190. Target 180 is only 10 cm beyond the donor-proven boundary.",
+      "inputs": {
+        "attribute": "Post Hook",
+        "raw": 99,
+        "sourceBody": {
+          "heightCm": 190,
+          "weightKg": 88.445
+        },
+        "sourceSupports": {
+          "Strength": 60,
+          "Agility": 35
+        },
+        "targetBody": {
+          "heightCm": 180,
+          "weightKg": 79.38000000000001
+        },
+        "targetFinalSupports": {
+          "Strength": 60,
+          "Agility": 35
+        }
+      },
+      "expected": {
+        "final": 87,
+        "finalBeforeRound": 87.340192,
+        "structuralCeiling": 87.340192
+      }
+    },
+    {
+      "id": "F07",
+      "title": "Contextual donor condition cannot be smuggled to a different body",
+      "kind": "atomic",
+      "notes": "A 229 cm donor with Vertical 32 does not prove that 198 cm + Vertical 32 can carry Standing Dunk 95.",
+      "inputs": {
+        "attribute": "Standing Dunk",
+        "raw": 95,
+        "sourceBody": {
+          "heightCm": 229,
+          "weightKg": 128.48045000000002
+        },
+        "sourceSupports": {
+          "Vertical": 32,
+          "Strength": 60
+        },
+        "targetBody": {
+          "heightCm": 198,
+          "weightKg": 96.04979999999999
+        },
+        "targetFinalSupports": {
+          "Vertical": 32,
+          "Strength": 60
+        }
+      },
+      "expected": {
+        "final": 75,
+        "supportCeiling": 75.0
+      }
+    },
+    {
+      "id": "F08",
+      "title": "Contextual donor reproduces itself",
+      "kind": "atomic",
+      "notes": "The same 229 cm / Vertical 32 donor must retain Standing Dunk 95 on its own body.",
+      "inputs": {
+        "attribute": "Standing Dunk",
+        "raw": 95,
+        "sourceBody": {
+          "heightCm": 229,
+          "weightKg": 128.48045000000002
+        },
+        "sourceSupports": {
+          "Vertical": 32,
+          "Strength": 60
+        },
+        "targetBody": {
+          "heightCm": 229,
+          "weightKg": 128.48045000000002
+        },
+        "targetFinalSupports": {
+          "Vertical": 32,
+          "Strength": 60
+        }
+      },
+      "expected": {
+        "final": 95
+      }
+    },
+    {
+      "id": "F09",
+      "title": "Extreme height cannot compensate catastrophic Vertical for Driving Dunk",
+      "kind": "atomic",
+      "notes": "Height MIN is satisfied, but Vertical 5 fully saturates the critical support reduction.",
+      "inputs": {
+        "attribute": "Driving Dunk",
+        "raw": 90,
+        "sourceBody": {
+          "heightCm": 198,
+          "weightKg": 96.04979999999999
+        },
+        "sourceSupports": {
+          "Vertical": 90,
+          "Speed with Ball": 70,
+          "Agility": 70,
+          "Strength": 50
+        },
+        "targetBody": {
+          "heightCm": 240,
+          "weightKg": 141.12
+        },
+        "targetFinalSupports": {
+          "Vertical": 5,
+          "Speed with Ball": 70,
+          "Agility": 70,
+          "Strength": 50
+        }
+      },
+      "expected": {
+        "final": 61,
+        "supportCeiling": 61.0
+      }
+    },
+    {
+      "id": "F10",
+      "title": "Structural and support ceilings combine by min, not additive cuts",
+      "kind": "atomic",
+      "notes": "180 cm + Vertical 20 with raw Block 95 must resolve to min(67 structural, 59 support)=59, not 23.",
+      "inputs": {
+        "attribute": "Block",
+        "raw": 95,
+        "sourceBody": {
+          "heightCm": 213,
+          "weightKg": 111.15404999999998
+        },
+        "sourceSupports": {
+          "Vertical": 80
+        },
+        "targetBody": {
+          "heightCm": 180,
+          "weightKg": 79.38000000000001
+        },
+        "targetFinalSupports": {
+          "Vertical": 20
+        }
+      },
+      "expected": {
+        "final": 59,
+        "structuralCeiling": 67.0,
+        "supportCeiling": 59.0,
+        "forbiddenAdditiveResult": 23
+      }
+    },
+    {
+      "id": "F11",
+      "title": "Giant low-agility perimeter defender is support-limited",
+      "kind": "atomic",
+      "notes": "Height/BMI are only part of the story; Agility 45 is the binding bottleneck.",
+      "inputs": {
+        "attribute": "Perimeter Defense",
+        "raw": 95,
+        "sourceBody": {
+          "heightCm": 200,
+          "weightKg": 98.0
+        },
+        "sourceSupports": {
+          "Agility": 90,
+          "Speed": 90,
+          "Strength": 90
+        },
+        "targetBody": {
+          "heightCm": 220,
+          "weightKg": 157.3
+        },
+        "targetFinalSupports": {
+          "Agility": 45,
+          "Speed": 90,
+          "Strength": 90
+        }
+      },
+      "expected": {
+        "final": 71,
+        "structuralCeiling": 86.407407,
+        "supportCeiling": 71.0
+      }
+    },
+    {
+      "id": "F12",
+      "title": "Same giant body with elite agility retains much more perimeter defense",
+      "kind": "atomic",
+      "notes": "Same body as F11, only Agility changes from 45 to 90. Result should be structural-limited around 86.",
+      "inputs": {
+        "attribute": "Perimeter Defense",
+        "raw": 95,
+        "sourceBody": {
+          "heightCm": 200,
+          "weightKg": 98.0
+        },
+        "sourceSupports": {
+          "Agility": 90,
+          "Speed": 90,
+          "Strength": 90
+        },
+        "targetBody": {
+          "heightCm": 220,
+          "weightKg": 157.3
+        },
+        "targetFinalSupports": {
+          "Agility": 90,
+          "Speed": 90,
+          "Strength": 90
+        }
+      },
+      "expected": {
+        "final": 86,
+        "structuralCeiling": 86.407407,
+        "supportCeiling": 99.0
+      }
+    },
+    {
+      "id": "F13",
+      "title": "Position must not proxy for wingspan",
+      "kind": "pair_invariance",
+      "notes": "Change only target position PG <-> C. Block, Steal, Perimeter Defense and every other atomic value must remain identical.",
+      "inputs": {
+        "mutations": [
+          {
+            "targetPosition": "PG"
+          },
+          {
+            "targetPosition": "C"
+          }
+        ]
+      },
+      "expected": {
+        "relation": "allAtomicAttributesEqual",
+        "tolerance": 0
+      }
+    },
+    {
+      "id": "F14",
+      "title": "Target wingspan score 1-100 is excluded from Body Degrade V2",
+      "kind": "pair_invariance",
+      "notes": "Change only target wingspan score from 25 to 99. Atomic output must not move because there is no verified cm mapping.",
+      "inputs": {
+        "mutations": [
+          {
+            "targetWingspanScore": 25
+          },
+          {
+            "targetWingspanScore": 99
+          }
+        ]
+      },
+      "expected": {
+        "relation": "allAtomicAttributesEqual",
+        "tolerance": 0
+      }
+    },
+    {
+      "id": "F15",
+      "title": "Structural threshold boundary is a true zero zone",
+      "kind": "atomic",
+      "notes": "At Height 210 and BMI 27.5, Ball Handle structural violation is exactly zero; Agility 70 also exactly satisfies support.",
+      "inputs": {
+        "attribute": "Ball Handle",
+        "raw": 99,
+        "sourceBody": {
+          "heightCm": 190,
+          "weightKg": 88.445
+        },
+        "sourceSupports": {
+          "Agility": 80
+        },
+        "targetBody": {
+          "heightCm": 210,
+          "weightKg": 121.275
+        },
+        "targetFinalSupports": {
+          "Agility": 70
+        }
+      },
+      "expected": {
+        "final": 99,
+        "structuralReduction": 0.0,
+        "supportReduction": 0.0
+      }
+    },
+    {
+      "id": "F16",
+      "title": "One-unit threshold violation must be smooth, not a cliff",
+      "kind": "atomic",
+      "notes": "Ball Handle at Height 211 is only 1 cm above MAX 210; internal ceiling is about 98.82 and final rounds to 99.",
+      "inputs": {
+        "attribute": "Ball Handle",
+        "raw": 99,
+        "sourceBody": {
+          "heightCm": 190,
+          "weightKg": 88.445
+        },
+        "sourceSupports": {
+          "Agility": 80
+        },
+        "targetBody": {
+          "heightCm": 211,
+          "weightKg": 111.3025
+        },
+        "targetFinalSupports": {
+          "Agility": 70
+        }
+      },
+      "expected": {
+        "final": 99,
+        "structuralCeiling": 98.821674
+      }
+    },
+    {
+      "id": "F17",
+      "title": "Multiple support failures must obey supportTotalCap",
+      "kind": "atomic",
+      "notes": "SWB support reductions sum to 52 but total cap is 32, yielding ceiling 67.",
+      "inputs": {
+        "attribute": "Speed with Ball",
+        "raw": 95,
+        "sourceBody": {
+          "heightCm": 200,
+          "weightKg": 98.0
+        },
+        "sourceSupports": {
+          "Speed": 90,
+          "Ball Handle": 90,
+          "Agility": 80
+        },
+        "targetBody": {
+          "heightCm": 195,
+          "weightKg": 91.25999999999999
+        },
+        "targetFinalSupports": {
+          "Speed": 50,
+          "Ball Handle": 45,
+          "Agility": 40
+        }
+      },
+      "expected": {
+        "final": 67,
+        "uncappedSupportReduction": 52.0,
+        "cappedSupportReduction": 32,
+        "supportCeiling": 67
+      }
+    },
+    {
+      "id": "F18",
+      "title": "Evaluation order is deterministic and topological",
+      "kind": "property",
+      "notes": "Reordering object keys / slot input array must not change final atomic values. Roots freeze first, Ball Handle next, Speed with Ball next, then SWB-dependent finishing.",
+      "inputs": {
+        "permutations": "at least 20 random permutations of the same atomic input graph"
+      },
+      "expected": {
+        "relation": "allOutputsIdentical",
+        "tolerance": 0
+      }
+    },
+    {
+      "id": "F19",
+      "title": "Donor-expanded BMI MAX preserves Zion-like outliers",
+      "kind": "variants",
+      "notes": "A Vertical donor already proven at BMI 32.82 gets an effective BMI MAX of 32.82. Same body stays 99; BMI 34 starts a gentle penalty from 32.82, not from base 29.",
+      "inputs": {
+        "attribute": "Vertical",
+        "raw": 99,
+        "sourceBody": {
+          "heightCm": 198,
+          "weightKg": 128.667528
+        },
+        "targetBodies": [
+          {
+            "heightCm": 198,
+            "weightKg": 128.667528
+          },
+          {
+            "heightCm": 198,
+            "weightKg": 133.2936
+          }
+        ]
+      },
+      "expected": {
+        "finalByVariant": [
+          99,
+          95
+        ],
+        "secondStructuralCeiling": 95.224856
+      }
+    },
+    {
+      "id": "F20",
+      "title": "Extreme low BMI limits inherited Strength",
+      "kind": "atomic",
+      "notes": "Strength BMI MIN 22.5, distance 4, max reduction 25: BMI 18.5 fully saturates to ceiling 74.",
+      "inputs": {
+        "attribute": "Strength",
+        "raw": 95,
+        "sourceBody": {
+          "heightCm": 205,
+          "weightKg": 117.66999999999999
+        },
+        "targetBody": {
+          "heightCm": 205,
+          "weightKg": 77.74624999999999
+        }
+      },
+      "expected": {
+        "final": 74,
+        "structuralCeiling": 74.0
+      }
+    },
+    {
+      "id": "F21",
+      "title": "Shooting structural guardrail stays gentle even at science-fiction body size",
+      "kind": "atomic",
+      "notes": "Height and BMI both fully saturate but Three-Point structural total cap is 10, so raw 99 bottoms at 89.",
+      "inputs": {
+        "attribute": "Three-Point Shot",
+        "raw": 99,
+        "sourceBody": {
+          "heightCm": 200,
+          "weightKg": 96.0
+        },
+        "targetBody": {
+          "heightCm": 238,
+          "weightKg": 203.9184
+        }
+      },
+      "expected": {
+        "final": 89,
+        "uncappedStructuralReduction": 16.0,
+        "cappedStructuralReduction": 10,
+        "structuralCeiling": 89
+      }
+    },
+    {
+      "id": "F22",
+      "title": "skipBody bypasses both Structural and Support V2",
+      "kind": "atomic",
+      "notes": "Compatibility requirement for the existing 'skip body limits' switch.",
+      "inputs": {
+        "attribute": "Block",
+        "raw": 95,
+        "skipBody": true,
+        "sourceBody": {
+          "heightCm": 213,
+          "weightKg": 111.15404999999998
+        },
+        "sourceSupports": {
+          "Vertical": 80
+        },
+        "targetBody": {
+          "heightCm": 180,
+          "weightKg": 79.38000000000001
+        },
+        "targetFinalSupports": {
+          "Vertical": 20
+        }
+      },
+      "expected": {
+        "final": 95
+      }
+    },
+    {
+      "id": "F23",
+      "title": "Preview and final generation share exactly the same atomic evaluator",
+      "kind": "pair_invariance",
+      "notes": "The same candidate graph through evaluateAllPreview and final createResult path must produce identical atomics and identical slot preview average.",
+      "inputs": {
+        "paths": [
+          "preview",
+          "final"
+        ]
+      },
+      "expected": {
+        "relation": "allAtomicAttributesEqual",
+        "tolerance": 0
+      }
+    },
+    {
+      "id": "F24",
+      "title": "UI minimum height must be lowered without changing algorithm thresholds",
+      "kind": "manual_integration",
+      "notes": "Change manual target height lower bound from current 180 cm to ~170 cm. Do not raise Layup MIN 175 or Driving Dunk MIN 180 to fit the old UI.",
+      "inputs": {
+        "targetUiHeightMinCm": 170
+      },
+      "expected": {
+        "relation": "uiAccepts170AndEngineUsesExistingThresholds"
+      }
+    }
+  ]
+}

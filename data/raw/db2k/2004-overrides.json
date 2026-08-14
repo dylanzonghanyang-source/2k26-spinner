@@ -50,5 +50,37 @@
   "dorell-wright": {
     "overall": 68,
     "source": "user-ui-confirmed-2026-08-08"
+  },
+  "chris-duhon": {
+    "overall": 72,
+    "estimated": true
+  },
+  "josh-childress": {
+    "overall": 78,
+    "estimated": true
+  },
+  "kris-humphries": {
+    "overall": 77,
+    "estimated": true
+  },
+  "pavel-podkolzin": {
+    "overall": 69,
+    "estimated": true
+  },
+  "rafael-araujo": {
+    "overall": 76,
+    "estimated": true
+  },
+  "sasha-vujacic": {
+    "overall": 68,
+    "estimated": true
+  },
+  "sebastian-telfair": {
+    "overall": 71,
+    "estimated": true
+  },
+  "trevor-ariza": {
+    "overall": 76,
+    "estimated": true
   }
 }

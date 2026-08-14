@@ -114,19 +114,24 @@ function isFiniteNumber(v: unknown): v is number {
   check("deterministic seed → identical results", JSON.stringify(a.initialAttrs) === JSON.stringify(b.initialAttrs) && JSON.stringify(a.hotZones) === JSON.stringify(b.hotZones));
 }
 
-// --- 5. Position cross penalty: same player, C target vs PG target ---
+// --- 5. V2 position invariance: same player, C target vs PG target ---
+// V2 下 position 不进入 atomic evaluator（spec §2.2）。createResult 最终
+// initialAttrs 会受 OVR constraint 影响（position weights 进 OVR 是允许的），
+// 因此 atomic 层断言用 evaluateAll：同一 passing 槽在 C/PG 目标下必须完全一致。
 {
-  const locks: Record<string, any> = {};
-  // lock a PG source into passing slot
-  locks.passing = { kind: "player", playerId: playerPool.get("stephen-curry")!.id ?? "" };
-  const pgBody = { ...bodyBases.PG };
-  const cBody = { ...bodyBases.C };
-  const rPG = createResult(locks, 20, "PG", "PG", pgBody, playerPool, null, "legacy", null);
-  const rC = createResult(locks, 20, "C", "C", cBody, playerPool, null, "legacy", null);
-  check("C target passing < PG target passing (positionCross active)", rC.initialAttrs["Pass Accuracy"] <= rPG.initialAttrs["Pass Accuracy"], `C=${rC.initialAttrs["Pass Accuracy"]} PG=${rPG.initialAttrs["Pass Accuracy"]}`);
+  const curry = playerPool.get("stephen-curry")!;
+  const passing = bundles.find((b) => b.id === "passing")!;
+  const body = { ...bodyBases.PG };
+  const asPG = evaluateAll([{ bundle: passing, player: curry }], body, { targetPosition: "PG", secondaryPosition: "PG" });
+  const asC = evaluateAll([{ bundle: passing, player: curry }], { ...bodyBases.C }, { targetPosition: "C", secondaryPosition: "C" });
+  const pgValues = asPG.passing?.values ?? {};
+  const cValues = asC.passing?.values ?? {};
+  const equal = passing.attrs.every((attr) => pgValues[attr] === cValues[attr]);
+  check("position must not change atomic passing (V2)", equal, `PG=${JSON.stringify(pgValues)} C=${JSON.stringify(cValues)}`);
+  check("passing values stay at raw (passthrough)", pgValues["Pass Accuracy"] === 80, `PG Pass Accuracy=${pgValues["Pass Accuracy"]}`);
 }
 
-// --- 6. Grace zone: same-position + similar body → raw inheritance ---
+// --- 6. V2 passthrough: 无 profile 属性（三分）不受身体影响 ---
 {
   const curry = playerPool.get("stephen-curry")!;
   const body = { ...bodyBases.PG, height: 190, weight: 85 }; // close to Curry 6'3"/185lb → 190.5cm/83.9kg
@@ -134,8 +139,9 @@ function isFiniteNumber(v: unknown): v is number {
     { bundle: bundles.find((b) => b.id === "three")!, player: curry },
   ], body, { targetPosition: "PG", secondaryPosition: "PG" });
   const ev = evals.three;
-  check("grace zone → bodyAdjustment === 0", ev.bodyAdjustment === 0, `adj=${ev.bodyAdjustment}`);
-  check("grace zone → usedGraceZone flag", ev.usedGraceZone === true);
+  // Three-Point Shot 无 structural/support profile → passthrough → 无调整
+  check("passthrough attr → bodyAdjustment === 0", ev.bodyAdjustment === 0, `adj=${ev.bodyAdjustment}`);
+  check("V2 has no grace zone flag", ev.usedGraceZone === false, `usedGraceZone=${ev.usedGraceZone}`);
 }
 
 // --- 7. Body mismatch WITHOUT grace zone: tiny target vs huge source ---

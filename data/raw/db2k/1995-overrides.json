@@ -1,53 +1,89 @@
 {
- "kevin-garnett": {
-  "overall": 83
- },
- "antonio-mcdyess": {
-  "overall": 81
- },
- "damon-stoudamire": {
-  "overall": 80
- },
- "jerry-stackhouse": {
-  "overall": 79
- },
- "bryant-reeves": {
-  "overall": 76
- },
- "brent-barry": {
-  "overall": 77
- },
- "corliss-williamson": {
-  "overall": 75
- },
- "kurt-thomas": {
-  "overall": 73
- },
- "kevin-ollie": {
-  "overall": 74
- },
- "michael-finley": {
-  "overall": 75
- },
- "eric-snow": {
-  "overall": 71
- },
- "greg-ostertag": {
-  "overall": 70
- },
- "rick-brunson": {
-  "overall": 71
- },
- "fred-hoiberg": {
-  "overall": 71
- },
- "jason-caffey": {
-  "overall": 70
- },
- "jimmy-king": {
-  "overall": 68
- },
- "gary-trent": {
-  "overall": 73
- }
+  "kevin-garnett": {
+    "overall": 83
+  },
+  "antonio-mcdyess": {
+    "overall": 81
+  },
+  "damon-stoudamire": {
+    "overall": 80
+  },
+  "jerry-stackhouse": {
+    "overall": 79
+  },
+  "bryant-reeves": {
+    "overall": 76
+  },
+  "brent-barry": {
+    "overall": 77
+  },
+  "corliss-williamson": {
+    "overall": 75
+  },
+  "kurt-thomas": {
+    "overall": 73
+  },
+  "kevin-ollie": {
+    "overall": 74
+  },
+  "michael-finley": {
+    "overall": 75
+  },
+  "eric-snow": {
+    "overall": 71
+  },
+  "greg-ostertag": {
+    "overall": 70
+  },
+  "rick-brunson": {
+    "overall": 71
+  },
+  "fred-hoiberg": {
+    "overall": 71
+  },
+  "jason-caffey": {
+    "overall": 70
+  },
+  "jimmy-king": {
+    "overall": 68
+  },
+  "gary-trent": {
+    "overall": 73
+  },
+  "alan-henderson": {
+    "overall": 75,
+    "estimated": true
+  },
+  "andrew-declercq": {
+    "overall": 68,
+    "estimated": true
+  },
+  "bob-sura": {
+    "overall": 78,
+    "estimated": true
+  },
+  "cherokee-parks": {
+    "overall": 69,
+    "estimated": true
+  },
+  "david-vaughn": {
+    "overall": 64,
+    "estimated": true
+  },
+  "randolph-childress": {
+    "overall": 71,
+    "estimated": true
+  },
+  "theo-ratliff": {
+    "overall": 77,
+    "estimated": true
+  },
+  "travis-best": {
+    "overall": 70,
+    "estimated": true
+  },
+  "tyus-edney": {
+    "overall": 70,
+    "estimated": true
+  }
 }

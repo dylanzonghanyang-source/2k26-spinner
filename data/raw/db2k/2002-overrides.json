@@ -1,53 +1,129 @@
 {
- "yao-ming": {
-  "overall": 80
- },
- "amar-e-stoudemire": {
-  "overall": 80
- },
- "caron-butler": {
-  "overall": 76
- },
- "mike-dunleavy": {
-  "overall": 73
- },
- "nene": {
-  "overall": 75
- },
- "carlos-boozer": {
-  "overall": 74
- },
- "drew-gooden": {
-  "overall": 76
- },
- "udonis-haslem": {
-  "overall": 76
- },
- "jared-jeffries": {
-  "overall": 74
- },
- "matt-barnes": {
-  "overall": 74
- },
- "luis-scola": {
-  "overall": 74
- },
- "jannero-pargo": {
-  "overall": 69
- },
- "darius-songaila": {
-  "overall": 72
- },
- "kareem-rush": {
-  "overall": 70
- },
- "jamal-sampson": {
-  "overall": 69
- },
- "roger-mason": {
-  "overall": 70
- },
- "casey-jacobsen": {
-  "overall": 68
- }
+  "yao-ming": {
+    "overall": 80
+  },
+  "amar-e-stoudemire": {
+    "overall": 80
+  },
+  "caron-butler": {
+    "overall": 76
+  },
+  "mike-dunleavy": {
+    "overall": 73
+  },
+  "nene": {
+    "overall": 75
+  },
+  "carlos-boozer": {
+    "overall": 74
+  },
+  "drew-gooden": {
+    "overall": 76
+  },
+  "udonis-haslem": {
+    "overall": 76
+  },
+  "jared-jeffries": {
+    "overall": 74
+  },
+  "matt-barnes": {
+    "overall": 74
+  },
+  "luis-scola": {
+    "overall": 74
+  },
+  "jannero-pargo": {
+    "overall": 69
+  },
+  "darius-songaila": {
+    "overall": 72
+  },
+  "kareem-rush": {
+    "overall": 70
+  },
+  "jamal-sampson": {
+    "overall": 69
+  },
+  "roger-mason": {
+    "overall": 70
+  },
+  "casey-jacobsen": {
+    "overall": 68
+  },
+  "bostjan-nachbar": {
+    "overall": 69,
+    "estimated": true
+  },
+  "chris-owens": {
+    "overall": 69,
+    "estimated": true
+  },
+  "chris-wilcox": {
+    "overall": 73,
+    "estimated": true
+  },
+  "corsley-edwards": {
+    "overall": 68,
+    "estimated": true
+  },
+  "dajuan-wagner": {
+    "overall": 76,
+    "estimated": true
+  },
+  "dan-dickau": {
+    "overall": 66,
+    "estimated": true
+  },
+  "david-andersen": {
+    "overall": 73,
+    "estimated": true
+  },
+  "fred-jones": {
+    "overall": 58,
+    "estimated": true
+  },
+  "jiri-welsch": {
+    "overall": 69,
+    "estimated": true
+  },
+  "juan-carlos-navarro": {
+    "overall": 76,
+    "estimated": true
+  },
+  "juan-dixon": {
+    "overall": 73,
+    "estimated": true
+  },
+  "lonny-baxter": {
+    "overall": 71,
+    "estimated": true
+  },
+  "marcus-haislip": {
+    "overall": 72,
+    "estimated": true
+  },
+  "melvin-ely": {
+    "overall": 72,
+    "estimated": true
+  },
+  "nenad-krstic": {
+    "overall": 76,
+    "estimated": true
+  },
+  "qyntel-woods": {
+    "overall": 54,
+    "estimated": true
+  },
+  "ronald-murray": {
+    "overall": 59,
+    "estimated": true
+  },
+  "ryan-humphrey": {
+    "overall": 71,
+    "estimated": true
+  },
+  "tamar-slay": {
+    "overall": 68,
+    "estimated": true
+  }
 }

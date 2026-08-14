@@ -23,10 +23,13 @@ import { lookupRookieCard, type RookieCard, type RookieCardLookup } from "./rook
 import { tendencyBundleMap } from "./components/tendencyBundleMap.ts";
 import { badgeBundleMap } from "./components/badgeBundleMap.ts";
 import { estimateGameOverall, type OverallDataVersion } from "./rookieOverall.ts";
+import { estimateDisplayOverallV3EFromRecord } from "./rookieOverallV3E.ts";
 import { generateDurabilityAttributes, generateRookieDurability } from "./rookieDurability.ts";
 import { constrainRookieInitialAttributes } from "./rookieInitialOverall.ts";
-import { applyBodyConstraints, parsePlayerBody, effectivePositionDistance, parsePositionRoles, type BuilderBody, type SourceBody } from "./rookieBodyConstraints.ts";
-import { attrToSlot, bodyTransferProfiles, profileFor } from "./rookieBodyProfiles.ts";
+import { parsePlayerBody, effectivePositionDistance, parsePositionRoles, type BuilderBody, type SourceBody } from "./rookieBodyConstraints.ts";
+import { atomicProfileFor, evaluateAtomic, evaluateAtomicGraph, type AtomicSource, type BodyV2 } from "./rookieBodyV2.ts";
+import { computeSlotDisplay } from "./slotPresentation.ts";
+import type { SlotId } from "./slotPresentationProfiles.ts";
 
 export type Position = "PG" | "SG" | "SF" | "PF" | "C";
 export type BundleCategory = "technical" | "physical" | "mental";
@@ -92,17 +95,39 @@ export function applyBundleLockTransaction(
   return { next, usedPlayerIds: nextUsed, accepted: true };
 }
 
+export type SupportIncompleteReason =
+  /** 单槽 preview 缺少其他槽位 final support（完整组合后可能变化 → 可显示 provisional） */
+  | "target_context_missing"
+  /** 源数据本身缺 donor support 值（不能提示"完整组合后自动计算"） */
+  | "donor_support_missing"
+  /** 源数据缺 donor body（contextual requirement 无法计算；同上不可提示） */
+  | "donor_context_missing";
+
 export type Evaluation = {
   raw: number;
+  /**
+   * Legacy simple-average slot score。语义冻结：这是生产 OVR fallback mean
+   * 的输入（createResult scores.push(adjusted)），Slot Presentation V2 上线
+   * 前后必须保持不变。UI 展示请使用 displayScore。
+   */
   adjusted: number;
+  /**
+   * Slot Presentation V2 position-aware display score（spec PART B）。
+   * 只读 finalAtomicValues，不参与 OVR fallback mean，不改写 atomic。
+   */
+  displayScore: number;
   bodyAdjustment: number;
   bodyAdjustments: Record<string, number>;
   bodyCaps: Partial<Record<string, number>>;
   supportAdjustments?: Record<string, number>;
   /** 来源无身体数据（仅应用目标 cap，未执行来源体型比较/位置交叉） */
   bodyIncomplete?: boolean;
-  /** 支持依赖缺失真实值（未执行支持修正） */
-  supportIncomplete?: { attr: string; missing: string[] };
+  /**
+   * 支持依赖缺失真实值（未执行支持修正）。missing 为纯 attr 名（兼容
+   * V1/UI 契约）；reasons 区分缺失原因（target_context_missing 才可显示
+   * provisional，donor 类缺失不可提示"完整组合后会自动计算"）。
+   */
+  supportIncomplete?: { attr: string; missing: string[]; reasons: Record<string, SupportIncompleteReason[]> };
   values: Record<string, number>;
   /** 主/次位置到来源的有效距离（null = 来源位置不可解析） */
   positionDistance?: number | null;
@@ -240,7 +265,7 @@ export function evaluate(
 ): Evaluation {
   // In rookie mode a locked player with a real rookie card shows that card's
   // values directly (e.g. Luka mid-range shows 79, not his current 97). The
-  // card is the display source; body constraints still apply on top.
+  // card is the display source; V2 body constraints still apply on top.
   const rawValues = Object.fromEntries(bundle.attrs.map((attr) => [
     attr,
     attr === "Potential"
@@ -249,12 +274,31 @@ export function evaluate(
   ]));
   // 来源身体优先取 rookie card 自带数据（新秀时体型），其次当前球员。
   const sourceBody = cardBody ?? parsePlayerBody(player);
-  const constrained = applyBodyConstraints(rawValues, body, sourceBody, {
-    targetPosition: options?.targetPosition ?? null,
-    secondaryPosition: options?.secondaryPosition ?? null,
-    sourcePosition: player.position,
-    skipBody: options?.skipBody,
-  });
+  const targetBody: BodyV2 = { heightCm: body.height, weightKg: body.weight };
+  const values: Record<string, number> = {};
+  const bodyAdjustments: Record<string, number> = {};
+  const bodyCaps: Partial<Record<string, number>> = {};
+  const incomplete: string[] = [];
+  for (const attr of bundle.attrs) {
+    const result = evaluateAtomic({
+      attr,
+      raw: rawValues[attr],
+      targetBody,
+      donorBody: sourceBody ? { heightCm: sourceBody.height, weightKg: sourceBody.weight } : null,
+      donorObservedSupports: donorObservedFor(player, card, attr),
+      // 单槽 evaluate（SlotPicker 展示）无跨槽 DAG 上下文：不猜 support，
+      // support 依赖标记 incomplete 跳过，structural 完整生效（与 V1 单槽
+      // 只做结构阶段的信息层级一致）。
+      finalizedTargetSupports: {},
+      skipBody: options?.skipBody,
+    });
+    values[attr] = result.final;
+    bodyAdjustments[attr] = result.final - rawValues[attr];
+    if (result.structuralCeiling < 99 || result.supportCeiling < 99) {
+      bodyCaps[attr] = Math.round(Math.min(result.structuralCeiling, result.supportCeiling));
+    }
+    incomplete.push(...result.incomplete);
+  }
   const positionDistance = options?.targetPosition != null
     ? effectivePositionDistance(
       options.targetPosition,
@@ -263,41 +307,147 @@ export function evaluate(
     )
     : null;
   const raw = Math.round(average(Object.values(rawValues)));
-  const adjusted = Math.round(average(Object.values(constrained.values)));
+  const adjusted = Math.round(average(Object.values(values)));
+  // Legacy simple-average 冻结为 OVR fallback mean 输入（硬要求 #1）；
+  // UI 展示 score 用 displayScore（position-aware Slot Presentation V2）。
+  const displayScore = options?.targetPosition
+    ? computeSlotDisplay({
+      slot: bundle.id as SlotId,
+      finalAtomicValues: values,
+      primaryPosition: options.targetPosition,
+      secondaryPosition: options.secondaryPosition ?? null,
+      supportIncomplete: incomplete.length > 0,
+    }).score
+    : adjusted;
+  const supportIncomplete = parseSupportIncomplete(incomplete, bundle.attrs);
   return {
     raw,
     adjusted,
+    displayScore,
     bodyAdjustment: adjusted - raw,
-    bodyAdjustments: constrained.adjustments,
-    bodyCaps: constrained.caps,
-    values: constrained.values,
+    bodyAdjustments,
+    bodyCaps,
+    values,
     positionDistance,
-    usedGraceZone: constrained.usedGraceZone,
+    usedGraceZone: false,
     bodyIncomplete: sourceBody === null,
+    supportIncomplete,
   };
+}
+
+/**
+ * 解析 V2 evaluateAtomic 返回的 incomplete 描述串（如 "Strength(target support 缺失)"），
+ * 分类为 SupportIncompleteReason。missing 保持纯 attr 名（兼容 V1/UI 契约）。
+ */
+function parseSupportIncomplete(
+  incomplete: string[],
+  attrs: string[],
+): { attr: string; missing: string[]; reasons: Record<string, SupportIncompleteReason[]> } | undefined {
+  if (incomplete.length === 0) return undefined;
+  const reasons: Record<string, SupportIncompleteReason[]> = {};
+  for (const entry of incomplete) {
+    const attr = entry.split("(")[0];
+    let reason: SupportIncompleteReason;
+    if (entry.includes("target support")) reason = "target_context_missing";
+    else if (entry.includes("donor support")) reason = "donor_support_missing";
+    else if (entry.includes("contextual")) reason = "donor_context_missing";
+    else reason = "donor_support_missing";
+    (reasons[attr] ??= []).push(reason);
+  }
+  return { attr: attrs.join(","), missing: [...new Set(Object.keys(reasons))], reasons };
+}
+
+/** 同一 donor 的 support 观测值（card detailed 优先，其次真实 observed）。 */
+function donorObservedFor(
+  player: PlayerSource,
+  card: RookieCard | null | undefined,
+  attr: string,
+): Record<string, number | undefined> {
+  const profile = atomicProfileFor(attr);
+  const supports: Record<string, number | undefined> = {};
+  for (const dep of profile?.support?.dependencies ?? []) {
+    supports[dep.supportAttr] = card?.detailed?.[dep.supportAttr]
+      ?? getObservedAttr(player, dep.supportAttr);
+  }
+  return supports;
 }
 
 export function evaluateCustom(bundle: Bundle, customValues: Record<string, number>, body: BuilderBody, options?: EvaluateOptions): Evaluation {
   const rawValues = Object.fromEntries(bundle.attrs.map((attr) => [attr, clamp(customValues[attr] ?? 75)]));
-  const constrained = applyBodyConstraints(rawValues, body, null, { skipBody: options?.skipBody });
+  const targetBody: BodyV2 = { heightCm: body.height, weightKg: body.weight };
+  const values: Record<string, number> = {};
+  const bodyAdjustments: Record<string, number> = {};
+  const bodyCaps: Partial<Record<string, number>> = {};
+  const incomplete: string[] = [];
+  for (const attr of bundle.attrs) {
+    const result = evaluateAtomic({
+      attr,
+      raw: rawValues[attr],
+      targetBody,
+      donorBody: null,
+      donorObservedSupports: {},
+      finalizedTargetSupports: {},
+      skipBody: options?.skipBody,
+    });
+    values[attr] = result.final;
+    bodyAdjustments[attr] = result.final - rawValues[attr];
+    if (result.structuralCeiling < 99 || result.supportCeiling < 99) {
+      bodyCaps[attr] = Math.round(Math.min(result.structuralCeiling, result.supportCeiling));
+    }
+    incomplete.push(...result.incomplete);
+  }
   const raw = Math.round(average(Object.values(rawValues)));
-  const adjusted = Math.round(average(Object.values(constrained.values)));
+  const adjusted = Math.round(average(Object.values(values)));
+  const displayScore = options?.targetPosition
+    ? computeSlotDisplay({
+      slot: bundle.id as SlotId,
+      finalAtomicValues: values,
+      primaryPosition: options.targetPosition,
+      secondaryPosition: options.secondaryPosition ?? null,
+      supportIncomplete: incomplete.length > 0,
+    }).score
+    : adjusted;
+  const supportIncomplete = parseSupportIncomplete(incomplete, bundle.attrs);
   return {
     raw,
     adjusted,
+    displayScore,
     bodyAdjustment: adjusted - raw,
-    bodyAdjustments: constrained.adjustments,
-    bodyCaps: constrained.caps,
-    values: constrained.values,
+    bodyAdjustments,
+    bodyCaps,
+    values,
+    supportIncomplete,
   };
 }
 
-// --- 两阶段批量评估（槽位身体修正 + 跨槽位支持依赖） ---
+/**
+ * V2 custom 字段评估：无 donor → structural 用 base threshold、
+ * support 依赖缺失全部跳过（incomplete），与 evaluateAll 中 custom 槽位
+ * 语义一致。取代 V1 的 source=null 目标侧 wingspan/shoulder cap 路径。
+ */
+export function applyV2CustomFinal(
+  rawValues: Record<string, number>,
+  body: BuilderBody,
+  skipBody?: boolean,
+): Record<string, number> {
+  const targetBody: BodyV2 = { heightCm: body.height, weightKg: body.weight };
+  const out: Record<string, number> = {};
+  for (const [attr, raw] of Object.entries(rawValues)) {
+    const result = evaluateAtomic({
+      attr,
+      raw,
+      targetBody,
+      donorBody: null,
+      donorObservedSupports: {},
+      finalizedTargetSupports: {},
+      skipBody,
+    });
+    out[attr] = result.final;
+  }
+  return out;
+}
 
-const SUPPORT_MAX_CUT = 8;
-const SUPPORT_MIN_KEEP = 0.65;
-/** 支持属性每 20 点差值折算 1 单位支持缺口 */
-const SUPPORT_GAP_REFERENCE = 20;
+// --- V2 批量评估（collectAtomicSources → DAG → rebuild slot Evaluation） ---
 
 export type SlotInput = {
   bundle: Bundle;
@@ -306,38 +456,54 @@ export type SlotInput = {
   customValues?: Record<string, number>;
 };
 
-function supportDeficitFor(
-  player: PlayerSource,
-  card: RookieCard | null | undefined,
-  attr: string,
-  bundleId: string,
-  targetSupport: Record<string, number>,
-): { deficit: number; missing: string[] } {
-  const slotProfile = bodyTransferProfiles[bundleId];
-  if (!slotProfile) return { deficit: 0, missing: [] };
-  const attrProfile = profileFor(slotProfile, attr);
-  const support = attrProfile.support ?? slotProfile.support;
-  if (!support?.length) return { deficit: 0, missing: [] };
-  let deficit = 0;
-  const missing: string[] = [];
-  for (const dep of support) {
-    // 支持属性与槽位 raw 值使用同一来源：优先 rookie card，其次当前球员。
-    // 只认真实观测值；缺失时跳过该依赖（不猜聚合值），并上报 missing。
-    const sourceValue = card?.detailed?.[dep.attr] ?? getObservedAttr(player, dep.attr);
-    const targetValue = targetSupport[dep.attr];
-    if (typeof sourceValue !== "number" || typeof targetValue !== "number") {
-      if (typeof sourceValue !== "number") missing.push(dep.attr);
-      continue;
-    }
-    deficit += dep.weight * Math.max(0, sourceValue - targetValue) / SUPPORT_GAP_REFERENCE;
+function rawValueFor(input: SlotInput, attr: string): number {
+  if (input.customValues) return clamp(input.customValues[attr] ?? 75);
+  const player = input.player!;
+  if (attr === "Potential") {
+    return input.card?.potential?.current != null ? clamp(input.card.potential.current) : getAttr(player, attr);
   }
-  return { deficit, missing };
+  return input.card?.detailed?.[attr] != null ? clamp(input.card.detailed[attr]) : getAttr(player, attr);
+}
+
+function donorBodyFor(input: SlotInput): BodyV2 | null {
+  if (input.customValues || !input.player) return null;
+  const sourceBody = cardSourceBody(input.card) ?? parsePlayerBody(input.player);
+  return sourceBody ? { heightCm: sourceBody.height, weightKg: sourceBody.weight } : null;
+}
+
+function donorSupportsFor(input: SlotInput, attr: string): Record<string, number | undefined> {
+  if (input.customValues || !input.player) return {};
+  return donorObservedFor(input.player, input.card, attr);
 }
 
 /**
- * 两阶段评估：
- * 1. 每个锁定槽位独立身体评估（有符号差值 + 位置交叉 + 目标 cap）；
- * 2. 读取目标已调整的根属性（athletic/strength），对依赖槽位应用软支持修正。
+ * 收集全图 atomic sources：每个 bundle 的每个 attr 独立记录自己的
+ * raw / donor body / donor supports（规格 §11.1）。
+ * donor 数据必须来自提供该 target skill 的同一个 slot donor。
+ */
+export function collectAtomicSources(
+  inputs: SlotInput[],
+  skipBody?: boolean,
+): Record<string, AtomicSource> {
+  const sources: Record<string, AtomicSource> = {};
+  for (const input of inputs) {
+    for (const attr of input.bundle.attrs) {
+      sources[attr] = {
+        raw: rawValueFor(input, attr),
+        donorBody: donorBodyFor(input),
+        donorObservedSupports: donorSupportsFor(input, attr),
+        skipBody,
+      };
+    }
+  }
+  return sources;
+}
+
+/**
+ * V2 批量评估：
+ * 1. collectAtomicSources（donor provenance per attr）；
+ * 2. evaluateAtomicGraph 按固定 DAG 顺序（Level0 roots freeze → L1 → L2 → L3）；
+ * 3. rebuild 每个 bundle 的 Evaluation（slot adjusted = 兼容层平均）。
  * 预览与最终 createResult 共用此函数，保证结果一致。
  */
 export function evaluateAll(
@@ -345,69 +511,57 @@ export function evaluateAll(
   body: BuilderBody,
   options?: EvaluateOptions,
 ): Record<string, Evaluation> {
+  const skipBody = options?.skipBody === true;
+  const targetBody: BodyV2 = { heightCm: body.height, weightKg: body.weight };
+  const sources = collectAtomicSources(inputs, skipBody);
+  const atomics = evaluateAtomicGraph(sources, targetBody);
+
   const evaluations: Record<string, Evaluation> = {};
   for (const input of inputs) {
-    if (input.customValues) {
-      evaluations[input.bundle.id] = evaluateCustom(input.bundle, input.customValues, body, options);
-      continue;
+    const bundle = input.bundle;
+    const rawValues: Record<string, number> = {};
+    const values: Record<string, number> = {};
+    const bodyAdjustments: Record<string, number> = {};
+    const bodyCaps: Partial<Record<string, number>> = {};
+    const incomplete: string[] = [];
+    for (const attr of bundle.attrs) {
+      const result = atomics[attr];
+      if (!result) continue;
+      rawValues[attr] = result.raw;
+      values[attr] = result.final;
+      bodyAdjustments[attr] = result.final - result.raw;
+      if (result.structuralCeiling < 99 || result.supportCeiling < 99) {
+        bodyCaps[attr] = Math.round(Math.min(result.structuralCeiling, result.supportCeiling));
+      }
+      incomplete.push(...result.incomplete);
     }
-    if (!input.player) continue;
-    evaluations[input.bundle.id] = evaluate(
-      input.player,
-      input.bundle,
-      body,
-      input.card,
-      options,
-      cardSourceBody(input.card),
-    );
+    const raw = Math.round(average(Object.values(rawValues)));
+    // Legacy simple-average 冻结为 OVR fallback mean 输入（createResult
+    // scores.push(adjusted)）。UI 展示用 displayScore（position-aware）。
+    const adjusted = Math.round(average(Object.values(values)));
+    const displayScore = options?.targetPosition
+      ? computeSlotDisplay({
+        slot: bundle.id as SlotId,
+        finalAtomicValues: values,
+        primaryPosition: options.targetPosition,
+        secondaryPosition: options.secondaryPosition ?? null,
+        supportIncomplete: incomplete.length > 0,
+      }).score
+      : adjusted;
+    const supportIncomplete = parseSupportIncomplete(incomplete, bundle.attrs);
+    evaluations[bundle.id] = {
+      raw,
+      adjusted,
+      displayScore,
+      bodyAdjustment: adjusted - raw,
+      bodyAdjustments,
+      bodyCaps,
+      values,
+      bodyIncomplete: input.player != null && sources[bundle.attrs[0]]?.donorBody == null,
+      supportIncomplete,
+      usedGraceZone: false,
+    };
   }
-
-  // 目标支持值：第一阶段后 athletic/strength 槽位的最终值
-  const targetSupport: Record<string, number> = {};
-  for (const [attr, slot] of Object.entries(attrToSlot)) {
-    const evaluation = evaluations[slot];
-    if (evaluation && typeof evaluation.values[attr] === "number") {
-      targetSupport[attr] = evaluation.values[attr];
-    }
-  }
-
-  // 第二阶段：支持依赖软修正
-  for (const input of inputs) {
-    if (!input.player) continue;
-    const evaluation = evaluations[input.bundle.id];
-    if (!evaluation) continue;
-    const deltas: Record<string, number> = {};
-    const incompleteAttrs: string[] = [];
-    for (const attr of input.bundle.attrs) {
-      const { deficit, missing } = supportDeficitFor(input.player, input.card, attr, input.bundle.id, targetSupport);
-      if (missing.length) incompleteAttrs.push(attr);
-      if (deficit <= 0) continue;
-      const cut = Math.min(deficit, SUPPORT_MAX_CUT);
-      const current = evaluation.values[attr] ?? 0;
-      const floor = Math.round(current * SUPPORT_MIN_KEEP);
-      const next = Math.max(current - cut, floor);
-      if (next !== current) deltas[attr] = next - current;
-    }
-    if (incompleteAttrs.length) {
-      const player = input.player;
-      const missing = incompleteAttrs.flatMap((attr) =>
-        supportDeficitFor(player, input.card, attr, input.bundle.id, targetSupport).missing);
-      evaluation.supportIncomplete = { attr: incompleteAttrs.join(","), missing: [...new Set(missing)] };
-    }
-    if (Object.keys(deltas).length === 0) continue;
-    const nextValues = { ...evaluation.values };
-    for (const [attr, delta] of Object.entries(deltas)) {
-      // clamp 内部四舍五入：supportAdjustments 记录取整后的实际差值，
-      // 保证诊断值与最终 values 完全一致。
-      nextValues[attr] = clamp((nextValues[attr] ?? 0) + delta);
-    }
-    evaluation.supportAdjustments = Object.fromEntries(
-      Object.entries(deltas).map(([attr]) => [attr, nextValues[attr] - (evaluation.values[attr] ?? 0)]),
-    );
-    evaluation.values = nextValues;
-    evaluation.adjusted = Math.round(average(input.bundle.attrs.map((attr) => nextValues[attr])));
-  }
-
   return evaluations;
 }
 
@@ -611,9 +765,13 @@ export function createResult(
   const rawCustomFinalAttrs = Object.assign({}, ...Object.values(locks)
     .filter((lock): lock is CustomLock => lock.kind === "custom")
     .map((lock) => lock.values));
-  const customFinalAttrs = applyBodyConstraints(rawCustomFinalAttrs, body, null, { skipBody }).values;
+  // V2：custom 字段按原子 V2 评估（无 donor → structural 用 base threshold、
+  // support 全部 incomplete 跳过），取代 V1 source=null 的 wingspan/shoulder cap。
+  const customFinalAttrs = applyV2CustomFinal(rawCustomFinalAttrs, body, skipBody);
   Object.assign(peakAttrs, customFinalAttrs);
-  peakAttrs = applyBodyConstraints(peakAttrs, body, null, { skipBody }).values;
+  // V2：peakAttrs 已由 evaluateAll 产出最终 atomic，仅做数值边界 clamp，
+  // 不再调用 V1 的 wingspan/shoulder safety cap。
+  peakAttrs = Object.fromEntries(Object.entries(peakAttrs).map(([attr, value]) => [attr, clamp(value)]));
   const badgeSources = bundles.filter((bundle) => bundle.id !== "potential" && !cardByBundle.get(bundle.id)).map((bundle) => {
     const lock = locks[bundle.id];
     return {
@@ -720,9 +878,10 @@ export function createResult(
   // Merge: card badges verbatim + downgraded non-card badges.
   const badges = uniqueBadges([...downgradeBadgesForRookie(peakBadges, rookieTier), ...cardBadges]);
   Object.assign(initialAttrs, customFinalAttrs);
-  initialAttrs = applyBodyConstraints(initialAttrs, body, null, { skipBody }).values;
-  // 恢复卡槽位的完整身体约束结果（含来源容量豁免），避免被上面 source=null
-  // 的目标 cap 二次压低；非卡槽位保持目标 cap 校验。
+  // V2：initialAttrs 已由 cardEvaluations（V2）与 customFinalAttrs（V2）产出，
+  // 仅做数值边界 clamp，不再调用 V1 的 wingspan/shoulder safety cap。
+  initialAttrs = Object.fromEntries(Object.entries(initialAttrs).map(([attr, value]) => [attr, clamp(value)]));
+  // 恢复卡槽位的 V2 身体约束结果（含来源容量豁免语义），非卡槽位保持边界 clamp。
   for (const [attr, value] of Object.entries(cardConstrainedValues)) {
     initialAttrs[attr] = value;
   }
@@ -753,25 +912,33 @@ export function createResult(
   )
     ? firstCard
     : null;
-  // 综评补偿 (Intangibles): 优先用户自定义硬锁，其次继承潜力来源卡的真实值，
-  // 再次同卡构建的卡值，最后默认 50。
-  // MUST be resolved and written BEFORE the OVR constraint: the constraint,
-  // baseOverall and the final OVR must all see the FINAL Intangibles value.
-  // Previously Intangibles was written after the constraint — 647/1190 cards
-  // disagreed with the final attributes (e.g. Mitch Richmond showed 77 while
-  // final attributes recompute to 80 with Intangibles 98).
-  const intangibles = customFinalAttrs["Intangibles"]
+  // 综评补偿 (Intangibles) 过渡双值 (Stage 6B.1)：
+  //   controlIntangibles：仅供 legacy CONTROL_LOOP（constraint / baseOverall /
+  //     growthGap），保持旧 Potential-donor 行为 —— control invariance 硬要求：
+  //     Stage 6B.1 audit 证明 policy 改变会经 legacy estimator 改变 offset/atomics/growth。
+  //   displayIntangibles：最终输出 + V3-E display，Final Policy：
+  //     custom explicit > single-card real > multi-donor neutral 50。
+  // 不得让 display Intangibles 回流 control。等 Growth Controller V2 再删 legacy。
+  // 不使用 Stability donor；不根据 morphology 生成。
+  const controlIntangibles = customFinalAttrs["Intangibles"]
     ?? potentialCard?.detailed?.["Intangibles"]
     ?? singleCard?.detailed?.["Intangibles"]
     ?? 50;
-  initialAttrs.Intangibles = intangibles;
+  const displayIntangibles = customFinalAttrs["Intangibles"]
+    ?? singleCard?.detailed?.["Intangibles"]
+    ?? 50;
+  // ── Stage 6B.2: 不可变双 record 隔离 ─────────────────────────
+  // controlAttrs：仅供 legacy CONTROL_LOOP（constraint / baseOverall / growthGap），
+  //   保持旧 Potential-donor 行为。任何 growth/constraint API 只接收 control record。
+  // displayAttrs：仅供 V3-E display / 最终输出。display 值绝不回流 control。
+  const controlAttrs: Record<string, number> = { ...initialAttrs, Intangibles: controlIntangibles };
   const rookieOverallConstraint = constrainRookieInitialAttributes({
-    values: initialAttrs,
+    values: controlAttrs,
     potential,
     adjustableAttributes: bundles
       .filter((bundle) => bundle.id !== "potential")
       .flatMap((bundle) => bundle.attrs),
-    lockedValues: { ...customFinalAttrs, ...cardLockedValues, Intangibles: intangibles },
+    lockedValues: { ...customFinalAttrs, ...cardLockedValues, Intangibles: controlIntangibles },
     badges,
     estimateOverall: (values, candidateBadges) => calibratedOverall(
       values,
@@ -781,11 +948,17 @@ export function createResult(
       initialOverallVersion,
     ),
   });
-  if (rookieOverallConstraint) Object.assign(initialAttrs, rookieOverallConstraint.values);
-  // Final OVR: recomputed AFTER all final attributes (including Intangibles)
-  // are in place, so the reported OVR always matches the exported attributes.
-  const baseOverall = calibratedOverall(initialAttrs, position, badges, mean, initialOverallVersion);
+  if (rookieOverallConstraint) Object.assign(controlAttrs, rookieOverallConstraint.values);
+  // Final OVR (control): recomputed AFTER all final control attributes are in
+  // place, so the reported control OVR always matches the exported attributes.
+  const baseOverall = calibratedOverall(controlAttrs, position, badges, mean, initialOverallVersion);
   const initialStrength = baseOverall;
+  // Stage 6B: V3-E display OVR — display/export/shadow 专用。
+  // 绝不回流到 constraint / potential / growthGap（它们只消费 controlAttrs）。
+  const displayAttrs: Record<string, number> = { ...controlAttrs, Intangibles: displayIntangibles };
+  const v3eDisplay = estimateDisplayOverallV3EFromRecord(displayAttrs, position);
+  // 最终输出 record = displayAttrs（control 链已结束：growthGap 已算）
+  Object.assign(initialAttrs, displayAttrs);
   // 惯用手: 继承运动槽来源卡的真实值；扣篮惯用手: 继承扣篮槽来源卡的真实值。
   // vitals 存 "Left"/"Right"，无卡或值无效时回退原有随机逻辑。
   const handFromVital = cardByBundle.get("athletic")?.vitals?.dominantHand;
@@ -838,7 +1011,10 @@ export function createResult(
     hand, dunkHand, ...body,
     potential, growthGap, progressSpeed, boom, normal, bust, peakStart, peakEnd,
     peakOverall: sourcePeakOverall,
-    peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles, peakBadges, badges,
+    peakAttrs, initialAttrs, initialStrength, baseOverall, intangibles: displayIntangibles, peakBadges, badges,
+    /** Stage 6B: V3-E display OVR（display/export/shadow 专用，不进 control）。 */
+    v3eDisplayOverall: v3eDisplay.score,
+    v3eDisplayOverallRaw: v3eDisplay.raw,
     potentialMin, potentialMax,
     /** OVR 模型 fallback mean（复现 initialStrength/baseOverall 所需）。 */
     overallMean: mean,

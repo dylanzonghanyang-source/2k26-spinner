@@ -1,38 +1,82 @@
 {
- "glenn-robinson": {
-  "overall": 81
- },
- "jason-kidd": {
-  "overall": 82
- },
- "grant-hill": {
-  "overall": 82
- },
- "donyell-marshall": {
-  "overall": 77
- },
- "eddie-jones": {
-  "overall": 76
- },
- "aaron-mckie": {
-  "overall": 73
- },
- "juwan-howard": {
-  "overall": 76
- },
- "brian-grant": {
-  "overall": 74
- },
- "lawrence-funderburke": {
-  "overall": 70
- },
- "charlie-ward": {
-  "overall": 70
- },
- "howard-eisley": {
-  "overall": 70
- },
- "dickey-simpkins": {
-  "overall": 70
- }
+  "glenn-robinson": {
+    "overall": 81
+  },
+  "jason-kidd": {
+    "overall": 82
+  },
+  "grant-hill": {
+    "overall": 82
+  },
+  "donyell-marshall": {
+    "overall": 77
+  },
+  "eddie-jones": {
+    "overall": 76
+  },
+  "aaron-mckie": {
+    "overall": 73
+  },
+  "juwan-howard": {
+    "overall": 76
+  },
+  "brian-grant": {
+    "overall": 74
+  },
+  "lawrence-funderburke": {
+    "overall": 70
+  },
+  "charlie-ward": {
+    "overall": 70
+  },
+  "howard-eisley": {
+    "overall": 70
+  },
+  "dickey-simpkins": {
+    "overall": 70
+  },
+  "anthony-goldwire": {
+    "overall": 64,
+    "estimated": true
+  },
+  "carlos-rogers": {
+    "overall": 73,
+    "estimated": true
+  },
+  "eric-montross": {
+    "overall": 73,
+    "estimated": true
+  },
+  "eric-piatkowski": {
+    "overall": 71,
+    "estimated": true
+  },
+  "greg-minor": {
+    "overall": 66,
+    "estimated": true
+  },
+  "jalen-rose": {
+    "overall": 75,
+    "estimated": true
+  },
+  "lamond-murray": {
+    "overall": 76,
+    "estimated": true
+  },
+  "michael-smith": {
+    "overall": 70,
+    "estimated": true
+  },
+  "monty-williams": {
+    "overall": 71,
+    "estimated": true
+  },
+  "wesley-person": {
+    "overall": 72,
+    "estimated": true
+  },
+  "zeljko-rebraca": {
+    "overall": 73,
+    "estimated": true
+  }
 }

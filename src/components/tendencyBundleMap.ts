@@ -48,9 +48,8 @@ export const tendencyBundleMap: Record<string, string> = {
   "Floater": "face",
   "Step Through Shot": "face",
   "Use Glass": "face",
-  "Alley-Oop": "face",
-  "Putback": "face",
   "Post Face Up": "face",
+  // 迁移 (Slot Semantics V2, 2026-08-14): Alley-Oop → dunk, Putback → rebound
 
   // —— 背身 (post) ——
   "Post Up": "post",
@@ -73,6 +72,7 @@ export const tendencyBundleMap: Record<string, string> = {
   "Standing Dunk": "dunk",
   "Driving Dunk": "dunk",
   "Flashy Dunk": "dunk",
+  "Alley-Oop": "dunk", // 迁移 (Slot Semantics V2, 2026-08-14): face → dunk
 
   // —— 控球 (handle) ——
   "Drive": "handle",
@@ -96,13 +96,17 @@ export const tendencyBundleMap: Record<string, string> = {
   "Driving In & Out": "handle",
   "No Driving Dribble Move": "handle",
   "Attack Strong on Drive": "handle",
+  "Iso vs Elite Defender": "handle", // 迁移 (Slot Semantics V2, 2026-08-14): stability → handle
+  "Iso vs Good Defender": "handle",
+  "Iso vs Average Defender": "handle",
 
   // —— 传球 (passing) ——
   "Dish to Open Man": "passing",
   "Flashy Pass": "passing",
   "Alley-Oop Pass": "passing",
+  // Roll vs Pop ownership unresolved (Slot Semantics V2 2026-08-14);
+  // current owner retained for compatibility. Do not move without a frozen decision.
   "Roll vs Pop": "passing",
-  "Transition Spot Up vs Cut to the Basket": "passing",
 
   // —— 外防 (perimeter) ——
   "Take Charge": "perimeter",
@@ -118,14 +122,13 @@ export const tendencyBundleMap: Record<string, string> = {
 
   // —— 篮板 (rebound) ——
   "Crash": "rebound",
+  "Putback": "rebound", // 迁移 (Slot Semantics V2, 2026-08-14): face → rebound
 
   // —— 稳定性 (stability) ——
   "Shot": "stability",
   "Touches": "stability",
   "Play Discipline": "stability",
-  "Iso vs Elite Defender": "stability",
-  "Iso vs Good Defender": "stability",
-  "Iso vs Average Defender": "stability",
+  "Transition Spot Up vs Cut to the Basket": "stability", // 迁移 (Slot Semantics V2, 2026-08-14): passing → stability
   // Iso vs Poor Defender exists in some game UIs / older maps but is not in
   // the current ATD 96-field table (tendencyProfiles.min.json).
 };

@@ -62,5 +62,57 @@
   "carl-landry": {
     "overall": 71,
     "source": "user-ui-confirmed-2026-08-08"
+  },
+  "acie-law": {
+    "overall": 73,
+    "estimated": true
+  },
+  "al-thornton": {
+    "overall": 74,
+    "estimated": true
+  },
+  "arron-afflalo": {
+    "overall": 71,
+    "estimated": true
+  },
+  "jason-smith": {
+    "overall": 73,
+    "estimated": true
+  },
+  "jermareo-davidson": {
+    "overall": 64,
+    "estimated": true
+  },
+  "josh-mcroberts": {
+    "overall": 72,
+    "estimated": true
+  },
+  "julian-wright": {
+    "overall": 72,
+    "estimated": true
+  },
+  "kyrylo-fesenko": {
+    "overall": 70,
+    "estimated": true
+  },
+  "nick-young": {
+    "overall": 79,
+    "estimated": true
+  },
+  "ramon-sessions": {
+    "overall": 74,
+    "estimated": true
+  },
+  "rodney-stuckey": {
+    "overall": 76,
+    "estimated": true
+  },
+  "thaddeus-young": {
+    "overall": 77,
+    "estimated": true
+  },
+  "wilson-chandler": {
+    "overall": 73,
+    "estimated": true
   }
 }

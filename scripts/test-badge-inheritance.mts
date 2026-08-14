@@ -108,7 +108,7 @@ assert(dimer?.tier === "Gold", "duplicate badge must keep highest tier (Gold ove
 
 const withFallback = buildBadgesByBundle({
   sources: [
-    { bundleId: "athletic", playerId: "elite-athlete" },
+    { bundleId: "dunk", playerId: "elite-athlete" },
     { bundleId: "handle", playerId: "unknown-player" },
     { bundleId: "rebound", playerId: "known-zero" },
   ],
@@ -120,7 +120,9 @@ const withFallback = buildBadgesByBundle({
     { name: "Rebound Chaser", category: "rebounding", tier: "Gold" },
   ],
 });
-assert(withFallback.badges.some((badge) => badge.name === "Aerial Wizard"), "athletic slot must inherit athletic badges");
+// Slot Semantics V2 (2026-08-14): Aerial Wizard moved athletic → dunk + rebound,
+// so a dunk-slot source still inherits it.
+assert(withFallback.badges.some((badge) => badge.name === "Aerial Wizard"), "dunk slot must inherit dunk-owned badges (Aerial Wizard)");
 assert(withFallback.badges.some((badge) => badge.name === "Handles For Days"), "unknown profile must use slot fallback");
 assert(!withFallback.badges.some((badge) => badge.name === "Rebound Chaser"), "known zero-badge profile must not be replaced by fallback");
 assert.equal(withFallback.estimated, true, "using fallback must mark badges estimated");

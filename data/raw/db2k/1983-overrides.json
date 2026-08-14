@@ -1,56 +1,108 @@
 {
- "ralph-sampson": {
-  "overall": 80
- },
- "clyde-drexler": {
-  "overall": 79
- },
- "dale-ellis": {
-  "overall": 78
- },
- "greg-kite": {
-  "overall": 78
- },
- "byron-scott": {
-  "overall": 74
- },
- "derek-harper": {
-  "overall": 76
- },
- "rodney-mccray": {
-  "overall": 74
- },
- "antoine-carr": {
-  "overall": 75
- },
- "thurl-bailey": {
-  "overall": 74
- },
- "doc-rivers": {
-  "overall": 73
- },
- "jeff-malone": {
-  "overall": 73
- },
- "john-paxson": {
-  "overall": 72
- },
- "randy-wittman": {
-  "overall": 72
- },
- "sidney-green": {
-  "overall": 74
- },
- "craig-ehlo": {
-  "overall": 72
- },
- "mike-holton": {
-  "overall": 69
- },
- "randy-breuer": {
-  "overall": 70
- },
- "darrell-walker": {
-  "overall": 69
- }
+  "ralph-sampson": {
+    "overall": 80
+  },
+  "clyde-drexler": {
+    "overall": 79
+  },
+  "dale-ellis": {
+    "overall": 78
+  },
+  "greg-kite": {
+    "overall": 78
+  },
+  "byron-scott": {
+    "overall": 74
+  },
+  "derek-harper": {
+    "overall": 76
+  },
+  "rodney-mccray": {
+    "overall": 74
+  },
+  "antoine-carr": {
+    "overall": 75
+  },
+  "thurl-bailey": {
+    "overall": 74
+  },
+  "doc-rivers": {
+    "overall": 73
+  },
+  "jeff-malone": {
+    "overall": 73
+  },
+  "john-paxson": {
+    "overall": 72
+  },
+  "randy-wittman": {
+    "overall": 72
+  },
+  "sidney-green": {
+    "overall": 74
+  },
+  "craig-ehlo": {
+    "overall": 72
+  },
+  "mike-holton": {
+    "overall": 69
+  },
+  "randy-breuer": {
+    "overall": 70
+  },
+  "darrell-walker": {
+    "overall": 69
+  },
+  "bob-hansen": {
+    "overall": 67,
+    "estimated": true
+  },
+  "chris-mcnealy": {
+    "overall": 72,
+    "estimated": true
+  },
+  "ennis-whatley": {
+    "overall": 70,
+    "estimated": true
+  },
+  "jon-sundvold": {
+    "overall": 81,
+    "estimated": true
+  },
+  "leo-rautins": {
+    "overall": 70,
+    "estimated": true
+  },
+  "mark-west": {
+    "overall": 78,
+    "estimated": true
+  },
+  "michael-holton": {
+    "overall": 69,
+    "estimated": true
+  },
+  "rod-foster": {
+    "overall": 75,
+    "estimated": true
+  },
+  "roy-hinson": {
+    "overall": 76,
+    "estimated": true
+  },
+  "scooter-mccray": {
+    "overall": 75,
+    "estimated": true
+  },
+  "sedale-threatt": {
+    "overall": 71,
+    "estimated": true
+  },
+  "sidney-lowe": {
+    "overall": 74,
+    "estimated": true
+  },
+  "tom-piotrowski": {
+    "overall": 69,
+    "estimated": true
+  }
 }

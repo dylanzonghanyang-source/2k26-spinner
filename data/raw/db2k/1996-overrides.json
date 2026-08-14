@@ -1,65 +1,113 @@
 {
- "allen-iverson": {
-  "overall": 83
- },
- "kobe-bryant": {
-  "overall": 82
- },
- "stephon-marbury": {
-  "overall": 80
- },
- "shareef-abdur-rahim": {
-  "overall": 79
- },
- "marcus-camby": {
-  "overall": 79
- },
- "antoine-walker": {
-  "overall": 77
- },
- "ben-wallace": {
-  "overall": 75
- },
- "steve-nash": {
-  "overall": 78
- },
- "jermaine-o-neal": {
-  "overall": 73
- },
- "kerry-kittles": {
-  "overall": 76
- },
- "lorenzen-wright": {
-  "overall": 75
- },
- "chucky-atkins": {
-  "overall": 74
- },
- "peja-stojakovic": {
-  "overall": 75
- },
- "malik-rose": {
-  "overall": 71
- },
- "shandon-anderson": {
-  "overall": 70
- },
- "zydrunas-ilgauskas": {
-  "overall": 74
- },
- "walter-mccarty": {
-  "overall": 70
- },
- "derek-fisher": {
-  "overall": 73
- },
- "adrian-griffin": {
-  "overall": 68
- },
- "rusty-larue": {
-  "overall": 70
- },
- "darvin-ham": {
-  "overall": 69
- }
+  "allen-iverson": {
+    "overall": 83
+  },
+  "kobe-bryant": {
+    "overall": 82
+  },
+  "stephon-marbury": {
+    "overall": 80
+  },
+  "shareef-abdur-rahim": {
+    "overall": 79
+  },
+  "marcus-camby": {
+    "overall": 79
+  },
+  "antoine-walker": {
+    "overall": 77
+  },
+  "ben-wallace": {
+    "overall": 75
+  },
+  "steve-nash": {
+    "overall": 78
+  },
+  "jermaine-o-neal": {
+    "overall": 73
+  },
+  "kerry-kittles": {
+    "overall": 76
+  },
+  "lorenzen-wright": {
+    "overall": 75
+  },
+  "chucky-atkins": {
+    "overall": 74
+  },
+  "peja-stojakovic": {
+    "overall": 75
+  },
+  "malik-rose": {
+    "overall": 71
+  },
+  "shandon-anderson": {
+    "overall": 70
+  },
+  "zydrunas-ilgauskas": {
+    "overall": 74
+  },
+  "walter-mccarty": {
+    "overall": 70
+  },
+  "derek-fisher": {
+    "overall": 73
+  },
+  "adrian-griffin": {
+    "overall": 68
+  },
+  "rusty-larue": {
+    "overall": 70
+  },
+  "darvin-ham": {
+    "overall": 69
+  },
+  "amal-mccaskill": {
+    "overall": 72,
+    "estimated": true
+  },
+  "chris-robinson": {
+    "overall": 68,
+    "estimated": true
+  },
+  "efthimios-rentzias": {
+    "overall": 68,
+    "estimated": true
+  },
+  "erick-dampier": {
+    "overall": 76,
+    "estimated": true
+  },
+  "jason-sasser": {
+    "overall": 71,
+    "estimated": true
+  },
+  "jeff-mcinnis": {
+    "overall": 73,
+    "estimated": true
+  },
+  "jerome-williams": {
+    "overall": 74,
+    "estimated": true
+  },
+  "moochie-norris": {
+    "overall": 69,
+    "estimated": true
+  },
+  "samaki-walker": {
+    "overall": 71,
+    "estimated": true
+  },
+  "tony-delk": {
+    "overall": 74,
+    "estimated": true
+  },
+  "travis-knight": {
+    "overall": 68,
+    "estimated": true
+  },
+  "vitaly-potapenko": {
+    "overall": 73,
+    "estimated": true
+  }
 }

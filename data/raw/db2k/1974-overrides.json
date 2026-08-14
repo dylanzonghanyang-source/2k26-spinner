@@ -1,32 +1,60 @@
 {
- "jamaal-wilkes": {
-  "overall": 78
- },
- "bill-walton": {
-  "overall": 78
- },
- "bobby-jones": {
-  "overall": 78
- },
- "george-gervin": {
-  "overall": 75
- },
- "maurice-lucas": {
-  "overall": 78
- },
- "brian-winters": {
-  "overall": 73
- },
- "campy-russell": {
-  "overall": 73
- },
- "truck-robinson": {
-  "overall": 74
- },
- "scott-wedman": {
-  "overall": 75
- },
- "harvey-catchings": {
-  "overall": 71
- }
+  "jamaal-wilkes": {
+    "overall": 78
+  },
+  "bill-walton": {
+    "overall": 78
+  },
+  "bobby-jones": {
+    "overall": 78
+  },
+  "george-gervin": {
+    "overall": 75
+  },
+  "maurice-lucas": {
+    "overall": 78
+  },
+  "brian-winters": {
+    "overall": 73
+  },
+  "campy-russell": {
+    "overall": 73
+  },
+  "truck-robinson": {
+    "overall": 74
+  },
+  "scott-wedman": {
+    "overall": 75
+  },
+  "harvey-catchings": {
+    "overall": 71
+  },
+  "billy-knight": {
+    "overall": 78,
+    "estimated": true
+  },
+  "eric-money": {
+    "overall": 76,
+    "estimated": true
+  },
+  "foots-walker": {
+    "overall": 69,
+    "estimated": true
+  },
+  "john-drew": {
+    "overall": 81,
+    "estimated": true
+  },
+  "len-elmore": {
+    "overall": 71,
+    "estimated": true
+  },
+  "mickey-johnson": {
+    "overall": 79,
+    "estimated": true
+  },
+  "tom-mcmillen": {
+    "overall": 74,
+    "estimated": true
+  }
 }

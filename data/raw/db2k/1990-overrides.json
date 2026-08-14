@@ -1,71 +1,135 @@
 {
- "derrick-coleman": {
-  "overall": 80
- },
- "kendall-gill": {
-  "overall": 76
- },
- "mahmoud-abdul-rauf": {
-  "overall": 76
- },
- "dee-brown": {
-  "overall": 71
- },
- "alaa-abdelnaby": {
-  "overall": 71
- },
- "les-jepsen": {
-  "overall": 72
- },
- "scott-williams": {
-  "overall": 69
- },
- "carl-herrera": {
-  "overall": 71
- },
- "dennis-scott": {
-  "overall": 74
- },
- "antonio-davis": {
-  "overall": 71
- },
- "jud-buechler": {
-  "overall": 71
- },
- "elden-campbell": {
-  "overall": 72
- },
- "matt-bullard": {
-  "overall": 73
- },
- "toni-kukoc": {
-  "overall": 72
- },
- "tyrone-hill": {
-  "overall": 72
- },
- "anthony-bonner": {
-  "overall": 71
- },
- "greg-foster": {
-  "overall": 68
- },
- "keith-askins": {
-  "overall": 71
- },
- "willie-burton": {
-  "overall": 69
- },
- "tony-smith": {
-  "overall": 66
- },
- "irving-thomas": {
-  "overall": 69
- },
- "tony-massenburg": {
-  "overall": 66
- },
- "gary-payton": {
-  "overall": 81
- }
+  "derrick-coleman": {
+    "overall": 80
+  },
+  "kendall-gill": {
+    "overall": 76
+  },
+  "mahmoud-abdul-rauf": {
+    "overall": 76
+  },
+  "dee-brown": {
+    "overall": 71
+  },
+  "alaa-abdelnaby": {
+    "overall": 71
+  },
+  "les-jepsen": {
+    "overall": 72
+  },
+  "scott-williams": {
+    "overall": 69
+  },
+  "carl-herrera": {
+    "overall": 71
+  },
+  "dennis-scott": {
+    "overall": 74
+  },
+  "antonio-davis": {
+    "overall": 71
+  },
+  "jud-buechler": {
+    "overall": 71
+  },
+  "elden-campbell": {
+    "overall": 72
+  },
+  "matt-bullard": {
+    "overall": 73
+  },
+  "toni-kukoc": {
+    "overall": 72
+  },
+  "tyrone-hill": {
+    "overall": 72
+  },
+  "anthony-bonner": {
+    "overall": 71
+  },
+  "greg-foster": {
+    "overall": 68
+  },
+  "keith-askins": {
+    "overall": 71
+  },
+  "willie-burton": {
+    "overall": 69
+  },
+  "tony-smith": {
+    "overall": 66
+  },
+  "irving-thomas": {
+    "overall": 69
+  },
+  "tony-massenburg": {
+    "overall": 66
+  },
+  "gary-payton": {
+    "overall": 81
+  },
+  "a-j-english": {
+    "overall": 71,
+    "estimated": true
+  },
+  "bimbo-coles": {
+    "overall": 68,
+    "estimated": true
+  },
+  "bo-kimble": {
+    "overall": 69,
+    "estimated": true
+  },
+  "cedric-ceballos": {
+    "overall": 74,
+    "estimated": true
+  },
+  "derek-strong": {
+    "overall": 70,
+    "estimated": true
+  },
+  "duane-causwell": {
+    "overall": 74,
+    "estimated": true
+  },
+  "jayson-williams": {
+    "overall": 69,
+    "estimated": true
+  },
+  "jerrod-mustaf": {
+    "overall": 72,
+    "estimated": true
+  },
+  "lionel-simmons": {
+    "overall": 81,
+    "estimated": true
+  },
+  "marcus-liberty": {
+    "overall": 72,
+    "estimated": true
+  },
+  "negele-knight": {
+    "overall": 72,
+    "estimated": true
+  },
+  "sean-higgins": {
+    "overall": 73,
+    "estimated": true
+  },
+  "steve-bardo": {
+    "overall": 65,
+    "estimated": true
+  },
+  "steve-henson": {
+    "overall": 68,
+    "estimated": true
+  },
+  "tate-george": {
+    "overall": 65,
+    "estimated": true
+  },
+  "terry-mills": {
+    "overall": 73,
+    "estimated": true
+  }
 }

@@ -1,26 +1,70 @@
 {
- "darrel-griffith": {
-  "overall": 77
- },
- "jeff-ruland": {
-  "overall": 78
- },
- "kevin-mchale": {
-  "overall": 81
- },
- "kiki-vandeweghe": {
-  "overall": 77
- },
- "mike-gminski": {
-  "overall": 75
- },
- "larry-drew": {
-  "overall": 73
- },
- "rick-mahorn": {
-  "overall": 71
- },
- "kurt-rambis": {
-  "overall": 71
- }
+  "darrel-griffith": {
+    "overall": 77
+  },
+  "jeff-ruland": {
+    "overall": 78
+  },
+  "kevin-mchale": {
+    "overall": 81
+  },
+  "kiki-vandeweghe": {
+    "overall": 77
+  },
+  "mike-gminski": {
+    "overall": 75
+  },
+  "larry-drew": {
+    "overall": 73
+  },
+  "rick-mahorn": {
+    "overall": 71
+  },
+  "kurt-rambis": {
+    "overall": 71
+  },
+  "butch-carter": {
+    "overall": 76,
+    "estimated": true
+  },
+  "darwin-cook": {
+    "overall": 80,
+    "estimated": true
+  },
+  "kurt-nimphius": {
+    "overall": 77,
+    "estimated": true
+  },
+  "larry-smith": {
+    "overall": 73,
+    "estimated": true
+  },
+  "lorenzo-romar": {
+    "overall": 73,
+    "estimated": true
+  },
+  "mike-o-koren": {
+    "overall": 73,
+    "estimated": true
+  },
+  "mike-woodson": {
+    "overall": 81,
+    "estimated": true
+  },
+  "reggie-johnson": {
+    "overall": 68,
+    "estimated": true
+  },
+  "rickey-brown": {
+    "overall": 70,
+    "estimated": true
+  },
+  "rory-sparrow": {
+    "overall": 74,
+    "estimated": true
+  },
+  "wes-matthews": {
+    "overall": 73,
+    "estimated": true
+  }
 }

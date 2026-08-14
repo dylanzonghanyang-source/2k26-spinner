@@ -17,6 +17,7 @@ import { getTendencyNameCN } from "./tendencyNames.ts";
 import { getPlayerNameCN } from "./playerNames.ts";
 import { attributeGroups, badgeGroups, tendencyGroups } from "./fieldCategories.ts";
 import { bundles, type Evaluation, type LockState, type createResult } from "./createResult.ts";
+import { resolveDisplayOverall } from "./displayOverall.ts";
 
 /** Mirrors RookieBuilder's load state union (kept local for testability). */
 export type TendencyLoadState = "idle" | "loading" | "ready" | "unavailable" | "error";
@@ -32,6 +33,8 @@ export function createExportText(
 ) {
   void evaluations; // reserved for future sections; kept for signature stability
   const card = result.card ?? null;
+  // Stage 6C: export Overall 统一为 V3-E display（旧对象重算/标记 fallback）。
+  const { overall: displayOverall } = resolveDisplayOverall(result);
   const sep = " ｜ ";
   const handCN = (hand: string | number | boolean | null | undefined) =>
     hand === "Right" ? "右手" : hand === "Left" ? "左手" : hand == null ? "--" : String(hand);
@@ -163,8 +166,9 @@ export function createExportText(
   });
   const ovrLines = [
     "说明: 综评由本工具按最终属性、徽章和无形属性模型估算，仅作生成参考；不是 2K 实机读取的真实官方综评。",
-    `模型估算初始综评: ${result.initialStrength}（目标 ${result.initialOverallTarget}）`,
+    `模型估算初始综评: ${displayOverall}（目标 ${result.initialOverallTarget}）`,
     `无形属性: ${result.intangibles}`,
+    ...(displayOverall >= 85 ? ["提示: 85+ 为模型外推区间"] : []),
     ...(result.initialOverallConstraintReachable ? [] : ["警告：手动锁定的数值使模型估算综评无法完全达到目标"]),
   ];
 

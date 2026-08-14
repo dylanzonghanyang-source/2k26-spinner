@@ -34,5 +34,45 @@
   "tony-wroten": {
     "overall": 70,
     "source": "user-ui-confirmed-2026-08-08"
+  },
+  "austin-rivers": {
+    "overall": 73,
+    "estimated": true
+  },
+  "jae-crowder": {
+    "overall": 74,
+    "estimated": true
+  },
+  "jared-sullinger": {
+    "overall": 75,
+    "estimated": true
+  },
+  "john-henson": {
+    "overall": 74,
+    "estimated": true
+  },
+  "mike-scott": {
+    "overall": 71,
+    "estimated": true
+  },
+  "quincy-acy": {
+    "overall": 73,
+    "estimated": true
+  },
+  "terrence-jones": {
+    "overall": 77,
+    "estimated": true
+  },
+  "terrence-ross": {
+    "overall": 72,
+    "estimated": true
+  },
+  "tyler-zeller": {
+    "overall": 70,
+    "estimated": true
+  },
+  "tyshawn-taylor": {
+    "overall": 67,
+    "estimated": true
   }
 }

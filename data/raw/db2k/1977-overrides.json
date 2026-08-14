@@ -1,29 +1,85 @@
 {
- "bernard-king": {
-  "overall": 82
- },
- "jack-sikma": {
-  "overall": 79
- },
- "walter-davis": {
-  "overall": 75
- },
- "marques-johnson": {
-  "overall": 73
- },
- "otis-birdsong": {
-  "overall": 72
- },
- "norm-nixon": {
-  "overall": 73
- },
- "tree-rollins": {
-  "overall": 74
- },
- "james-edwards": {
-  "overall": 69
- },
- "brad-davis": {
-  "overall": 74
- }
+  "bernard-king": {
+    "overall": 82
+  },
+  "jack-sikma": {
+    "overall": 79
+  },
+  "walter-davis": {
+    "overall": 75
+  },
+  "marques-johnson": {
+    "overall": 73
+  },
+  "otis-birdsong": {
+    "overall": 72
+  },
+  "norm-nixon": {
+    "overall": 73
+  },
+  "tree-rollins": {
+    "overall": 74
+  },
+  "james-edwards": {
+    "overall": 69
+  },
+  "brad-davis": {
+    "overall": 74
+  },
+  "alvin-scott": {
+    "overall": 71,
+    "estimated": true
+  },
+  "ben-poquette": {
+    "overall": 71,
+    "estimated": true
+  },
+  "billy-mckinney": {
+    "overall": 69,
+    "estimated": true
+  },
+  "cedric-maxwell": {
+    "overall": 78,
+    "estimated": true
+  },
+  "eddie-jordan": {
+    "overall": 72,
+    "estimated": true
+  },
+  "ernie-grunfeld": {
+    "overall": 73,
+    "estimated": true
+  },
+  "joe-hassett": {
+    "overall": 70,
+    "estimated": true
+  },
+  "kenny-carr": {
+    "overall": 80,
+    "estimated": true
+  },
+  "mike-bratz": {
+    "overall": 72,
+    "estimated": true
+  },
+  "mike-glenn": {
+    "overall": 76,
+    "estimated": true
+  },
+  "rickey-green": {
+    "overall": 81,
+    "estimated": true
+  },
+  "robert-reid": {
+    "overall": 80,
+    "estimated": true
+  },
+  "steve-hayes": {
+    "overall": 69,
+    "estimated": true
+  },
+  "t-r-dunn": {
+    "overall": 75,
+    "estimated": true
+  }
 }

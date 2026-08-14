@@ -141,16 +141,23 @@ const source: SourceBody = { height: 198, weight: 98, wingspan: 208 };
   assert(!builderSource.includes("enforceBodyStrengthCap"), "peak/rookie paths must not retain the old strength-only cap helper");
   assert(!builderSource.includes("enforceBodyPhysicalCaps"), "peak/rookie paths must not retain the old physical cap helper");
 
-  // The unified body constraint pipeline lives in the domain module
-  // (src/createResult.ts) plus the builder's evaluate()/evaluateCustom()
-  // preview paths; count across both files.
+  // Body Degrade V2: 生产路径（createResult/evaluateAll）不再调用 V1
+  // applyBodyConstraints —— V1 只作为遗留函数保留在 rookieBodyConstraints.ts。
   const createResultSource = readFileSync(new URL("../src/createResult.ts", import.meta.url), "utf8");
-  const constraintUsages = (builderSource.match(/applyBodyConstraints/g)?.length ?? 0)
-    + (createResultSource.match(/applyBodyConstraints/g)?.length ?? 0);
   assert(
-    constraintUsages >= 6,
-    "preview, custom, peak and rookie paths must all use the unified body constraint function",
+    !createResultSource.includes("applyBodyConstraints("),
+    "V2 production path must not call the V1 applyBodyConstraints",
   );
+  assert(
+    !createResultSource.includes("SUPPORT_MAX_CUT")
+    && !createResultSource.includes("SUPPORT_MIN_KEEP")
+    && !createResultSource.includes("SUPPORT_GAP_REFERENCE"),
+    "V2 production path must not retain the V1 support cut model",
+  );
+  // 统一 V2 evaluator 覆盖 preview / custom / peak / rookie 四条路径
+  const v2Usages = (builderSource.match(/evaluateAllPreview|evaluateAll|createResult/g)?.length ?? 0)
+    + (createResultSource.match(/evaluateAll|evaluateAtomicGraph|applyV2CustomFinal/g)?.length ?? 0);
+  assert(v2Usages >= 6, "preview, custom, peak and rookie paths must all route through the V2 evaluator");
 
   for (const legacyTerm of [
     "PotentialRange",

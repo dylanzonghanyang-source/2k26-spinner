@@ -30,12 +30,14 @@ export const badgeBundleMap: Record<string, string | string[]> = {
   // —— 扣篮 (dunk) ——
   Posterizer: "dunk",
   "Rise Up": "dunk",
+  "Aerial Wizard": ["dunk", "rebound"], // 迁移 (Slot Semantics V2, 2026-08-14): athletic → dunk + rebound
 
   // —— 控球 (handle) ——
   "Ankle Assassin": "handle",
   "Handles For Days": "handle",
   "Strong Handle": "handle",
   Unpluckable: "handle",
+  "Lightning Launch": "handle", // 迁移 (Slot Semantics V2, 2026-08-14): athletic → handle
 
   // —— 传球 (passing) ——
   "Bail Out": "passing",
@@ -59,15 +61,12 @@ export const badgeBundleMap: Record<string, string | string[]> = {
 
   // —— 内防 (interior) ——
   "Paint Patroller": "interior",
-  "Immovable Enforcer": "interior",
+  "Immovable Enforcer": ["interior", "strength"], // 迁移 (Slot Semantics V2, 2026-08-14): interior 保留 + strength 共享
   "Post Lockdown": "interior",
-  "Brick Wall": "interior",
+  "Brick Wall": ["interior", "strength"], // 迁移 (Slot Semantics V2, 2026-08-14): interior 保留 + strength 共享
 
   // —— 篮板 (rebound) ——
   "Boxout Beast": "rebound",
   "Rebound Chaser": "rebound",
-
-  // —— 运动 (athletic) ——
-  "Aerial Wizard": "athletic",
-  "Lightning Launch": "athletic",
+  // Pogo Stick 保持 Block only（Slot Semantics V2 2026-08-14 未冻结 Block+Rebound 共享）
 };

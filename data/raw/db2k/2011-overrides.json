@@ -46,5 +46,41 @@
   "bismack-biyombo": {
     "overall": 74,
     "source": "user-ui-confirmed-2026-08-08"
+  },
+  "andrew-goudelock": {
+    "overall": 69,
+    "estimated": true
+  },
+  "bojan-bogdanovic": {
+    "overall": 71,
+    "estimated": true
+  },
+  "chandler-parsons": {
+    "overall": 72,
+    "estimated": true
+  },
+  "davis-bertans": {
+    "overall": 69,
+    "estimated": true
+  },
+  "donatas-motiejunas": {
+    "overall": 72,
+    "estimated": true
+  },
+  "isaiah-thomas": {
+    "overall": 88,
+    "estimated": true
+  },
+  "kenneth-faried": {
+    "overall": 77,
+    "estimated": true
+  },
+  "markieff-morris": {
+    "overall": 75,
+    "estimated": true
+  },
+  "nikola-mirotic": {
+    "overall": 76,
+    "estimated": true
   }
 }

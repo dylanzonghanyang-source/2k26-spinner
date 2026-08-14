@@ -90,5 +90,13 @@
   "luke-kornet": {
     "overall": 71,
     "source": "user-ui-confirmed-2026-08-08"
+  },
+  "monte-morris": {
+    "overall": 67,
+    "estimated": true
+  },
+  "vlatko-cancar": {
+    "overall": 67,
+    "estimated": true
   }
 }

@@ -66,5 +66,49 @@
   "royce-o-neale": {
     "overall": 77,
     "source": "user-ui-confirmed-2026-08-08"
+  },
+  "cameron-payne": {
+    "overall": 68,
+    "estimated": true
+  },
+  "delon-wright": {
+    "overall": 71,
+    "estimated": true
+  },
+  "emmanuel-mudiay": {
+    "overall": 74,
+    "estimated": true
+  },
+  "frank-kaminsky": {
+    "overall": 73,
+    "estimated": true
+  },
+  "jarell-martin": {
+    "overall": 69,
+    "estimated": true
+  },
+  "josh-richardson": {
+    "overall": 69,
+    "estimated": true
+  },
+  "richaun-holmes": {
+    "overall": 70,
+    "estimated": true
+  },
+  "stanley-johnson": {
+    "overall": 71,
+    "estimated": true
+  },
+  "terry-rozier-iii": {
+    "overall": 73,
+    "estimated": true
+  },
+  "willie-cauley-stein": {
+    "overall": 76,
+    "estimated": true
+  },
+  "willy-hernangomez": {
+    "overall": 75,
+    "estimated": true
   }
 }

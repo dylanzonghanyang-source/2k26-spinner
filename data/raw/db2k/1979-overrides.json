@@ -1,38 +1,70 @@
 {
- "magic-johnson": {
-  "overall": 84
- },
- "bill-cartwright": {
-  "overall": 76
- },
- "jim-paxson": {
-  "overall": 73
- },
- "james-donaldson": {
-  "overall": 75
- },
- "sidney-moncrief": {
-  "overall": 78
- },
- "vinnie-johnson": {
-  "overall": 72
- },
- "bill-laimbeer": {
-  "overall": 73
- },
- "kyle-macy": {
-  "overall": 74
- },
- "jerry-sichting": {
-  "overall": 70
- },
- "johnny-moore": {
-  "overall": 75
- },
- "paul-mokeski": {
-  "overall": 69
- },
- "earl-cureton": {
-  "overall": 70
- }
+  "magic-johnson": {
+    "overall": 84
+  },
+  "bill-cartwright": {
+    "overall": 76
+  },
+  "jim-paxson": {
+    "overall": 73
+  },
+  "james-donaldson": {
+    "overall": 75
+  },
+  "sidney-moncrief": {
+    "overall": 78
+  },
+  "vinnie-johnson": {
+    "overall": 72
+  },
+  "bill-laimbeer": {
+    "overall": 73
+  },
+  "kyle-macy": {
+    "overall": 74
+  },
+  "jerry-sichting": {
+    "overall": 70
+  },
+  "johnny-moore": {
+    "overall": 75
+  },
+  "paul-mokeski": {
+    "overall": 69
+  },
+  "earl-cureton": {
+    "overall": 70
+  },
+  "allen-leavell": {
+    "overall": 76,
+    "estimated": true
+  },
+  "calvin-garrett": {
+    "overall": 69,
+    "estimated": true
+  },
+  "calvin-natt": {
+    "overall": 81,
+    "estimated": true
+  },
+  "cliff-t-robinson": {
+    "overall": 76,
+    "estimated": true
+  },
+  "clint-richardson": {
+    "overall": 68,
+    "estimated": true
+  },
+  "geoff-huston": {
+    "overall": 75,
+    "estimated": true
+  },
+  "jim-spanarkel": {
+    "overall": 71,
+    "estimated": true
+  },
+  "phil-hubbard": {
+    "overall": 75,
+    "estimated": true
+  }
 }

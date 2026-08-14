@@ -1,47 +1,91 @@
 {
- "glen-rice": {
-  "overall": 79
- },
- "sean-elliott": {
-  "overall": 76
- },
- "clifford-robinson": {
-  "overall": 75
- },
- "doug-west": {
-  "overall": 74
- },
- "shawn-kemp": {
-  "overall": 78
- },
- "vlade-divac": {
-  "overall": 75
- },
- "nick-anderson": {
-  "overall": 73
- },
- "stacey-king": {
-  "overall": 76
- },
- "b-j-armstrong": {
-  "overall": 74
- },
- "tom-hammonds": {
-  "overall": 73
- },
- "chris-childs": {
-  "overall": 71
- },
- "chucky-brown": {
-  "overall": 69
- },
- "haywoode-workman": {
-  "overall": 71
- },
- "tim-hardaway": {
-  "overall": 78
- },
- "jaren-jackson": {
-  "overall": 72
- }
+  "glen-rice": {
+    "overall": 79
+  },
+  "sean-elliott": {
+    "overall": 76
+  },
+  "clifford-robinson": {
+    "overall": 75
+  },
+  "doug-west": {
+    "overall": 74
+  },
+  "shawn-kemp": {
+    "overall": 78
+  },
+  "vlade-divac": {
+    "overall": 75
+  },
+  "nick-anderson": {
+    "overall": 73
+  },
+  "stacey-king": {
+    "overall": 76
+  },
+  "b-j-armstrong": {
+    "overall": 74
+  },
+  "tom-hammonds": {
+    "overall": 73
+  },
+  "chris-childs": {
+    "overall": 71
+  },
+  "chucky-brown": {
+    "overall": 69
+  },
+  "haywoode-workman": {
+    "overall": 71
+  },
+  "tim-hardaway": {
+    "overall": 78
+  },
+  "jaren-jackson": {
+    "overall": 72
+  },
+  "blue-edwards": {
+    "overall": 78,
+    "estimated": true
+  },
+  "cliff-robinson": {
+    "overall": 77,
+    "estimated": true
+  },
+  "dana-barros": {
+    "overall": 74,
+    "estimated": true
+  },
+  "dino-radja": {
+    "overall": 72,
+    "estimated": true
+  },
+  "george-mccloud": {
+    "overall": 75,
+    "estimated": true
+  },
+  "greg-grant": {
+    "overall": 72,
+    "estimated": true
+  },
+  "kenny-battle": {
+    "overall": 68,
+    "estimated": true
+  },
+  "kenny-payne": {
+    "overall": 69,
+    "estimated": true
+  },
+  "pooh-richardson": {
+    "overall": 77,
+    "estimated": true
+  },
+  "randy-white": {
+    "overall": 73,
+    "estimated": true
+  },
+  "todd-lichti": {
+    "overall": 72,
+    "estimated": true
+  }
 }

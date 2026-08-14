@@ -214,24 +214,30 @@ function customLockFor(bundleId: string, values: Record<string, number>): LockSt
   assert.equal(result.initialAttrs["Overall Durability"], 99, "manual durability lock must survive generation");
 }
 
-// --- 4. source body data flows into body-mismatch adjustments ---
+// --- 4. source body data flows into V2 body constraints (donor-expanded threshold) ---
 {
-  const athletic = bundles.find((bundle) => bundle.id === "athletic");
-  assert.ok(athletic);
-  const bigTarget: typeof body = { height: 220, weight: 128, wingspan: 65, shoulder: 65, neck: 50, torso: 50 };
-  // Small source (real body fields) into a big target => agility/speed penalties.
+  const post = bundles.find((bundle) => bundle.id === "post");
+  assert.ok(post);
+  const target: typeof body = { height: 180, weight: 79, wingspan: 50, shoulder: 50, neck: 50, torso: 50 };
+  // Post Hook donor-expanded MIN: base 198, donor 190.5cm → effective 190.5,
+  // target 180 → violation 10.5 → severity ~0.624 → ceiling ~86.52 → final 87.
   const smallSource: PlayerSource = {
     ...cardlessSource,
-    height: "6'1\"",
-    weight: 180,
-    wingspan: "6'5\"",
+    height: "6'3\"",
+    weight: 195,
+    wingspan: "6'7\"",
+    detailed: { ...cardlessSource.detailed, "Post Hook": 99 },
   };
-  const withBody = evaluate(smallSource, athletic, bigTarget);
-  assert.notEqual(withBody.bodyAdjustment, 0, "real source body must produce a non-zero adjustment");
-  // Without body fields the source body resolves to null and nothing adjusts.
+  const withBody = evaluate(smallSource, post, target);
+  assert.notEqual(withBody.values["Post Hook"], 99, "real donor body must expand the structural threshold");
+  assert.equal(withBody.values["Post Hook"], 87, "Post Hook donor-expanded (190.5cm) on 180cm target must resolve to 87");
+  // Without body fields the source body resolves to null → base threshold 198
+  // (no donor expansion) → violation 18 → severity 1 → ceiling 79.
   const noBodySource: PlayerSource = { ...smallSource, weight: null, wingspan: null };
-  const withoutBody = evaluate(noBodySource, athletic, bigTarget);
-  assert.equal(withoutBody.bodyAdjustment, 0, "missing source body must produce zero adjustment (App wiring must supply weight/wingspan)");
+  const withoutBody = evaluate(noBodySource, post, target);
+  assert.equal(withoutBody.values["Post Hook"], 79, "missing donor body must fall back to base threshold (198 → 79)");
+  assert.notEqual(withoutBody.values["Post Hook"], withBody.values["Post Hook"],
+    "donor body presence must change the V2 structural result");
 }
 
 // --- 5. every locked non-potential player resolves an evaluation (full lock sanity) ---
@@ -358,12 +364,11 @@ console.log("createResult production-path OK: single-card OVR, potential-only ca
   assert.ok(asGuard.values.Block >= asCenter.values.Block, "far position must not produce a higher Block than a close position");
 }
 
-// --- 8. 支持依赖：目标 strength 槽很低时，来源高 Strength 的 interior 被额外修正 ---
+// --- 8. V2 support：目标 Final Strength 低 → Interior Defense support ceiling 被压低 ---
 {
   const interior = bundles.find((bundle) => bundle.id === "interior");
   const strength = bundles.find((bundle) => bundle.id === "strength");
-  const blockBundle = bundles.find((bundle) => bundle.id === "block");
-  assert.ok(interior && strength && blockBundle);
+  assert.ok(interior && strength);
   const baseBody = bodyBases.PG;
   const withLowStrength = evaluateAll([
     { bundle: interior, player: luka },
@@ -372,47 +377,28 @@ console.log("createResult production-path OK: single-card OVR, potential-only ca
   const withoutStrengthSlot = evaluateAll([
     { bundle: interior, player: luka },
   ], baseBody, { targetPosition: "PG", secondaryPosition: "SG" });
-  assert.ok(interior.attrs.some((attr) => withLowStrength.interior?.supportAdjustments?.[attr] !== undefined)
-    || Object.values(withLowStrength.interior?.supportAdjustments ?? {}).some((delta) => Number(delta) < 0),
-  "low target strength must trigger interior support cut when source strength is higher");
-  assert.equal(
-    Object.keys(withoutStrengthSlot.interior?.supportAdjustments ?? {}).length,
-    0,
-    "missing strength slot must not fabricate a support cut",
-  );
+  // V2：target Final Strength 参与 support ceiling（req 65 − donor exception）。
+  // Strength 槽缺失 → target support 缺失 → 该 dependency 跳过（不猜）。
+  const capWith = withLowStrength.interior?.bodyCaps["Interior Defense"];
+  const capWithout = withoutStrengthSlot.interior?.bodyCaps["Interior Defense"];
+  assert.ok(typeof capWith === "number", "low target strength must lower the V2 support ceiling");
+  assert.ok(typeof capWithout === "number" && capWithout > capWith,
+    "missing strength slot must leave a higher (or no) ceiling than a low one");
 }
 
-// --- 9. 宽容区：同位置接近体型原值继承（生产路径） ---
+// --- 9. V2 position invariance：同一身体/来源，C↔PG 的 atomic 完全一致 ---
 {
   const block = bundles.find((bundle) => bundle.id === "block");
   assert.ok(block);
-  // 目标 205 C：自动选取与目标体型最接近的 C/SF 来源，确保真正进入宽容区
-  const cTarget: typeof body = { height: 205, weight: 105, wingspan: 55, shoulder: 55, neck: 50, torso: 50 };
-  const bodyGap = (p: CatalogPlayer): number | null => {
-    const d = detailedBySlug.get(p.id);
-    if (!d || typeof d.height !== "string" || typeof d.weight !== "number") return null;
-    const match = d.height.match(/(\d+)'(\d+)/);
-    if (!match) return null;
-    const hCm = (Number(match[1]) * 12 + Number(match[2])) * 2.54;
-    const wKg = d.weight * 0.453592;
-    return Math.abs(205 - hCm) + Math.abs(105 - wKg) / 2;
-  };
-  const closeSource = currentPlayers
-    .filter((p) => p.position?.includes("C") || p.position?.includes("SF"))
-    .map((p) => ({ p, gap: bodyGap(p) }))
-    .filter((x): x is { p: CatalogPlayer; gap: number } => x.gap !== null)
-    .sort((a, b) => a.gap - b.gap)[0];
-  assert.ok(closeSource, "expected a C/SF with detailed body data");
-  const closePlayer = players.get(`test:${closeSource.p.id}`);
-  assert.ok(closePlayer, "close source must resolve in the players map");
-  const guardTarget: typeof body = { height: 185, weight: 85, wingspan: 48, shoulder: 48, neck: 50, torso: 50 };
-  const evalSame = evaluate(closePlayer, block, cTarget, null, { targetPosition: "C", secondaryPosition: "PF" });
-  const evalFar = evaluate(closePlayer, block, guardTarget, null, { targetPosition: "PG", secondaryPosition: "SG" });
-  assert.equal(evalSame.usedGraceZone, true, "close same-position body must actually enter the grace zone");
-  assert.ok(evalFar.values.Block <= evalSame.values.Block, "grace-zone close match must not be lower than a far mismatch");
+  const bigTarget: typeof body = { height: 205, weight: 105, wingspan: 55, shoulder: 55, neck: 50, torso: 50 };
+  const asCenter = evaluate(luka, block, bigTarget, null, { targetPosition: "C", secondaryPosition: "PF" });
+  const asGuard = evaluate(luka, block, bigTarget, null, { targetPosition: "PG", secondaryPosition: "SG" });
+  // V2：position 不进入 atomic evaluator → 值必须完全一致（V1 grace zone 已废弃）
+  assert.equal(asGuard.values.Block, asCenter.values.Block, "position label must not change atomic Block");
+  assert.equal(asGuard.usedGraceZone, false, "V2 has no grace zone");
 }
 
-// --- 10. 支持修正取整一致：supportAdjustments 与最终 values 实际差值一致 ---
+// --- 10. V2 never buffs：所有槽位 final ≤ raw，且调整量与 values 自洽 ---
 {
   const interior = bundles.find((bundle) => bundle.id === "interior");
   const strength = bundles.find((bundle) => bundle.id === "strength");
@@ -424,10 +410,9 @@ console.log("createResult production-path OK: single-card OVR, potential-only ca
   ], baseBody, { targetPosition: "PG", secondaryPosition: "SG" });
   const evaluation = out.interior;
   assert.ok(evaluation);
-  const adjustments = evaluation.supportAdjustments ?? {};
-  for (const [attr, delta] of Object.entries(adjustments)) {
-    const before = evaluation.values[attr] - delta;
-    assert.equal(evaluation.values[attr] - before, delta, "supportAdjustments must equal the actual rounded delta");
+  for (const attr of interior.attrs) {
+    const raw = evaluation.values[attr] - evaluation.bodyAdjustments[attr];
+    assert.ok(evaluation.values[attr] <= raw + 1e-9, `${attr} must never exceed its raw (no buff)`);
   }
 }
 
@@ -452,4 +437,52 @@ console.log("createResult production-path OK: single-card OVR, potential-only ca
   assert.ok(locked);
   assert.deepEqual(preview.values, locked.values, "preview must equal the locked evaluation");
   assert.deepEqual(preview.supportAdjustments, locked.supportAdjustments, "preview support adjustments must match");
+}
+
+// --- 12. Intangibles Final Policy (Stage 6B) ---
+// 优先级：custom explicit > single-card real > multi-donor neutral 50。
+// Potential donor 继承已删除；不使用 Stability donor；不根据 morphology 生成。
+{
+  // 12a. single-card reproduction：所有非 potential 槽位同卡 → 继承卡真实 Intangibles
+  // （policy 语义是「卡的 detailed.Intangibles」；luka 有 rookie 卡）
+  const singleInt = (lukaCard as { detailed?: Record<string, number> }).detailed?.["Intangibles"];
+  if (typeof singleInt === "number") {
+    const locks: LockState = {};
+    for (const bundle of bundles) {
+      if (bundle.id === "potential") continue;
+      locks[bundle.id] = { kind: "player", playerId: lukaId };
+    }
+    const result = createResult(locks, 20, "PG", "SG", bodyBases.PG, players, tendencyLookup, "2k26", cards);
+    assert.equal(result.intangibles, singleInt,
+      `single-card build must inherit real Intangibles (${singleInt}) from the card`);
+  } else {
+    console.warn("  (skip 12a: luka card lacks detailed Intangibles)");
+  }
+
+  // 12b. multi-donor synthetic：不同卡混合（无 custom、非 single-card）→ neutral 50
+  const locks: LockState = {};
+  for (const bundle of bundles) {
+    if (bundle.id === "three") locks[bundle.id] = { kind: "player", playerId: lukaId };
+    else if (bundle.id === "mid") locks[bundle.id] = { kind: "player", playerId: cardlessId };
+    else if (bundle.id === "potential") locks[bundle.id] = { kind: "player", playerId: lukaId };
+    else locks[bundle.id] = { kind: "player", playerId: cardlessId };
+  }
+  const result = createResult(locks, 20, "PG", "SG", bodyBases.PG, players, tendencyLookup, "2k26", cards);
+  assert.equal(result.intangibles, 50,
+    "multi-donor synthetic build must use neutral Intangibles = 50 (Potential donor inheritance removed)");
+
+  // 12c. custom explicit 优先于一切（single-card 场景下仍生效）
+  const customInt = 77;
+  const customLocks: LockState = {};
+  for (const bundle of bundles) {
+    if (bundle.id === "potential") continue;
+    customLocks[bundle.id] = { kind: "player", playerId: lukaId };
+  }
+  customLocks["passing"] = {
+    kind: "custom",
+    values: { "Intangibles": customInt },
+  };
+  const customResult = createResult(customLocks, 20, "PG", "SG", bodyBases.PG, players, tendencyLookup, "2k26", cards);
+  assert.equal(customResult.intangibles, customInt,
+    "custom explicit Intangibles must win over single-card value");
 }

@@ -1,69 +1,109 @@
 {
- "nicolas-batum": {
-  "overall": 71,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "goran-dragic": {
-  "overall": 72,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "eric-gordon": {
-  "overall": 74,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "george-hill": {
-  "overall": 73,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "serge-ibaka": {
-  "overall": 77,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "deandre-jordan": {
-  "overall": 75,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "brook-lopez": {
-  "overall": 77,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "kevin-love": {
-  "overall": 78,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "derrick-rose": {
-  "overall": 81,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "russell-westbrook": {
-  "overall": 77,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "mer-asik": {
-  "overall": 72
- },
- "mario-chalmers": {
-  "overall": 71,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "roy-hibbert": {
-  "overall": 72,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "timofey-mozgov": {
-  "overall": 70,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "brandon-rush": {
-  "overall": 72,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "marreese-speights": {
-  "overall": 73,
-  "source": "user-ui-confirmed-2026-08-08"
- },
- "reggie-williams": {
-  "overall": 70,
-  "source": "user-ui-confirmed-2026-08-08"
- }
+  "nicolas-batum": {
+    "overall": 71,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "goran-dragic": {
+    "overall": 72,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "eric-gordon": {
+    "overall": 74,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "george-hill": {
+    "overall": 73,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "serge-ibaka": {
+    "overall": 77,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "deandre-jordan": {
+    "overall": 75,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "brook-lopez": {
+    "overall": 77,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "kevin-love": {
+    "overall": 78,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "derrick-rose": {
+    "overall": 81,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "russell-westbrook": {
+    "overall": 77,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "mer-asik": {
+    "overall": 72
+  },
+  "mario-chalmers": {
+    "overall": 71,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "roy-hibbert": {
+    "overall": 72,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "timofey-mozgov": {
+    "overall": 70,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "brandon-rush": {
+    "overall": 72,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "marreese-speights": {
+    "overall": 73,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "reggie-williams": {
+    "overall": 70,
+    "source": "user-ui-confirmed-2026-08-08"
+  },
+  "alexis-ajinca": {
+    "overall": 72,
+    "estimated": true
+  },
+  "anthony-randolph": {
+    "overall": 77,
+    "estimated": true
+  },
+  "chris-douglas-roberts": {
+    "overall": 71,
+    "estimated": true
+  },
+  "d-j-augustin": {
+    "overall": 74,
+    "estimated": true
+  },
+  "darnell-jackson": {
+    "overall": 64,
+    "estimated": true
+  },
+  "dont-greene": {
+    "overall": 69,
+    "estimated": true
+  },
+  "j-j-hickson": {
+    "overall": 75,
+    "estimated": true
+  },
+  "joe-alexander": {
+    "overall": 74,
+    "estimated": true
+  },
+  "luc-mbah-a-moute": {
+    "overall": 73,
+    "estimated": true
+  },
+  "nikola-pekovic": {
+    "overall": 77,
+    "estimated": true
+  }
 }

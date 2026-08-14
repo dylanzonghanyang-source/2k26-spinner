@@ -74,5 +74,49 @@
   "dwight-powell": {
     "overall": 70,
     "source": "user-ui-confirmed-2026-08-08"
+  },
+  "bruno-caboclo": {
+    "overall": 66,
+    "estimated": true
+  },
+  "c-j-wilcox": {
+    "overall": 66,
+    "estimated": true
+  },
+  "elfrid-payton": {
+    "overall": 77,
+    "estimated": true
+  },
+  "glenn-robinson-iii": {
+    "overall": 73,
+    "estimated": true
+  },
+  "joe-harris": {
+    "overall": 68,
+    "estimated": true
+  },
+  "k-j-mcdaniels": {
+    "overall": 71,
+    "estimated": true
+  },
+  "nick-johnson": {
+    "overall": 64,
+    "estimated": true
+  },
+  "p-j-hairston": {
+    "overall": 71,
+    "estimated": true
+  },
+  "spencer-dinwiddie": {
+    "overall": 68,
+    "estimated": true
+  },
+  "tyler-ennis": {
+    "overall": 71,
+    "estimated": true
+  },
+  "vasilije-micic": {
+    "overall": 73,
+    "estimated": true
   }
 }

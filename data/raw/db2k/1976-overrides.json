@@ -1,17 +1,37 @@
 {
- "adrian-dantley": {
-  "overall": 80
- },
- "moses-malone": {
-  "overall": 80
- },
- "alex-english": {
-  "overall": 78
- },
- "robert-parish": {
-  "overall": 78
- },
- "dennis-johnson": {
-  "overall": 76
- }
+  "adrian-dantley": {
+    "overall": 80
+  },
+  "moses-malone": {
+    "overall": 80
+  },
+  "alex-english": {
+    "overall": 78
+  },
+  "robert-parish": {
+    "overall": 78
+  },
+  "dennis-johnson": {
+    "overall": 76
+  },
+  "armond-hill": {
+    "overall": 72,
+    "estimated": true
+  },
+  "johnny-r-davis": {
+    "overall": 75,
+    "estimated": true
+  },
+  "major-jones": {
+    "overall": 69,
+    "estimated": true
+  },
+  "mike-dunleavy": {
+    "overall": 71,
+    "estimated": true
+  },
+  "quinn-buckner": {
+    "overall": 72,
+    "estimated": true
+  }
 }

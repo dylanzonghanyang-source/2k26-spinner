@@ -55,6 +55,7 @@ import { generateRookieFirstName, generateRookieLastName } from "../rookieNames"
 import { type BuilderBody as BodySettings } from "../rookieBodyConstraints";
 import { attributeGroups, badgeGroups, hotZoneGroups, tendencyGroups } from "../fieldCategories";
 import { createExportText } from "../exportText";
+import { resolveDisplayOverall } from "../displayOverall";
 import { useModalBehavior } from "../useModalBehavior";
 import { clearDraft, loadDraft, saveDraft, type RookieDraft, type ResultSnapshot, type BuilderDifficulty, normalizeBuilderDifficulty, normalizeSwitchesLeft, SWITCH_LIMIT_BY_DIFFICULTY } from "../draftStore";
 import { clearEntrySet, entryFieldKey, filterEntrySet, loadEntrySet, saveEntrySet, toggleEntrySet } from "../entryProgress";
@@ -997,6 +998,15 @@ function RookieBuilder({
     );
   }, [allSourcesById, body, effectiveAge, locks, overallVersion, position, effectiveSecondaryPosition, restoredResult, rookieCards, skipBodyConstraints, tendencyLookup]);
 
+  // Stage 6C: 用户可见 Overall 统一为 V3-E display（旧存档缺失时重算/标记 fallback）。
+  // baseOverall / initialStrength 仅内部 generation/debug，不再作为用户可见综评。
+  const displayResolution = useMemo(
+    () => (result ? resolveDisplayOverall(result) : { overall: 0, source: "legacyFallback" as const }),
+    [result],
+  );
+  const displayOverall = displayResolution.overall;
+  const displayOverallSource = displayResolution.source;
+
   // 流程结束后：把完成态结果快照持久化，刷新后仍可恢复结果页（H1）。
   // 同时清理任何尚未处理的旧草稿提示，避免旧横幅残留覆盖新结果。
   useEffect(() => {
@@ -1703,13 +1713,20 @@ function RookieBuilder({
               const lockedPlayer = lock?.kind === "player" ? allSourcesById.get(lock.playerId) : undefined;
               const lockedEvaluation = evaluations[bundle.id];
               const preview = selectedEvaluations[bundle.id];
-              const value = lockedEvaluation?.adjusted ?? preview?.adjusted;
+              const value = lockedEvaluation?.displayScore ?? preview?.displayScore ?? lockedEvaluation?.adjusted ?? preview?.adjusted;
               const activeEvaluation = lockedEvaluation ?? preview;
               const bodyAdjustment = lockedEvaluation?.bodyAdjustment ?? preview?.bodyAdjustment ?? 0;
               const sourceLabel = lock?.kind === "custom" ? "手动设置" : lockedPlayer ? getPlayerNameCN(lockedPlayer.name) : (isManualSelection ? "点击选择" : (selectedPlayer ? "可锁定" : "等待选择"));
               const weightLabel = bundle.id === "potential"
                 ? "潜力独立取值，不计入位置权重"
                 : `位置影响：${bundle.label}槽位属性按主/次位置参与位置交叉修正`;
+              // provisional：仅当缺失原因是 target_context_missing（单槽 preview
+              // 缺其他槽位 support，完整组合后会重算）；donor 数据缺失不可提示
+              // "完整组合后会自动计算"。
+              const incompleteReasons = new Set(Object.values(activeEvaluation?.supportIncomplete?.reasons ?? {}).flat());
+              const provisional = incompleteReasons.has("target_context_missing")
+                && !incompleteReasons.has("donor_support_missing")
+                && !incompleteReasons.has("donor_context_missing");
               const bodyAdjustmentLabel = bodyAdjustment ? `身体修正 ${bodyAdjustment > 0 ? "+" : ""}${bodyAdjustment}` : "";
               const capLabels = Object.entries(activeEvaluation?.bodyCaps ?? {})
                 .map(([attr, cap]) => `${attrNameCN[attr] ?? attr}上限 ${cap}`);
@@ -1741,6 +1758,7 @@ function RookieBuilder({
                     {typeof value === "number" ? (
                       <span className="flex shrink-0 items-center gap-1" title={hasBodyConstraint ? adjustmentLabel : undefined}>
                         {hasBodyConstraint && <span className="text-[8px] font-semibold text-court-600">身体</span>}
+                        {provisional && <span className="text-[10px] font-semibold text-ink-400">≈</span>}
                         <span className={`text-[13px] font-bold tabular-nums ${valueColor(value)}`}>{value}</span>
                       </span>
                     ) : <span className="text-ink-300">--</span>}
@@ -1900,8 +1918,19 @@ function RookieBuilder({
                   </div>
                 )}
                 <div className="mt-2 flex items-end justify-between">
-                  <div><div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(result.initialStrength)}`} data-testid="rookie-overall">{result.initialStrength}</div><div className="mt-1 text-[9px] text-ink-400">模型估算综评</div></div>
-                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{positionLabel} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">非官方推测值 · 模型 OVR <span className={`font-semibold tabular-nums ${valueColor(result.baseOverall)}`} data-testid="rookie-base-overall">{result.baseOverall}</span> · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
+                  <div>
+                    <div className={`text-[25px] font-bold leading-none tabular-nums ${valueColor(displayOverall)}`} data-testid="rookie-overall">
+                      {displayOverall}
+                      {displayOverallSource === "legacyFallback" && (
+                        <span className="ml-1.5 align-middle text-[8px] font-semibold text-amber-600" title="旧存档缺少 V3-E 显示综评且无法重算，此值为 legacy 估算">旧档</span>
+                      )}
+                    </div>
+                    <div className="mt-1 text-[9px] text-ink-400">模型估算综评</div>
+                    {displayOverall >= 85 && (
+                      <div className="mt-1 rounded-[3px] border border-amber-300/60 bg-amber-50 px-1 py-0.5 text-[8px] font-medium text-amber-700" data-testid="extrapolation-warning" title="85+ 综评属于模型外推区间，准确性尚未得到同等规模的真实标签验证">85+ 为模型外推区间</div>
+                    )}
+                  </div>
+                  <div className="text-right"><div className="text-[14px] font-semibold text-court-800">{positionLabel} · {effectiveAge}岁</div><div className="text-[10px] text-ink-500">潜力 <span className={`font-semibold tabular-nums ${valueColor(result.potential)}`} data-testid="rookie-potential">{result.potential}</span></div><div className="text-[8px] text-ink-400">非官方推测值 · 无形属性 <span className={`font-semibold tabular-nums ${valueColor(result.intangibles)}`}>{result.intangibles}</span></div></div>
                 </div>
                 <div className="mt-2 rounded-[5px] border border-warning-500/20 bg-warning-500/10 px-2 py-1.5 text-[9px] leading-4 text-warning-700">综评由本工具按最终属性、徽章和无形属性估算，不是 2K 实机读取的真实官方综评。</div>
               </div>
@@ -2113,7 +2142,7 @@ function RookieBuilder({
                     <span className="min-w-0 truncate text-ink-500">{bundle.label}</span>
                     <span className="flex shrink-0 items-baseline gap-1.5">
                       <span className="max-w-[110px] truncate text-[9px] text-ink-400">{sourceLabel}</span>
-                      <span className="tabular-nums text-ink-700">{evaluation.raw} → {evaluation.adjusted}</span>
+                      <span className="tabular-nums text-ink-700">{evaluation.raw} → {evaluation.displayScore ?? evaluation.adjusted}</span>
                     </span>
                   </div>
                 );

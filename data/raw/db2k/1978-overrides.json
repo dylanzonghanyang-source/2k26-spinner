@@ -1,32 +1,60 @@
 {
- "micheal-ray-richardson": {
-  "overall": 78
- },
- "reggie-theus": {
-  "overall": 79
- },
- "larry-bird": {
-  "overall": 82
- },
- "purvis-short": {
-  "overall": 74
- },
- "wayne-cooper": {
-  "overall": 74
- },
- "john-long": {
-  "overall": 74
- },
- "dave-corzine": {
-  "overall": 72
- },
- "maurice-cheeks": {
-  "overall": 76
- },
- "mychal-thompson": {
-  "overall": 73
- },
- "michael-cooper": {
-  "overall": 74
- }
+  "micheal-ray-richardson": {
+    "overall": 78
+  },
+  "reggie-theus": {
+    "overall": 79
+  },
+  "larry-bird": {
+    "overall": 82
+  },
+  "purvis-short": {
+    "overall": 74
+  },
+  "wayne-cooper": {
+    "overall": 74
+  },
+  "john-long": {
+    "overall": 74
+  },
+  "dave-corzine": {
+    "overall": 72
+  },
+  "maurice-cheeks": {
+    "overall": 76
+  },
+  "mychal-thompson": {
+    "overall": 73
+  },
+  "michael-cooper": {
+    "overall": 74
+  },
+  "clay-johnson": {
+    "overall": 66,
+    "estimated": true
+  },
+  "clemon-johnson": {
+    "overall": 70,
+    "estimated": true
+  },
+  "george-johnson": {
+    "overall": 79,
+    "estimated": true
+  },
+  "gerald-henderson-sr": {
+    "overall": 78,
+    "estimated": true
+  },
+  "jeff-cook": {
+    "overall": 72,
+    "estimated": true
+  },
+  "marc-iavaroni": {
+    "overall": 71,
+    "estimated": true
+  },
+  "ron-brewer": {
+    "overall": 73,
+    "estimated": true
+  }
 }
