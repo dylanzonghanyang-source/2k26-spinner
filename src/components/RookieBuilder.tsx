@@ -1290,7 +1290,12 @@ function RookieBuilder({
     // 阻止旧 render 的 usedBy 放行）。规则见 applyBundleLockTransaction：
     // 目标槽未锁 + 同 playerId 未使用；一次提交只触发一次 drawNextTeam。
     if (lockMutationRef.current) return;
-    const transaction = applyBundleLockTransaction(locksRef.current, bundleId, lock, usedPlayerIdsRef.current);
+    // custom/self-build 模式：同一张 rookie card 允许拥有多个不同槽位
+    // （每槽只继承自己的 atomic/tendency/badge bundle，无数据冲突）。
+    // challenge/random 模式保留"一名球员一次"玩法限制。
+    const transaction = applyBundleLockTransaction(
+      locksRef.current, bundleId, lock, usedPlayerIdsRef.current, isManualSelection,
+    );
     if (!transaction.accepted) return;
     lockMutationRef.current = true;
     try {

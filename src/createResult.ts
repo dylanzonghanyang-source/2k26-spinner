@@ -84,10 +84,11 @@ export function applyBundleLockTransaction(
   bundleId: string,
   lock: BundleLock,
   usedPlayerIds: ReadonlySet<string>,
+  allowDuplicateDonor = false,
 ): BundleLockTransaction {
   const nextUsed = new Set(usedPlayerIds);
   if (current[bundleId]) return { next: current, usedPlayerIds: nextUsed, accepted: false };
-  if (lock.kind === "player" && usedPlayerIds.has(lock.playerId)) {
+  if (lock.kind === "player" && !allowDuplicateDonor && usedPlayerIds.has(lock.playerId)) {
     return { next: current, usedPlayerIds: nextUsed, accepted: false };
   }
   const next = { ...current, [bundleId]: lock };
