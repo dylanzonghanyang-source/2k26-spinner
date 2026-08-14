@@ -57,7 +57,7 @@ jobs:
           HK_SSH_KEY: ${{ secrets.HK_SSH_KEY }}
           HK_KNOWN_HOSTS: ${{ secrets.HK_KNOWN_HOSTS }}
           HK_HOST: ${{ secrets.HK_HOST }}
-          HK_DEPLOY_USER: ${{ secrets.HK_DEPLOY_USER }}
+          HK_DEPLOY_USER: ${{ secrets.HK_USER }}
         run: |
           set -euo pipefail
           mkdir -p ~/.ssh
